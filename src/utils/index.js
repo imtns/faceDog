@@ -13,7 +13,6 @@ function formatDate(date) {
     return `${[year, month, day].map(formatNumber).join('/')} ${[hour, minute, second].map(formatNumber).join(':')}`;
 }
 
-
 function isArray(val) {
     return Array.isArray(val);
 }
@@ -26,7 +25,7 @@ function toast(title) {
     wx.showToast({
         title,
         icon: 'none',
-        duration: 1500,
+        duration: 1500
     });
 }
 module.exports = {
