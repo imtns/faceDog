@@ -1,4 +1,4 @@
-# 颜值Battle
+# 颜狗faceDog
 
 @(微信小程序)[Jason|强强]
 
