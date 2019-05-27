@@ -3,6 +3,7 @@
     <view wx:if="{{selectedTab === 1}}"> <discover></discover></view>
     <view wx:if="{{selectedTab === 2}}"> <chat></chat></view>
     <view wx:if="{{selectedTab === 3}}"> <my></my></view>
+    
     <!-- <van-button type="default">默认按钮</van-button>
     <van-button type="primary">主要按钮</van-button>
     <van-button type="warning">警告按钮</van-button> -->

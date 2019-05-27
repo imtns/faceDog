@@ -1,13 +1,13 @@
 <!--  -->
 <template>
-  <view class='container'>
-      battle
-  </view>
+    <view class='container'>
+        battle
+    </view>
 </template>
 
 <script>
-  import wepy from 'wepy';
-  export default class Battle extends wepy.component {
+import wepy from 'wepy';
+export default class Battle extends wepy.component {
     data = {};
 
     components = {};
@@ -20,11 +20,14 @@
 
     computed = {};
 
-    onLoad() { };
+    onLoad() {}
 
-    onShow() { };
-  }
+    onShow() {}
+}
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
+.container {
+    font-size: 30rpx;
+}
 </style>
