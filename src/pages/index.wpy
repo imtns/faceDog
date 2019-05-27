@@ -1,18 +1,30 @@
 <template>
-    <tabbar></tabbar>
-    <van-button type="default">默认按钮</van-button>
+    <view wx:if="{{selectedTab === 0}}"> <battle></battle></view>
+    <view wx:if="{{selectedTab === 1}}"> <discover></discover></view>
+    <view wx:if="{{selectedTab === 2}}"> <chat></chat></view>
+    <view wx:if="{{selectedTab === 3}}"> <my></my></view>
+    <!-- <van-button type="default">默认按钮</van-button>
     <van-button type="primary">主要按钮</van-button>
-    <van-button type="warning">警告按钮</van-button>
+    <van-button type="warning">警告按钮</van-button> -->
+    <!-- <button open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="onGotUserInfo">
+        获取用户信息
+    </button> -->
+    <tabbar :tabIndex="selectedTab" />
 </template>
 
 <script>
 import wepy from 'wepy';
-import tabbar from '@/components/tabbar'; // alias example
+import tabbar from '@/components/tabbar';
+import battle from '@/components/battle/battle';
+import discover from '@/components/discover/discover';
+import my from '@/components/my/my';
+import chat from '@/components/chat/chat';
+
 import testMixin from '../mixins/test';
-import { toast } from '@/utils';
+// import { toast } from '@/utils';
 export default class Index extends wepy.page {
     config = {
-        navigationBarTitleText: '颜值',
+        navigationBarTitleText: '颜狗',
         usingComponents: {
             'van-button': '../components/vant/button/index',
             'van-tabbar': '../components/vant/tabbar/index',
@@ -20,7 +32,11 @@ export default class Index extends wepy.page {
         }
     };
     components = {
-        tabbar
+        tabbar,
+        battle,
+        discover,
+        chat,
+        my
     };
 
     mixins = [testMixin];
@@ -30,58 +46,7 @@ export default class Index extends wepy.page {
         userInfo: {
             nickName: '加载中...'
         },
-        normalTitle: '原始标题',
-        setTimeoutTitle: '标题三秒后会被修改',
-        count: 0,
-        netrst: '',
-        groupList: [
-            {
-                id: 1,
-                name: '点击改变',
-                list: [
-                    {
-                        childid: '1.1',
-                        childname: '子项，点我改变'
-                    },
-                    {
-                        childid: '1.2',
-                        childname: '子项，点我改变'
-                    },
-                    {
-                        childid: '1.3',
-                        childname: '子项，点我改变'
-                    }
-                ]
-            },
-            {
-                id: 2,
-                name: '点击改变',
-                list: [
-                    {
-                        childid: '2.1',
-                        childname: '子项，点我改变'
-                    },
-                    {
-                        childid: '2.2',
-                        childname: '子项，点我改变'
-                    },
-                    {
-                        childid: '2.3',
-                        childname: '子项，点我改变'
-                    }
-                ]
-            },
-            {
-                id: 3,
-                name: '点击改变',
-                list: [
-                    {
-                        childid: '3.1',
-                        childname: '子项，点我改变'
-                    }
-                ]
-            }
-        ]
+        selectedTab: 0
     };
 
     computed = {
@@ -91,51 +56,10 @@ export default class Index extends wepy.page {
     };
 
     methods = {
-        plus() {
-            this.mynum++;
-        },
-        toast() {
-            toast('自动以');
-        },
-        tap() {
-            console.log('do noting from ' + this.$name);
-        },
-        communicate() {
-            console.log(this.$name + ' tap');
-
-            this.$invoke('counter2', 'minus', 45, 6);
-            this.$invoke('counter1', 'plus', 45, 6);
-
-            this.$broadcast('index-broadcast', 1, 3, 4);
-        },
-        request() {
-            let self = this;
-            let i = 10;
-            let map = [
-                'MA==',
-                'MQo=',
-                'Mg==',
-                'Mw==',
-                'NA==',
-                'NQ==',
-                'Ng==',
-                'Nw==',
-                'OA==',
-                'OQ=='
-            ];
-            while (i--) {
-                wepy.request({
-                    url:
-                        'https://www.madcoder.cn/tests/sleep.php?time=1&t=css&c=' +
-                        map[i] +
-                        '&i=' +
-                        i,
-                    success(d) {
-                        self.netrst += d.data + '.';
-                        self.$apply();
-                    }
-                });
-            }
+        onGotUserInfo(e) {
+            console.log(e.detail.errMsg);
+            console.log(e.detail.userInfo);
+            console.log(e.detail.rawData);
         },
         counterEmit(...args) {
             let $event = args[args.length - 1];
@@ -159,20 +83,14 @@ export default class Index extends wepy.page {
     };
 
     onLoad() {
-        let self = this;
-        this.$parent.getUserInfo(function(userInfo) {
-            if (userInfo) {
-                self.userInfo = userInfo;
+        wx.getSetting({
+            success(res) {
+                console.log(res.authSetting);
+                res.authSetting = {
+                    'scope.userInfo': true,
+                    'scope.userLocation': true
+                };
             }
-            self.normalTitle = '标题已被修改';
-
-            self.setTimeoutTitle = '标题三秒后会被修改';
-            setTimeout(() => {
-                self.setTimeoutTitle = '到三秒了';
-                self.$apply();
-            }, 3000);
-
-            self.$apply();
         });
     }
 }

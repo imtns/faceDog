@@ -1,9 +1,9 @@
 <template>
-    <van-tabbar active="{{ active }}" bind:change="onChange">
-        <van-tabbar-item icon="home-o">标签</van-tabbar-item>
-        <van-tabbar-item icon="search" dot>标签</van-tabbar-item>
-        <van-tabbar-item icon="friends-o" info="5">标签</van-tabbar-item>
-        <van-tabbar-item icon="setting-o" info="20">标签</van-tabbar-item>
+    <van-tabbar active="{{ active }}" @change="onChange">
+        <van-tabbar-item icon="home-o">颜值</van-tabbar-item>
+        <van-tabbar-item icon="eye-o" dot>发现</van-tabbar-item>
+        <van-tabbar-item icon="chat-o" info="5">消息</van-tabbar-item>
+        <van-tabbar-item icon="contact">我的</van-tabbar-item>
     </van-tabbar>
 </template>
 <script>
@@ -13,9 +13,17 @@ export default class tabbar extends wepy.component {
     data = {
         active: 0
     };
-    // event.detail 的值为当前选中项的索引
-    onChange(event) {
-        console.log(event.detail);
-    }
+    props = {
+        tabIndex: {
+            type: Number,
+            default: 0,
+            twoWay: true
+        }
+    };
+    methods = {
+        onChange(event) {
+            this.tabIndex = event.detail;
+        }
+    };
 }
 </script>

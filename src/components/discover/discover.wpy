@@ -1,0 +1,31 @@
+<!--  -->
+<template>
+  <view class='container'>
+      discover
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  export default class Discover extends wepy.component {
+
+    data = {};
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() { };
+
+    onShow() { };
+  }
+</script>
+
+<style lang='less'>
+</style>
