@@ -1,0 +1,45 @@
+<!--  -->
+<template>
+    <van-button size="large" open-type="getUserInfo" bind:getuserinfo="onGotUserInfo">sss号按钮</van-button>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Example extends wepy.component {
+    props = {
+        step: {
+            type: Number,
+            default: 0,
+            twoWay: true
+        }
+    };
+
+    data = {};
+
+    components = {};
+
+    methods = {
+        onGotUserInfo(e) {
+            if (e.detail.errMsg !== 'getUserInfo:fail auth deny') {
+                console.log(e.detail.userInfo);
+                wepy.$instance.globalData.userInfo = e.detail.userInfo;
+                wepy.setStorageSync('userInfo',e.detail.userInfo);
+                console.log(e.detail.rawData);
+                this.step = 2;
+            }
+        }
+    };
+
+    events = {};
+
+    watch = {};
+    computed = {};
+
+    onLoad() {}
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+</style>

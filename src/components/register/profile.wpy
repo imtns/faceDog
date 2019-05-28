@@ -1,0 +1,149 @@
+<!--  -->
+<template>
+    <view class='wapper'>
+        <view class="logo">
+            <image mode="aspectFill" src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2593289841,2157576688&fm=26&gp=0.jpg" />
+            <text>好看的人才能玩</text>
+        </view>
+        <view class="form">
+            <van-cell-group>
+                <van-field style="paddding:10rpx 0;" value="{{ userInfo.nickName }}" @change="onChangeName" label="用户名" placeholder="请输入昵称" />
+                <view class="sex">
+                    <view class="label">性别</view>
+                    <view class="sex-container">
+                        <view class="male button {{gender=='1'?'active':''}}" @tap="choose(1)">男生<image src="../../images/male.jpg"></image>
+                        </view>
+                        <view class="female button {{gender=='2'?'active':''}}" @tap="choose(2)">女生 <image src="../../images/female.jpg"></image>
+                        </view>
+                    </view>
+                </view>
+                <picker mode="date" value="{{currentDate}}" start="1970-01-01" end="{{ currentDate }}" bindchange="bindDateChange">
+                    <van-field style="paddding:10rpx 0;" value="{{ currentDate }}" readonly label="生日" placeholder="请填写生日" />
+                </picker>
+            </van-cell-group>
+        </view>
+        <van-button size="large" @tap="next">下一步</van-button>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Profile extends wepy.component {
+    props = {
+        userInfo: {
+            type: Object,
+            default: {}
+        },
+        step: {
+            type: Number,
+            default: 0,
+            twoWay: true
+        }
+    };
+
+    data = {
+        gender: 0,
+        show: false,
+        birth: '',
+        currentDate: ''
+    };
+
+    components = {};
+
+    methods = {
+        onChangeName(event) {
+            console.log(event.detail);
+        },
+        choose(gender) {
+            console.log(gender);
+            this.gender = gender;
+            this.$apply();
+        },
+        onClickIcon() {
+            this.show = true;
+        },
+        onClose() {
+            this.show = false;
+        },
+        birthConfirm() {
+            this.birth = this.currentDate;
+            this.show = false;
+        },
+        bindDateChange(event) {
+            console.log(event);
+            this.currentDate = event.detail.value;
+        },
+        next(){
+            this.step = 3
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+}
+</script>
+
+<style lang='less'>
+.wapper {
+    width: 100%;
+    .van-cell {
+        padding: 10rpx 0 !important;
+    }
+
+    .logo {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        image {
+            width: 200rpx;
+            height: 200rpx;
+        }
+        text {
+            width: 100%;
+            font-size: 28rpx;
+            text-align: center;
+        }
+    }
+    .form {
+        .label {
+            width: 150rpx;
+        }
+        .sex {
+            display: flex;
+            font-size: 28rpx;
+            align-items: center;
+
+            .sex-container {
+                flex: 2;
+                display: flex;
+                .button {
+                    width: 150rpx;
+                    height: 88rpx;
+                    border: 1rpx solid red;
+                    border-radius: 10rpx;
+                    position: relative;
+                    display: flex;
+                    padding-left: 50rpx;
+                    align-items: center;
+                    justify-content: flex-start;
+                    margin-right: 20rpx;
+                    image {
+                        width: 40rpx;
+                        height: 40rpx;
+                        position: absolute;
+                        top: 50%;
+                        right: 20rpx;
+                        transform: translateY(-50%);
+                    }
+                    &.active {
+                        background: red;
+                    }
+                }
+            }
+        }
+    }
+}
+</style>

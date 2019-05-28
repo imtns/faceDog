@@ -1,5 +1,5 @@
 {
-  "description": "A WePY project",
+  "description": "颜狗faceDog微信小程序",
   "setting": {
     "urlCheck": true,
     "es6": false,
@@ -7,7 +7,7 @@
     "minified": false
   },
   "compileType": "miniprogram",
-  "appid": "touristappid",
+  "appid": "wx64b39e0ba40b3ea8",
   "projectname": "battle",
   "miniprogramRoot": "./dist"
 }

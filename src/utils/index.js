@@ -3,7 +3,7 @@ function formatNumber(n) {
     return n[1] ? n : `0${n}`;
 }
 
-function formatDate(date) {
+function formatTime(date) {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
@@ -12,7 +12,12 @@ function formatDate(date) {
     const second = date.getSeconds();
     return `${[year, month, day].map(formatNumber).join('/')} ${[hour, minute, second].map(formatNumber).join(':')}`;
 }
-
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${[year, month, day].map(formatNumber).join('-')}`;
+}
 function isArray(val) {
     return Array.isArray(val);
 }
@@ -30,6 +35,7 @@ function toast(title) {
 }
 module.exports = {
     formatDate,
+    formatTime,
     toast,
     isArray,
     isObject

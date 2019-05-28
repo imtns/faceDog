@@ -1,0 +1,78 @@
+<!-- 注册 -->
+<template>
+    <view class='main'>
+        <block wx:if="{{step==1}}">
+            <getInfo :step="step"></getInfo>
+        </block>
+        <block wx:if="{{step==2}}">
+            <profile :step.sync="step" :userInfo.sync="userInfo"></profile>
+        </block>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import getInfo from '@/components/register/getInfo';
+import profile from '@/components/register/profile';
+export default class Example extends wepy.page {
+    config = {
+        navigationBarTitleText: '颜狗',
+        usingComponents: {
+            'van-button': '../components/vant/button/index',
+            'van-cell': '../components/vant/cell/index',
+            'van-cell-group': '../components/vant/cell-group/index',
+            'van-field': '../components/vant/field/index',
+            'van-datetime-picker': '../components/vant/datetime-picker/index',
+            'van-action-sheet': '../components/vant/action-sheet/index'
+        }
+    };
+
+    data = {
+        step: 0,
+        scopeUser: false,
+        userInfo: {}
+    };
+
+    components = {
+        profile,
+        getInfo
+    };
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {
+        const that = this;
+        if (!wepy.getStorageSync('userInfo')) {
+            wx.getSetting({
+                success(res) {
+                    console.log(res.authSetting);
+                    if (res.authSetting && res.authSetting['scope.userInfo']) {
+                        that.scopeUser = res.authSetting['scope.userInfo'];
+                        that.step = 2;
+                    } else {
+                        that.step = 1;
+                    }
+                    that.$apply();
+                }
+            });
+        } else {
+            this.userInfo = wepy.getStorageSync('userInfo');
+            that.step = 2;
+        }
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+.main {
+    padding: 0 30rpx;
+}
+</style>
