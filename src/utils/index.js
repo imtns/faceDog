@@ -1,3 +1,4 @@
+import Dialog from '@/components/vant/dialog/dialog';
 function formatNumber(n) {
     n = n.toString();
     return n[1] ? n : `0${n}`;
@@ -17,6 +18,15 @@ function formatDate(date) {
     const month = date.getMonth() + 1;
     const day = date.getDate();
     return `${[year, month, day].map(formatNumber).join('-')}`;
+}
+function dialog(...props) {
+    return new Promise((resolve, reject) => {
+        Dialog.confirm(...props).then(() => {
+            resolve();
+        }).catch(() => {
+            reject();
+        });
+    });
 }
 function isArray(val) {
     return Array.isArray(val);
@@ -38,5 +48,6 @@ module.exports = {
     formatTime,
     toast,
     isArray,
-    isObject
+    isObject,
+    dialog
 };

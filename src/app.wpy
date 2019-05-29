@@ -8,6 +8,9 @@
     justify-content: space-between;
     box-sizing: border-box;
 }
+.van-tabbar--fixed {
+    z-index: 9999 !important;
+}
 </style>
 
 <script>
@@ -35,6 +38,7 @@ export default class extends wepy.app {
     constructor() {
         super();
         this.use('requestfix');
+        this.use('promisify');
     }
 
     onLaunch() {

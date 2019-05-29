@@ -1,0 +1,61 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view>请选择你的认证方式</view>
+        <view class="">方式一: 填写推荐人编号（请事先沟通确认）</view>
+        <van-cell-group>
+            <van-field value="{{ inviteCode }}" center clearable label="输入数字" border="{{ true }}" use-button-slot>
+                <van-button slot="button" size="small" type="primary">提交验证</van-button>
+            </van-field>
+        </van-cell-group>
+        <view>方式二: 录制视频认证</view>
+        <van-button slot="button" size="small" type="primary">前往录制</van-button>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class ChooseVerify extends wepy.component {
+    props = {};
+
+    data = {
+        inviteCode: ''
+    };
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+}
+</script>
+
+<style lang='less'>
+.wapper {
+    width: 100%;
+    .van-cell {
+        padding: 10rpx 0 !important;
+    }
+    image {
+        width: 100%;
+    }
+    .logo {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        image {
+            width: 200rpx;
+            height: 200rpx;
+        }
+        text {
+            width: 100%;
+            font-size: 28rpx;
+            text-align: center;
+        }
+    }
+}
+</style>

@@ -1,26 +1,164 @@
 <!--  -->
 <template>
     <view class='container'>
-        battle
+        <movable-area style="height: 200vh; width: 400vw;left:-40vw;top:-50vh;">
+            <movable-view wx:if="{{battleTop.visible1}}" data-id="top1" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex1}} " bindtouchend="touchendimg" bindtouchcancel='touchendimg' x="{{battleTop.x1}}" inertia="{{true}}" y="{{battleTop.y1}}" friction="1" damping="35" direction="all" bindchange="moveimg" animation="false">
+                <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFill"></image>
+            </movable-view>
+            <movable-view wx:if="{{battleTop.visible2}}" data-id="top2" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex2}} " bindtouchend="touchendimg" bindtouchcancel='touchendimg' x="{{battleTop.x2}}" y="{{battleTop.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all" bindchange="moveimg" animation="false">
+                <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=8ba1dd4d736b51cbde2922e65fbfd7b6&imgtype=0&src=http%3A%2F%2Fd-pic-image.yesky.com%2F1080x-%2FuploadImages%2F2019%2F044%2F59%2F1113V6L3Q6TY.jpg" mode="aspectFill"></image>
+            </movable-view>
+            <movable-view wx:if="{{battleBottom.visible1}}" data-id="bottom1" data-type="bottom" style="height: 50vh;width:100vw;left:190vw;top:50%;z-index:{{battleBottom.zIndex1}} " bindtouchend="touchendimg" bindtouchcancel='touchendimg' x="{{battleBottom.x1}}" inertia="{{true}}" y="{{battleBottom.y1}}" friction="1" damping="35" direction="all" bindchange="moveimg" animation="false">
+                <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
+            </movable-view>
+            <movable-view wx:if="{{battleBottom.visible2}}" data-id="bottom2" data-type="bottom" style="height: 50vh;width:100vw;left:190vw;top:50%;z-index:{{battleBottom.zIndex2}} " bindtouchend="touchendimg" bindtouchcancel='touchendimg' x="{{battleBottom.x2}}" y="{{battleBottom.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all" bindchange="moveimg" animation="false">
+                <image src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=531929377,4121486257&fm=26&gp=0.jpg" mode="aspectFill"></image>
+            </movable-view>
+        </movable-area>
     </view>
+    <van-dialog id="van-dialog" />
 </template>
 
 <script>
 import wepy from 'wepy';
+// import { dialog } from '@/utils';
+let prex = 0;
 export default class Battle extends wepy.component {
-    data = {};
+    data = {
+        battleTop: {
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 0,
+            visible1: true,
+            visible2: true,
+            zIndex1: 0,
+            zIndex2: 0
+        },
+        battleBottom: {
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 0,
+            visible1: true,
+            visible2: true,
+            zIndex1: 0,
+            zIndex2: 0
+        }
+    };
 
     components = {};
 
-    methods = {};
-
+    methods = {
+        moveimg(e) {
+            prex = e.detail.x;
+        },
+        async touchendimg(e) {
+            console.log(e);
+            console.log(prex);
+            const { id, type } = e.currentTarget.dataset;
+            this.handleLayer(id, type);
+        }
+    };
+    handleLayer(id, type) {
+        this.handlePosition(
+            type === 'top' ? this.battleTop : this.battleBottom,
+            id
+        );
+    }
+    async handlePosition(o, id) {
+        let trans = prex < -145 ? -400 : prex > 145 ? 400 : 0;
+        if (trans === 0) {
+            o.x1 = Math.random();
+            o.x2 = Math.random();
+            o.y1 = Math.random();
+            o.y2 = Math.random();
+        } else {
+            if (id == 'top1' || id == 'bottom1') {
+                o.x1 = trans + Math.random();
+            } else {
+                o.x2 = trans + Math.random();
+            }
+            await this.delay();
+            this.resetPosition(o, id);
+        }
+        Object.assign(this, o);
+        // if (prex < -145) {
+        //     if (o == 'top') {
+        //         this.x1 = -400 + Math.random();
+        //     } else {
+        //         this.x2 = -400 + Math.random();
+        //     }
+        //     await this.delay();
+        //     this.resetPosition(o, id);
+        // } else if (prex > 145) {
+        //     if (id == 'f') {
+        //         this.x = 400 + Math.random();
+        //     } else {
+        //         this.x1 = 400 + Math.random();
+        //     }
+        //     await this.delay();
+        //     this.resetPosition(id);
+        // }
+        //  else {
+        //     if (id == 'f') {
+        //         this.x = Math.random();
+        //         this.y = Math.random();
+        //     } else {
+        //         this.x1 = Math.random();
+        //         this.y1 = Math.random();
+        //     }
+        //     this.$apply();
+        // }
+    }
+    async resetPosition(o, id) {
+        if (id == 'top1' || id == 'bottom1') {
+            o.zIndex2 = o.zIndex2 + 1;
+            o.visible1 = false;
+            await this.delay();
+            o.visible1 = true;
+            o.x1 = 0;
+            o.y1 = 0;
+        } else {
+            o.zIndex1 = o.zIndex1 + 1;
+            o.visible2 = false;
+            await this.delay();
+            o.visible2 = true;
+            o.x2 = 0;
+            o.y2 = 0;
+        }
+        Object.assign(this, o);
+        this.$apply();
+    }
+    delay() {
+        return new Promise(function(resolve, reject) {
+            setTimeout(resolve.bind(null, 10), 200);
+        });
+    }
     events = {};
 
     watch = {};
 
     computed = {};
 
-    onLoad() {}
+    async onLoad() {
+        // if (!wepy.getStorageSync('isNew')) {
+        //     try {
+        //         await dialog({
+        //             message:
+        //                 '您是第一次使用颜狗小程序,需要了解一下颜狗的使用介绍么?',
+        //             confirmButtonText: '去看看',
+        //             showCancelButton: true,
+        //             cancelButtonText: '不用了'
+        //         });
+        //         console.log('1');
+        //     } catch (e) {
+        //         console.log(2);
+        //     }
+        // }
+        const { windowWidth } = await wepy.getSystemInfo();
+        console.log(windowWidth);
+    }
 
     onShow() {}
 }
@@ -28,6 +166,21 @@ export default class Battle extends wepy.component {
 
 <style lang='less' scoped>
 .container {
-    font-size: 30rpx;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    image {
+        width: 100%;
+        height: 100%;
+    }
+    .battle-top {
+        width: 100%;
+        height: calc(50vh - 50rpx);
+    }
+    .battle-bottom {
+        width: 100%;
+        height: calc(50vh - 50rpx);
+    }
 }
 </style>

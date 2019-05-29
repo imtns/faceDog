@@ -23,7 +23,7 @@ export default class Example extends wepy.component {
             if (e.detail.errMsg !== 'getUserInfo:fail auth deny') {
                 console.log(e.detail.userInfo);
                 wepy.$instance.globalData.userInfo = e.detail.userInfo;
-                wepy.setStorageSync('userInfo',e.detail.userInfo);
+                wepy.setStorageSync('userInfo', e.detail.userInfo);
                 console.log(e.detail.rawData);
                 this.step = 2;
             }

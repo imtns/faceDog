@@ -73,8 +73,8 @@ export default class Profile extends wepy.component {
             console.log(event);
             this.currentDate = event.detail.value;
         },
-        next(){
-            this.step = 3
+        next() {
+            this.step = 3;
         }
     };
 

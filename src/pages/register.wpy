@@ -7,14 +7,28 @@
         <block wx:if="{{step==2}}">
             <profile :step.sync="step" :userInfo.sync="userInfo"></profile>
         </block>
+        <block wx:if="{{step==3}}">
+            <uploadPic :step.sync="step"></uploadPic>
+        </block>
+        <block wx:if="{{step==4}}">
+            <chooseVerify :step.sync="step"></chooseVerify>
+        </block>
+        <block wx:if="{{step==5}}">
+            <uploadVideo :step.sync="step"></uploadVideo>
+        </block>
     </view>
+
 </template>
 
 <script>
 import wepy from 'wepy';
 import getInfo from '@/components/register/getInfo';
 import profile from '@/components/register/profile';
-export default class Example extends wepy.page {
+import uploadPic from '@/components/register/uploadPic';
+import chooseVerify from '@/components/register/chooseVerify';
+import uploadVideo from '@/components/register/uploadVideo';
+
+export default class Register extends wepy.page {
     config = {
         navigationBarTitleText: '颜狗',
         usingComponents: {
@@ -28,14 +42,17 @@ export default class Example extends wepy.page {
     };
 
     data = {
-        step: 0,
+        step: 3,
         scopeUser: false,
         userInfo: {}
     };
 
     components = {
         profile,
-        getInfo
+        getInfo,
+        uploadPic,
+        chooseVerify,
+        uploadVideo
     };
 
     methods = {};
@@ -47,24 +64,24 @@ export default class Example extends wepy.page {
     computed = {};
 
     onLoad() {
-        const that = this;
-        if (!wepy.getStorageSync('userInfo')) {
-            wx.getSetting({
-                success(res) {
-                    console.log(res.authSetting);
-                    if (res.authSetting && res.authSetting['scope.userInfo']) {
-                        that.scopeUser = res.authSetting['scope.userInfo'];
-                        that.step = 2;
-                    } else {
-                        that.step = 1;
-                    }
-                    that.$apply();
-                }
-            });
-        } else {
-            this.userInfo = wepy.getStorageSync('userInfo');
-            that.step = 2;
-        }
+        // const that = this;
+        // if (!wepy.getStorageSync('userInfo')) {
+        //     wx.getSetting({
+        //         success(res) {
+        //             console.log(res.authSetting);
+        //             if (res.authSetting && res.authSetting['scope.userInfo']) {
+        //                 that.scopeUser = res.authSetting['scope.userInfo'];
+        //                 that.step = 2;
+        //             } else {
+        //                 that.step = 1;
+        //             }
+        //             that.$apply();
+        //         }
+        //     });
+        // } else {
+        //     this.userInfo = wepy.getStorageSync('userInfo');
+        //     that.step = 2;
+        // }
     }
 
     onShow() {}

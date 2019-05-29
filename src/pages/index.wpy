@@ -1,8 +1,16 @@
 <template>
-    <view wx:if="{{selectedTab === 0}}"> <battle></battle></view>
-    <view wx:if="{{selectedTab === 1}}"> <discover></discover></view>
-    <view wx:if="{{selectedTab === 2}}"> <chat></chat></view>
-    <view wx:if="{{selectedTab === 3}}"> <my></my></view>
+    <view wx:if="{{selectedTab === 0}}">
+        <battle></battle>
+    </view>
+    <view wx:if="{{selectedTab === 1}}">
+        <discover></discover>
+    </view>
+    <view wx:if="{{selectedTab === 2}}">
+        <chat></chat>
+    </view>
+    <view wx:if="{{selectedTab === 3}}">
+        <my></my>
+    </view>
 
     <!-- <van-button type="default">默认按钮</van-button>
     <van-button type="primary">主要按钮</van-button>
@@ -26,10 +34,12 @@ import testMixin from '../mixins/test';
 export default class Index extends wepy.page {
     config = {
         navigationBarTitleText: '颜狗',
+        disableScroll: true,
         usingComponents: {
             'van-button': '../components/vant/button/index',
             'van-tabbar': '../components/vant/tabbar/index',
-            'van-tabbar-item': '../components/vant/tabbar-item/index'
+            'van-tabbar-item': '../components/vant/tabbar-item/index',
+            'van-dialog': '../components/vant/dialog/index'
         }
     };
     components = {
@@ -83,7 +93,7 @@ export default class Index extends wepy.page {
         }
     };
 
-    onLoad() {
-    }
+    onLoad() {}
 }
 </script>
+
