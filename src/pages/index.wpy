@@ -40,7 +40,11 @@ export default class Index extends wepy.page {
             'van-tabbar': '../components/vant/tabbar/index',
             'van-tabbar-item': '../components/vant/tabbar-item/index',
             'van-dialog': '../components/vant/dialog/index',
-            'van-icon': '../components/vant/icon/index'
+            'van-icon': '../components/vant/icon/index',
+            'van-tabs': '../components/vant/tabs/index',
+            'van-tab': '../components/vant/tab/index',
+            'van-popup': '../components/vant/popup/index',
+            'van-overlay': '../components/vant/overlay/index',
         }
     };
     components = {
@@ -56,7 +60,7 @@ export default class Index extends wepy.page {
         userInfo: {
             nickName: '加载中...'
         },
-        selectedTab: 0
+        selectedTab: 1
     };
     computed = {
         now() {

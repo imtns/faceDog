@@ -1,6 +1,6 @@
 
 /* eslint-disable */
-var webim = require('webim_wx.js');
+var webim = require('./webim.js');
 var selToID,
     loginInfo,
     accountMode,

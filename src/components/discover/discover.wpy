@@ -1,21 +1,65 @@
 <!--  -->
 <template>
-  <view class='container'>
-      discover
-  </view>
+  <scroll-view scroll-y class='discover'>
+      <topBanner></topBanner>
+      <view class="content-search">
+          <van-tabs class="tabs">
+            <van-tab title="全部"></van-tab>
+            <van-tab title="同城"></van-tab>
+          </van-tabs>
+          <view class="change">筛选</view>
+      </view>
+      <view class="card">
+          <momentCard></momentCard>
+          <momentCard></momentCard>
+          <momentCard></momentCard>
+          <momentCard></momentCard>
+          <van-popup    
+            class="warn-pop"
+            show="{{ show }}"
+            position="bottom"
+            close-on-click-overlay="{{ true }}"
+            >
+            <view class="warn">匿名举报</view>
+            <view class="warn">加入黑名单</view>
+            <view class="warn last" @tap="closewarn">取消</view>
+          </van-popup>
+      </view>
+      <image  class="make-photo" src="../../images/discover/discover-add.png" @tap="mkPhoto"></image>
+  </scroll-view>
 </template>
 
 <script>
-  import wepy from 'wepy';
-  export default class Discover extends wepy.component {
+import wepy from 'wepy';
+import topBanner from '@/components/discover/topBanner';
+import momentCard from '@/components/discover/momentCard';
+export default class Discover extends wepy.component {
+    data = {
+        show: false,
+    };
 
-    data = {};
+    components = {
+        topBanner,
+        momentCard
+    };
+    onClose() {
+        this.show = false;
+    }
+    methods = {
+        mkPhoto() {
+            console.log(1111111111);
+        },
+        closewarn() {
+            this.show = false;
+        },
+    };
 
-    components = {};
-
-    methods = {};
-
-    events = {};
+    events = {
+        showwarn(id) {
+            this.show = true;
+            console.log(id);
+        },
+    };
 
     watch = {};
 
@@ -23,9 +67,63 @@
 
     onLoad() { };
 
-    onShow() { };
-  }
+    onShow() {
+        console.log(222222);
+    };
+}
 </script>
 
-<style lang='less' scoped>
+<style lang='less'>
+.discover{
+    height: 100vh;
+    .make-photo{
+        display: block;
+        position: fixed;
+        width: 110rpx;
+        height: 110rpx;
+        bottom: 145rpx;
+        right: 22rpx;
+    }
+    .card{
+        margin-bottom: 15vh;
+        .warn-pop{
+            background: red;
+            .warn{
+                height: 120rpx;
+                text-align: center;
+                font-size:32rpx;
+                font-weight:600;
+                line-height:120rpx;
+                color:rgba(0,0,0,1);
+                border-bottom:1px solid rgba(226,225,225,1);
+            }
+            .last{
+                margin-bottom: 10vh;
+            }
+        }
+    }
+    .content-search{
+        display: flex;
+        justify-content: space-between;
+        padding: 0 30rpx;
+        .tabs{
+            width: 230rpx;
+            .van-tab--active{
+                font-size: 42rpx !important;
+                font-weight:600 !important;
+                z-index:1;
+            }
+            .van-tabs__line{
+                width:77rpx !important;
+                height:10rpx !important;
+                bottom: 28% !important;
+            }
+        }
+        .change{
+            line-height: 44px;
+            color:rgba(158,157,157,1);
+            font-size: 14px;
+        }
+    }
+}
 </style>
