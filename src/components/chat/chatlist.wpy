@@ -1,0 +1,32 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        a
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Chatlist extends wepy.component {
+    props = {};
+
+    data = {};
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {}
+
+    onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+</style>

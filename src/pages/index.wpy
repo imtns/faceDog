@@ -1,15 +1,15 @@
 <template>
     <view wx:if="{{selectedTab === 0}}">
-        <battle></battle>
+        <battle />
     </view>
     <view wx:if="{{selectedTab === 1}}">
-        <discover></discover>
+        <discover />
     </view>
     <view wx:if="{{selectedTab === 2}}">
-        <chat></chat>
+        <chat />
     </view>
     <view wx:if="{{selectedTab === 3}}">
-        <my></my>
+        <my />
     </view>
 
     <!-- <van-button type="default">默认按钮</van-button>
@@ -18,7 +18,7 @@
     <!-- <button open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="onGotUserInfo">
         获取用户信息
     </button> -->
-    <tabbar :tabIndex="selectedTab" />
+    <tabbar :tabIndex.sync="selectedTab" />
 </template>
 
 <script>
@@ -40,7 +40,9 @@ export default class Index extends wepy.page {
             'van-tabbar': '../components/vant/tabbar/index',
             'van-tabbar-item': '../components/vant/tabbar-item/index',
             'van-dialog': '../components/vant/dialog/index',
-            'van-icon': '../components/vant/icon/index'
+            'van-icon': '../components/vant/icon/index',
+            'van-tab': '../components/vant/tab/index',
+            'van-tabs': '../components/vant/tabs/index'
         }
     };
     components = {
@@ -79,16 +81,11 @@ export default class Index extends wepy.page {
         }
     };
     events = {
-        'index-emit': (...args) => {
+        'tabSelect': (...args) => {
             let $event = args[args.length - 1];
-            console.log(
-                `${this.$name} receive ${$event.name} from ${
-                    $event.source.$name
-                }`
-            );
+            this.selectedTab = $event.source.tabIndex;
         }
     };
     onLoad() {}
 }
 </script>
-

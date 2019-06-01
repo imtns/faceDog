@@ -2,23 +2,23 @@
 <template>
     <view class='container'>
         <movable-area style="height: 200vh; width: 400vw;left:-40vw;top:-50vh;">
-            <movable-view wx:if="{{battleTop.visible1}}" data-id="top1" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex1}} " disable="true" x="{{battleTop.x1}}" inertia="{{true}}" disabled="true" y="{{battleTop.y1}}" friction="1" damping="35" direction="all" animation="false">
+            <movable-view wx:if="{{battleTop.visible1}}" data-id="top1" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex1}} " disable="true" x="{{battleTop.x1}}" disabled="{{false}}" y="{{battleTop.y1}}" direction="all">
                 <view class="battle-box top" @tap="fly('top1','top')">
                     <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFill"></image>
                 </view>
             </movable-view>
-            <movable-view wx:if="{{battleTop.visible2}}" data-id="top2" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex2}} " disabled="true" x="{{battleTop.x2}}" y="{{battleTop.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all" animation="false">
+            <movable-view wx:if="{{battleTop.visible2}}" data-id="top2" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex2}} " disabled="{{false}}" x="{{battleTop.x2}}" y="{{battleTop.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all">
                 <view class="battle-box top" @tap="fly('top2','top')">
                     <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFill"></image>
                 </view>
             </movable-view>
 
-            <movable-view wx:if="{{battleBottom.visible1}}" data-id="bottom1" data-type="bottom" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{battleBottom.zIndex1}} " x="{{battleBottom.x1}}" inertia="{{true}}" y="{{battleBottom.y1}}" friction="1" damping="35" direction="all" disabled="true" animation="false">
+            <movable-view wx:if="{{battleBottom.visible1}}" data-id="bottom1" data-type="bottom" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{battleBottom.zIndex1}} " x="{{battleBottom.x1}}" inertia="{{true}}" y="{{battleBottom.y1}}" friction="1" damping="35" direction="all" disabled="{{false}}">
                  <view class="battle-box bottom " @tap="fly('bottom3','bottom')">
                     <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
                 </view>
             </movable-view>
-            <movable-view wx:if="{{battleBottom.visible2}}" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{battleBottom.zIndex2}} " x="{{battleBottom.x2}}" y="{{battleBottom.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all" disabled="true" animation="false">
+            <movable-view wx:if="{{battleBottom.visible2}}" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{battleBottom.zIndex2}} " x="{{battleBottom.x2}}" y="{{battleBottom.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all" disabled="{{false}}" >
                 <view class="battle-box bottom " @tap="fly('bottom2','bottom')">
                     <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
                 </view>
@@ -65,10 +65,12 @@ export default class Battle extends wepy.component {
 
     methods = {
         async fly(id, type) {
+            console.log('ffffffffffff')
             if(id == 'bottom3'){
                 wepy.navigateTo({ url: 'battle/profile' });
                 return;
             }
+            console.log(buttonDisable)
             if (buttonDisable) return;
             this.handleLayer(id, type);
             buttonDisable = true;
@@ -94,15 +96,16 @@ export default class Battle extends wepy.component {
         //     o.y1 = Math.random();
         //     o.y2 = Math.random();
         // } else {
-        if (id === 'top1' || id === 'bottom1') {
+        if (id == 'top1' || id == 'bottom1') {
             o.x1 = trans + Math.random();
         } else {
             o.x2 = trans + Math.random();
         }
+        // console.log(o.x1)
         await this.delay();
         this.resetPosition(o, id);
-        // }
         Object.assign(this, o);
+        this.$apply();
     }
     async resetPosition(o, id) {
         if (id === 'top1' || id === 'bottom1') {
@@ -120,6 +123,7 @@ export default class Battle extends wepy.component {
             o.y2 = 0;
             o.visible2 = true;
         }
+        console.log('123123')
         Object.assign(this, o);
         this.$apply();
     }
@@ -176,7 +180,7 @@ export default class Battle extends wepy.component {
         top: 44.5%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 692rpx;
+        width: 696rpx;
         height: 100rpx;
         z-index: 9999;
         image {
