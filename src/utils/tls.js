@@ -1,4 +1,4 @@
-var encrypt = require('encrypt.js');
+var encrypt = require('./encrypt.js');
 
 var sdkappid = 10001;
 

@@ -8,9 +8,9 @@ module.exports = function(){
 	var b64pad = "";
 	var chrsz = 8;
 	var mode = 32;
-    var TEA = require("tea.js");
-    var RSA = require("rsa.js");
-		var base64 = require("base64.js");
+    var TEA = require("./tea.js");
+    var RSA = require("./rsa.js");
+		var base64 = require("./base64.js");
 	function md5(s){
 		return hex_md5(s);
 	}

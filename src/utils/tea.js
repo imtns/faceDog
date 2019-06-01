@@ -1,4 +1,4 @@
-var base64 = require("base64.js");
+var base64 = require("./base64.js");
 var	__key = '',
 	__pos = 0,
 	__plain = [],
