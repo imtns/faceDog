@@ -39,7 +39,8 @@ export default class Index extends wepy.page {
             'van-button': '../components/vant/button/index',
             'van-tabbar': '../components/vant/tabbar/index',
             'van-tabbar-item': '../components/vant/tabbar-item/index',
-            'van-dialog': '../components/vant/dialog/index'
+            'van-dialog': '../components/vant/dialog/index',
+            'van-icon': '../components/vant/icon/index'
         }
     };
     components = {
@@ -49,9 +50,7 @@ export default class Index extends wepy.page {
         chat,
         my
     };
-
     mixins = [testMixin];
-
     data = {
         mynum: 20,
         userInfo: {
@@ -59,13 +58,11 @@ export default class Index extends wepy.page {
         },
         selectedTab: 0
     };
-
     computed = {
         now() {
             return +new Date();
         }
     };
-
     methods = {
         onGotUserInfo(e) {
             console.log(e.detail.errMsg);
@@ -81,7 +78,6 @@ export default class Index extends wepy.page {
             );
         }
     };
-
     events = {
         'index-emit': (...args) => {
             let $event = args[args.length - 1];
@@ -92,7 +88,6 @@ export default class Index extends wepy.page {
             );
         }
     };
-
     onLoad() {}
 }
 </script>

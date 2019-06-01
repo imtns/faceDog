@@ -1,13 +1,5 @@
 <style lang="less">
 @import "components/vant/common/index.wxss";
-.container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    box-sizing: border-box;
-}
 .van-tabbar--fixed {
     z-index: 9999 !important;
 }
@@ -21,7 +13,8 @@ export default class extends wepy.app {
     config = {
         pages: [
             'pages/index',
-            'pages/register'
+            'pages/register',
+            'pages/battle/profile'
         ],
         window: {
             backgroundTextStyle: 'light',

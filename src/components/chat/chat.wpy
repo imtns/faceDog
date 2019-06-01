@@ -1,15 +1,59 @@
 <!--  -->
 <template>
-  <view class='container'>
-      chat
-  </view>
+    <view class='msg-con'>
+        <view class='service-msg flex-wrap'>
+            <view class='flex-item'>
+                <view class='service-avatar'>
+                    <view class='iconfont icon-kefu'></view>
+                </view>
+            </view>
+            <view class='flex-item4 service-item'>
+                <view class='name s'>在线客服</view>
+            </view>
+            <button open-type="contact" hover-class="none"></button>
+        </view>
+        <view class='msg-item flex-wrap' wx:for="{{contactList}}" wx:key="{{index}}" wx:if="{{contactList.length > 0}}" bindtap='linkChat' data-id="{{item.To_Account}}" data-name="{{item.C2cNick}}">
+            <view class='flex-item'>
+                <view class='msg-avatar'>
+                    <image style="width:50px;height:50px;border-radius:50%;" mode="scaleToFill" wx:if="{{item.C2cImage == ''}}" src="{{noData}}"></image>
+                    <image style="width:50px;height:50px;border-radius:50%;" mode="scaleToFill" wx:if="{{item.C2cImage != ''}}" src="{{item.C2cImage}}"></image>
+                </view>
+            </view>
+            <view class='flex-item4 msg-text'>
+                <view class='name flex-wrap'>
+                    <view class="flex-item ellipsis1">{{item.C2cNick}}</view>
+                    <view class="flex-item tr fz24 c9">{{item.MsgTimeStamp}}</view>
+                </view>
+                <view class='text flex-wrap'>
+                    <view class='flex-item3 ellipsis1'> <text>{{item.MsgShow}}</text> </view>
+                    <view class='flex-item'> <text class='count' wx:if="{{item.UnreadMsgCount > 0}}">{{item.UnreadMsgCount}}</text></view>
+                </view>
+            </view>
+        </view>
+        <view>
+        </view>
+
+    </view>
+    <view class='dev' wx:if="{{!isNoData}}">
+        <image style="width:306rpx;height:306rpx;display:block;" mode="scaleToFill" src="{{noData}}"></image>
+        <view class="devt">
+            消息列表为空~
+        </view>
+    </view>
 </template>
 
 <script>
-  import wepy from 'wepy';
-  export default class Chat extends wepy.component {
-
-    data = {};
+import util from '@/utils/util.js'; //转换时间插件
+import webim from '@/utils/webim.js'; //腾讯云im包
+import { onMsgNotify, init, sdkLogin  } from '@/utils/handler.js'; //这个是所有事件的腾讯js，这个页面需要用到登录
+import Config from '@/utils/config';
+import wepy from 'wepy';
+export default class Chat extends wepy.component {
+    data = {
+        isNoData: true,
+        noData: '/no-msg.png', //无数据的图片
+        contactList: [] //会话列表
+    };
 
     components = {};
 
@@ -21,11 +65,228 @@
 
     computed = {};
 
-    onLoad() { };
+    onLoad() {}
 
-    onShow() { };
-  }
+    onShow() {
+        wx.showLoading();
+        var that = this;
+        var selToID = ''; //会话列表不设置对方私聊账号
+        init({
+            //初始化的方法
+            accountMode: Config.accountMode,
+            accountType: Config.accountType,
+            sdkAppID: Config.sdkappid,
+            selType: webim.SESSION_TYPE.C2C, //私聊
+            agent_member_id: wepy.$instance.data.userInfo.id, //经纪人id
+            id: selToID, //如果是经纪人，则填agent_member_id ,如果是普通用户则填经纪人id
+            name: '123',
+            icon: '123',
+            that: that
+        });
+        if (webim.checkLogin()) {
+            //检查是否登录返回true和false,不登录则重新登录
+            console.log('已登录');
+            that.initRecentContactList();
+        } else {
+            console.log('登录成功');
+            sdkLogin(that, wepy.$instance, selToID, function() {
+                that.initRecentContactList();
+            });
+        }
+    }
+    // 初始化聊天界面最近会话列表
+    initRecentContactList() {
+        var that = this;
+        webim.getRecentContactList(
+            {
+                //获取会话列表的方法
+                Count: 10 //最近的会话数 ,最大为 100
+            },
+            function(resp) {
+                if (resp.SessionItem) {
+                    if (resp.SessionItem.length == 0) {
+                        that.setData({
+                            isNoData: false
+                        });
+                        wx.hideLoading();
+                    } else if (resp.SessionItem.length > 0) {
+                        that.setData({
+                            contactList: resp.SessionItem,
+                            isNoData: true
+                        });
+                        var userId = that.data.contactList.map(
+                            (item, index) => {
+                                return item.To_Account;
+                            }
+                        );
+                        that.getAvatar(userId, that.data.contactList, function(
+                            data
+                        ) {
+                            data = data.map((item, index) => {
+                                if (item.MsgShow == '[其他]') {
+                                    item.MsgShow = '[房源信息]';
+                                }
+                                return item;
+                            });
+                            that.setData({
+                                contactList: data
+                            });
+                            wx.hideLoading();
+                            // 初始化最近会话的消息未读数(监听新消息事件)
+                            webim.syncMsgs(onMsgNotify());
+                        });
+                        // webim.syncMsgs(that.initUnreadMsgCount())
+                    } else {
+                        wx.hideLoading();
+                        return;
+                    }
+                } else {
+                    wx.hideLoading();
+                }
+            },
+            function(resp) {
+                //错误回调
+            }
+        );
+    }
+    // 初始化最近会话的消息未读数（这个方法用不到，多余，这是个坑，登录之后仍然返回空对象）
+    initUnreadMsgCount() {
+        var sess;
+        var sessMap = JSON.stringify(webim.MsgStore.sessMap());
+
+        for (var i in sessMap) {
+            console.log('循环对象');
+            sess = sessMap[i];
+            // if (selToID && selToID != sess.id()) { //更新其他聊天对象的未读消息数
+            console.log('sess.unread()', sess.unread());
+            // updateSessDiv(sess.type(), sess.id(), sess.name(), sess.unread());
+            // }
+        }
+    }
+    //获取会话列表所有用户头像
+    getAvatar(userId, item, callback) {
+        if (!callback) {
+            callback = () => {};
+        }
+        var that = this;
+        var tag_list = ['Tag_Profile_IM_Nick', 'Tag_Profile_IM_Image'];
+        tag_list.push('Tag_Profile_IM_Nick');
+        //用户id
+        var account = userId;
+        var options = {
+            From_Account: userId,
+            To_Account: account,
+            LastStandardSequence: 0,
+            TagList: tag_list
+        };
+        var contactList = [];
+
+        webim.getProfilePortrait(options, function(res) {
+            var UserProfileItem = res.UserProfileItem;
+            var C2cNick, C2cImage;
+            for (var i = 0; i < UserProfileItem.length; i++) {
+                var data = UserProfileItem[i].ProfileItem;
+
+                // 循环添加昵称和头像
+                contactList = item.map((item, index) => {
+                    item.C2cNick = UserProfileItem[index].ProfileItem[0].Value;
+
+                    item.C2cImage = UserProfileItem[index].ProfileItem[1].Value;
+                    return item;
+                });
+            }
+            contactList = contactList.map((item, index) => {
+                var MsgTimeStamp = util.getDateDiff(item.MsgTimeStamp * 1000);
+                item.MsgTimeStamp = MsgTimeStamp;
+                return item;
+            });
+            callback(contactList);
+        });
+    }
+}
 </script>
 
 <style lang='less' scoped>
+.msg-con {
+    width: 100%;
+    height: auto;
+    background: #ffffff;
+    padding: 0px 10px;
+    box-sizing: border-box;
+}
+.service-msg {
+    width: 100%;
+    height: 70px;
+}
+.msg-item {
+    border-top: 1px solid #e5e5e5;
+}
+.service-avatar {
+    width: 50px;
+    height: 50px;
+    background: #69beff;
+    margin: 10px 0;
+    border-radius: 50%;
+}
+.msg-avatar {
+    width: 50px;
+    height: 50px;
+    margin: 10px 0;
+    border-radius: 50%;
+}
+.msg-text {
+    margin-top: 12px;
+}
+.name {
+    font-size: 16px;
+    color: #333333;
+    height: 25px;
+}
+.name.s {
+    height: 70px;
+    line-height: 70px;
+}
+.text {
+    color: #999999;
+    font-size: 13px;
+    position: relative;
+}
+.icon-kefu::before {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    font-size: 60rpx;
+}
+.count {
+    width: 20px;
+    height: 20px;
+    background: #f74c31;
+    border-radius: 50%;
+    line-height: 20px;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    position: absolute;
+    right: 0px;
+    top: 0;
+}
+button {
+    color: #333333;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+}
+button:after {
+    border: none;
+}
+.service-msg {
+    position: relative;
+}
 </style>

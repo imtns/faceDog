@@ -1,14 +1,67 @@
 <!--  -->
 <template>
-  <view class='container'>
-      my
-  </view>
+    <view class="bg">
+        <view class="head">
+            <view class="headIcon">
+                <image src="{{userInfo.avatarUrl}}" style="width:70px;height:70px;"></image>
+            </view>
+            <view class="login">
+                {{userInfo.nickName}}
+            </view>
+        </view>
+        <button class="button" open-type="getUserInfo" wx:if="{{hasUserInfo}}" bindgetuserinfo="doAuthorization"> 微信登录 </button>
+    </view>
+
+    <view class="hr"></view>
+    <view class='item'>
+        <view class="title">手机绑定</view>
+        <view class="detail2">
+            <van-icon name="arrow" />
+        </view>
+    </view>
+    <view class="line"></view>
+
+    <view class='item'>
+        <view class="title">阅读文章</view>
+        <view class="detail2">
+            <van-icon name="arrow" />
+        </view>
+    </view>
+
+    <view class="hr"></view>
+    <view class='item'>
+        <view class="title">电影推荐</view>
+        <view class="detail2">
+            <van-icon name="arrow" />
+        </view>
+    </view>
+    <view class="line"></view>
+    <view class="item">
+        <view class="title">我的收藏</view>
+        <view class="detail2">
+            <van-icon name="arrow" />
+        </view>
+    </view>
+    <view class="line"></view>
+    <view class="item">
+        <view class="title">意见反馈</view>
+        <view class="detail2">
+            <van-icon name="arrow" />
+        </view>
+    </view>
+    <view class="line"></view>
+    <view class="item">
+        <view class="title">设置</view>
+        <view class="detail2">
+            <van-icon name="arrow" />
+        </view>
+    </view>
+    <view class="hr"></view>
 </template>
 
 <script>
-  import wepy from 'wepy';
-  export default class My extends wepy.component {
-
+import wepy from 'wepy';
+export default class My extends wepy.component {
     data = {};
 
     components = {};
@@ -21,11 +74,74 @@
 
     computed = {};
 
-    onLoad() { };
+    onLoad() {}
 
-    onShow() { };
-  }
+    onShow() {}
+}
 </script>
 
 <style lang='less' scoped>
+.bg {
+    height: 150px;
+    background-color: #d53e37;
+}
+
+.head {
+    display: flex;
+    flex-direction: column;
+}
+
+.headIcon {
+    display: flex;
+    justify-content: center;
+}
+
+.login {
+    display: flex;
+    color: #fff;
+    font-size: 15px;
+    margin-top: 15rpx;
+    justify-content: center;
+}
+
+.button {
+    margin: 10px;
+    font-size: 14px;
+}
+
+.head image {
+    border-radius: 50%;
+}
+
+.hr {
+    width: 100%;
+    height: 15px;
+    background-color: #f4f5f6;
+}
+
+.item {
+    display: flex;
+    flex-direction: row;
+}
+
+.title {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    font-size: 15px;
+}
+
+.detail2 {
+    font-size: 15px;
+    position: absolute;
+    right: 10px;
+    height: 50px;
+    line-height: 50px;
+    color: #888;
+}
+
+.line {
+    border: 1px solid #ccc;
+    opacity: 0.2;
+}
 </style>
