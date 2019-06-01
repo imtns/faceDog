@@ -28,9 +28,9 @@
         </view>
         <view class="bottom-box">
             <image class="close" src="../../images/profile/close.png"></image>
-            <image class="menu" src="../../images/profile/menu.png"></image>
+            <image class="menu" @tap="showOrHide" src="../../images/profile/menu.png"></image>
         </view>
-        <view class="drawer_screen" bindtap="showOrHide" wx:if="{{true}}" catchtouchmove="myCatchTouch">
+        <view class="drawer_screen" bindtap="showOrHide" wx:if="{{isShow}}" catchtouchmove="myCatchTouch">
             <view class="drawer-btn">
                 <image src="../../images/profile/lip.png" mode="aspectFill" class="btn" @tap="deleteLots"></image>
                 <view class="textWrap">
@@ -53,7 +53,7 @@
                     <view>剩余12次</view>
                 </view>
             </view>
-            <image src="../../images/profile/close.png" mode="aspectFill" class="layer-close" @tap="showOrHide"></image>
+            <image src="../../images/profile/close.png" mode="aspectFill" class="layer-close" @tap.stop="showOrHide"></image>
         </view>
     </view>
 </template>

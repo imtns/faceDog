@@ -3,22 +3,30 @@
     <view class='container'>
         <movable-area style="height: 200vh; width: 400vw;left:-40vw;top:-50vh;">
             <movable-view wx:if="{{battleTop.visible1}}" data-id="top1" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex1}} " disable="true" x="{{battleTop.x1}}" inertia="{{true}}" disabled="true" y="{{battleTop.y1}}" friction="1" damping="35" direction="all" animation="false">
-                <van-button size="normal" data-id="bottom2" data-type="bottom" @tap="fly('top1','top')">号按钮</van-button>
-                <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFill"></image>
+                <view class="battle-box top" @tap="fly('top1','top')">
+                    <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFill"></image>
+                </view>
             </movable-view>
             <movable-view wx:if="{{battleTop.visible2}}" data-id="top2" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex2}} " disabled="true" x="{{battleTop.x2}}" y="{{battleTop.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all" animation="false">
-                <van-button size="normal" data-id="bottom2" data-type="bottom" @tap="fly('top2','top')">号按钮</van-button>
-                <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=8ba1dd4d736b51cbde2922e65fbfd7b6&imgtype=0&src=http%3A%2F%2Fd-pic-image.yesky.com%2F1080x-%2FuploadImages%2F2019%2F044%2F59%2F1113V6L3Q6TY.jpg" mode="aspectFill"></image>
+                <view class="battle-box top" @tap="fly('top2','top')">
+                    <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFill"></image>
+                </view>
             </movable-view>
-            <movable-view wx:if="{{battleBottom.visible1}}" data-id="bottom1" data-type="bottom" style="height: 50vh;width:100vw;left:190vw;top:50%;z-index:{{battleBottom.zIndex1}} " x="{{battleBottom.x1}}" inertia="{{true}}" y="{{battleBottom.y1}}" friction="1" damping="35" direction="all" disabled="true" animation="false">
-                <van-button size="normal" data-id="bottom2" data-type="bottom" @tap="fly('bottom1','bottom')">号按钮</van-button>
-                <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
+
+            <movable-view wx:if="{{battleBottom.visible1}}" data-id="bottom1" data-type="bottom" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{battleBottom.zIndex1}} " x="{{battleBottom.x1}}" inertia="{{true}}" y="{{battleBottom.y1}}" friction="1" damping="35" direction="all" disabled="true" animation="false">
+                 <view class="battle-box bottom " @tap="fly('bottom3','bottom')">
+                    <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
+                </view>
             </movable-view>
-            <movable-view wx:if="{{battleBottom.visible2}}" style="height: 50vh;width:100vw;left:190vw;top:50%;z-index:{{battleBottom.zIndex2}} " x="{{battleBottom.x2}}" y="{{battleBottom.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all" disabled="true" animation="false">
-                <van-button size="normal" data-id="bottom2" data-type="bottom" @tap="fly('bottom2','bottom')">号按钮</van-button>
-                <image src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=531929377,4121486257&fm=26&gp=0.jpg" mode="aspectFill"></image>
+            <movable-view wx:if="{{battleBottom.visible2}}" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{battleBottom.zIndex2}} " x="{{battleBottom.x2}}" y="{{battleBottom.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all" disabled="true" animation="false">
+                <view class="battle-box bottom " @tap="fly('bottom2','bottom')">
+                    <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
+                </view>
             </movable-view>
         </movable-area>
+        <view class="divider">
+            <image src="../../images/battle/devider.png" mode="aspectFill"></image>
+        </view>
     </view>
     <van-dialog id="van-dialog" />
 </template>
@@ -57,6 +65,10 @@ export default class Battle extends wepy.component {
 
     methods = {
         async fly(id, type) {
+            if(id == 'bottom3'){
+                wepy.navigateTo({ url: 'battle/profile' });
+                return;
+            }
             if (buttonDisable) return;
             this.handleLayer(id, type);
             buttonDisable = true;
@@ -158,6 +170,34 @@ export default class Battle extends wepy.component {
     image {
         width: 100%;
         height: 100%;
+    }
+    .divider {
+        position: absolute;
+        top: 44.5%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 692rpx;
+        height: 100rpx;
+        z-index: 9999;
+        image {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    .battle-box {
+        width: 690rpx;
+        height: 532rpx;
+        background: rgba(255, 255, 255, 1);
+        border: 1px solid rgba(112, 112, 112, 1);
+        opacity: 1;
+        overflow: hidden;
+        margin: 0 auto;
+        &.top {
+            border-radius: 36rpx 36rpx 0rpx 0rpx;
+        }
+        &.bottom {
+            border-radius: 0rpx 0rpx 36rpx 36rpx;
+        }
     }
     .battle-top {
         width: 100%;

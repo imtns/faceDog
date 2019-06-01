@@ -56,7 +56,7 @@ export default class Index extends wepy.page {
         userInfo: {
             nickName: '加载中...'
         },
-        selectedTab: 0
+        selectedTab: 2
     };
     computed = {
         now() {
