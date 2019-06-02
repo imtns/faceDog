@@ -45,6 +45,7 @@ export default class Index extends wepy.page {
             'van-tab': '../components/vant/tab/index',
             'van-popup': '../components/vant/popup/index',
             'van-overlay': '../components/vant/overlay/index',
+            "van-swipe-cell": "../components/vant/swipe-cell/index"
         }
     };
     components = {
@@ -60,7 +61,7 @@ export default class Index extends wepy.page {
         userInfo: {
             nickName: '加载中...'
         },
-        selectedTab: 2
+        selectedTab: 3
     };
     computed = {
         now() {
