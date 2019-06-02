@@ -47,6 +47,98 @@
                 </view>
             </view>
         </view>
+        <view class="like-box">
+            <view class="header">
+                <view class="date"><text>28</text><text>/May</text></view>
+                <view class="all">全部
+                    <van-icon name="arrow" />
+                </view>
+            </view>
+            <view class="like-list">
+                <view class="like">
+                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <view class="desc">
+                        <view class="left">
+                            <view class="name">黄浪儿</view>
+                            <view class="info">21岁 / 双鱼座</view>
+                        </view>
+                        <view class="right">
+                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
+                        </view>
+                    </view>
+                </view>
+                <view class="like">
+                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <view class="desc">
+                        <view class="left">
+                            <view class="name">黄浪儿</view>
+                            <view class="info">21岁 / 双鱼座</view>
+                        </view>
+                        <view class="right">
+                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
+                        </view>
+                    </view>
+                </view>
+                <view class="like">
+                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <view class="desc">
+                        <view class="left">
+                            <view class="name">黄浪儿</view>
+                            <view class="info">21岁 / 双鱼座</view>
+                        </view>
+                        <view class="right">
+                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="like-box">
+            <view class="header">
+                <view class="date"><text>28</text><text>/May</text></view>
+                <view class="all">全部
+                    <van-icon name="arrow" />
+                </view>
+            </view>
+            <view class="like-list">
+                <view class="like">
+                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <view class="desc">
+                        <view class="left">
+                            <view class="name">黄浪儿</view>
+                            <view class="info">21岁 / 双鱼座</view>
+                        </view>
+                        <view class="right">
+                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
+                        </view>
+                    </view>
+                </view>
+                <view class="like">
+                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <view class="desc">
+                        <view class="left">
+                            <view class="name">黄浪儿</view>
+                            <view class="info">21岁 / 双鱼座</view>
+                        </view>
+                        <view class="right">
+                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
+                        </view>
+                    </view>
+                </view>
+                <view class="like">
+                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <view class="desc">
+                        <view class="left">
+                            <view class="name">黄浪儿</view>
+                            <view class="info">21岁 / 双鱼座</view>
+                        </view>
+                        <view class="right">
+                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
     </view>
 </template>
 
@@ -76,9 +168,11 @@ export default class Like extends wepy.component {
 <style lang='less' scoped>
 .wrapper {
     width: 690rpx;
-    margin-top: 100rpx;
+    margin-top: 68rpx;
+    margin-left:30rpx;
     .like-box {
         width: 100%;
+        margin-bottom: 75rpx;
         .header {
             height: 49rpx;
             display: flex;
@@ -107,8 +201,9 @@ export default class Like extends wepy.component {
         .like-list {
             width: 100%;
             height: 360rpx;
-            display:flex;
+            display: flex;
             justify-content: space-between;
+            margin-top: 30rpx;
             .like {
                 width: 214rpx;
                 height: 360rpx;

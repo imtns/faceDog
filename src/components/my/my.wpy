@@ -1,62 +1,67 @@
 <!--  -->
 <template>
-    <view class="bg">
+    <view class="wrapper">
         <view class="head">
             <view class="headIcon">
-                <image src="{{userInfo.avatarUrl}}" style="width:70px;height:70px;"></image>
+                <image src="../../images/profile/model.jpg" style="width:172rpx;height:172rpx;"></image>
             </view>
-            <view class="login">
-                {{userInfo.nickName}}
+            <view class="box">
+                <view class="top-part">
+                    <view class="info">
+                        <view class="name">爱吃跳跳糖</view>
+                        <view class="desc">28岁 | 北京 | 单身</view>
+                    </view>
+                    <view class="verify">
+                        未认证
+                    </view>
+                </view>
+                <view class="bottom-part">
+                    <view class="edit-profile" @tap="redirect('editfile')">编辑资料</view>
+                    <view class="setting" @tap="redirect('setting')">
+                        <image class="i" src="../../images/my/setting.png" mode="aspectFill"></image>
+                    </view>
+                </view>
             </view>
         </view>
-        <button class="button" open-type="getUserInfo" wx:if="{{hasUserInfo}}" bindgetuserinfo="doAuthorization"> 微信登录 </button>
-    </view>
+        <!-- <button class="button" open-type="getUserInfo" wx:if="{{hasUserInfo}}" bindgetuserinfo="doAuthorization"> 微信登录 </button> -->
 
-    <view class="hr"></view>
-    <view class='item'>
-        <view class="title">手机绑定</view>
-        <view class="detail2">
-            <van-icon name="arrow" />
+        <view class="hr"></view>
+        <view class='item'>
+            <view class="title">我的次数</view>
+            <view class="detail2">
+                <van-icon name="arrow" />
+            </view>
         </view>
-    </view>
-    <view class="line"></view>
-
-    <view class='item'>
-        <view class="title">阅读文章</view>
-        <view class="detail2">
-            <van-icon name="arrow" />
+        <view class="line"></view>
+        <view class='item'>
+            <view class="title">我的排名</view>
+            <view class="detail2">
+                <van-icon name="arrow" />
+            </view>
         </view>
-    </view>
-
-    <view class="hr"></view>
-    <view class='item'>
-        <view class="title">电影推荐</view>
-        <view class="detail2">
-            <van-icon name="arrow" />
+        <view class="line"></view>
+        <view class='item'>
+            <view class="title">我的动态</view>
+            <view class="detail2">
+                <van-icon name="arrow" />
+            </view>
         </view>
-    </view>
-    <view class="line"></view>
-    <view class="item">
-        <view class="title">我的收藏</view>
-        <view class="detail2">
-            <van-icon name="arrow" />
+        <view class="line"></view>
+        <view class="item">
+            <view class="title">推广有奖</view>
+            <view class="detail2">
+                <van-icon name="arrow" />
+            </view>
         </view>
-    </view>
-    <view class="line"></view>
-    <view class="item">
-        <view class="title">意见反馈</view>
-        <view class="detail2">
-            <van-icon name="arrow" />
+        <view class="line"></view>
+        <view class="item">
+            <view class="title">联系客服</view>
+            <view class="detail2">
+                <van-icon name="arrow" />
+            </view>
         </view>
+        <view class="line"></view>
     </view>
-    <view class="line"></view>
-    <view class="item">
-        <view class="title">设置</view>
-        <view class="detail2">
-            <van-icon name="arrow" />
-        </view>
-    </view>
-    <view class="hr"></view>
 </template>
 
 <script>
@@ -66,7 +71,11 @@ export default class My extends wepy.component {
 
     components = {};
 
-    methods = {};
+    methods = {
+        redirect(name) {
+            wepy.navigateTo({ url: `my/${name}` });
+        }
+    };
 
     events = {};
 
@@ -81,67 +90,126 @@ export default class My extends wepy.component {
 </script>
 
 <style lang='less' scoped>
-.bg {
-    height: 150px;
-    background-color: #d53e37;
+.wrapper {
 }
-
 .head {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 300rpx;
+    flex-wrap: wrap;
+    padding: 0 60rpx;
 }
 
 .headIcon {
     display: flex;
     justify-content: center;
+    margin-right: 43rpx;
+    image {
+        border-radius: 50%;
+    }
 }
-
-.login {
+.box {
+    width: 420rpx;
     display: flex;
-    color: #fff;
-    font-size: 15px;
-    margin-top: 15rpx;
-    justify-content: center;
+    flex-wrap: wrap;
+    .top-part {
+        margin-right: auto;
+        display: flex;
+        width: 420rpx;
+        justify-content: space-between;
+        .info {
+            width: 200rpx;
+            .name {
+                font-size: 32rpx;
+                font-family: PingFang SC;
+                font-weight: 600;
+                color: rgba(0, 0, 0, 1);
+            }
+            .desc {
+                margin-top: 15rpx;
+                font-size: 20rpx;
+                font-family: PingFang SC;
+                font-weight: 400;
+                color: rgba(158, 157, 157, 1);
+            }
+        }
+        .verify {
+            width: 128rpx;
+            height: 60rpx;
+            border: 2rpx solid rgba(226, 225, 225, 1);
+            border-radius: 30rpx;
+            line-height: 60rpx;
+            text-align: center;
+            font-size: 28rpx;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 1);
+        }
+    }
+    .bottom-part {
+        display: flex;
+        width: 420rpx;
+        margin-top: 25rpx;
+        .edit-profile {
+            width: 300rpx;
+            height: 60rpx;
+            border: 2rpx solid rgba(226, 225, 225, 1);
+            opacity: 1;
+            border-radius: 30rpx;
+            font-size: 28rpx;
+            line-height: 60rpx;
+            text-align: center;
+            font-family: PingFang SC;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 1);
+        }
+        .setting {
+            width: 90rpx;
+            height: 60rpx;
+            display: flex;
+            margin-left: 29rpx;
+            justify-content: center;
+            align-items: center;
+            border: 2rpx solid rgba(226, 225, 225, 1);
+            opacity: 1;
+            border-radius: 30rpx;
+            .i {
+                width: 31rpx;
+                height: 29rpx;
+            }
+        }
+    }
 }
-
-.button {
-    margin: 10px;
-    font-size: 14px;
-}
-
-.head image {
-    border-radius: 50%;
-}
-
 .hr {
     width: 100%;
-    height: 15px;
-    background-color: #f4f5f6;
+    height: 18rpx;
+    background: rgba(246, 246, 246, 1);
 }
 
 .item {
     display: flex;
     flex-direction: row;
-}
-
-.title {
-    padding-top: 15px;
-    padding-bottom: 15px;
-    padding-left: 15px;
-    font-size: 15px;
+    height: 120rpx;
+    align-items: center;
+    padding: 0 60rpx;
+    .title {
+        font-size: 28rpx;
+        font-family: PingFang SC;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 1);
+    }
 }
 
 .detail2 {
-    font-size: 15px;
+    font-size: 30rpx;
     position: absolute;
-    right: 10px;
-    height: 50px;
-    line-height: 50px;
-    color: #888;
+    right: 60rpx;
+    color: rgba(178, 178, 178, 1);
 }
 
 .line {
-    border: 1px solid #ccc;
-    opacity: 0.2;
+    width: 630rpx;
+    margin: 0 auto;
+    border: 1rpx solid rgba(226, 225, 225, 0.5);
 }
 </style>

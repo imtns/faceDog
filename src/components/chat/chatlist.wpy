@@ -1,7 +1,118 @@
 <!--  -->
 <template>
     <view class='wrapper'>
-        a
+        <van-swipe-cell right-width="{{ 60 }}">
+            <view class="chat-box">
+                <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">小橘子</view>
+                    <view class="content">今天晚上大悦城等你啦啦啦啦第三方第三方第三方啦啦啊</view>
+                </view>
+                <view class="right-part">
+                    <view class="time">7小时前</view>
+                    <view class="unread">8</view>
+                </view>
+            </view>
+            <view class="delete" slot="right">删除</view>
+        </van-swipe-cell>
+         <van-swipe-cell right-width="{{ 60 }}">
+            <view class="chat-box">
+                <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">小橘子</view>
+                    <view class="content">今天晚上大悦城等你</view>
+                </view>
+                <view class="right-part">
+                    <view class="time">7小时前</view>
+                    <view class="unread">8</view>
+                </view>
+            </view>
+            <view class="delete" slot="right">删除</view>
+        </van-swipe-cell>
+         <van-swipe-cell right-width="{{ 60 }}">
+            <view class="chat-box">
+                <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">小橘子</view>
+                    <view class="content">今天晚上大悦城等你</view>
+                </view>
+                <view class="right-part">
+                    <view class="time">7小时前</view>
+                    <view class="unread">8</view>
+                </view>
+            </view>
+            <view class="delete" slot="right">删除</view>
+        </van-swipe-cell>
+         <van-swipe-cell right-width="{{ 60 }}">
+            <view class="chat-box">
+                <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">小橘子</view>
+                    <view class="content">今天晚上大悦城等你</view>
+                </view>
+                <view class="right-part">
+                    <view class="time">7小时前</view>
+                    <view class="unread">8</view>
+                </view>
+            </view>
+            <view class="delete" slot="right">删除</view>
+        </van-swipe-cell>
+         <van-swipe-cell right-width="{{ 60 }}">
+            <view class="chat-box">
+                <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">小橘子</view>
+                    <view class="content">今天晚上大悦城等你</view>
+                </view>
+                <view class="right-part">
+                    <view class="time">7小时前</view>
+                    <view class="unread">8</view>
+                </view>
+            </view>
+            <view class="delete" slot="right">删除</view>
+        </van-swipe-cell>
+         <van-swipe-cell right-width="{{ 60 }}">
+            <view class="chat-box">
+                <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">小橘子</view>
+                    <view class="content">今天晚上大悦城等你</view>
+                </view>
+                <view class="right-part">
+                    <view class="time">7小时前</view>
+                    <view class="unread">8</view>
+                </view>
+            </view>
+            <view class="delete" slot="right">删除</view>
+        </van-swipe-cell>
+         <van-swipe-cell right-width="{{ 60 }}">
+            <view class="chat-box">
+                <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">小橘子</view>
+                    <view class="content">今天晚上大悦城等你</view>
+                </view>
+                <view class="right-part">
+                    <view class="time">7小时前</view>
+                    <view class="unread">8</view>
+                </view>
+            </view>
+            <view class="delete" slot="right">删除</view>
+        </van-swipe-cell>
+         <van-swipe-cell right-width="{{ 60 }}">
+            <view class="chat-box">
+                <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">小橘子</view>
+                    <view class="content">今天晚上大悦城等你哈哈哈哈</view>
+                </view>
+                <view class="right-part">
+                    <view class="time">7小时前</view>
+                    <view class="unread">8</view>
+                </view>
+            </view>
+            <view class="delete" slot="right">删除</view>
+        </van-swipe-cell>
     </view>
 </template>
 
@@ -29,4 +140,71 @@ export default class Chatlist extends wepy.component {
 </script>
 
 <style lang='less' scoped>
+.wrapper {
+    width: 750rpx;
+    margin-top: 68rpx;
+    .delete {
+        background: red;
+        height: 100rpx;
+        line-height: 100rpx;
+        color: white;
+        text-align: center;
+        width: 142rpx;
+    }
+    .chat-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 61rpx;
+        padding: 0 30rpx;
+        .icon {
+            width: 100rpx;
+            height: 100rpx;
+            border-radius: 50%;
+        }
+        .msg {
+            margin-right: auto;
+            margin-left: 27rpx;
+            width: 450rpx;
+            .name {
+                font-size: 32rpx;
+                font-family: PingFang SC;
+                font-weight: 600;
+                color: rgba(0, 0, 0, 1);
+            }
+            .content {
+                margin-top: 8rpx;
+                font-size: 24rpx;
+                font-family: PingFang SC;
+                font-weight: 300;
+                color: rgba(162, 162, 162, 1);
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+        }
+        .right-part {
+            display: block;
+            text-align: right;
+            .time {
+                font-size: 20rpx;
+                font-family: PingFang SC;
+                font-weight: 400;
+                color: rgba(158, 157, 157, 1);
+            }
+            .unread {
+                margin-top: 17rpx;
+                width: 38rpx;
+                height: 38rpx;
+                background: rgba(237, 72, 87, 1);
+                border-radius: 50%;
+                float: right;
+                line-height: 41rpx;
+                text-align: center;
+                color: white;
+                font-size: 20rpx;
+            }
+        }
+    }
+}
 </style>

@@ -42,7 +42,7 @@ export default class Register extends wepy.page {
     };
 
     data = {
-        step: 3,
+        step: 5,
         scopeUser: false,
         userInfo: {}
     };

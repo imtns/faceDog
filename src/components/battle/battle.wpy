@@ -4,12 +4,12 @@
         <movable-area style="height: 200vh; width: 400vw;left:-40vw;top:-50vh;">
             <movable-view wx:if="{{battleTop.visible1}}" data-id="top1" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex1}} " disable="true" x="{{battleTop.x1}}" disabled="{{false}}" y="{{battleTop.y1}}" direction="all">
                 <view class="battle-box top" @tap="fly('top1','top')">
-                    <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFill"></image>
+                    <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFit"></image>
                 </view>
             </movable-view>
             <movable-view wx:if="{{battleTop.visible2}}" data-id="top2" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex2}} " disabled="{{false}}" x="{{battleTop.x2}}" y="{{battleTop.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all">
                 <view class="battle-box top" @tap="fly('top2','top')">
-                    <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFill"></image>
+                    <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFit"></image>
                 </view>
             </movable-view>
 

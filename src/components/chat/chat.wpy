@@ -2,23 +2,23 @@
 <template>
     <view class="container">
         <view class="tabs">
-            <image class="tab" @tap="tabClick(1)" src="{{tabIndex == 1?'../../../images/chat/like-active.png':'../../../images/chat/like.png'}}" mode="aspectFill"></image>
-            <image class="tab" @tap="tabClick(2)" src="{{tabIndex == 2?'../../../images/chat/chat-active.png':'../../../images/chat/chat.png'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(1)" src="{{tabIndex == 1?'../../../images/chat/chat-active.png':'../../../images/chat/chat.png'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(2)" src="{{tabIndex == 2?'../../../images/chat/like-active.png':'../../../images/chat/like.png'}}" mode="aspectFill"></image>
             <image class="tab" @tap="tabClick(3)" src="{{tabIndex == 3?'../../../images/chat/friends-active.png':'../../../images/chat/friends.png'}}" mode="aspectFill"></image>
             <image class="tab" @tap="tabClick(4)" src="{{tabIndex == 4?'../../../images/chat/notify-active.png':'../../../images/chat/notify.png'}}" mode="aspectFill"></image>
         </view>
-        <block wx:if="{{tabIndex == 1}}">
-            <like />
-        </block>
-        <block wx:if="{{tabIndex == 2}}">
+        <scroll-view scroll-y style="height:{{scrollHeight}}px" class="scroll" wx:if="{{tabIndex == 1}}">
             <chatList />
-        </block>
-        <block wx:if="{{tabIndex == 3}}">
+        </scroll-view>
+        <scroll-view scroll-y  class="scroll"  style="height:{{scrollHeight}}px" wx:if="{{tabIndex == 2}}">
+            <like />
+        </scroll-view>
+        <scroll-view scroll-y  class="scroll"  style="height:{{scrollHeight}}px" wx:if="{{tabIndex == 3}}">
             <friends />
-        </block>
-        <block wx:if="{{tabIndex == 4}}">
+        </scroll-view>
+        <scroll-view scroll-y  class="scroll"  style="height:{{scrollHeight}}px" wx:if="{{tabIndex == 4}}">
             <notify />
-        </block>
+        </scroll-view>
         <!-- <view class='msg-con' wx:if="{{false}}">
             <view class='service-msg flex-wrap'>
                 <view class='flex-item'>
@@ -60,6 +60,7 @@
             </view>
         </view> -->
     </view>
+       <!-- <van-dialog id="van-dialog" /> -->
 </template>
 
 <script>
@@ -77,7 +78,8 @@ export default class Chat extends wepy.component {
         isNoData: true,
         noData: '/no-msg.png', //无数据的图片
         contactList: [], //会话列表
-        tabIndex: 1
+        tabIndex: 1,
+        scrollHeight:0
     };
 
     components = {
@@ -99,7 +101,10 @@ export default class Chat extends wepy.component {
 
     computed = {};
 
-    onLoad() {}
+    onLoad() {
+        this.scrollHeight = wx.getSystemInfoSync().windowHeight - 84;
+        this.$apply();
+    }
 
     onShow() {
         wx.showLoading();
@@ -243,10 +248,10 @@ export default class Chat extends wepy.component {
 <style lang='less' scoped>
 .container {
     width: 100%;
-    padding: 0 30rpx;
     .tabs {
         width: 690rpx;
         display: flex;
+        margin-left:30rpx;
         justify-content: space-between;
         .tab {
             width: 146rpx;

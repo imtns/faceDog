@@ -15,6 +15,10 @@ export default class extends wepy.app {
             'pages/index',
             'pages/register',
             'pages/battle/profile',
+            'pages/my/setting',
+            'pages/my/editname',
+            'pages/my/editdesc',
+            'pages/my/editfile'
         ],
         window: {
             backgroundTextStyle: 'light',
