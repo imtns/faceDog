@@ -15,6 +15,7 @@ export default class extends wepy.app {
             'pages/index',
             'pages/register',
             'pages/battle/profile',
+            'pages/fabu/fabu', // 发布页面
         ],
         window: {
             backgroundTextStyle: 'light',

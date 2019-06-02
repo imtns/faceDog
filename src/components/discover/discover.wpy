@@ -47,7 +47,9 @@ export default class Discover extends wepy.component {
     }
     methods = {
         mkPhoto() {
-            console.log(1111111111);
+            wepy.navigateTo({
+                url: 'fabu/fabu',
+            });
         },
         closewarn() {
             this.show = false;

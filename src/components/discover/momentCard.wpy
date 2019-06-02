@@ -42,6 +42,42 @@
                     </view>
                 </view>
             </view>
+            <view class="comment-box">
+                <view class="comment-who">
+                    <image class="icon" src="../../images/discover/discover-zan.png"></image>
+                    <image class="img" src="../../images/discover/discover-top1.png"></image>
+                    <image class="img" src="../../images/discover/discover-top1.png"></image>
+                    <image class="img" src="../../images/discover/discover-top1.png"></image>
+                    <image class="img" src="../../images/discover/discover-top1.png"></image>
+                    <image class="img" src="../../images/discover/discover-top1.png"></image>
+                    <image class="img" src="../../images/discover/discover-top1.png"></image>
+                    <image class="img" src="../../images/discover/discover-top1.png"></image>
+                    <image class="img" src="../../images/discover/discover-top1.png"></image>
+                </view>
+                <view class="comment-info-box">
+                    <view class="comment-info">
+                        <view class="from">小西西</view>
+                        <view class="reply">回复</view>
+                        <view class="to">跳舞的皮卡丘</view>
+                        <view>:</view>
+                        这张我觉得比较有感觉~这张我觉得比较有感觉~这张我觉得比较有感觉~
+                    </view>
+                    <view class="comment-info">
+                        <view class="from">小西西</view>
+                        <view class="reply"></view>
+                        <view class="to"></view>
+                        <view>:</view>
+                        统一回复，哈哈哈
+                    </view>
+                    <view class="comment-info">
+                        <view class="from">跳舞的皮卡丘</view>
+                        <view class="reply">回复</view>
+                        <view class="to">小西西</view>
+                        <view>:</view>
+                        别在我这里乱发评论，谢谢合作！
+                    </view>
+                </view>
+            </view>
         </view>
     </view>
 </template>
@@ -167,6 +203,44 @@ export default class momentCard extends wepy.component {
                             margin: 18rpx 0;
                         }
                     }
+                }
+            }
+        }
+    }
+    .comment-box{
+        background:rgba(245,245,245,1);
+        margin-top: 30rpx;
+        .comment-who{
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(212,212,213,1);
+            padding-bottom: 23rpx;
+            .icon{
+                width: 24rpx;
+                height: 21rpx;
+                margin: 44rpx 11rpx 21rpx 30rpx;
+            }
+            .img{
+                width: 60rpx;
+                height: 60rpx;
+                border-radius: 100%;
+                margin: 23rpx 10rpx 0 10rpx;
+            }
+        }
+        .comment-info-box{
+            padding: 19rpx 0;
+            .comment-info{
+                margin: 5rpx 30rpx;
+                font-size:24rpx;
+                view{
+                    display: inline-block;
+                }
+                .from, .to{
+                    color:rgba(230,0,17,1);
+                    font-weight: 600;
+                }
+                .reply{
+                    margin: 0 5rpx;
                 }
             }
         }
