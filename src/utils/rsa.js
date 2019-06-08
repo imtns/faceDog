@@ -1,7 +1,7 @@
 /**
  * [Encryption rsa算法封装]
  */
-module.exports = function() {
+module.exports = (function() {
     // Depends on jsbn.js and rng.js
 
     // Version 1.1: support utf-8 encoding in pkcs1pad2
@@ -13,10 +13,10 @@ module.exports = function() {
     }
 
     function linebrk(s, n) {
-        var ret = "";
+        var ret = '';
         var i = 0;
         while (i + n < s.length) {
-            ret += s.substring(i, i + n) + "\n";
+            ret += s.substring(i, i + n) + '\n';
             i += n;
         }
         return ret + s.substring(i, s.length);
@@ -24,15 +24,15 @@ module.exports = function() {
 
     function byte2Hex(b) {
         if (b < 0x10)
-            return "0" + b.toString(16);
+            {return "0" + b.toString(16);}
         else
-            return b.toString(16);
+            {return b.toString(16);}
     }
 
     // PKCS#1 (type 2, random) pad input string s to n bytes, and return a bigint
     function pkcs1pad2(s, n) {
         if (n < s.length + 11) { // TODO: fix for utf-8
-            uv_alert("Message too long for RSA");
+            uv_alert('Message too long for RSA');
             return null;
         }
         var ba = new Array();
@@ -51,7 +51,7 @@ module.exports = function() {
                   ba[--n] = (c & 63) | 128;
                   ba[--n] = ((c >> 6) & 63) | 128;
                   ba[--n] = (c >> 12) | 224;
-                }*/
+                } */
         }
         ba[--n] = 0;
         var rng = new SecureRandom();
@@ -84,7 +84,7 @@ module.exports = function() {
             this.n = parseBigInt(N, 16);
             this.e = parseInt(E, 16);
         } else
-            uv_alert("Invalid RSA public key");
+            {uv_alert("Invalid RSA public key");}
     }
 
     // Perform raw public operation on "x": return x^e (mod n)
@@ -100,14 +100,14 @@ module.exports = function() {
         if (c == null) return null;
         var h = c.toString(16);
         if ((h.length & 1) == 0) return h;
-        else return "0" + h;
+        else return '0' + h;
     }
 
     // Return the PKCS#1 RSA encryption of "text" as a Base64-encoded string
-    //function RSAEncryptB64(text) {
+    // function RSAEncryptB64(text) {
     //  var h = this.encrypt(text);
     //  if(h) return hex2b64(h); else return null;
-    //}
+    // }
 
     // protected
     RSAKey.prototype.doPublic = RSADoPublic;
@@ -115,10 +115,9 @@ module.exports = function() {
     // public
     RSAKey.prototype.setPublic = RSASetPublic;
     RSAKey.prototype.encrypt = RSAEncrypt;
-    //RSAKey.prototype.encrypt_b64 = RSAEncryptB64;
+    // RSAKey.prototype.encrypt_b64 = RSAEncryptB64;
 
-
-    //==================================================jsbn.js======================================================================//
+    // ==================================================jsbn.js======================================================================//
 
     // Copyright (c) 2005  Tom Wu
     // All Rights Reserved.
@@ -136,9 +135,9 @@ module.exports = function() {
     // (public) Constructor
     function BigInteger(a, b, c) {
         if (a != null)
-            if ("number" == typeof a) this.fromNumber(a, b, c);
+            {if ("number" == typeof a) this.fromNumber(a, b, c);
             else if (b == null && "string" != typeof a) this.fromString(a, 256);
-        else this.fromString(a, b);
+        else this.fromString(a, b);}
     }
 
     // return new, unset BigInteger
@@ -215,14 +214,14 @@ module.exports = function() {
     BigInteger.prototype.F2 = 2 * dbits - BI_FP;
 
     // Digit conversions
-    var BI_RM = "0123456789abcdefghijklmnopqrstuvwxyz";
+    var BI_RM = '0123456789abcdefghijklmnopqrstuvwxyz';
     var BI_RC = new Array();
     var rr, vv;
-    rr = "0".charCodeAt(0);
+    rr = '0'.charCodeAt(0);
     for (vv = 0; vv <= 9; ++vv) BI_RC[rr++] = vv;
-    rr = "a".charCodeAt(0);
+    rr = 'a'.charCodeAt(0);
     for (vv = 10; vv < 36; ++vv) BI_RC[rr++] = vv;
-    rr = "A".charCodeAt(0);
+    rr = 'A'.charCodeAt(0);
     for (vv = 10; vv < 36; ++vv) BI_RC[rr++] = vv;
 
     function int2char(n) {
@@ -278,17 +277,17 @@ module.exports = function() {
         while (--i >= 0) {
             var x = (k == 8) ? s[i] & 0xff : intAt(s, i);
             if (x < 0) {
-                if (s.charAt(i) == "-") mi = true;
+                if (s.charAt(i) == '-') mi = true;
                 continue;
             }
             mi = false;
             if (sh == 0)
-                this[this.t++] = x;
+                {this[this.t++] = x;}
             else if (sh + k > this.DB) {
                 this[this.t - 1] |= (x & ((1 << (this.DB - sh)) - 1)) << sh;
                 this[this.t++] = (x >> (this.DB - sh));
             } else
-                this[this.t - 1] |= x << sh;
+                {this[this.t - 1] |= x << sh;}
             sh += k;
             if (sh >= this.DB) sh -= this.DB;
         }
@@ -308,7 +307,7 @@ module.exports = function() {
 
     // (public) return string representation in given radix
     function bnToString(b) {
-        if (this.s < 0) return "-" + this.negate().toString(b);
+        if (this.s < 0) return '-' + this.negate().toString(b);
         var k;
         if (b == 16) k = 4;
         else if (b == 8) k = 3;
@@ -318,7 +317,7 @@ module.exports = function() {
         else return this.toRadix(b);
         var km = (1 << k) - 1,
             d, m = false,
-            r = "",
+            r = '',
             i = this.t;
         var p = this.DB - (i * this.DB) % k;
         if (i-- > 0) {
@@ -341,7 +340,7 @@ module.exports = function() {
                 if (m) r += int2char(d);
             }
         }
-        return m ? r : "0";
+        return m ? r : '0';
     }
 
     // (public) -this
@@ -364,7 +363,7 @@ module.exports = function() {
         r = i - a.t;
         if (r != 0) return r;
         while (--i >= 0)
-            if ((r = this[i] - a[i]) != 0) return r;
+            {if ((r = this[i] - a[i]) != 0) return r;}
         return 0;
     }
 
@@ -679,7 +678,7 @@ module.exports = function() {
     // x = x/R mod m (HAC 14.32)
     function montReduce(x) {
         while (x.t <= this.mt2) // pad x so am has enough room later
-            x[x.t++] = 0;
+            {x[x.t++] = 0;}
         for (var i = 0; i < this.m.t; ++i) {
             // faster way of calculating u0 = x[i]*mp mod DV
             var j = x[i] & 0x7fff;
@@ -779,7 +778,7 @@ module.exports = function() {
     BigInteger.ZERO = nbv(0);
     BigInteger.ONE = nbv(1);
 
-    //====================================================rng.js===================================================================//
+    // ====================================================rng.js===================================================================//
     // Random number generator - requires a PRNG backend, e.g. prng4.js
 
     // For best results, put code like
@@ -822,8 +821,8 @@ module.exports = function() {
         }
         rng_pptr = 0;
         rng_seed_time();
-        //rng_seed_int(window.screenX);
-        //rng_seed_int(window.screenY);
+        // rng_seed_int(window.screenX);
+        // rng_seed_int(window.screenY);
     }
 
     function rng_get_byte() {
@@ -832,9 +831,9 @@ module.exports = function() {
             rng_state = prng_newstate();
             rng_state.init(rng_pool);
             for (rng_pptr = 0; rng_pptr < rng_pool.length; ++rng_pptr)
-                rng_pool[rng_pptr] = 0;
+                {rng_pool[rng_pptr] = 0;}
             rng_pptr = 0;
-            //rng_pool = null;
+            // rng_pool = null;
         }
         // TODO: allow reseeding after first request
         return rng_state.next();
@@ -849,8 +848,7 @@ module.exports = function() {
 
     SecureRandom.prototype.nextBytes = rng_get_bytes;
 
-
-    //===============================================prng4==========================================================================//
+    // ===============================================prng4==========================================================================//
     // prng4.js - uses Arcfour as a PRNG
 
     function Arcfour() {
@@ -863,7 +861,7 @@ module.exports = function() {
     function ARC4init(key) {
         var i, j, t;
         for (i = 0; i < 256; ++i)
-            this.S[i] = i;
+            {this.S[i] = i;}
         j = 0;
         for (i = 0; i < 256; ++i) {
             j = (j + this.S[i] + key[i % key.length]) & 255;
@@ -897,16 +895,16 @@ module.exports = function() {
     // An array of bytes the size of the pool will be passed to init()
     var rng_psize = 256;
 
-    //rsa加密
+    // rsa加密
     function rsa_encrypt(rawValue, key, mod) {
-        //公钥
-        key = key || "F20CE00BAE5361F8FA3AE9CEFA495362FF7DA1BA628F64A347F0A8C012BF0B254A30CD92ABFFE7A6EE0DC424CB6166F8819EFA5BCCB20EDFB4AD02E412CCF579B1CA711D55B8B0B3AEB60153D5E0693A2A86F3167D7847A0CB8B00004716A9095D9BADC977CBB804DBDCBA6029A9710869A453F27DFDDF83C016D928B3CBF4C7";
-        mod = mod || "3";
-        var _RSA = new RSAKey(); //生成rsa加密对象
-        _RSA.setPublic(key, mod); //设置公钥和mod，PublicKey是1（2）中打印的hex值
+        // 公钥
+        key = key || 'F20CE00BAE5361F8FA3AE9CEFA495362FF7DA1BA628F64A347F0A8C012BF0B254A30CD92ABFFE7A6EE0DC424CB6166F8819EFA5BCCB20EDFB4AD02E412CCF579B1CA711D55B8B0B3AEB60153D5E0693A2A86F3167D7847A0CB8B00004716A9095D9BADC977CBB804DBDCBA6029A9710869A453F27DFDDF83C016D928B3CBF4C7';
+        mod = mod || '3';
+        var _RSA = new RSAKey(); // 生成rsa加密对象
+        _RSA.setPublic(key, mod); // 设置公钥和mod，PublicKey是1（2）中打印的hex值
         return _RSA.encrypt(rawValue);
     }
     return {
         encrypt: rsa_encrypt
-    }
-}();
+    };
+}());

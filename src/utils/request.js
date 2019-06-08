@@ -1,26 +1,38 @@
-import wepy from 'wepy';
+import { toast } from './index';
+
+const domain = 'http://www.molineapp.cn';
 
 const http = (method, ...props) => new Promise((resolve, reject) => {
     try {
-        const url = props[0];
-        let data = (props[1] && props[1].data) || '';
+        let url = props[0];
+        let data = props[1];
+        url = method === 'DELETE' ? url + '/' + data : url + '?';
         if (typeof data === 'function') {
             resolve(data);
             data = {};
         }
         wx.showLoading && wx.showLoading({ title: '加载中', mask: true });
-        let header = props[1] ? props[1].header : null;
-        wepy.request({
-            url: url + (~url.indexOf('?') ? '' : '?'),
+        let header = props[2] || {};
+        if (wx.getStorageSync('token')) {
+            Object.assign(header, {
+                Authorization: `Bearer ${wx.getStorageSync('token')}`
+            });
+        }
+        wx.request({
+            url: domain + url,
             data,
             method,
             dataType: 'json',
             header: {
-                'content-type': method === 'GET' ? 'application/json' : 'application/x-www-form-urlencoded',
+                'content-type': 'application/json',
                 ...header
             },
-            success(response) {
-                resolve(response);
+            success({data}) {
+                if (data.return_code === 0) {
+                    resolve(data.data);
+                } else {
+                    toast(data.message || '服务器开小差了, 请稍后再试');
+                }
             },
             fail(e) {
                 reject(e);
@@ -31,7 +43,11 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
         });
     } catch (e) {
         console.log(e);
+        reject(e);
+        wx.hideLoading && wx.hideLoading();
     }
 });
 module.exports.get = (...props) => http('GET', ...props);
 module.exports.post = (...props) => http('POST', ...props);
+module.exports.put = (...props) => http('PUT', ...props);
+module.exports.del = (...props) => http('DELETE', ...props);

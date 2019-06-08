@@ -1,30 +1,36 @@
 /*eslint-disable */
-let uploadUrl = 'https://yaofa.58.com/fileUpload';
-
+let uploadUrl = 'http://www.molineapp.cn/api/user/profile';
+// uploadUrl = 'https://yaofa.58.com/fileUpload'
+import { toast } from './index';
 module.exports.uploader = (tempFilePath, ...props) => {
     let [params, callback] = props;
-    if(params && params.isVideo) uploadUrl = 'https://yaofa.58.com/wosMeidaUpload'
+    if (params && params.isVideo) uploadUrl = 'http://www.molineapp.cn/api/user/certify/video';
+    if (params && params.profile) uploadUrl = 'http://www.molineapp.cn/api/user/image';
     if (typeof params === 'function') {
         callback = params;
         params = {};
     }
 
     const formData = params && params.data || {};
-    const name = params && params.name || 'content';
-
+    const name = params && params.name || '';
     wx.showLoading && wx.showLoading({ title: '上传中', mask: true });
+    console.log(name);
     return wx.uploadFile({
         url: uploadUrl,
         name,
         formData,
+        header: {
+            Authorization: `Bearer ${wx.getStorageSync('token')}`,
+            "Content-Type": "multipart/form-data"
+        },
         filePath: tempFilePath,
         success({ data }) {
-            const nData = JSON.parse(data);
-            console.log(nData);
-            if (nData.state === 100) {
-                callback && callback(null, nData.data);
+            console.log(data);
+            data = JSON.parse(data);
+            if (data.return_code == 0) {
+                callback('ok');
             } else {
-                callback('上传失败');
+                toast(data.message || '上传失败');
             }
         },
         fail() {

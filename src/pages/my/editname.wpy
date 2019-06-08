@@ -2,9 +2,9 @@
 <template>
     <view class='wrapper'>
         <view class="input">
-            <input type="text" maxlength="5" auto-focus/>
+            <input type="text" value="{{profile.nick_name}}" maxlength="5" auto-focus @input="inputChange" />
         </view>
-        <view class="btn">
+        <view class="btn" @tap="submit">
             确定
         </view>
     </view>
@@ -12,16 +12,28 @@
 
 <script>
 import wepy from 'wepy';
+import mixin from '@/mixins/editMixin'
 export default class EditName extends wepy.page {
     config = {
         navigationBarTitleText: '编辑昵称'
     };
-
-    data = {};
+    mixins = [mixin];
+    data = {
+        name:""
+    };
 
     components = {};
 
-    methods = {};
+    methods = {
+        inputChange({ detail }) {
+            this.name = detail.value;
+        },
+        submit() {
+            this.submit({
+                nick_name: this.name
+            });
+        }
+    };
 
     events = {};
 
@@ -50,17 +62,17 @@ export default class EditName extends wepy.page {
             margin: 15rpx 24rpx;
         }
     }
-    .btn{
-        width:620rpx;
-        height:92rpx;
-        color:#fcfcfc;
-        font-size:28rpx;
+    .btn {
+        width: 620rpx;
+        height: 92rpx;
+        color: #fcfcfc;
+        font-size: 28rpx;
         text-align: center;
         line-height: 92rpx;
-        position:absolute;
-        bottom:95rpx;
-        left:50%;
-        background:#000;
+        position: absolute;
+        bottom: 95rpx;
+        left: 50%;
+        background: #000;
         transform: translateX(-50%);
     }
 }

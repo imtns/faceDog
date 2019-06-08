@@ -1,7 +1,12 @@
 <!--  -->
 <template>
     <view class='wrapper'>
-        <van-button size="large" @tap="uploadVideo">开始录制</van-button>
+        <view class="thumb">
+            <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+        </view>
+        <view class="text">请对着摄像头读出：</view>
+        <view class="word">“颜狗认证，{{number}}”</view>
+        <button class="button" @tap="uploadVideo">开始录制</button>
     </view>
 </template>
 
@@ -19,11 +24,26 @@ export default class Example extends wepy.component {
     };
 
     data = {
-        video: {}
+        video: {},
+        number: 0
     };
 
     components = {};
+    RondomPass(number) {
+        let val = 0;
+        var arr = new Array();
+        var arr1 = new Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
 
+        for (var i = 0; i < number; i++) {
+            var n = Math.floor(Math.random() * 10);
+            arr[i] = arr1[n];
+            //document.write(arr1[n]);
+        }
+
+        val = arr.join('');
+        //document.write(val);
+        return val;
+    }
     methods = {
         async uploadVideo() {
             try {
@@ -31,18 +51,24 @@ export default class Example extends wepy.component {
                     tempFilePath,
                     thumbTempFilePath
                 } = await wepy.chooseVideo();
-                uploader(tempFilePath, { isVideo: true }, (e, result) => {
-                    if (e) {
-                        toast('上传失败，请重试。');
-                        return;
+                uploader(
+                    tempFilePath,
+                    {
+                        isVideo: true,
+                        data: {
+                            code: this.number
+                        },
+                        name: 'files'
+                    },
+                    result => {
+                        toast('上传成功。');
+                        // Object.assign(this.video, {
+                        //     src: result.content,
+                        //     cover: thumbTempFilePath
+                        // });
+                        this.$apply();
                     }
-                    toast('上传成功。');
-                    Object.assign(this.video, {
-                        src: result.content,
-                        cover: thumbTempFilePath
-                    });
-                    this.$apply();
-                });
+                );
             } catch (e) {
                 toast('上传失败', 3000);
             }
@@ -54,31 +80,51 @@ export default class Example extends wepy.component {
     watch = {};
 
     computed = {};
+    onLoad(){
+        this.number = this.RondomPass(5);
+        this.$apply();
+        console.log(this.number)
+    }
 }
 </script>
 
-<style lang='less'>
-.wapper {
-    width: 100%;
-    .van-cell {
-        padding: 10rpx 0 !important;
-    }
-    image {
-        width: 100%;
-    }
-    .logo {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
+<style lang='less' scoped>
+.wrapper {
+    width: 556rpx;
+    margin: 0 auto;
+    text-align: center;
+    .thumb {
+        width: 470rpx;
+        height: 470rpx;
+        margin: 147rpx auto 110rpx;
         image {
-            width: 200rpx;
-            height: 200rpx;
-        }
-        text {
             width: 100%;
-            font-size: 28rpx;
-            text-align: center;
+            height: 100%;
         }
+    }
+    .text {
+        font-size: 28rpx;
+        font-weight: 300;
+        color: rgba(10, 10, 10, 1);
+    }
+    .word {
+        font-size: 32rpx;
+        font-weight: 600;
+        margin-top: 20rpx;
+        color: rgba(10, 10, 10, 1);
+    }
+    button {
+        width: 394rpx;
+        height: 84rpx;
+        margin: 0 auto;
+        font-size: 28rpx;
+        line-height: 84rpx;
+        font-weight: 600;
+        border-radius: 0;
+        margin-top: 97rpx;
+        color: rgba(252, 252, 252, 1);
+        background: rgba(0, 0, 0, 1);
+        opacity: 1;
     }
 }
 </style>

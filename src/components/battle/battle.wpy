@@ -2,23 +2,23 @@
 <template>
     <view class='container'>
         <movable-area style="height: 200vh; width: 400vw;left:-40vw;top:-50vh;">
-            <movable-view wx:if="{{battleTop.visible1}}" data-id="top1" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex1}} " disable="true" x="{{battleTop.x1}}" disabled="{{false}}" y="{{battleTop.y1}}" direction="all">
+            <movable-view wx:if="{{vt1}}" data-id="top1" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{zt1}} " x="{{xt1}}" disabled="true" direction="all" animate="{{true}}">
                 <view class="battle-box top" @tap="fly('top1','top')">
                     <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFit"></image>
                 </view>
             </movable-view>
-            <movable-view wx:if="{{battleTop.visible2}}" data-id="top2" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{battleTop.zIndex2}} " disabled="{{false}}" x="{{battleTop.x2}}" y="{{battleTop.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all">
+            <movable-view wx:if="{{vt2}}" data-id="top2" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{zt2}} " disabled="true" x="{{xt2}}" inertia="{{true}}" friction="1" damping="35" direction="all">
                 <view class="battle-box top" @tap="fly('top2','top')">
                     <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFit"></image>
                 </view>
             </movable-view>
 
-            <movable-view wx:if="{{battleBottom.visible1}}" data-id="bottom1" data-type="bottom" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{battleBottom.zIndex1}} " x="{{battleBottom.x1}}" inertia="{{true}}" y="{{battleBottom.y1}}" friction="1" damping="35" direction="all" disabled="{{false}}">
-                 <view class="battle-box bottom " @tap="fly('bottom3','bottom')">
+            <movable-view wx:if="{{vb1}}" data-id="bottom1" data-type="bottom" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{zb1}} " x="{{xb1}}" inertia="{{true}}" friction="1" damping="35" direction="all" disabled="true">
+                <view class="battle-box bottom " @tap="fly('bottom3','bottom')">
                     <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
                 </view>
             </movable-view>
-            <movable-view wx:if="{{battleBottom.visible2}}" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{battleBottom.zIndex2}} " x="{{battleBottom.x2}}" y="{{battleBottom.y2}}" inertia="{{true}}" friction="1" damping="35" direction="all" disabled="{{false}}" >
+            <movable-view wx:if="{{vb2}}" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{zb2}} " x="{{xb2}}" inertia="{{true}}" friction="1" damping="35" direction="all" disabled="true">
                 <view class="battle-box bottom " @tap="fly('bottom2','bottom')">
                     <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
                 </view>
@@ -29,6 +29,17 @@
         </view>
     </view>
     <van-dialog id="van-dialog" />
+    <view class="box-layer" wx:if="{{layer}}">
+        <view class="pop-box" wx:if="{{pop}}">
+            <image class="image" src="../../images/battle/gift.png" mode="aspectFill"></image>
+            <view class="text">您获得一份<text class="red">随机奖励</text></view>
+            <view class="btn">查看奖励</view>
+        </view>
+        <view class="gift-box" wx:if="{{gift}}">
+            <image class="icon" src="../../images/battle/heart.png" mode="aspectFill"></image>
+            <view class="text">喜欢次数 +1</view>
+        </view>
+    </view>
 </template>
 
 <script>
@@ -39,38 +50,33 @@ let timeout = 0;
 let buttonDisable = false;
 export default class Battle extends wepy.component {
     data = {
-        battleTop: {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 0,
-            visible1: true,
-            visible2: true,
-            zIndex1: 0,
-            zIndex2: 0
-        },
-        battleBottom: {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 0,
-            visible1: true,
-            visible2: true,
-            zIndex1: 0,
-            zIndex2: 0
-        }
+        layer: false,
+        pop: false,
+        gift: false,
+        // x:x轴坐标 v:隐藏  z:层级
+        xt1: 0,
+        xt2: 0,
+        xb1: 0,
+        xb2: 0,
+        vt1: true,
+        vt2: true,
+        zt1: 0,
+        zt2: 0,
+        vb1: true,
+        vb2: true,
+        zb1: 0,
+        zb2: 0
     };
 
     components = {};
 
     methods = {
         async fly(id, type) {
-            console.log('ffffffffffff')
-            if(id == 'bottom3'){
+            if (id == 'bottom3') {
                 wepy.navigateTo({ url: 'battle/profile' });
                 return;
             }
-            console.log(buttonDisable)
+            console.log(buttonDisable);
             if (buttonDisable) return;
             this.handleLayer(id, type);
             buttonDisable = true;
@@ -82,54 +88,35 @@ export default class Battle extends wepy.component {
     };
     handleLayer(id, type) {
         this.handlePosition(
-            type === 'top' ? this.battleTop : this.battleBottom,
+            type === 'top' ? 't' : 'b',
+            id === ('top1' || 'bottom1') ? 1 : 2,
             id
         );
     }
 
-    async handlePosition(o, id) {
-        let trans = 400;
-        // let trans = prex < -145 ? -400 : prex > 145 ? 400 : 0;
-        // if (trans === 0) {
-        //     o.x1 = Math.random();
-        //     o.x2 = Math.random();
-        //     o.y1 = Math.random();
-        //     o.y2 = Math.random();
-        // } else {
-        if (id == 'top1' || id == 'bottom1') {
-            o.x1 = trans + Math.random();
-        } else {
-            o.x2 = trans + Math.random();
-        }
-        // console.log(o.x1)
+    async handlePosition(t, n, id) {
+        let trans = -380 - Math.random();
+        this[`x${t}${n}`] = trans;
         await this.delay();
-        this.resetPosition(o, id);
-        Object.assign(this, o);
-        this.$apply();
+        this.resetPosition(t, n, id);
     }
-    async resetPosition(o, id) {
+    async resetPosition(t, n, id) {
         if (id === 'top1' || id === 'bottom1') {
-            o.zIndex2 = o.zIndex2 + 1;
-            o.visible1 = false;
-            await this.delay();
-            o.x1 = 0;
-            o.y1 = 0;
-            o.visible1 = true;
+            this[`z${t}2`]++;
+            this[`v${t}1`] = false;
         } else {
-            o.zIndex1 = o.zIndex1 + 1;
-            o.visible2 = false;
-            await this.delay();
-            o.x2 = 0;
-            o.y2 = 0;
-            o.visible2 = true;
+            this[`z${t}1`]++;
+            this[`v${t}2`] = false;
         }
-        console.log('123123')
-        Object.assign(this, o);
+        this[`x${t}${n}`] = 0;
+        this.$apply();
+        await this.delay();
+        this[`v${t}${n}`] = true;
         this.$apply();
     }
     delay() {
         return new Promise(function(resolve, reject) {
-            setTimeout(resolve.bind(null, 10), 200);
+            setTimeout(resolve.bind(null, 10), 300);
         });
     }
     events = {};
@@ -162,6 +149,67 @@ export default class Battle extends wepy.component {
 </script>
 
 <style lang='less' scoped>
+.box-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.55);
+    .pop-box {
+        margin: 254rpx auto;
+        width: 470rpx;
+        height: 509rpx;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        background: rgba(255, 255, 255, 1);
+        .image {
+            width: 290rpx;
+            height: 290rpx;
+            display: block;
+        }
+        .text {
+            margin-top: 2rpx;
+            font-size: 32rpx;
+            color: #060706;
+            .red {
+                color: #df062e;
+            }
+        }
+        .btn {
+            width: 392rpx;
+            height: 78rpx;
+            line-height: 78rpx;
+            text-align: center;
+            font-weight: 500;
+            background: rgba(223, 6, 46, 1);
+            color: #fcfcfc;
+            font-size: 28rpx;
+        }
+    }
+    .gift-box {
+        width: 480rpx;
+        height: 195rpx;
+        margin: 353rpx auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background:white;
+        color:#707070;
+    }
+    .icon {
+        width: 96rpx;
+        height: 96rpx;
+    }
+    .text {
+        margin-left: 26rpx;
+        font-size: 32rpx;
+        font-weight: 400;
+        color: rgba(30, 30, 30, 1);
+    }
+}
 .container {
     height: 100%;
     display: flex;

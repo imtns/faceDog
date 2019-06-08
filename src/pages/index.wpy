@@ -11,13 +11,6 @@
     <view wx:if="{{selectedTab === 3}}">
         <my />
     </view>
-
-    <!-- <van-button type="default">默认按钮</van-button>
-    <van-button type="primary">主要按钮</van-button>
-    <van-button type="warning">警告按钮</van-button> -->
-    <!-- <button open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="onGotUserInfo">
-        获取用户信息
-    </button> -->
     <tabbar :tabIndex.sync="selectedTab" />
 </template>
 
@@ -28,8 +21,9 @@ import battle from '@/components/battle/battle';
 import discover from '@/components/discover/discover';
 import my from '@/components/my/my';
 import chat from '@/components/chat/chat';
+import { sleep } from '@/utils';
+import testMixin from '@/mixins/test';
 
-import testMixin from '../mixins/test';
 // import { toast } from '@/utils';
 export default class Index extends wepy.page {
     config = {
@@ -45,7 +39,7 @@ export default class Index extends wepy.page {
             'van-tab': '../components/vant/tab/index',
             'van-popup': '../components/vant/popup/index',
             'van-overlay': '../components/vant/overlay/index',
-            "van-swipe-cell": "../components/vant/swipe-cell/index"
+            'van-swipe-cell': '../components/vant/swipe-cell/index'
         }
     };
     components = {
@@ -55,13 +49,13 @@ export default class Index extends wepy.page {
         chat,
         my
     };
-    mixins = [testMixin];
+
     data = {
         mynum: 20,
         userInfo: {
             nickName: '加载中...'
         },
-        selectedTab: 3
+        selectedTab: 0
     };
     computed = {
         now() {
@@ -84,11 +78,21 @@ export default class Index extends wepy.page {
         }
     };
     events = {
-        'tabSelect': (...args) => {
+        tabSelect: (...args) => {
             let $event = args[args.length - 1];
             this.selectedTab = $event.source.tabIndex;
+            if (this.selectedTab == 3) {
+                this.$invoke('my', 'setProfile');
+            }
         }
     };
     onLoad() {}
+
+    async onShow() {
+        sleep(2);
+        if (this.selectedTab == 3) {
+            this.$invoke('my', 'setProfile');
+        }
+    }
 }
 </script>

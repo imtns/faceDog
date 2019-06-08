@@ -3,16 +3,16 @@
     <view class="wrapper">
         <view class="head">
             <view class="headIcon">
-                <image src="../../images/profile/model.jpg" style="width:172rpx;height:172rpx;"></image>
+                <image src="{{profile.icon}}" style="width:172rpx;height:172rpx;"></image>
             </view>
             <view class="box">
                 <view class="top-part">
                     <view class="info">
-                        <view class="name">爱吃跳跳糖</view>
-                        <view class="desc">28岁 | 北京 | 单身</view>
+                        <view class="name">{{profile.nick_name}}</view>
+                        <view class="desc">{{profile.age}}岁 | {{profile.city}}</view>
                     </view>
                     <view class="verify">
-                        未认证
+                        {{progress[profile.progress]}}
                     </view>
                 </view>
                 <view class="bottom-part">
@@ -23,8 +23,6 @@
                 </view>
             </view>
         </view>
-        <!-- <button class="button" open-type="getUserInfo" wx:if="{{hasUserInfo}}" bindgetuserinfo="doAuthorization"> 微信登录 </button> -->
-
         <view class="hr"></view>
         <view class='item'>
             <view class="title">我的次数</view>
@@ -66,17 +64,50 @@
 
 <script>
 import wepy from 'wepy';
-export default class My extends wepy.component {
-    data = {};
 
+import { get } from '@/utils/request';
+import { PROFILE } from '@/utils/url';
+import { getAge } from '@/utils';
+export default class My extends wepy.component {
+    data = {
+        progress: {
+            profile: '待完善资料',
+            certify: '未验证',
+            audit: '未审核',
+            finish: '通过审核'
+        },
+        profile: {}
+    };
     components = {};
 
     methods = {
         redirect(name) {
             wepy.navigateTo({ url: `my/${name}` });
+        },
+        async setProfile() {
+            const data = await get(PROFILE);
+            console.log(data);
+            data.age = getAge(data.birthday);
+            this.profile = data;
+            this.profile.images &&
+                this.profile.images.forEach(item => {
+                    if (item.is_avatar) {
+                        this.profile.icon = item.image;
+                    }
+                });
+            this.profile.images = this.switchOrder(this.profile.images);
+            this.$apply();
         }
     };
-
+    // 改变图片顺序，把头像放到数组第一个
+    switchOrder(d) {
+        var r = [];
+        d.forEach(e => {
+            if (e['is_avatar']) r.unshift(e);
+            else r.push(e);
+        });
+        return r;
+    }
     events = {};
 
     watch = {};
@@ -105,12 +136,16 @@ export default class My extends wepy.component {
     display: flex;
     justify-content: center;
     margin-right: 43rpx;
+    width: 172rpx;
+    height: 172rpx;
     image {
         border-radius: 50%;
+        width: 100%;
+        height: 100%;
     }
 }
 .box {
-    width: 420rpx;
+    width: 415rpx;
     display: flex;
     flex-wrap: wrap;
     .top-part {
@@ -135,7 +170,7 @@ export default class My extends wepy.component {
             }
         }
         .verify {
-            width: 128rpx;
+            padding: 0 22rpx;
             height: 60rpx;
             border: 2rpx solid rgba(226, 225, 225, 1);
             border-radius: 30rpx;

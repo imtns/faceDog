@@ -1,20 +1,20 @@
 <!-- 注册 -->
 <template>
     <view class='main'>
-        <block wx:if="{{step==1}}">
-            <getInfo :step="step"></getInfo>
+        <block wx:if="{{step===1}}">
+            <getInfo></getInfo>
         </block>
-        <block wx:if="{{step==2}}">
-            <profile :step.sync="step" :userInfo.sync="userInfo"></profile>
+        <block wx:if="{{step===2}}">
+            <profile :userInfo.sync="userInfo"></profile>
         </block>
-        <block wx:if="{{step==3}}">
-            <uploadPic :step.sync="step"></uploadPic>
+        <block wx:if="{{step===3}}">
+            <uploadPic></uploadPic>
         </block>
-        <block wx:if="{{step==4}}">
-            <chooseVerify :step.sync="step"></chooseVerify>
+        <block wx:if="{{step===4}}">
+            <chooseVerify></chooseVerify>
         </block>
-        <block wx:if="{{step==5}}">
-            <uploadVideo :step.sync="step"></uploadVideo>
+        <block wx:if="{{step===5}}">
+            <uploadVideo></uploadVideo>
         </block>
     </view>
 
@@ -27,7 +27,8 @@ import profile from '@/components/register/profile';
 import uploadPic from '@/components/register/uploadPic';
 import chooseVerify from '@/components/register/chooseVerify';
 import uploadVideo from '@/components/register/uploadVideo';
-
+import { post } from '@/utils/request';
+import { LOGIN } from '@/utils/url';
 export default class Register extends wepy.page {
     config = {
         navigationBarTitleText: '颜狗',
@@ -42,7 +43,7 @@ export default class Register extends wepy.page {
     };
 
     data = {
-        step: 5,
+        step: 1,
         scopeUser: false,
         userInfo: {}
     };
@@ -57,33 +58,100 @@ export default class Register extends wepy.page {
 
     methods = {};
 
-    events = {};
-
+    events = {
+        changeStep(step) {
+            this.step = step;
+        },
+        getLocation(t) {
+            wx.getLocation({
+                type: 'wgs84',
+                success: res => {
+                    wepy.setStorageSync('latitude', res.latitude);
+                    wepy.setStorageSync('longitude', res.longitude);
+                    t.goLogin(res.latitude, res.longitude);
+                },
+                fail: err => {
+                    console.log(err);
+                    t.authorizeLocation();
+                }
+            });
+        }
+    };
+    async goLogin(latitude, longitude) {
+        const result = await post(
+            LOGIN,
+            { code: wepy.getStorageSync('code') },
+            {
+                latitude,
+                longitude
+            }
+        );
+        wepy.setStorageSync('welcome', result.welcome);
+        wepy.setStorageSync('token', result.access_token);
+        wepy.setStorageSync('tencent_token', result.tencent_token);
+        if (result.welcome) {
+            this.step = 2;
+            this.$apply();
+        } else {
+            wx.redirectTo({
+                url: 'index'
+            });
+        }
+    }
     watch = {};
 
     computed = {};
 
     onLoad() {
-        // const that = this;
-        // if (!wepy.getStorageSync('userInfo')) {
-        //     wx.getSetting({
-        //         success(res) {
-        //             console.log(res.authSetting);
-        //             if (res.authSetting && res.authSetting['scope.userInfo']) {
-        //                 that.scopeUser = res.authSetting['scope.userInfo'];
-        //                 that.step = 2;
-        //             } else {
-        //                 that.step = 1;
-        //             }
-        //             that.$apply();
-        //         }
-        //     });
-        // } else {
-        //     this.userInfo = wepy.getStorageSync('userInfo');
-        //     that.step = 2;
-        // }
+        wx.login({
+            success: res => {
+                console.log(res);
+                wepy.setStorageSync('code', res.code);
+                if (!wepy.getStorageSync('latitude')) {
+                    this.$invoke('getInfo', 'display');
+                    wx.getSetting({
+                        success: res => {
+                            console.log(res.authSetting['scope.userLocation']);
+                            if (
+                                res.authSetting['scope.userLocation'] !==
+                                    undefined &&
+                                res.authSetting['scope.userLocation'] !== true
+                            ) {
+                                this.authorizeLocation();
+                            } else {
+                                this.events.getLocation(this);
+                            }
+                        }
+                    });
+                } else {
+                    this.goLogin(
+                        wepy.getStorageSync('latitude'),
+                        wepy.getStorageSync('longitude')
+                    );
+                }
+            }
+        });
     }
 
+    authorizeLocation() {
+        wx.showModal({
+            title: '是否授权当前位置',
+            content: '需要获取您的地理位置，请确认授权，否则无法使用',
+            success: res => {
+                if (res.cancel) {
+                } else if (res.confirm) {
+                    wx.openSetting({
+                        success: data => {
+                            console.log(data);
+                            if (data.authSetting['scope.userLocation']) {
+                                this.events.getLocation(this);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
     onShow() {}
 }
 </script>

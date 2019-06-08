@@ -1,5 +1,5 @@
 <style lang="less">
-@import "components/vant/common/index.wxss";
+@import 'components/vant/common/index.wxss';
 .van-tabbar--fixed {
     z-index: 9999 !important;
 }
@@ -12,8 +12,8 @@ import 'wepy-async-function';
 export default class extends wepy.app {
     config = {
         pages: [
-            'pages/index',
             'pages/register',
+            'pages/index',
             'pages/battle/profile',
             'pages/fabu/fabu', // 发布页面
             'pages/my/setting',
@@ -26,11 +26,18 @@ export default class extends wepy.app {
             navigationBarBackgroundColor: '#fff',
             navigationBarTitleText: 'WeChat',
             navigationBarTextStyle: 'black'
+        },
+        permission: {
+            'scope.userLocation': {
+                desc: '你的位置信息将用于小程序位置接口的效果展示'
+            }
         }
     };
 
     globalData = {
-        userInfo: null
+        userInfo: {},
+        location: {},
+        welcome: false
     };
 
     constructor() {
@@ -40,15 +47,7 @@ export default class extends wepy.app {
     }
 
     onLaunch() {
-        this.testAsync();
-    }
 
-    sleep(s) {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve('promise resolved');
-            }, s * 1000);
-        });
     }
 
     async testAsync() {

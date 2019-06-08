@@ -1,13 +1,12 @@
 <!-- 上传图片 -->
 <template>
     <view class='wapper'>
-        <view class="logo">
-            <image mode="aspectFill" src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2593289841,2157576688&fm=26&gp=0.jpg" />
-            <text>在颜狗里，颜值就是王道！请上传你本人最好看的一张照片，它将关系到你的各项权益（照片可随时修改）</text>
+        <view class="step-info">
+            <view class="num">2.</view>上传照片
         </view>
-        <image src="{{src}}" mode="aspectFill"></image>
-        <van-button size="large" @tap="uploadPic">添加图片</van-button>
-        <van-button size="large" @tap="next">下一步</van-button>
+        <view class="desc">在颜狗里，颜值就是王道！请上传你本人最好看的一张 照片它将直接关系到你的各项权益（照片可以随时修改）</view>
+        <image class="thumb" src="{{src}}" @tap="uploadPic" mode="aspectFill"></image>
+        <button class="button" @tap="next">下一步</button>
     </view>
     <view wx:if="{{show}}">
         <cropper :options="cropperOpt" @beforeImageLoad="bl"></cropper>
@@ -17,9 +16,10 @@
 <script>
 import wepy from 'wepy';
 import { uploader } from '@/utils/uploader';
+import { get } from '@/utils/request';
 import { toast } from '@/utils';
 import cropper from '../cropper';
-
+import { PROFILE } from '@/utils/url';
 const device = wx.getSystemInfoSync();
 const width = device.windowWidth;
 const height = device.windowHeight - 50;
@@ -34,7 +34,7 @@ export default class uploadPic extends wepy.component {
     };
 
     data = {
-        src: '',
+        src: '../images/reg/upload.png',
         show: false,
         cropperOpt: {
             width,
@@ -63,6 +63,9 @@ export default class uploadPic extends wepy.component {
             } catch (e) {
                 console.log(e);
             }
+        },
+        next() {
+            this.$emit('changeStep',4)
         }
     };
 
@@ -86,21 +89,23 @@ export default class uploadPic extends wepy.component {
             this.$invoke('cropper', 'getCropperImage')
                 .then(src => {
                     console.log(src);
-                    uploader(src, (e, result) => {
-                        if (e) {
-                            toast('上传失败，请重试。');
-                            return;
+                    uploader(
+                        src,
+                        {
+                            data: wepy.getStorageSync('reg_profile'),
+                            name: 'avatar'
+                        },
+                        result => {
+                            toast('上传成功');
+                            setTimeout(() => {
+                                this.show = false;
+                                this.$apply();
+                            }, 1500);
                         }
-                        toast('上传成功');
-                        this.src = `https://pic1.58cdn.com.cn${result.content}`;
-                        // wepy.previewImage({
-                        //     current: '',
-                        //     urls: [this.src]
-                        // });
-                        this.$apply();
-                    });
+                    );
                 })
                 .catch(err => {
+                    toast('error')
                     console.log(err + '获取图片地址失败，请稍后重试');
                 });
         }
@@ -118,26 +123,98 @@ export default class uploadPic extends wepy.component {
 
 <style lang='less' scoped>
 .wapper {
-    width: 100%;
+    width: 556rpx;
+    margin: 60rpx auto 0;
+    text-align: center;
     .van-cell {
         padding: 10rpx 0 !important;
     }
+    .desc {
+        font-size: 24rpx;
+        margin-top: 61rpx;
+        font-weight: 600;
+        text-align: left;
+    }
+    .step-info {
+        display: flex;
+        justify-content: flex-start;
+        font-size: 36rpx;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 1);
+        .num {
+            width: 51rpx;
+            height: 51rpx;
+            text-align: center;
+            line-height: 51rpx;
+            background: rgba(28, 28, 28, 1);
+            border-radius: 50%;
+            color: white;
+            font-weight: 600;
+            font-size: 36rpx;
+            margin-right: 21rpx;
+        }
+    }
+    .form {
+        .field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-top: 105rpx;
+            font-size: 28rpx;
+            color: rgba(0, 0, 0, 1);
+            text-align: left;
+            .label {
+                width: 84rpx;
+                font-weight: 600;
+            }
+            .icon {
+                width: 40rpx;
+                height: 40rpx;
+                position: absolute;
+                right: 15rpx;
+            }
+            .input {
+                width: 481rpx;
+                height: 80rpx;
+                border: 2rpx solid rgba(0, 0, 0, 1);
+                box-sizing: border-box;
+                padding-left: 24rpx;
+            }
+            .sex-container {
+                width: 481rpx;
+                .button {
+                    display: inline-block;
+                    width: 211rpx;
+                    height: 80rpx;
+                    &:nth-child(1) {
+                        margin-right: 53rpx;
+                    }
+                }
+            }
+        }
+    }
+    .thumb {
+        width: 470rpx;
+        height: 470rpx;
+        margin-top: 81rpx;
+        margin-bottom: 132rpx;
+    }
+    button {
+        width: 394rpx;
+        height: 84rpx;
+        margin: 0 auto;
+        font-size: 28rpx;
+        line-height: 84rpx;
+        font-weight: 600;
+        border-radius: 0;
+        color: rgba(252, 252, 252, 1);
+        background: rgba(0, 0, 0, 1);
+        opacity: 1;
+    }
     image {
         width: 100%;
-    }
-    .logo {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        image {
-            width: 200rpx;
-            height: 200rpx;
-        }
-        text {
-            width: 100%;
-            font-size: 28rpx;
-            text-align: center;
-        }
+        height: 100%;
     }
 }
 </style>

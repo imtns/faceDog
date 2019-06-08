@@ -3,81 +3,226 @@
     <view class='wrapper'>
         <view class="avatar-box">
             <view class="avatar big">
-                <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <image @tap.stop="upload(0)" src="{{profile.images[0].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
             </view>
             <view class="inner-flex-container">
                 <view class="avatar">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <image @tap.stop="upload(1)" src="{{profile.images[1].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
                 </view>
                 <view class="avatar">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <image @tap.stop="upload(2)" src="{{profile.images[2].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
                 </view>
             </view>
 
             <view class="avatar">
-                <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <image @tap.stop="upload(3)" src="{{profile.images[3].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
             </view>
             <view class="avatar">
-                <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <image @tap.stop="upload(4)" src="{{profile.images[4].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
             </view>
             <view class="avatar">
-                <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <image @tap.stop="upload(5)" src="{{profile.images[5].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
             </view>
         </view>
         <view class="item">
             <view class="title">ID</view>
             <view class="content">
-                123123
+                {{profile.ID}}
             </view>
         </view>
         <view class="line"></view>
-        <view class="item">
+        <view class="item" @tap="redirect('editname')">
             <view class="title">昵称</view>
-            <view class="content">哎妈呀</view>
+            <view class="content">{{profile.nick_name}}</view>
             <view class="detail2">
                 <van-icon name="arrow" />
             </view>
         </view>
         <view class="line"></view>
-        <view class="item">
-            <view class="title">出生日期</view>
-            <view class="content">2013-03-39</view>
-            <view class="detail2">
+        <picker mode="date" value="{{profile.birthday}}" start="1970-01-01" end="2019-12-31" bindchange="bindDateChange">
+            <view class="item">
+                <view class="title">出生日期</view>
+                <view class="content">{{profile.birthday}}</view>
+                <view class="detail2">
 
-                <van-icon name="arrow" />
+                    <van-icon name="arrow" />
+                </view>
             </view>
-        </view>
+        </picker>
         <view class="line"></view>
-        <view class="item">
+        <view class="item" @tap="redirect('editdesc')">
             <view class="title">个性签名</view>
-            <view class="content">哈哈哈哈哈哈</view>
+            <view class="content">{{profile.signature}}</view>
             <view class="detail2">
                 <van-icon name="arrow" />
             </view>
         </view>
         <view class="line"></view>
     </view>
+    <view wx:if="{{showCrop}}">
+        <cropper :options="cropperOpt" @beforeImageLoad="bl"></cropper>
+    </view>
+    <van-action-sheet cancel-text="取消" show="{{ show }}" actions="{{ actions }}" bind:cancel="onClose" bind:close="onClose" bind:select="onSelect" />
 </template>
 
 <script>
 import wepy from 'wepy';
+import { uploader } from '@/utils/uploader';
+import { get } from '@/utils/request';
+import { toast, sleep } from '@/utils';
+import cropper from '@/components/cropper';
+import { PROFILE } from '@/utils/url';
+import mixin from '@/mixins/editMixin';
+const device = wx.getSystemInfoSync();
+const width = device.windowWidth;
+const height = device.windowHeight - 50;
+let disabled = false;
 export default class EditFile extends wepy.page {
     config = {
         navigationBarTitleText: '编辑资料',
         usingComponents: {
             'van-button': '../../components/vant/button/index',
             'van-icon': '../../components/vant/icon/index',
-            'van-switch': '../../components/vant/switch/index'
+            'van-switch': '../../components/vant/switch/index',
+            'van-action-sheet': '../../components/vant/action-sheet/index'
         }
     };
 
-    data = {};
+    data = {
+        birth: '',
+        show: false,
+        showCrop: false,
+        disabled: false,
+        actions: [
+            {
+                name: '设为默认头像',
+                disabled
+            },
+            {
+                name: '删除此照片'
+            }
+        ],
+        cropperOpt: {
+            width,
+            height,
+            scale: 2.5,
+            zoom: 8,
+            cut: {
+                x: (width - 300) / 2,
+                y: (height - 300) / 2,
+                width: 300,
+                height: 300
+            }
+        },
+        clickIndex: 0
+    };
+    mixins = [mixin];
+    components = {
+        cropper
+    };
 
-    components = {};
+    methods = {
+        onClose() {
+            this.show = false;
+        },
 
-    methods = {};
-
-    events = {};
+        async onSelect({ detail }) {
+            console.log(detail);
+            if (detail.name == '删除此照片') {
+                this.del(this.profile.images[this.clickIndex]._id);
+                this.show = false;
+                this.$apply();
+                await sleep(1);
+                this.getProfile();
+            } else {
+                this.changeAvatar({
+                    image_id: this.profile.images[this.clickIndex]._id
+                });
+                this.show = false;
+                this.$apply();
+                await sleep(1);
+                this.getProfile();
+            }
+        },
+        async upload(index) {
+            try {
+                if (index == 0) this.actions[0].disabled = true;
+                else this.actions[0].disabled = false;
+                this.clickIndex = index;
+                if (this.profile.images[index]) {
+                    this.show = true;
+                } else {
+                    this.chooseImage();
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        },
+        bindDateChange(event) {
+            console.log(event);
+            this.submit(
+                {
+                    birthday: event.detail.value
+                },
+                false
+            );
+            console.log(event.detail.value);
+            this.profile.birthday = event.detail.value;
+            this.$apply();
+        }
+    };
+    async chooseImage() {
+        const { tempFilePaths } = await wepy.chooseImage({ count: 1 });
+        this.$invoke('cropper', 'pushOrigin', tempFilePaths[0]);
+        this.showCrop = true;
+    }
+    events = {
+        ready() {
+            // console.log('we-cropper ready');
+        },
+        beforeImageLoad() {
+            // console.log('we-cropper beforeImageLoad');
+        },
+        imageLoad() {
+            // console.log('we-cropper imageLoad');
+        },
+        beforeDraw() {
+            // console.log('we-cropper beforeDraw');
+        },
+        cancel() {
+            this.showCrop = false;
+        },
+        getCropImage: () => {
+            this.$invoke('cropper', 'getCropperImage')
+                .then(src => {
+                    console.log(src);
+                    uploader(
+                        src,
+                        {
+                            profile: true,
+                            data: {
+                                id:
+                                    (this.profile.images[this.clickIndex] &&
+                                        this.profile.images[this.clickIndex]
+                                            ._id) ||
+                                    ''
+                            },
+                            name: 'files'
+                        },
+                        result => {
+                            toast('上传成功', async () => {
+                                this.getProfile();
+                                this.showCrop = false;
+                                this.$apply();
+                            });
+                        }
+                    );
+                })
+                .catch(err => {
+                    console.log(err + '获取图片地址失败，请稍后重试');
+                });
+        }
+    };
 
     watch = {};
 
@@ -85,14 +230,18 @@ export default class EditFile extends wepy.page {
 
     onLoad() {}
 
-    onShow() {}
+    onShow() {
+    }
 }
 </script>
 
 <style lang='less'>
+.van-action-sheet__cancel,.van-action-sheet__item{
+    font-size:32rpx !important;
+}
 .wrapper {
     width: 100%;
-    padding-bottom:20rpx;
+    padding-bottom: 20rpx;
     .avatar-box {
         padding: 0 30rpx;
         width: 690rpx;
@@ -143,10 +292,10 @@ export default class EditFile extends wepy.page {
 
     .detail2 {
         font-size: 30rpx;
-        display:flex;
+        display: flex;
         align-items: center;
-        margin-top:8rpx;
-        margin-left:15rpx;
+        margin-top: 8rpx;
+        margin-left: 15rpx;
         color: rgba(178, 178, 178, 1);
     }
 
