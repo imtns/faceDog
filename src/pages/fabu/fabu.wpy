@@ -3,7 +3,7 @@
     <view class="fabu-page">
         <view class="actions">
             <view class="btn">取消</view>
-            <view class="btn">发布</view>
+            <view class="btn" @tap="publish">发布</view>
         </view>
         <view class="inputArea">
             <textarea class="desc" placeholder="请输入内容..."
@@ -11,7 +11,15 @@
             <view class="len">{{ content.length + '/1000'}}</view>
         </view>
         <view class="img-box">
-            <view class="imgBox">
+            <repeat for="{{tempFilePaths}}" key="index" index="index" item="item">
+                <view class="imgBox">
+                    <image class="items" src="{{item}}" mode="aspectFill"></image>
+                    <view class="minus">
+                        <view class="line"></view>
+                    </view>
+                </view>
+            </repeat>
+            <!-- <view class="imgBox">
                 <image class="items" src="../../images/fabu/fabu-test.jpeg" mode="aspectFill"></image>
                 <view class="minus">
                     <view class="line"></view>
@@ -40,15 +48,15 @@
                 <view class="minus">
                     <view class="line"></view>
                 </view>
-            </view>
-            <view class="addbtn">
+            </view> -->
+            <view class="addbtn" @tap="uploadPic">
                 <van-icon name="plus" size="25px"/>
             </view>
         </view>
-        <view class="location">
+        <view class="location" @tap="choseLocation">
             <view class="flex">
                 <image class="location-icon" src="../../images/fabu/fabu-location.png" ></image>
-                <view class="location-address">您的位置</view>
+                <view class="location-address">{{ region || '您的位置' }}</view>
             </view>
             <view class="icon">
                 <van-icon name="arrow" color="#B2B2B2"/>
@@ -58,6 +66,9 @@
 </template>
 <script>
 import wepy from 'wepy';
+import { uploader } from '@/utils/uploader';
+import { post } from '@/utils/request';
+import { FABU_FABU_MOMENT } from '@/utils/url';
 export default class fabu extends wepy.page {
     config = {
         navigationBarTitleText: '发布动态',
@@ -66,15 +77,58 @@ export default class fabu extends wepy.page {
         }
     };
     data = {
-        content: '' // 动态内容
-    };
+        content: '', // 动态内容
+        region: '',
+        latitude: '',
+        longitude: '',
+        tempFilePaths: [],
+    }
 
     components = {};
 
     methods = {
         inputDesc(e) {
             this.content = e.detail.value;
-        }
+        },
+        async uploadPic() {
+            const { tempFilePaths } = await wepy.chooseImage({ count: 6 });
+            this.tempFilePaths = tempFilePaths;
+            this.$apply();
+            console.log(tempFilePaths);
+            // tempFilePaths.forEach(tempFilePath => {
+            //     uploader(tempFilePath, {
+            //         profile: true,
+            //         name: 'files',
+            //     }, (res) => {
+            //         console.log(111111, res);
+            //     });
+            // });
+        },
+        async choseLocation() {
+            const {
+                latitude = 0,
+                longitude = 0,
+                name = '',
+                address ='',
+            } = await wepy.chooseLocation();
+            this.region = name;
+            this.longitude = longitude,
+            this.latitude = latitude;
+            this.$apply();
+        },
+        async publish() {
+            const subData = this.tempFilePaths.reduce((sub, file, index) => {
+                sub[`file${index + 1}`] = file;
+                return sub;
+            }, {
+                content: this.content,
+                region: this.region,
+                latitude: this.latitude,
+                longitude: this.longitude,
+            });
+            const data = await post(FABU_FABU_MOMENT, subData);
+            console.log(data);
+        },
     };
 
     events = {};

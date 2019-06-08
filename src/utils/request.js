@@ -15,7 +15,9 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
         let header = props[2] || {};
         if (wx.getStorageSync('token')) {
             Object.assign(header, {
-                Authorization: `Bearer ${wx.getStorageSync('token')}`
+                Authorization: `Bearer ${wx.getStorageSync('token')}`,
+                latitude: wx.getStorageSync('latitude'),
+                longitude: wx.getStorageSync('longitude'),
             });
         }
         wx.request({

@@ -83,6 +83,8 @@ export default class Index extends wepy.page {
             this.selectedTab = $event.source.tabIndex;
             if (this.selectedTab == 3) {
                 this.$invoke('my', 'setProfile');
+            } else if (this.selectedTab == 1) {
+                this.$invoke('discover', 'initList');
             }
         }
     };
