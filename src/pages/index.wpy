@@ -81,6 +81,9 @@ export default class Index extends wepy.page {
         tabSelect: (...args) => {
             let $event = args[args.length - 1];
             this.selectedTab = $event.source.tabIndex;
+            if (this.selectedTab == 2) {
+                this.$invoke('chat', 'initChat');
+            }
             if (this.selectedTab == 3) {
                 this.$invoke('my', 'setProfile');
             } else if (this.selectedTab == 1) {

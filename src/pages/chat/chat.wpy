@@ -1,0 +1,187 @@
+<!--  -->
+<template>
+    <view class="container">
+        <view class="msgs-wrapper">
+            <view class="msgs" wx:for="{{msgs}}" wx:key="index">
+                <text class="msg-item"><text class="nickname">{{item.fromAccountNick}}</text> : {{item.content}}</text>
+            </view>
+        </view>
+
+        <view class="input-section">
+            <input value="{{msgContent}}" placeholder="" bindconfirm="bindConfirm" />
+            <button class="love" bindtap="bindTap"></button>
+        </view>
+    </view>
+
+</template>
+
+<script>
+import wepy from 'wepy';
+import webim from '@/utils/webim.js'; //腾讯云im包
+import webimhandler from '@/utils/handler';
+import { onMsgNotify, init, sdkLogin } from '@/utils/handler.js'; //这个是所有事件的腾讯js，这个页面需要用到登录
+import Config from '@/utils/config';
+
+export default class Chat extends wepy.page {
+    config = {
+        navigationBarTitleText: ''
+    };
+
+    data = {
+        identifier: '', // 当前用户身份标识，必选
+        userSig: '', // 当前用户签名，必选
+        nickName: '', // 当前用户昵称，选填
+        motto: 'Hello World',
+        msgs: [],
+        msgContent: ''
+    };
+
+    components = {};
+
+    methods = {
+        bindConfirm(e) {
+            var that = this;
+            var content = e.detail.value;
+            if (!content.replace(/^\s*|\s*$/g, '')) return;
+            webimhandler.onSendMsg(content, function() {
+                that.clearInput();
+            });
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+    initChat() {
+        var selToID = ''; //会话列表不设置对方私聊账号
+        webimhandler.init({
+            //初始化的方法
+            accountMode: 0,
+            accountType: Config.accountType,
+            sdkAppID: Config.sdkappid,
+            selType: webim.SESSION_TYPE.C2C, //私聊
+            selToID: 'ygtest0003'
+        });
+        if (webim.checkLogin()) {
+            //检查是否登录返回true和false,不登录则重新登录
+            console.log('已登录');
+            this.initRecentContactList();
+        } else {
+            console.log('登录成功');
+            //当前用户身份
+            var loginInfo = {
+                sdkAppID: Config.sdkappid, //用户所属应用id,必填
+                accountType: Config.accountType, //用户所属应用帐号类型，必填
+                identifier: Config.users[0].identifier, //当前用户ID,必须是否字符串类型，选填
+                identifierNick: Config.users[0].identifier, //当前用户昵称，选填
+                userSig: Config.users[0].userSig //当前用户身份凭证，必须是字符串类型，选填
+            };
+            //监听连接状态回调变化事件
+            var onConnNotify = function(resp) {
+                switch (resp.ErrorCode) {
+                    case webim.CONNECTION_STATUS.ON:
+                        webim.Log.warn('连接状态正常...');
+                        break;
+                    case webim.CONNECTION_STATUS.OFF:
+                        webim.Log.warn(
+                            '连接已断开，无法收到新消息，请检查下你的网络是否正常'
+                        );
+                        break;
+                    default:
+                        webim.Log.error(
+                            '未知连接状态,status=' + resp.ErrorCode
+                        );
+                        break;
+                }
+            };
+
+            //监听事件
+            var listeners = {
+                onConnNotify: onConnNotify, //监听连接状态回调变化事件,必填
+                onMsgNotify: onMsgNotify
+            };
+            var options = {
+                isAccessFormalEnv: true, //是否访问正式环境，默认访问正式，选填
+                isLogOn: true //是否开启控制台打印日志,默认开启，选填
+            };
+            webimhandler.sdkLogin(loginInfo, listeners, options, () => {
+                // this.initRecentContactList();
+            });
+        }
+    }
+    onLoad(options) {
+        this.identifier = 'ygtest0003';
+        this.initChat();
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+/**index.wxss**/
+.container {
+    background-image: url(https://mc.qcloudimg.com/static/img/7da57e0050d308e2e1b1e31afbc42929/bg.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+}
+
+.msgs-wrapper {
+    position: absolute;
+    bottom: 100rpx;
+    left: 10rpx;
+    right: 10rpx;
+}
+
+.msgs {
+    max-width: 80%;
+    display: block;
+    padding: 5rpx;
+    color: #ffffff;
+    margin: 5rpx 0;
+    word-wrap: break-word;
+}
+
+.msg-item {
+    padding: 8rpx 5rpx;
+    border-radius: 4rpx;
+    font-size: 14px;
+}
+
+.nickname {
+    color: #ff7906;
+}
+
+.input-section {
+    position: absolute;
+    bottom: 10rpx;
+    left: 10rpx;
+    right: 10rpx;
+}
+
+.input-section input {
+    background: #fff;
+    margin-right: 100rpx;
+    padding: 10rpx;
+}
+
+.input-section .love {
+    background: url(http://avc.qcloud.com/demo/webim/biggroup/mobile/img/like_hover.png);
+    background-size: 100%;
+    width: 70rpx;
+    height: 70rpx;
+    display: block;
+    position: absolute;
+    right: 10rpx;
+    bottom: 0;
+    border: 0;
+    outline: 0;
+}
+
+.input-section .love:after {
+    border: 0;
+}
+</style>
