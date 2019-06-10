@@ -11,45 +11,15 @@
             <view class="len">{{ content.length + '/1000'}}</view>
         </view>
         <view class="img-box">
-            <repeat for="{{tempFilePaths}}" key="index" index="index" item="item">
+            <repeat for="{{uploadedPics}}" key="index" index="index" item="item">
                 <view class="imgBox">
-                    <image class="items" src="{{item}}" mode="aspectFill"></image>
+                    <image class="items" src="{{item.image_url}}" mode="aspectFill"></image>
                     <view class="minus">
                         <view class="line"></view>
                     </view>
                 </view>
             </repeat>
-            <!-- <view class="imgBox">
-                <image class="items" src="../../images/fabu/fabu-test.jpeg" mode="aspectFill"></image>
-                <view class="minus">
-                    <view class="line"></view>
-                </view>
-            </view>
-            <view class="imgBox">
-                <image class="items" src="../../images/fabu/fabu-test2.jpeg" mode="aspectFill"></image>
-                <view class="minus">
-                    <view class="line"></view>
-                </view>
-            </view>
-            <view class="imgBox">
-                <image class="items" src="../../images/fabu/fabu-test2.jpeg" mode="aspectFill"></image>
-                <view class="minus">
-                    <view class="line"></view>
-                </view>
-            </view>
-            <view class="imgBox">
-                <image class="items" src="../../images/fabu/fabu-test.jpeg" mode="aspectFill"></image>
-                <view class="minus">
-                    <view class="line"></view>
-                </view>
-            </view>
-            <view class="imgBox">
-                <image class="items" src="../../images/fabu/fabu-test.jpeg" mode="aspectFill"></image>
-                <view class="minus">
-                    <view class="line"></view>
-                </view>
-            </view> -->
-            <view class="addbtn" @tap="uploadPic">
+            <view class="addbtn" @tap="uploadPic" wx:if="{{uploadedPics.length < 6}}">
                 <van-icon name="plus" size="25px"/>
             </view>
         </view>
@@ -66,9 +36,9 @@
 </template>
 <script>
 import wepy from 'wepy';
-import { uploader } from '@/utils/uploader';
-import { post } from '@/utils/request';
-import { FABU_FABU_MOMENT } from '@/utils/url';
+import { post, put } from '@/utils/request';
+import { toast } from '@/utils/index';
+import { FABU_FABU_MOMENT, FABU_UPLOAD_PIC } from '@/utils/url';
 export default class fabu extends wepy.page {
     config = {
         navigationBarTitleText: '发布动态',
@@ -81,7 +51,8 @@ export default class fabu extends wepy.page {
         region: '',
         latitude: '',
         longitude: '',
-        tempFilePaths: [],
+        // tempFilePaths: [],
+        uploadedPics: [],
     }
 
     components = {};
@@ -92,17 +63,42 @@ export default class fabu extends wepy.page {
         },
         async uploadPic() {
             const { tempFilePaths } = await wepy.chooseImage({ count: 6 });
-            this.tempFilePaths = tempFilePaths;
+            if (this.uploadedPics.length + tempFilePaths.length > 6) {
+                toast('最多只能上传六张照片！');
+                return;
+            }
+            // this.tempFilePaths = tempFilePaths;
+            wepy.showLoading({ title: '上传中', mask: true });
+            Promise.all(
+                tempFilePaths.map(x => this.methods.wxUploade(x))
+            ).then((res) => {
+                console.log('上传图片成功', res);
+                wepy.hideLoading();
+                this.uploadedPics = this.uploadedPics.concat(res);
+                this.$apply();
+            });
             this.$apply();
-            console.log(tempFilePaths);
-            // tempFilePaths.forEach(tempFilePath => {
-            //     uploader(tempFilePath, {
-            //         profile: true,
-            //         name: 'files',
-            //     }, (res) => {
-            //         console.log(111111, res);
-            //     });
-            // });
+        },
+        wxUploade(tempFilePath) {
+            return new Promise((resolve, reject) => {
+                wx.uploadFile({
+                    url: 'http://www.molineapp.cn/api/discover/moment/images',
+                    filePath: tempFilePath,
+                    name: 'image',
+                    header: {
+                        Authorization: `Bearer ${wx.getStorageSync('token')}`,
+                        "Content-Type": "multipart/form-data"
+                    },
+                    success (res){
+                        const data = JSON.parse(res.data).data;
+                        resolve(data);
+                        //do something
+                    },
+                    fail(res) {
+                        reject(res);
+                    },
+                })
+            });
         },
         async choseLocation() {
             const {
@@ -117,14 +113,15 @@ export default class fabu extends wepy.page {
             this.$apply();
         },
         async publish() {
-            const subData = this.tempFilePaths.reduce((sub, file, index) => {
-                sub[`file${index + 1}`] = file;
+            const subData = this.uploadedPics.reduce((sub, file) => {
+                sub.images.push(file.id);
                 return sub;
             }, {
                 content: this.content,
                 region: this.region,
                 latitude: this.latitude,
                 longitude: this.longitude,
+                images: [],
             });
             const data = await post(FABU_FABU_MOMENT, subData);
             console.log(data);

@@ -11,3 +11,5 @@ export const HANDLE_PICTURE = '/api/user/image';
 export const DISCOVER_MOMENT_LIST  = '/api/discover/moments/nearby';
 // 发布页面-发布动态
 export const FABU_FABU_MOMENT = '/api/discover/moments';
+// 发布页面 - 上传图片
+export const FABU_UPLOAD_PIC = '/api​/discover​/moment​/images';

@@ -1,90 +1,107 @@
 <!--  -->
 <template>
-    <view class="momentCard">
-        <image  class="header" src="../../images/discover/discover-top2.png"></image>
-        <view class="content">
-            <view class="info">
-                <view class="first">
-                    <view class="name">蹦迪的皮卡丘</view>
-                    <view class="other">
-                        <text class="location">距您 5km</text>
-                        <text class="online-time">7小时前</text>
+    <repeat for="{{momentList}}" key="index" index="index" item="item">
+        <view class="momentCard">
+            <image  class="header" src="{{item.avatar}}" mode="aspectFill"></image>
+            <view class="content">
+                <view class="info">
+                    <view class="first">
+                        <view class="name">{{item.nickname}}</view>
+                        <view class="other">
+                            <text class="location">距您 {{item.distance}}km</text>
+                            <text class="online-time">7小时前</text>
+                        </view>
+                    </view>
+                    <view class="second">
+                        <text class="margin-right">{{item.age}}岁</text>
+                        <text class="margin-right">巨蟹座</text>
+                        <text class="margin-right">{{item.city}}</text>
+                    </view>
+                    <view class="moment">
+                        {{item.content}}
+                    </view>
+                    <view class="imgs">
+                        <repeat for="{{item.images}}" key="indeximages" index="indeximages" item="pic">
+                            <image class="img" src="{{pic.image}}" data-index="{{index}}" data-picIndex="{{indeximages}}"  @tap="preview" mode="aspectFill"></image>
+                        </repeat>
+                    </view>
+                    <view class="actions">
+                        <view class="box" @tap="zan" data-id="{{item._id}}"
+                        data-index="{{index}}">
+                            <image class="icon" src="../../images/discover/discover-zan.png"></image>
+                            <view class="text">{{item.like}}</view>
+                        </view>
+                        <view class="box" @tap="comment" data-id="{{item._id}}"
+                        data-index="{{index}}">
+                            <image class="icon" src="../../images/discover/discover-commen.png"></image>
+                            <view class="text">私密评论</view>
+                        </view>
+                        <view class="last">
+                            <view class="lastbox" @tap="warn" data-id="1023">
+                                <image class="action-icon" src="../../images/discover/discover-actions.png"></image>
+                            </view>
+                        </view>
                     </view>
                 </view>
-                <view class="second">
-                    <text class="margin-right">22岁</text>
-                    <text class="margin-right">巨蟹座</text>
-                    <text class="margin-right">北京</text>
-                </view>
-                <view class="moment">
-                    幕布，在线的一款思维概要整理工具，将思维以树形结构方式快速整理，书写成文。其记录过程简单.将思维以树形结构方式快速整理，书写成文。其记录过程简单.
-                </view>
-                <view class="imgs">
-                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview" mode="aspectFill"></image>
-                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview" mode="aspectFill"></image>
-                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview" mode="aspectFill"></image>
-                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview"></image>
-                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview" mode="aspectFill"></image>
-                </view>
-                <view class="actions">
-                    <view class="box">
+                <view class="comment-box">
+                    <view class="comment-who">
                         <image class="icon" src="../../images/discover/discover-zan.png"></image>
-                        <view class="text">1234</view>
+                        <image class="img" src="../../images/discover/discover-top1.png"></image>
+                        <image class="img" src="../../images/discover/discover-top1.png"></image>
+                        <image class="img" src="../../images/discover/discover-top1.png"></image>
+                        <image class="img" src="../../images/discover/discover-top1.png"></image>
+                        <image class="img" src="../../images/discover/discover-top1.png"></image>
+                        <image class="img" src="../../images/discover/discover-top1.png"></image>
+                        <image class="img" src="../../images/discover/discover-top1.png"></image>
+                        <image class="img" src="../../images/discover/discover-top1.png"></image>
                     </view>
-                    <view class="box">
-                        <image class="icon" src="../../images/discover/discover-commen.png"></image>
-                        <view class="text">私密评论</view>
-                    </view>
-                    <view class="last">
-                        <view class="lastbox" @tap="warn" data-id="1023">
-                            <image class="action-icon" src="../../images/discover/discover-actions.png"></image>
+                    <view class="comment-info-box">
+                        <view class="comment-info">
+                            <view class="from">小西西</view>
+                            <view class="reply">回复</view>
+                            <view class="to">跳舞的皮卡丘</view>
+                            <view>:</view>
+                            这张我觉得比较有感觉~这张我觉得比较有感觉~这张我觉得比较有感觉~
+                        </view>
+                        <view class="comment-info">
+                            <view class="from">小西西</view>
+                            <view class="reply"></view>
+                            <view class="to"></view>
+                            <view>:</view>
+                            统一回复，哈哈哈
+                        </view>
+                        <view class="comment-info">
+                            <view class="from">跳舞的皮卡丘</view>
+                            <view class="reply">回复</view>
+                            <view class="to">小西西</view>
+                            <view>:</view>
+                            别在我这里乱发评论，谢谢合作！
                         </view>
                     </view>
                 </view>
             </view>
-            <view class="comment-box">
-                <view class="comment-who">
-                    <image class="icon" src="../../images/discover/discover-zan.png"></image>
-                    <image class="img" src="../../images/discover/discover-top1.png"></image>
-                    <image class="img" src="../../images/discover/discover-top1.png"></image>
-                    <image class="img" src="../../images/discover/discover-top1.png"></image>
-                    <image class="img" src="../../images/discover/discover-top1.png"></image>
-                    <image class="img" src="../../images/discover/discover-top1.png"></image>
-                    <image class="img" src="../../images/discover/discover-top1.png"></image>
-                    <image class="img" src="../../images/discover/discover-top1.png"></image>
-                    <image class="img" src="../../images/discover/discover-top1.png"></image>
-                </view>
-                <view class="comment-info-box">
-                    <view class="comment-info">
-                        <view class="from">小西西</view>
-                        <view class="reply">回复</view>
-                        <view class="to">跳舞的皮卡丘</view>
-                        <view>:</view>
-                        这张我觉得比较有感觉~这张我觉得比较有感觉~这张我觉得比较有感觉~
-                    </view>
-                    <view class="comment-info">
-                        <view class="from">小西西</view>
-                        <view class="reply"></view>
-                        <view class="to"></view>
-                        <view>:</view>
-                        统一回复，哈哈哈
-                    </view>
-                    <view class="comment-info">
-                        <view class="from">跳舞的皮卡丘</view>
-                        <view class="reply">回复</view>
-                        <view class="to">小西西</view>
-                        <view>:</view>
-                        别在我这里乱发评论，谢谢合作！
-                    </view>
-                </view>
-            </view>
+        </view>
+    </repeat>
+    <view class="moment-mask" wx:if="{{isShowComment}}" @tap="closeComment">
+        <view class="inputbox">
+            <input placeholder="发送私密评论，只有她能看到哦~" focus="{{isShowComment}}" class="inputview"
+            confirm-type="send" bindblur="closeComment"
+            bindconfirm="sendComment"
+            data-componentId="{{componentId}}"
+            data-componentIndex="{{componentIndex}}"/>
         </view>
     </view>
 </template>
 <script>
 import wepy from 'wepy';
+import { get, post } from '../../utils/request'
 export default class momentCard extends wepy.component {
-    data = {};
+    data = {
+        momentList: [],
+        isShowComment: false,
+        componentId: '',
+        componentIndex: '',
+    };
 
     components = {};
 
@@ -93,14 +110,82 @@ export default class momentCard extends wepy.component {
             const { id } = e.currentTarget.dataset;
             this.$emit('showwarn', id);
         },
-        preview() {
+        // 点击图片预览
+        preview(e) {
+            const { index, picindex } = e.currentTarget.dataset; 
+            const urls = this.momentList.reduce((res, item, i) => {
+                if (+index === +i) {
+                    res = item.images.map(x => x.image);
+                }
+                return res;
+            }, []);
+            const current = urls[picindex];
+            console.log(urls, current);
             wepy.previewImage({
-                current: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg', // 当前显示图片的http链接
-                urls: ['https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg'] // 需要预览的图片http链接列表
-            })
+                current, // 当前显示图片的http链接
+                urls, // 需要预览的图片http链接列表
+            });
+        },
+        // 处理接口的年龄字段
+        handleAge(birthday) {
+            const arr = birthday.split('-');
+            const time = new Date;
+            const cur_year = time.getFullYear();
+            const cur_month = time.getMonth();
+            const cur_day = time.getDate();
+            const baseAge = +cur_year - +arr[0] - 1;
+            console.log(baseAge);
+            if (+arr[1] > cur_month) {
+                return baseAge;
+            } else if (+arr[1] < cur_month) {
+                return baseAge + 1;
+            } else {
+                if (+arr[2] > cur_day) {
+                    return baseAge;
+                } else {
+                    return baseAge + 1;
+                }
+            }
+        },
+        // 点赞
+        async zan(e) {
+            const { id, index } = e.currentTarget.dataset; 
+            const data =  await get(`/api/discover/moment/${id}/like`);
+            this.momentList[index].like += 1;
+        },
+        // 私密评论
+        comment(e) {
+            this.isShowComment = true;
+            const { id, index } = e.currentTarget.dataset; 
+            this.componentId = id;
+            this.componentIndex = index;
+        },
+        // 关闭评论
+        closeComment() {
+            this.isShowComment = false;
+            this.componentId = '';
+            this.componentIndex = '';
+        },
+        // 发送评论
+        async sendComment(e) {
+            const { value } = e.detail; 
+            const data = await post(`/api/discover/moments/${this.componentId}/comment`, {
+                moment_id: this.componentId,
+                content: value,
+            });
+            console.log(data);
         },
     };
-
+    setMomentList(list) {
+        this.momentList = list.reduce((res, item) => {
+            // 处理距离
+            item.distance = (item.distance / 1000).toFixed(2);
+            item.age = this.methods.handleAge(item.birthday);
+            res.push(item);
+            return res;
+        }, []);
+        this.$apply();
+    };
     events = {};
 
     watch = {};
@@ -114,6 +199,34 @@ export default class momentCard extends wepy.component {
 </script>
 
 <style lang='less' scoped>
+.moment-mask{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,.7);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    .inputbox{
+        position: absolute;
+        bottom: 15vh;
+        height: 147rpx;
+        width: 100%;
+        background: white;
+        .inputview{
+            width: 92%;
+            margin: 32rpx auto;
+            background:rgba(230,229,232,1);
+            height: 82rpx;
+            line-height: 82rpx;
+            font-size:24rpx;
+            color:rgba(158,157,157,1);
+            padding-left: 22rpx;
+        }
+    }
+}
 .momentCard{
     display: flex;
     padding: 0 26rpx;
@@ -192,6 +305,7 @@ export default class momentCard extends wepy.component {
                         line-height: 45rpx;
                         color:rgba(158,157,157,1);
                         display: inline-block;
+                        margin-left: 5rpx;
                     }
                 }
                 .last{
