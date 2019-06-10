@@ -20,11 +20,11 @@
                     幕布，在线的一款思维概要整理工具，将思维以树形结构方式快速整理，书写成文。其记录过程简单.将思维以树形结构方式快速整理，书写成文。其记录过程简单.
                 </view>
                 <view class="imgs">
-                    <image class="img" src="../../images/discover/discover-top2.png"></image>
-                    <image class="img" src="../../images/discover/discover-top2.png"></image>
-                    <image class="img" src="../../images/discover/discover-top2.png"></image>
-                    <image class="img" src="../../images/discover/discover-top2.png"></image>
-                    <image class="img" src="../../images/discover/discover-top2.png"></image>
+                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview" mode="aspectFill"></image>
+                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview" mode="aspectFill"></image>
+                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview" mode="aspectFill"></image>
+                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview"></image>
+                    <image class="img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" @tap="preview" mode="aspectFill"></image>
                 </view>
                 <view class="actions">
                     <view class="box">
@@ -92,6 +92,12 @@ export default class momentCard extends wepy.component {
         warn(e) {
             const { id } = e.currentTarget.dataset;
             this.$emit('showwarn', id);
+        },
+        preview() {
+            wepy.previewImage({
+                current: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg', // 当前显示图片的http链接
+                urls: ['https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg'] // 需要预览的图片http链接列表
+            })
         },
     };
 

@@ -1,0 +1,68 @@
+<!--  -->
+<template>
+    <view class="rank-page">
+        <view class="rank-search">
+            <van-tabs class="tabs">
+                <van-tab title="全部"></van-tab>
+                <van-tab title="同城"></van-tab>
+                <van-tab title="星座"></van-tab>
+            </van-tabs>
+        </view>
+        <rankList :top3="top3" :topOthers="topOthers"></rankList>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+import rankList from '@/components/rank/rankList';
+export default class fabu extends wepy.page {
+    config = {
+        navigationBarTitleText: '排行榜',
+        usingComponents: {
+            'van-tabs': '../../components/vant/tabs/index',
+            'van-tab': '../../components/vant/tab/index',
+        }
+    };
+    data = {
+        all: [1,2,3,4,5,6,7],
+        top3: [1,2,3],
+        topOthers: [4,5,6,7],
+    };
+
+    components = {
+        rankList,
+    };
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() { };
+
+    onShow() { };
+}
+</script>
+
+<style lang='less'>
+.rank-page{
+    .rank-search{
+        width: 50vw;
+        margin-bottom: 30rpx;
+        .tabs{
+            .van-tab--active{
+                font-size: 42rpx !important;
+                font-weight:600 !important;
+                z-index:1;
+            }
+            .van-tabs__line{
+                width:77rpx !important;
+                height:10rpx !important;
+                bottom: 28% !important;
+            }
+        }
+    }
+}
+</style>

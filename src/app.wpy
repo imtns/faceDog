@@ -21,6 +21,7 @@ export default class extends wepy.app {
             'pages/my/editdesc',
             'pages/my/editfile',
             'pages/chat/chat'
+            'pages/rank/rank', // 排行榜页面
         ],
         window: {
             backgroundTextStyle: 'light',

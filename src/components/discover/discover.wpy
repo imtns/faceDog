@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import { get } from '@/utils/request';
+import { DISCOVER_MOMENT_LIST } from '../../utils/url.js';
 import wepy from 'wepy';
 import topBanner from '@/components/discover/topBanner';
 import momentCard from '@/components/discover/momentCard';
@@ -45,16 +47,6 @@ export default class Discover extends wepy.component {
     onClose() {
         this.show = false;
     }
-    methods = {
-        mkPhoto() {
-            wepy.navigateTo({
-                url: 'fabu/fabu',
-            });
-        },
-        closewarn() {
-            this.show = false;
-        },
-    };
 
     events = {
         showwarn(id) {
@@ -66,8 +58,25 @@ export default class Discover extends wepy.component {
     watch = {};
 
     computed = {};
-
-    onLoad() { };
+    methods = {
+        mkPhoto() {
+            wepy.navigateTo({
+                url: 'fabu/fabu',
+            });
+        },
+        closewarn() {
+            this.show = false;
+        },
+        async initList() {
+            // 请求动态列表
+            // todo，全国和同城这个接口还没有弄好
+            // const latitude = wepy.getStorageSync('latitude');
+            // const longitude = wepy.getStorageSync('longitude');
+            const data = await get(DISCOVER_MOMENT_LIST);
+            console.log('动态列表', data);
+        },
+    }
+    onLoad() {};
 
     onShow() {
         console.log(222222);
