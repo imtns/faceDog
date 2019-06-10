@@ -81,7 +81,7 @@ function handlderMsg(msg) {
 }
 
 // sdk登录
-function sdkLogin(userInfo, listeners, options, avChatRoomId) {
+function sdkLogin(userInfo, listeners, options, cb) {
     // web sdk 登录
     webim.login(userInfo, listeners, options,
         function (identifierNick) {
@@ -95,48 +95,10 @@ function sdkLogin(userInfo, listeners, options, avChatRoomId) {
                     'Value': userInfo.identifierNick
                 }]
             }, function () {
-                var options = {
-                    'GroupIdList': [
-                        avChatRoomId
-                    ],
-                    'GroupBasePublicInfoFilter': [
-                        'Type',
-                        'Name',
-                        'Introduction',
-                        'Notification',
-                        'FaceUrl',
-                        'CreateTime',
-                        'Owner_Account',
-                        'LastInfoTime',
-                        'LastMsgTime',
-                        'NextMsgSeq',
-                        'MemberNum',
-                        'MaxMemberNum',
-                        'ApplyJoinOption'
-                    ]
-                };
-                webim.getGroupPublicInfo(
-                    options,
-                    function (resp) {
-                        console.log('getGroupPublicInfo success', resp);
-                        if (resp.GroupInfo.length > 0) {
-                            applyJoinBigGroup(avChatRoomId);// 加入大群
-                        } else {
-                            // 测试代码，先创建群，确保群存在，正常的业务中无需这样处理。
-                            createBigGroup(avChatRoomId, loginInfo, function () {
-                                applyJoinBigGroup(avChatRoomId);// 加入大群
-                            });
-                        }
-                    },
-                    function (err) {
-                        console.log('getGroupPublicInfo error', err);
-                        // 测试代码，先创建群，确保群存在，正常的业务中无需这样处理。
-                        createBigGroup(avChatRoomId, loginInfo, function () {
-                            applyJoinBigGroup(avChatRoomId);// 加入大群
-                        });
-                    }
-                );
-            });
+  
+
+                });
+            cb && cb()
             // hideDiscussForm();//隐藏评论表单
             // initEmotionUL();//初始化表情
         },

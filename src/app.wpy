@@ -19,7 +19,8 @@ export default class extends wepy.app {
             'pages/my/setting',
             'pages/my/editname',
             'pages/my/editdesc',
-            'pages/my/editfile'
+            'pages/my/editfile',
+            'pages/chat/chat'
         ],
         window: {
             backgroundTextStyle: 'light',
