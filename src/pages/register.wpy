@@ -81,6 +81,7 @@ export default class Register extends wepy.page {
         const result = await post(
             LOGIN,
             { code: wepy.getStorageSync('code') },
+            // { code: 'ygtest0003' || wepy.getStorageSync('code') },
             {
                 latitude,
                 longitude

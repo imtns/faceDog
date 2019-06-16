@@ -6,7 +6,7 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
     try {
         let url = props[0];
         let data = props[1];
-        url = method === 'DELETE' ? url + '/' + data : url + '?';
+        url = method === 'DELETE' ? url + '/' + data : url;
         if (typeof data === 'function') {
             resolve(data);
             data = {};

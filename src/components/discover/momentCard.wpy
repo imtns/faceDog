@@ -22,14 +22,16 @@
                     </view>
                     <view class="imgs">
                         <repeat for="{{item.images}}" key="indeximages" index="indeximages" item="pic">
-                            <image class="img" src="{{pic.image}}" data-index="{{index}}" data-picIndex="{{indeximages}}"  @tap="preview" mode="aspectFill"></image>
+                            <image class="img" src="{{pic.image_url}}" data-index="{{index}}" data-picIndex="{{indeximages}}"  @tap="preview" mode="aspectFill"></image>
                         </repeat>
                     </view>
                     <view class="actions">
                         <view class="box" @tap="zan" data-id="{{item._id}}"
                         data-index="{{index}}">
-                            <image class="icon" src="../../images/discover/discover-zan.png"></image>
-                            <view class="text">{{item.like}}</view>
+                            <image class="icon" src="../../images/discover/discover-zaned.png" wx:if="{{item.liked}}"></image>
+                            <image class="icon" src="../../images/discover/discover-zan.png" wx:else></image>
+                            <view wx:if="{{item.liked}}" class="text red">{{item.likes.length || 0}}</view>
+                            <view wx:else class="text">{{item.likes.length || 0}}</view>
                         </view>
                         <view class="box" @tap="comment" data-id="{{item._id}}"
                         data-index="{{index}}">
@@ -44,39 +46,22 @@
                     </view>
                 </view>
                 <view class="comment-box">
-                    <view class="comment-who">
+                    <view class="comment-who" wx:if="{{item.likes.length}}">
                         <image class="icon" src="../../images/discover/discover-zan.png"></image>
-                        <image class="img" src="../../images/discover/discover-top1.png"></image>
-                        <image class="img" src="../../images/discover/discover-top1.png"></image>
-                        <image class="img" src="../../images/discover/discover-top1.png"></image>
-                        <image class="img" src="../../images/discover/discover-top1.png"></image>
-                        <image class="img" src="../../images/discover/discover-top1.png"></image>
-                        <image class="img" src="../../images/discover/discover-top1.png"></image>
-                        <image class="img" src="../../images/discover/discover-top1.png"></image>
-                        <image class="img" src="../../images/discover/discover-top1.png"></image>
+                        <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
+                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}"></image>
+                        </repeat>
                     </view>
-                    <view class="comment-info-box">
-                        <view class="comment-info">
-                            <view class="from">小西西</view>
-                            <view class="reply">回复</view>
-                            <view class="to">跳舞的皮卡丘</view>
-                            <view>:</view>
-                            这张我觉得比较有感觉~这张我觉得比较有感觉~这张我觉得比较有感觉~
-                        </view>
-                        <view class="comment-info">
-                            <view class="from">小西西</view>
-                            <view class="reply"></view>
-                            <view class="to"></view>
-                            <view>:</view>
-                            统一回复，哈哈哈
-                        </view>
-                        <view class="comment-info">
-                            <view class="from">跳舞的皮卡丘</view>
-                            <view class="reply">回复</view>
-                            <view class="to">小西西</view>
-                            <view>:</view>
-                            别在我这里乱发评论，谢谢合作！
-                        </view>
+                    <view class="comment-info-box" wx:if="{{item.comments.length}}">
+                        <repeat for="{{item.comments}}" key="indexcomments" index="indexcomments" item="comments">
+                            <view class="comment-info">
+                                <view class="from">{{comments.user_nick_name}}</view>
+                                <view class="reply" wx:if="{{comments.replay_user_nick_name}}">回复</view>
+                                <view class="to" wx:if="{{comments.replay_user_nick_name}}">{{comments.replay_user_nick_name}}</view>
+                                <view>:</view>
+                                {{comments.content}}
+                            </view>
+                        </repeat>
                     </view>
                 </view>
             </view>
@@ -115,7 +100,7 @@ export default class momentCard extends wepy.component {
             const { index, picindex } = e.currentTarget.dataset; 
             const urls = this.momentList.reduce((res, item, i) => {
                 if (+index === +i) {
-                    res = item.images.map(x => x.image);
+                    res = item.images.map(x => x.image_url);
                 }
                 return res;
             }, []);
@@ -150,8 +135,13 @@ export default class momentCard extends wepy.component {
         // 点赞
         async zan(e) {
             const { id, index } = e.currentTarget.dataset; 
+            if (this.momentList[index].liked) {
+                return;
+            }
             const data =  await get(`/api/discover/moment/${id}/like`);
-            this.momentList[index].like += 1;
+            this.momentList[index].likes.length += 1;
+            this.momentList[index].liked = true;
+            this.$apply();
         },
         // 私密评论
         comment(e) {
@@ -169,7 +159,7 @@ export default class momentCard extends wepy.component {
         // 发送评论
         async sendComment(e) {
             const { value } = e.detail; 
-            const data = await post(`/api/discover/moments/${this.componentId}/comment`, {
+            const data = await post(`/api/discover/comment/${this.componentId}`, {
                 moment_id: this.componentId,
                 content: value,
             });
@@ -177,10 +167,13 @@ export default class momentCard extends wepy.component {
         },
     };
     setMomentList(list) {
+        console.log(list);
         this.momentList = list.reduce((res, item) => {
             // 处理距离
             item.distance = (item.distance / 1000).toFixed(2);
-            item.age = this.methods.handleAge(item.birthday);
+            if (item.birthday) {
+                item.age = this.methods.handleAge(item.birthday);
+            }
             res.push(item);
             return res;
         }, []);
@@ -306,6 +299,9 @@ export default class momentCard extends wepy.component {
                         color:rgba(158,157,157,1);
                         display: inline-block;
                         margin-left: 5rpx;
+                    }
+                    .red{
+                        color: #E60011;
                     }
                 }
                 .last{
