@@ -3,29 +3,57 @@
     <view class='container'>
         <movable-area style="height: 200vh; width: 400vw;left:-40vw;top:-50vh;">
             <movable-view wx:if="{{vt1}}" data-id="top1" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{zt1}} " x="{{xt1}}" disabled="true" direction="all" animate="{{true}}">
-                <view class="battle-box top" @tap="fly('top1','top')">
-                    <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFit"></image>
+                <view class="battle-box top" @tap="fly('top1','top',{{battle.a.image_id}})">
+                    <image src="{{battle.a.image}}" mode="aspectFill"></image>
+                    <view class="info">
+                        <view class="name">{{battle.a.nick_name}}</view>
+                        <view class="desc">{{battle.a.gender=='male'?'男':'女'}}/{{battle.a.age}}岁/{{battle.a.constellation}}</view>
+                        <view class="distance"><text>{{battle.a.distance}}KM</text>{{battle.a.city}}</view>
+                    </view>
                 </view>
             </movable-view>
             <movable-view wx:if="{{vt2}}" data-id="top2" data-type="top" style="height: 50vh;width:100vw;left:190vw;top:50vh;z-index:{{zt2}} " disabled="true" x="{{xt2}}" inertia="{{true}}" friction="1" damping="35" direction="all">
-                <view class="battle-box top" @tap="fly('top2','top')">
-                    <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559122060467&di=a65018c1ccd632fcbb5c973416045586&imgtype=0&src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F62%2F42%2F1903%2F123753347.jpg" mode="aspectFit"></image>
+                <view class="battle-box top" @tap="fly('top2','top',{{battle.a.image_id}})">
+                    <image src="{{battle.a.image}}" mode="aspectFill"></image>
+                    <view class="info">
+                        <view class="name">{{battle.a.nick_name}}</view>
+                        <view class="desc">{{battle.a.gender=='male'?'男':'女'}}/{{battle.a.age}}岁/{{battle.a.constellation}}</view>
+                        <view class="distance"><text>{{battle.a.distance}}KM</text>{{battle.a.city}}</view>
+                    </view>
                 </view>
             </movable-view>
 
             <movable-view wx:if="{{vb1}}" data-id="bottom1" data-type="bottom" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{zb1}} " x="{{xb1}}" inertia="{{true}}" friction="1" damping="35" direction="all" disabled="true">
-                <view class="battle-box bottom " @tap="fly('bottom3','bottom')">
+                <view class="battle-box bottom " @tap="fly('bottom3','bottom',{{battle.a.image_id}})">
                     <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
+                    <view class="info">
+                        <view class="name">黄飞鸿</view>
+                        <view class="desc">女/21岁/双鱼座</view>
+                        <view class="distance"><text>31.5KM</text>北京市</view>
+                    </view>
                 </view>
             </movable-view>
             <movable-view wx:if="{{vb2}}" style="height: 50vh;width:100vw;left:190vw;top:47%;z-index:{{zb2}} " x="{{xb2}}" inertia="{{true}}" friction="1" damping="35" direction="all" disabled="true">
-                <view class="battle-box bottom " @tap="fly('bottom2','bottom')">
+                <view class="battle-box bottom " @tap="fly('bottom2','bottom',{{battle.a.image_id}})">
                     <image src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" mode="aspectFill"></image>
+                    <view class="info">
+                        <view class="name">黄飞鸿</view>
+                        <view class="desc">女/21岁/双鱼座</view>
+                        <view class="distance"><text>31.5KM</text>北京市</view>
+                    </view>
                 </view>
             </movable-view>
         </movable-area>
         <view class="divider">
             <image src="../../images/battle/devider.png" mode="aspectFill"></image>
+        </view>
+        <view class="heart" wx:if="{{heartShow}}">
+            <view class="top-heart {{heartTop?'active':''}}" wx:if="{{heartTop}}">
+                <image src="{{topHeart}}" mode="aspectFill"></image>
+            </view>
+            <view class="bottom-heart {{heartBottom?'active':''}}" wx:if="{{heartBottom}}">
+                <image src="{{bottomHeart}}" mode="aspectFill"></image>
+            </view>
         </view>
     </view>
     <van-dialog id="van-dialog" />
@@ -46,6 +74,8 @@
 import wepy from 'wepy';
 // import { dialog } from '@/utils';
 // let prex = 0;
+import { BATTLE } from '@/utils/url';
+import { get } from '@/utils/request';
 let timeout = 0;
 let buttonDisable = false;
 export default class Battle extends wepy.component {
@@ -65,19 +95,34 @@ export default class Battle extends wepy.component {
         vb1: true,
         vb2: true,
         zb1: 0,
-        zb2: 0
+        zb2: 0,
+        topHeart: '',
+        bottomHeart: '',
+        battle: {},
+        heartShow: false,
+        heartTop: false,
+        heartBottom: false,
+        likeCount: {
+            count: {}
+        }
     };
 
     components = {};
 
     methods = {
-        async fly(id, type) {
+        async fly(id, type, imageid) {
+            if (this.likeCount.count[imageid] == 3) {
+                console.error(imageid + '喜欢了3次');
+                return;
+            }
             if (id == 'bottom3') {
                 wepy.navigateTo({ url: 'battle/profile' });
                 return;
             }
             console.log(buttonDisable);
+            console.log(imageid);
             if (buttonDisable) return;
+            this.flyHeart(type, imageid);
             this.handleLayer(id, type);
             buttonDisable = true;
             timeout = setTimeout(() => {
@@ -86,6 +131,24 @@ export default class Battle extends wepy.component {
             }, 600);
         }
     };
+    flyHeart(type, imageid) {
+        this.heartShow = true;
+        if (type == 'top') {
+            this.heartBottom = true;
+        } else {
+            this.heartTop = true;
+        }
+
+        if (!this.likeCount.count[imageid]) this.likeCount.count[imageid] = 0;
+        this.likeCount.count[imageid] = this.likeCount.count[imageid] + 1;
+        this.setHeart(type, this.likeCount.count[imageid]);
+        setTimeout(() => {
+            this.heartTop = false;
+            this.heartBottom = false;
+            this.heartShow = false;
+            this.$apply();
+        }, 1000);
+    }
     handleLayer(id, type) {
         this.handlePosition(
             type === 'top' ? 't' : 'b',
@@ -124,8 +187,19 @@ export default class Battle extends wepy.component {
     watch = {};
 
     computed = {};
+    async getBattle(position = '') {
+        const result = await get(BATTLE, {
+            battle: position
+        });
 
+        this.battle = result;
+        this.battle.a.distance = (result.a.distance / 1000).toFixed(2);
+        this.battle.b.distance = (result.b.distance / 1000).toFixed(2);
+        this.$apply();
+        console.warn(result);
+    }
     async onLoad() {
+        this.getBattle();
         // if (!wepy.getStorageSync('isNew')) {
         //     try {
         //         await dialog({
@@ -140,10 +214,19 @@ export default class Battle extends wepy.component {
         //         console.log(2);
         //     }
         // }
+        this.setHeart('top', 1);
+        this.setHeart('bottom', 1);
         const { windowWidth } = await wepy.getSystemInfo();
         console.log(windowWidth);
     }
-
+    setHeart(position, index) {
+        if (position == 'bottom') {
+            this.topHeart = `../../../images/battle/${index}.png`;
+        } else {
+            this.bottomHeart = `../../../images/battle/${index}.png`;
+        }
+        this.$apply();
+    }
     onShow() {}
 }
 </script>
@@ -196,8 +279,8 @@ export default class Battle extends wepy.component {
         display: flex;
         justify-content: center;
         align-items: center;
-        background:white;
-        color:#707070;
+        background: white;
+        color: #707070;
     }
     .icon {
         width: 96rpx;
@@ -219,6 +302,52 @@ export default class Battle extends wepy.component {
     box-sizing: border-box;
     width: 100%;
     overflow: hidden;
+    .heart {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 200vh;
+        position: absolute;
+        z-index: 9999;
+        .top-heart,
+        .bottom-heart {
+            position: absolute;
+            left: 50%;
+            top: 200rpx;
+            transform: translateX(-50%);
+            image {
+                width: 180rpx;
+                height: 180rpx;
+            }
+        }
+        .bottom-heart {
+            top: 700rpx;
+        }
+        .bottom-heart.active,
+        .top-heart.active {
+            animation: flashHeart 1s ease-in-out 1;
+            animation-fill-mode: both;
+        }
+        @keyframes flashHeart {
+            /** 第一种写法**/
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.4, 0.4);
+            }
+            30% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1, 1);
+            }
+            70% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1, 1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.4, 0.4);
+            }
+        }
+    }
     image {
         width: 100%;
         height: 100%;
@@ -244,6 +373,22 @@ export default class Battle extends wepy.component {
         opacity: 1;
         overflow: hidden;
         margin: 0 auto;
+        position: relative;
+        .info {
+            position: absolute;
+            left: 18rpx;
+            bottom: 40rpx;
+            color: white;
+            font-size: 22rpx;
+            .name {
+                font-size: 48rpx;
+            }
+            .distance {
+                text {
+                    color: #e60011;
+                }
+            }
+        }
         &.top {
             border-radius: 36rpx 36rpx 0rpx 0rpx;
         }

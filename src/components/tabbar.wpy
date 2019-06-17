@@ -5,12 +5,12 @@
             <image slot="icon-active" src="{{ icon.home.active }}" mode="aspectFit"></image>
             颜值
         </van-tabbar-item>
-        <van-tabbar-item dot>
+        <van-tabbar-item>
             <image slot="icon" src="{{ icon.discover.normal }}" mode="aspectFit"></image>
             <image slot="icon-active" src="{{ icon.discover.active }}" mode="aspectFit"></image>
             发现
         </van-tabbar-item>
-        <van-tabbar-item info="5">
+        <van-tabbar-item info="{{unread}}">
             <image slot="icon" src="{{ icon.message.normal }}" mode="aspectFit"></image>
             <image slot="icon-active" src="{{ icon.message.active }}" mode="aspectFit"></image>
             消息
@@ -28,6 +28,7 @@ import wepy from 'wepy';
 export default class tabbar extends wepy.component {
     data = {
         active: 0,
+        unread: '',
         icon: {
             home: {
                 normal: '../images/tabbar/home.png',
@@ -50,14 +51,18 @@ export default class tabbar extends wepy.component {
     props = {
         tabIndex: {
             type: Number,
-        default: 0
+            default: 0
         }
     };
 
     methods = {
         onChange(event) {
             this.tabIndex = event.detail;
-            this.$emit('tabSelect',event.detail)
+            this.$emit('tabSelect', event.detail);
+        },
+        unreadSet(num) {
+            this.unread = num || '';
+            this.$apply();
         }
     };
 }

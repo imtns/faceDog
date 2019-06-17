@@ -4,9 +4,6 @@
         <view class="like-box">
             <view class="header">
                 <view class="date"><text>28</text><text>/May</text></view>
-                <view class="all" @tap="redirect('like')">全部
-                    <van-icon name="arrow" />
-                </view>
             </view>
             <view class="like-list">
                 <view class="like">
@@ -45,16 +42,6 @@
                         </view>
                     </view>
                 </view>
-            </view>
-        </view>
-        <view class="like-box">
-            <view class="header">
-                <view class="date"><text>28</text><text>/May</text></view>
-                <view class="all">全部
-                    <van-icon name="arrow" />
-                </view>
-            </view>
-            <view class="like-list">
                 <view class="like">
                     <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
                     <view class="desc">
@@ -91,16 +78,18 @@
                         </view>
                     </view>
                 </view>
-            </view>
-        </view>
-        <view class="like-box">
-            <view class="header">
-                <view class="date"><text>28</text><text>/May</text></view>
-                <view class="all">全部
-                    <van-icon name="arrow" />
+                <view class="like">
+                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <view class="desc">
+                        <view class="left">
+                            <view class="name">黄浪儿</view>
+                            <view class="info">21岁 / 双鱼座</view>
+                        </view>
+                        <view class="right">
+                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
+                        </view>
+                    </view>
                 </view>
-            </view>
-            <view class="like-list">
                 <view class="like">
                     <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
                     <view class="desc">
@@ -144,20 +133,16 @@
 
 <script>
 import wepy from 'wepy';
-export default class Like extends wepy.component {
-    props = {};
+export default class Like extends wepy.page {
+    config = {
+        navigationBarTitleText: '喜欢我的'
+    };
 
     data = {};
 
     components = {};
 
-    methods = {
-        redirect(url) {
-            wx.navigateTo({
-                url: 'chat/' + url
-            });
-        }
-    };
+    methods = {};
 
     events = {};
 
@@ -171,11 +156,12 @@ export default class Like extends wepy.component {
 }
 </script>
 
-<style lang='less' scoped>
+<style lang='less'>
 .wrapper {
     width: 690rpx;
-    margin-top: 68rpx;
+    margin-top: 30rpx;
     margin-left: 30rpx;
+    padding-bottom:60rpx;
     .like-box {
         width: 100%;
         margin-bottom: 75rpx;
@@ -209,10 +195,12 @@ export default class Like extends wepy.component {
             height: 360rpx;
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
             margin-top: 30rpx;
             .like {
                 width: 214rpx;
                 height: 360rpx;
+                margin-bottom:24rpx;
                 image {
                     overflow: hidden;
                     border-radius: 12rpx 12rpx 0px 0px;
@@ -229,7 +217,7 @@ export default class Like extends wepy.component {
                     display: flex;
                     justify-content: space-between;
                     .left {
-                        width: 55%;
+                        width: 65%;
 
                         .name {
                             color: white;

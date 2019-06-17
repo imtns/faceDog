@@ -100,6 +100,7 @@ export default class uploadPic extends wepy.component {
                             setTimeout(() => {
                                 this.show = false;
                                 this.$apply();
+                                this.$emit('changeStep', 4);
                             }, 1500);
                         }
                     );

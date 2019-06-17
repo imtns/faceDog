@@ -3,6 +3,11 @@
 .van-tabbar--fixed {
     z-index: 9999 !important;
 }
+::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    color: transparent;
+}
 </style>
 
 <script>
@@ -21,7 +26,8 @@ export default class extends wepy.app {
             'pages/my/editdesc',
             'pages/my/editfile',
             'pages/chat/chat',
-            'pages/rank/rank' // 排行榜页面
+            'pages/rank/rank', // 排行榜页面
+            'pages/chat/like'
         ],
         window: {
             backgroundTextStyle: 'light',
@@ -48,9 +54,7 @@ export default class extends wepy.app {
         this.use('promisify');
     }
 
-    onLaunch() {
-
-    }
+    onLaunch() {}
 
     async testAsync() {
         const data = await this.sleep(3);

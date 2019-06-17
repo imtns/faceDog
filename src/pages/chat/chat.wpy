@@ -1,16 +1,57 @@
 <!--  -->
 <template>
-    <view class="container">
-        <view class="msgs-wrapper">
-            <view class="msgs" wx:for="{{msgs}}" wx:key="index">
-                <text class="msg-item"><text class="nickname">{{item.fromAccountNick}}</text> : {{item.content}}</text>
+    <scroll-view class="scrollView" scroll-y bindscrolltoupper="getMoreData" lower-threshold="200" style="height:{{scrollHeight}}px" scroll-into-view="{{toview}}">
+        <view class="chatBox-content-demo" wx:for="{{msgList}}" id="chat{{index}}" wx:key="index">
+            <view class="clearfloat" wx:if="{{!item.isSend}}">
+                <view class="author-name" wx:if="{{item.showtime}}">
+                    <text class="chat-date">{{item.sendTime}}</text>
+                </view>
+                <view class="left" style="margin-bottom:40rpx;" wx:if="{{Complete}}">
+                    <view class="chat-avatars">
+                        <image src="{{item.icon}}" class="avatar" mode="aspectFill" bindtap="gotoInfo"></image>
+                    </view>
+                    <view class="profile-image" wx:if="{{index==0}}">
+                        <image class="thumb" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                        <view class="profile-desc">
+                            <view class="left-container">
+                                <view class="top">小嘻嘻 21岁/双鱼座</view>
+                                <view class="bottom">在全国颜值排名前3%</view>
+                            </view>
+                            <view class="right-container">
+                                <image class="like-icon" src="../../images/profile/friend.png" mode="aspectFill"></image>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+                <view class="left">
+                    <view class="chat-avatars">
+                        <image src="{{item.icon}}" class="avatar" mode="aspectFill" bindtap="gotoInfo"></image>
+                    </view>
+                    <view class="chat-message">
+                        <!-- <image src="../../images/profile/model.jpg" mode="aspectFill"></image> -->
+                        {{item.msg}}
+                    </view>
+                </view>
+            </view>
+            <view class="clearfloat" wx:if="{{item.isSend}}">
+                <view class="author-name">
+                    <text class="chat-date">{{item.sendTime}}</text>
+                </view>
+                <view class="right">
+                    <view class="chat-message">
+                        <!-- <image src="{{item.item}}" wx:if="{{item.typ =='images'}}"></image> -->
+                        <view>{{item.msg}}</view>
+                    </view>
+                    <view class="chat-avatars">
+                        <image class="avatar" src="{{item.icon}}" mode="aspectFill"></image>
+                    </view>
+                </view>
             </view>
         </view>
-
-        <view class="input-section">
-            <input value="{{msgContent}}" placeholder="" bindconfirm="bindConfirm" />
-            <button class="love" bindtap="bindTap"></button>
-        </view>
+        <!-- </view> -->
+    </scroll-view>
+    <view class="chatInput" style="height:82rpx">
+        <input type="text" adjust-position="true" placeholder="请输入消息~" bindconfirm="bindConfirm" value="{{msgContent}}" class="input_text"></input>
     </view>
 
 </template>
@@ -19,32 +60,85 @@
 import wepy from 'wepy';
 import webim from '@/utils/webim.js'; //腾讯云im包
 import webimhandler from '@/utils/handler';
-import { onMsgNotify, init, sdkLogin } from '@/utils/handler.js'; //这个是所有事件的腾讯js，这个页面需要用到登录
+import { formatDateFromSeconds } from '@/utils';
 import Config from '@/utils/config';
-
+import { Event } from '@/utils/event.js';
+var loading = false;
 export default class Chat extends wepy.page {
     config = {
-        navigationBarTitleText: ''
+        navigationBarTitleText: '',
+        usingComponents: {
+            'van-field': '../components/vant/field/index'
+        }
     };
-
     data = {
-        identifier: '', // 当前用户身份标识，必选
-        userSig: '', // 当前用户签名，必选
-        nickName: '', // 当前用户昵称，选填
-        motto: 'Hello World',
-        msgs: [],
-        msgContent: ''
+        id: '',
+        msgList: {},
+        msgContent: '',
+        LastMsgTime: 0, //最近的消息时间，即从这个时间点向前拉取历史消息
+        MsgKey: '',
+        icon: '',
+        toview: '',
+        profile: {},
+        scrollHeight: 0,
+        msg: '',
+        Complete: false,
+        nick: '',
+        count: 0
     };
 
     components = {};
 
     methods = {
+        getMoreData() {
+            if (loading) return;
+            loading = true;
+            wx.showLoading();
+            this.getLastC2CHistoryMsgs(
+                (list, err) => {
+                    loading = false;
+                    wx.hideLoading();
+                    var c = 14;
+
+                    this.msgList.unshift(...list);
+                    this.$apply();
+                    setTimeout(() => {
+                        // this.toview = `chat${c}`;
+                        // this.$apply();
+                    }, 1000);
+                },
+                err => {
+                    loading = false;
+                    wx.hideLoading();
+                    console.log(err);
+                }
+            );
+        },
         bindConfirm(e) {
             var that = this;
             var content = e.detail.value;
             if (!content.replace(/^\s*|\s*$/g, '')) return;
-            webimhandler.onSendMsg(content, function() {
-                that.clearInput();
+
+            webimhandler.onSendMsg(encodeURIComponent(content), function() {
+                that.msgList.push({
+                    msg: content,
+                    icon: that.profile.icon,
+                    isSend: true,
+                    sendTime: formatDateFromSeconds(
+                        parseInt(new Date().getTime() / 1000)
+                    )
+                });
+                that.setData({
+                    msgContent: ''
+                });
+                that.toview = `chat${that.msgList.length - 1}`;
+                var skey = that.id; // 拼装 skey
+                var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
+                var selSess = sessMap[skey]; // 获取 Session 的实例
+                console.log(sessMap);
+                webim.setAutoRead(selSess, true, true);
+                Event.trigger('send');
+                that.$apply();
             });
         }
     };
@@ -55,133 +149,306 @@ export default class Chat extends wepy.page {
 
     computed = {};
     initChat() {
-        var selToID = ''; //会话列表不设置对方私聊账号
         webimhandler.init({
-            //初始化的方法
-            accountMode: 0,
-            accountType: Config.accountType,
-            sdkAppID: Config.sdkappid,
-            selType: webim.SESSION_TYPE.C2C, //私聊
-            selToID: 'ygtest0003'
+            selToID: this.id,
+            selType: webim.SESSION_TYPE.C2C,
+            selSessHeadUrl: this.icon
         });
+        var that = this;
         if (webim.checkLogin()) {
             //检查是否登录返回true和false,不登录则重新登录
             console.log('已登录');
-            this.initRecentContactList();
-        } else {
-            console.log('登录成功');
-            //当前用户身份
-            var loginInfo = {
-                sdkAppID: Config.sdkappid, //用户所属应用id,必填
-                accountType: Config.accountType, //用户所属应用帐号类型，必填
-                identifier: Config.users[0].identifier, //当前用户ID,必须是否字符串类型，选填
-                identifierNick: Config.users[0].identifier, //当前用户昵称，选填
-                userSig: Config.users[0].userSig //当前用户身份凭证，必须是字符串类型，选填
-            };
-            //监听连接状态回调变化事件
-            var onConnNotify = function(resp) {
-                switch (resp.ErrorCode) {
-                    case webim.CONNECTION_STATUS.ON:
-                        webim.Log.warn('连接状态正常...');
-                        break;
-                    case webim.CONNECTION_STATUS.OFF:
-                        webim.Log.warn(
-                            '连接已断开，无法收到新消息，请检查下你的网络是否正常'
-                        );
-                        break;
-                    default:
-                        webim.Log.error(
-                            '未知连接状态,status=' + resp.ErrorCode
-                        );
-                        break;
-                }
-            };
-
-            //监听事件
-            var listeners = {
-                onConnNotify: onConnNotify, //监听连接状态回调变化事件,必填
-                onMsgNotify: onMsgNotify
-            };
-            var options = {
-                isAccessFormalEnv: true, //是否访问正式环境，默认访问正式，选填
-                isLogOn: true //是否开启控制台打印日志,默认开启，选填
-            };
-            webimhandler.sdkLogin(loginInfo, listeners, options, () => {
-                // this.initRecentContactList();
+            this.getLastC2CHistoryMsgs((list, err) => {
+                this.msgList = list;
+                this.toview = `chat${list.length - 1}`;
+                console.log(list);
+                this.$apply();
             });
         }
     }
+    getLastC2CHistoryMsgs(cbOk, cbError) {
+        var that = this;
+        var options = {
+            Peer_Account: this.id, //好友帐号，selToID 为全局变量，表示当前正在进行的聊天 ID，当聊天类型为私聊时，该值为好友帐号，否则为群号。
+            MaxCnt: 15, //拉取消息条数
+            LastMsgTime: this.LastMsgTime, //最近的消息时间，即从这个时间点向前拉取历史消息
+            MsgKey: this.MsgKey
+        };
+        webim.getC2CHistoryMsgs(
+            options,
+            function(resp) {
+                var complete = resp.Complete; //是否还有历史消息可以拉取，1-表示没有，0-表示有
+                var retMsgCount = resp.MsgCount; //返回的消息条数，小于或等于请求的消息条数，小于的时候，说明没有历史消息可拉取了
+                that.LastMsgTime = resp.LastMsgTime;
+                that.MsgKey = resp.MsgKey;
+                that.count = resp.MaxCnt;
+                that.Complete = resp.MsgList.length == 0 ? true : false;
+                that.$apply();
+                if (resp.MsgList.length == 0) {
+                    wx.hideLoading();
+                    webim.Log.error(
+                        '没有历史消息了:data=' + JSON.stringify(options)
+                    );
+                    return;
+                }
+                const list = resp.MsgList.map((item, index) => {
+                    console.log(item);
+                    return {
+                        fromAccount: item.fromAccount,
+                        fromNickName: item.fromAccountNick,
+                        msg: decodeURIComponent(item.elems[0].content.text),
+                        icon: item.isSend ? that.profile.icon : that.icon,
+                        isSend: item.isSend,
+                        sendTime: formatDateFromSeconds(item.time),
+                        count: resp.MaxCnt,
+                        showtime:
+                            index > 0 &&
+                            item.time / 1000 -
+                                resp.MsgList[index - 1].time / 1000 >
+                                60
+                    };
+                });
+                if (cbOk) cbOk(list);
+            },
+            cbError
+        );
+    }
+    messageAppend(item) {
+        this.msgList.push({
+            fromAccount: item.fromAccount,
+            fromNickName: item.fromAccountNick,
+            msg: decodeURIComponent(item.elems[0].content.text),
+            icon: this.icon,
+            isSend: false,
+            sendTime: formatDateFromSeconds(item.time)
+        });
+        this.toview = `chat${this.msgList.length - 1}`;
+        this.$apply();
+    }
     onLoad(options) {
-        this.identifier = 'ygtest0003';
+        this.id = options.id;
+        wx.setNavigationBarTitle({
+            title: options.nick
+        });
+        this.nick = options.nick;
+        this.icon = wx.getStorageSync('chatIcon');
+        this.profile = wx.getStorageSync('profile');
+        this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
+        this.msgReaded();
         this.initChat();
     }
-
-    onShow() {}
+    msgDetect(msg) {
+        console.warn('msgDetect', msg);
+        if (msg.fromAccount == this.id) {
+            this.messageAppend(msg);
+            this.msgReaded();
+        }
+    }
+    msgReaded() {
+        var opts = {
+            To_Account: this.id, // 好友帐号
+            LastedMsgTime: parseInt(new Date().getTime() / 1000)
+        };
+        webim.c2CMsgReaded(opts);
+        var skey = 'C2C' + this.id; // 拼装 skey
+        var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
+        var selSess = sessMap[skey]; // 获取 Session 的实例
+        webim.setAutoRead(selSess, true, false);
+    }
+    onShow() {
+        if (this.msgList.length) {
+            this.toview = `chat${this.msgList.length - 1}`;
+        }
+        Event.listen('msgDetectChat', this.msgDetect.bind(this));
+    }
+    onUnload() {
+        var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
+        var skey = 'C2C' + this.id; // 拼装 skey
+        var selSess = sessMap[skey]; // 获取 Session 的实例
+        webim.setAutoRead(selSess, false, false);
+        Event.remove('msgDetectChat');
+        loading = false;
+        this.MsgKey = '';
+        this.toview = '';
+        this.LastMsgTime = 0;
+        this.msgList = {};
+        this.msgContent = '';
+        this.profile = {};
+        this.Complete = false;
+        this.$apply();
+    }
 }
 </script>
 
 <style lang='less'>
+page {
+    background: #f6f6f6;
+}
 /**index.wxss**/
-.container {
-    background-image: url(https://mc.qcloudimg.com/static/img/7da57e0050d308e2e1b1e31afbc42929/bg.png);
-    background-repeat: no-repeat;
-    background-size: cover;
-    height: 100vh;
+.allChatContent {
+    width: 100%;
+    position: relative;
+    top: 0;
+    /* overflow: scroll; */
 }
 
-.msgs-wrapper {
-    position: absolute;
-    bottom: 100rpx;
-    left: 10rpx;
-    right: 10rpx;
+.chatBox-content-demo {
+    width: 100%;
+    overflow-y: scroll;
 }
 
-.msgs {
-    max-width: 80%;
+.clearfloat:after {
     display: block;
-    padding: 5rpx;
-    color: #ffffff;
-    margin: 5rpx 0;
+    clear: both;
+    content: '';
+    visibility: hidden;
+    height: 0;
+}
+
+.clearfloat {
+    margin: 41rpx 29rpx 0;
+    .avatar {
+        width: 82rpx;
+        height: 82rpx;
+        border-radius: 50%;
+    }
+}
+.clearfloat .right {
+    float: right;
+}
+
+.author-name {
+    font-size: 22rpx;
+    text-align: center;
+    margin: 35rpx auto;
+    color: #a5a5a5;
+}
+
+.clearfloat .chat-message {
+    text-align: left;
+    max-width: 440rpx;
+    padding: 22rpx 23rpx;
+    border-radius: 20rpx;
     word-wrap: break-word;
+    position: relative;
+    display: inline-flex;
+    color: #191919;
 }
 
-.msg-item {
-    padding: 8rpx 5rpx;
-    border-radius: 4rpx;
+.profile-image {
+    width: 370rpx;
+    height: 428rpx;
+    position: relative;
+    margin-left: 22rpx;
+    display: inline-block;
+    .thumb {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 12rpx 12rpx 0 0;
+        border: 0;
+    }
+    .profile-desc {
+        width: 370rpx;
+        height: 79rpx;
+        background: rgba(237, 65, 81, 1);
+        border-radius: 0 0 12rpx 12rpx;
+        color: #070707;
+        display: flex;
+        position: relative;
+        justify-content: space-between;
+        top: -30rpx;
+        .left-container {
+            margin-top: 12rpx;
+            margin-right: auto;
+            margin-left: 20rpx;
+            .top {
+                font-size: 20rpx;
+            }
+            .bottom {
+                font-size: 18rpx;
+            }
+        }
+        .right-container {
+            width: 60rpx;
+            margin-right: 20rpx;
+            .like-icon {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+}
+
+.clearfloat .left .chat-message {
+    background: white;
+    font-size: 24rpx;
+    margin-left: 22rpx;
+}
+
+.clearfloat .left .chat-message:before {
+    position: absolute;
+    content: '';
+    top: 8px;
+    left: -6px;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid white;
+}
+
+.clearfloat .right {
+    text-align: right;
+}
+
+.clearfloat .right .chat-message {
+    background: #1ccddf;
+    text-align: left;
+    font-size: 24rpx;
+    font-weight: 600;
+    margin-right: 22rpx;
+}
+
+.clearfloat .right .chat-message:before {
+    position: absolute;
+    content: '';
+    top: 23rpx;
+    right: -6px;
+    border-top: 20rpx solid transparent;
+    border-bottom: 20rpx solid transparent;
+    border-left: 20rpx solid #1ccddf;
+}
+
+.clearfloat .chat-avatars {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.chatInput {
+    width: 690rpx;
+    height: 82rpx;
+    display: flex;
+    bottom: 23rpx;
+    position: fixed;
+    padding: 26rpx 32rpx 0;
+    align-items: center;
+    justify-content: center;
+    .input_text {
+        background: rgba(255, 255, 255, 1);
+        border-radius: 41rpx;
+        font-size: 28rpx;
+        height: 82rpx;
+        font-weight: 500;
+        padding: 0 32rpx;
+        width: 100%;
+        color: rgba(158, 157, 157, 1);
+    }
+}
+
+.noMoreChat {
+    text-align: center;
     font-size: 14px;
-}
-
-.nickname {
-    color: #ff7906;
-}
-
-.input-section {
-    position: absolute;
-    bottom: 10rpx;
-    left: 10rpx;
-    right: 10rpx;
-}
-
-.input-section input {
-    background: #fff;
-    margin-right: 100rpx;
-    padding: 10rpx;
-}
-
-.input-section .love {
-    background: url(http://avc.qcloud.com/demo/webim/biggroup/mobile/img/like_hover.png);
-    background-size: 100%;
-    width: 70rpx;
-    height: 70rpx;
-    display: block;
-    position: absolute;
-    right: 10rpx;
-    bottom: 0;
-    border: 0;
-    outline: 0;
-}
-
-.input-section .love:after {
-    border: 0;
+    height: 40px;
+    line-height: 40px;
+    color: #888;
 }
 </style>
