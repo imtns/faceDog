@@ -188,9 +188,13 @@ export default class Battle extends wepy.component {
 
     computed = {};
     async getBattle(position = '') {
-        const result = await get(BATTLE, {
-            battle: position
-        });
+        if (position) {
+            const result = await get(BATTLE, {
+                battle:position
+            });
+        } else {
+            const result = await get(BATTLE);
+        }
 
         this.battle = result;
         this.battle.a.distance = (result.a.distance / 1000).toFixed(2);

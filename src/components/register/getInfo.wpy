@@ -13,7 +13,7 @@ export default class getInfo extends wepy.component {
     props = {};
 
     data = {
-        show: true
+        show: false
     };
 
     components = {};

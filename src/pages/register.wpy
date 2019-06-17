@@ -104,34 +104,34 @@ export default class Register extends wepy.page {
     computed = {};
 
     onLoad() {
-        // wx.login({
-        //     success: res => {
-        //         console.log(res);
-        //         wepy.setStorageSync('code', res.code);
-        //         if (!wepy.getStorageSync('latitude')) {
-        //             this.$invoke('getInfo', 'display');
-        //             wx.getSetting({
-        //                 success: res => {
-        //                     console.log(res.authSetting['scope.userLocation']);
-        //                     if (
-        //                         res.authSetting['scope.userLocation'] !==
-        //                             undefined &&
-        //                         res.authSetting['scope.userLocation'] !== true
-        //                     ) {
-        //                         this.authorizeLocation();
-        //                     } else {
-        //                         this.events.getLocation(this);
-        //                     }
-        //                 }
-        //             });
-        //         } else {
-        //             this.goLogin(
-        //                 wepy.getStorageSync('latitude'),
-        //                 wepy.getStorageSync('longitude')
-        //             );
-        //         }
-        //     }
-        // });
+        wx.login({
+            success: res => {
+                console.log(res);
+                wepy.setStorageSync('code', res.code);
+                if (!wepy.getStorageSync('latitude')) {
+                    this.$invoke('getInfo', 'display');
+                    wx.getSetting({
+                        success: res => {
+                            console.log(res.authSetting['scope.userLocation']);
+                            if (
+                                res.authSetting['scope.userLocation'] !==
+                                    undefined &&
+                                res.authSetting['scope.userLocation'] !== true
+                            ) {
+                                this.authorizeLocation();
+                            } else {
+                                this.events.getLocation(this);
+                            }
+                        }
+                    });
+                } else {
+                    this.goLogin(
+                        wepy.getStorageSync('latitude'),
+                        wepy.getStorageSync('longitude')
+                    );
+                }
+            }
+        });
     }
 
     authorizeLocation() {
