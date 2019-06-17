@@ -53,10 +53,15 @@ export default class ChooseVerify extends wepy.component {
             const data = await post(VERIFY,{
                 code:this.inviteCode
             })
+            wx.redirectTo({
+                url: 'index'
+            });
+
             console.log(data)
         },
         redirect(){
-            this.step = 5;
+            // this.step = 5;
+            this.$emit('changeStep', 5);
         }
     };
 

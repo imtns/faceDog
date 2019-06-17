@@ -65,9 +65,6 @@
 <script>
 import wepy from 'wepy';
 
-import { get } from '@/utils/request';
-import { PROFILE } from '@/utils/url';
-import { getAge } from '@/utils';
 export default class My extends wepy.component {
     data = {
         progress: {
@@ -84,30 +81,13 @@ export default class My extends wepy.component {
         redirect(name) {
             wepy.navigateTo({ url: `my/${name}` });
         },
-        async setProfile() {
-            const data = await get(PROFILE);
-            console.log(data);
-            data.age = getAge(data.birthday);
-            this.profile = data;
-            this.profile.images &&
-                this.profile.images.forEach(item => {
-                    if (item.is_avatar) {
-                        this.profile.icon = item.image;
-                    }
-                });
-            this.profile.images = this.switchOrder(this.profile.images);
+        setProfile(profile) {
+            this.profile = profile;
             this.$apply();
         }
     };
     // 改变图片顺序，把头像放到数组第一个
-    switchOrder(d) {
-        var r = [];
-        d.forEach(e => {
-            if (e['is_avatar']) r.unshift(e);
-            else r.push(e);
-        });
-        return r;
-    }
+
     events = {};
 
     watch = {};

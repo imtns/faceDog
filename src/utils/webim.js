@@ -2,7 +2,7 @@
  * VER 1.7.2
  */
 /* eslint-disable */
-module.exports =  function () {
+module.exports = function () {
 
     if (typeof Array.prototype.forEach != 'function') {
         Array.prototype.forEach = function (callback) {
@@ -46,7 +46,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        login: function (loginInfo, listeners, options) {},
+        login: function (loginInfo, listeners, options) { },
 
         /* function syncMsgs
          *   拉取最新C2C消息
@@ -58,7 +58,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        syncMsgs: function (cbOk, cbErr) {},
+        syncMsgs: function (cbOk, cbErr) { },
 
 
         /* function getC2CHistoryMsgs
@@ -70,7 +70,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getC2CHistoryMsgs: function (options, cbOk, cbErr) {},
+        getC2CHistoryMsgs: function (options, cbOk, cbErr) { },
 
         /* function syncGroupMsgs
          * 拉取群漫游消息
@@ -81,7 +81,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        syncGroupMsgs: function (options, cbOk, cbErr) {},
+        syncGroupMsgs: function (options, cbOk, cbErr) { },
 
         /* function sendMsg
          *   发送一条消息
@@ -92,7 +92,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        sendMsg: function (msg, cbOk, cbErr) {},
+        sendMsg: function (msg, cbOk, cbErr) { },
 
         /* function logout
          *   sdk登出
@@ -102,7 +102,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        logout: function (cbOk, cbErr) {},
+        logout: function (cbOk, cbErr) { },
 
         /* function setAutoRead
          * 设置会话自动已读上报标志
@@ -113,7 +113,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        setAutoRead: function (selSess, isOn, isResetAll) {},
+        setAutoRead: function (selSess, isOn, isResetAll) { },
 
         /* function getProfilePortrait
          *   拉取资料（搜索用户）
@@ -123,7 +123,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getProfilePortrait: function (options, cbOk, cbErr) {},
+        getProfilePortrait: function (options, cbOk, cbErr) { },
 
         /* function setProfilePortrait
          *   设置个人资料
@@ -133,7 +133,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        setProfilePortrait: function (options, cbOk, cbErr) {},
+        setProfilePortrait: function (options, cbOk, cbErr) { },
 
         /* function applyAddFriend
          *   申请添加好友
@@ -143,7 +143,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        applyAddFriend: function (options, cbOk, cbErr) {},
+        applyAddFriend: function (options, cbOk, cbErr) { },
 
         /* function getPendency
          *   拉取好友申请
@@ -153,7 +153,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getPendency: function (options, cbOk, cbErr) {},
+        getPendency: function (options, cbOk, cbErr) { },
 
         /* function deletePendency
          *   删除好友申请
@@ -163,7 +163,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        deletePendency: function (options, cbOk, cbErr) {},
+        deletePendency: function (options, cbOk, cbErr) { },
 
         /* function responseFriend
          *   响应好友申请
@@ -173,7 +173,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        responseFriend: function (options, cbOk, cbErr) {},
+        responseFriend: function (options, cbOk, cbErr) { },
 
         /* function getAllFriend
          *   拉取我的好友
@@ -183,7 +183,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getAllFriend: function (options, cbOk, cbErr) {},
+        getAllFriend: function (options, cbOk, cbErr) { },
 
         /* function deleteFriend
          *   删除好友
@@ -193,7 +193,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        deleteFriend: function (options, cbOk, cbErr) {},
+        deleteFriend: function (options, cbOk, cbErr) { },
 
         /* function addBlackList
          *   增加黑名单
@@ -203,7 +203,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        addBlackList: function (options, cbOk, cbErr) {},
+        addBlackList: function (options, cbOk, cbErr) { },
 
         /* function getBlackList
          *   删除黑名单
@@ -213,7 +213,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getBlackList: function (options, cbOk, cbErr) {},
+        getBlackList: function (options, cbOk, cbErr) { },
 
         /* function deleteBlackList
          *   我的黑名单
@@ -223,7 +223,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        deleteBlackList: function (options, cbOk, cbErr) {},
+        deleteBlackList: function (options, cbOk, cbErr) { },
 
         /* function uploadPic
          *   上传图片
@@ -234,7 +234,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        uploadPic: function (options, cbOk, cbErr) {},
+        uploadPic: function (options, cbOk, cbErr) { },
 
         /* function createGroup
          *   创建群
@@ -245,7 +245,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        createGroup: function (options, cbOk, cbErr) {},
+        createGroup: function (options, cbOk, cbErr) { },
 
         /* function applyJoinGroup
          *   申请加群
@@ -256,7 +256,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        applyJoinGroup: function (options, cbOk, cbErr) {},
+        applyJoinGroup: function (options, cbOk, cbErr) { },
 
         /* function handleApplyJoinGroup
          *   处理申请加群(同意或拒绝)
@@ -267,7 +267,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        handleApplyJoinGroup: function (options, cbOk, cbErr) {},
+        handleApplyJoinGroup: function (options, cbOk, cbErr) { },
 
         /* function deleteApplyJoinGroupPendency
          *   删除加群申请
@@ -278,7 +278,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        deleteApplyJoinGroupPendency: function (options, cbOk, cbErr) {},
+        deleteApplyJoinGroupPendency: function (options, cbOk, cbErr) { },
 
 
         /* function quitGroup
@@ -290,7 +290,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        quitGroup: function (options, cbOk, cbErr) {},
+        quitGroup: function (options, cbOk, cbErr) { },
 
         /* function getGroupPublicInfo
          *   读取群公开资料-高级接口
@@ -301,7 +301,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getGroupPublicInfo: function (options, cbOk, cbErr) {},
+        getGroupPublicInfo: function (options, cbOk, cbErr) { },
 
         /* function getGroupInfo
          *   读取群详细资料-高级接口
@@ -312,7 +312,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getGroupInfo: function (options, cbOk, cbErr) {},
+        getGroupInfo: function (options, cbOk, cbErr) { },
 
         /* function modifyGroupBaseInfo
          *   修改群基本资料
@@ -323,7 +323,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        modifyGroupBaseInfo: function (options, cbOk, cbErr) {},
+        modifyGroupBaseInfo: function (options, cbOk, cbErr) { },
 
         /* function destroyGroup
          *  解散群
@@ -334,7 +334,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        destroyGroup: function (options, cbOk, cbErr) {},
+        destroyGroup: function (options, cbOk, cbErr) { },
 
         /* function getJoinedGroupListHigh
          *   获取我的群组-高级接口
@@ -345,7 +345,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getJoinedGroupListHigh: function (options, cbOk, cbErr) {},
+        getJoinedGroupListHigh: function (options, cbOk, cbErr) { },
 
         /* function getGroupMemberInfo
          *   获取群组成员列表
@@ -356,7 +356,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getGroupMemberInfo: function (options, cbOk, cbErr) {},
+        getGroupMemberInfo: function (options, cbOk, cbErr) { },
 
         /* function addGroupMember
          *   邀请好友加群
@@ -367,7 +367,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        addGroupMember: function (options, cbOk, cbErr) {},
+        addGroupMember: function (options, cbOk, cbErr) { },
 
         /* function modifyGroupMember
          *   修改群成员资料（角色或者群消息提类型示）
@@ -378,7 +378,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        modifyGroupMember: function (options, cbOk, cbErr) {},
+        modifyGroupMember: function (options, cbOk, cbErr) { },
 
         /* function forbidSendMsg
          *   设置群成员禁言时间
@@ -389,7 +389,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        forbidSendMsg: function (options, cbOk, cbErr) {},
+        forbidSendMsg: function (options, cbOk, cbErr) { },
 
         /* function deleteGroupMember
          *   删除群成员
@@ -400,7 +400,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        deleteGroupMember: function (options, cbOk, cbErr) {},
+        deleteGroupMember: function (options, cbOk, cbErr) { },
 
         /* function getPendencyGroup
          *   获取群组未决列表
@@ -411,7 +411,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getPendencyGroup: function (options, cbOk, cbErr) {},
+        getPendencyGroup: function (options, cbOk, cbErr) { },
 
         /* function getPendencyReport
          *   好友未决已读上报
@@ -422,7 +422,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getPendencyReport: function (options, cbOk, cbErr) {},
+        getPendencyReport: function (options, cbOk, cbErr) { },
 
         /* function getPendencyGroupRead
          *   群组未决已读上报
@@ -433,7 +433,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        getPendencyGroupRead: function (options, cbOk, cbErr) {},
+        getPendencyGroupRead: function (options, cbOk, cbErr) { },
 
         /* function sendCustomGroupNotify
          *   发送自定义群通知
@@ -444,7 +444,7 @@ module.exports =  function () {
          * return:
          *   (无)
          */
-        sendCustomGroupNotify: function (options, cbOk, cbErr) {},
+        sendCustomGroupNotify: function (options, cbOk, cbErr) { },
 
         /* class webim.Msg
          *   一条消息的描述类, 消息发送、接收的API中都会涉及此类型的对象
@@ -559,7 +559,7 @@ module.exports =  function () {
              * return:
              *
              */
-            resetCookieAndSyncFlag: function () {},
+            resetCookieAndSyncFlag: function () { },
 
             downloadMap: {}
         }
@@ -731,21 +731,21 @@ module.exports =  function () {
         //长轮询消息类型
         var LONG_POLLINNG_EVENT_TYPE = {
             "C2C": 1 //新的c2c消息通知
-                ,
+            ,
             "GROUP_COMMON": 3 //新的群普通消息
-                ,
+            ,
             "GROUP_TIP": 4 //新的群提示消息
-                ,
+            ,
             "GROUP_SYSTEM": 5 //新的群系统消息
-                ,
+            ,
             "GROUP_TIP2": 6 //新的群提示消息2
-                ,
+            ,
             "FRIEND_NOTICE": 7 //好友系统通知
-                ,
+            ,
             "PROFILE_NOTICE": 8 //资料系统通知
-                ,
+            ,
             "C2C_COMMON": 9 //新的C2C消息
-                ,
+            ,
             "C2C_EVENT": 10
         };
 
@@ -1179,7 +1179,7 @@ module.exports =  function () {
 
             //防止XSS攻击
             this.xssFilter = function (val) {
-                if( xssFilterEnable ){
+                if (xssFilterEnable) {
                     val = val.toString();
                     val = val.replace(/[<]/g, "&lt;");
                     val = val.replace(/[>]/g, "&gt;");
@@ -1245,22 +1245,22 @@ module.exports =  function () {
             this.error = function (logStr) {
                 try {
                     on && console.error(logStr);
-                } catch (e) {}
+                } catch (e) { }
             };
             this.warn = function (logStr) {
                 try {
                     on && console.warn(logStr);
-                } catch (e) {}
+                } catch (e) { }
             };
             this.info = function (logStr) {
                 try {
                     on && console.info(logStr);
-                } catch (e) {}
+                } catch (e) { }
             };
             this.debug = function (logStr) {
                 try {
                     on && console.debug(logStr);
-                } catch (e) {}
+                } catch (e) { }
             };
         };
         //获取unix时间戳
@@ -1505,7 +1505,7 @@ module.exports =  function () {
             if (opt.isLogOn == false) {
                 log.setOn(opt.isLogOn);
             }
-            if( typeof opt.xssFilterEnable !=='undefined'){
+            if (typeof opt.xssFilterEnable !== 'undefined') {
                 xssFilterEnable = opt.xssFilterEnable;
             }
             /*
@@ -1667,8 +1667,8 @@ module.exports =  function () {
         //上线
         var proto_login = function (cbOk, cbErr) {
             ConnManager.apiCall(SRV_NAME.OPEN_IM, "login", {
-                    "State": "Online"
-                },
+                "State": "Online"
+            },
                 function (loginResp) {
                     if (loginResp.TinyId) {
                         ctx.tinyid = loginResp.TinyId;
@@ -1740,8 +1740,8 @@ module.exports =  function () {
                     cbErr);
             } else {
                 ConnManager.apiCall(SRV_NAME.OPEN_IM, "longpollinglogout", {
-                        LongPollingId: LongPollingId
-                    },
+                    LongPollingId: LongPollingId
+                },
                     function (resp) {
                         clearSdk();
                         if (cbOk) cbOk(resp);
@@ -1753,7 +1753,9 @@ module.exports =  function () {
         var proto_sendMsg = function (msg, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             var msgInfo = null;
-
+            if (!msg.sess.type()) {
+                msg.sess.type = 'C2C';
+            }
             switch (msg.sess.type()) {
                 case SESSION_TYPE.C2C:
                     msgInfo = {
@@ -1762,8 +1764,8 @@ module.exports =  function () {
                         'MsgTimeStamp': msg.time,
                         'MsgSeq': msg.seq,
                         'MsgRandom': msg.random,
-                    	'MsgBody': [],
-                    	'OfflinePushInfo': msg.offlinePushInfo
+                        'MsgBody': [],
+                        'OfflinePushInfo': msg.offlinePushInfo
                     };
                     break;
                 case SESSION_TYPE.GROUP:
@@ -1893,9 +1895,9 @@ module.exports =  function () {
         var proto_getMsgs = function (cookie, syncFlag, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.OPEN_IM, "getmsg", {
-                    'Cookie': cookie,
-                    'SyncFlag': syncFlag
-                },
+                'Cookie': cookie,
+                'SyncFlag': syncFlag
+            },
                 function (resp) {
 
                     if (resp.MsgList && resp.MsgList.length) {
@@ -2058,40 +2060,40 @@ module.exports =  function () {
 
             options.GroupId = String(options.GroupId)
             ConnManager.apiCall(SRV_NAME.GROUP, "apply_join_group", {
-                    'GroupId': options.GroupId,
-                    'ApplyMsg': options.ApplyMsg,
-                    'UserDefinedField': options.UserDefinedField
-                },
+                'GroupId': options.GroupId,
+                'ApplyMsg': options.ApplyMsg,
+                'UserDefinedField': options.UserDefinedField
+            },
                 cbOk, cbErr);
         };
 
         //申请加入大群
-    // var BigGroupId;
+        // var BigGroupId;
         var proto_applyJoinBigGroup = function (options, cbOk, cbErr) {
             options.GroupId = String(options.GroupId)
-        //BigGroupId = options.GroupId;
+            //BigGroupId = options.GroupId;
             var srvName;
             if (!checkLogin(cbErr, false)) { //未登录
                 srvName = SRV_NAME.BIG_GROUP;
             } else { //已登录
                 srvName = SRV_NAME.GROUP;
-        }
-        if( MsgManager.checkBigGroupLongPollingOn( options.GroupId ) ) {
-            cbErr && cbErr(tool.getReturnError("Join Group failed; You have already been in this group, you have to quit group before you rejoin", 10013));
-            return;
+            }
+            if (MsgManager.checkBigGroupLongPollingOn(options.GroupId)) {
+                cbErr && cbErr(tool.getReturnError("Join Group failed; You have already been in this group, you have to quit group before you rejoin", 10013));
+                return;
             }
             ConnManager.apiCall(srvName, "apply_join_group", {
-                    'GroupId': options.GroupId,
-                    'ApplyMsg': options.ApplyMsg,
-                    'UserDefinedField': options.UserDefinedField
-                },
+                'GroupId': options.GroupId,
+                'ApplyMsg': options.ApplyMsg,
+                'UserDefinedField': options.UserDefinedField
+            },
                 function (resp) {
                     if (resp.JoinedStatus && resp.JoinedStatus == 'JoinedSuccess') {
                         if (resp.LongPollingKey) {
                             MsgManager.setBigGroupLongPollingOn(true); //开启长轮询
-                        MsgManager.setBigGroupLongPollingKey(options.GroupId, resp.LongPollingKey); //更新大群长轮询key
+                            MsgManager.setBigGroupLongPollingKey(options.GroupId, resp.LongPollingKey); //更新大群长轮询key
                             MsgManager.setBigGroupLongPollingMsgMap(options.GroupId, 0); //收到的群消息置0
-                        MsgManager.bigGroupLongPolling( options.GroupId ); //开启长轮询
+                            MsgManager.bigGroupLongPolling(options.GroupId); //开启长轮询
                         } else { //没有返回LongPollingKey，说明申请加的群不是直播聊天室(AVChatRoom)
                             cbErr && cbErr(tool.getReturnError("Join Group succeed; But the type of group is not AVChatRoom: groupid=" + options.GroupId, -12));
                             return;
@@ -2110,14 +2112,14 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "handle_apply_join_group", {
-                    'GroupId': options.GroupId,
-                    'Applicant_Account': options.Applicant_Account,
-                    'HandleMsg': options.HandleMsg,
-                    'Authentication': options.Authentication,
-                    'MsgKey': options.MsgKey,
-                    'ApprovalMsg': options.ApprovalMsg,
-                    'UserDefinedField': options.UserDefinedField
-                },
+                'GroupId': options.GroupId,
+                'Applicant_Account': options.Applicant_Account,
+                'HandleMsg': options.HandleMsg,
+                'Authentication': options.Authentication,
+                'MsgKey': options.MsgKey,
+                'ApprovalMsg': options.ApprovalMsg,
+                'UserDefinedField': options.UserDefinedField
+            },
                 cbOk,
                 function (err) {
                     if (err.ErrorCode == 10024) { //apply has be handled
@@ -2141,10 +2143,10 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "get_pendency", {
-                    'StartTime': options.StartTime,
-                    'Limit': options.Limit,
-                    'Handle_Account': ctx.identifier
-                },
+                'StartTime': options.StartTime,
+                'Limit': options.Limit,
+                'Handle_Account': ctx.identifier
+            },
                 cbOk,
                 function (err) {
 
@@ -2158,9 +2160,9 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "report_pendency", {
-                    'ReportTime': options.ReportTime,
-                    'From_Account': ctx.identifier
-                },
+                'ReportTime': options.ReportTime,
+                'From_Account': ctx.identifier
+            },
                 cbOk,
                 function (err) {
 
@@ -2173,14 +2175,14 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "handle_invite_join_group", {
-                    'GroupId': options.GroupId,
-                    'Inviter_Account': options.Inviter_Account,
-                    'HandleMsg': options.HandleMsg,
-                    'Authentication': options.Authentication,
-                    'MsgKey': options.MsgKey,
-                    'ApprovalMsg': options.ApprovalMsg,
-                    'UserDefinedField': options.UserDefinedField
-                },
+                'GroupId': options.GroupId,
+                'Inviter_Account': options.Inviter_Account,
+                'HandleMsg': options.HandleMsg,
+                'Authentication': options.Authentication,
+                'MsgKey': options.MsgKey,
+                'ApprovalMsg': options.ApprovalMsg,
+                'UserDefinedField': options.UserDefinedField
+            },
                 cbOk,
                 function (err) {
 
@@ -2193,8 +2195,8 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "quit_group", {
-                    'GroupId': options.GroupId
-                },
+                'GroupId': options.GroupId
+            },
                 cbOk, cbErr);
         };
 
@@ -2206,10 +2208,10 @@ module.exports =  function () {
             } else { //已登录
                 srvName = SRV_NAME.GROUP;
             }
-        MsgManager.resetBigGroupLongPollingInfo( options.GroupId );
+            MsgManager.resetBigGroupLongPollingInfo(options.GroupId);
             ConnManager.apiCall(srvName, "quit_group", {
-                    'GroupId': options.GroupId
-                },
+                'GroupId': options.GroupId
+            },
                 function (resp) {
                     MsgStore.delSessByTypeId(SESSION_TYPE.GROUP, options.GroupId);
                     //重置当前再请求中的ajax
@@ -2230,11 +2232,11 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "get_group_public_info", {
-                    'GroupIdList': options.GroupIdList,
-                    'ResponseFilter': {
-                        'GroupBasePublicInfoFilter': options.GroupBasePublicInfoFilter
-                    }
-                },
+                'GroupIdList': options.GroupIdList,
+                'ResponseFilter': {
+                    'GroupBasePublicInfoFilter': options.GroupBasePublicInfoFilter
+                }
+            },
                 function (resp) {
                     resp.ErrorInfo = '';
                     if (resp.GroupInfo) {
@@ -2287,13 +2289,13 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "get_group_member_info", {
-                    'GroupId': options.GroupId,
-                    'Offset': options.Offset,
-                    'Limit': options.Limit,
-                    'MemberInfoFilter': options.MemberInfoFilter,
-                    'MemberRoleFilter': options.MemberRoleFilter,
-                    'AppDefinedDataFilter_GroupMember': options.AppDefinedDataFilter_GroupMember
-                },
+                'GroupId': options.GroupId,
+                'Offset': options.Offset,
+                'Limit': options.Limit,
+                'MemberInfoFilter': options.MemberInfoFilter,
+                'MemberRoleFilter': options.MemberRoleFilter,
+                'AppDefinedDataFilter_GroupMember': options.AppDefinedDataFilter_GroupMember
+            },
                 cbOk, cbErr);
         };
 
@@ -2304,10 +2306,10 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "add_group_member", {
-                    'GroupId': options.GroupId,
-                    'Silence': options.Silence,
-                    'MemberList': options.MemberList
-                },
+                'GroupId': options.GroupId,
+                'Silence': options.Silence,
+                'MemberList': options.MemberList
+            },
                 cbOk, cbErr);
         };
         //修改群组成员资料
@@ -2347,11 +2349,11 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "delete_group_member", {
-                    'GroupId': options.GroupId,
-                    'Silence': options.Silence,
-                    'MemberToDel_Account': options.MemberToDel_Account,
-                    'Reason': options.Reason
-                },
+                'GroupId': options.GroupId,
+                'Silence': options.Silence,
+                'MemberToDel_Account': options.MemberToDel_Account,
+                'Reason': options.Reason
+            },
                 cbOk, cbErr);
         };
         //解散群组
@@ -2360,8 +2362,8 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "destroy_group", {
-                    'GroupId': options.GroupId
-                },
+                'GroupId': options.GroupId
+            },
                 cbOk, cbErr);
         };
         //转让群组
@@ -2376,15 +2378,15 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "get_joined_group_list", {
-                    'Member_Account': options.Member_Account,
-                    'Limit': options.Limit,
-                    'Offset': options.Offset,
-                    'GroupType': options.GroupType,
-                    'ResponseFilter': {
-                        'GroupBaseInfoFilter': options.GroupBaseInfoFilter,
-                        'SelfInfoFilter': options.SelfInfoFilter
-                    }
-                },
+                'Member_Account': options.Member_Account,
+                'Limit': options.Limit,
+                'Offset': options.Offset,
+                'GroupType': options.GroupType,
+                'ResponseFilter': {
+                    'GroupBaseInfoFilter': options.GroupBaseInfoFilter,
+                    'SelfInfoFilter': options.SelfInfoFilter
+                }
+            },
                 cbOk, cbErr);
         };
         //查询一组UserId在群中的身份
@@ -2393,9 +2395,9 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "get_role_in_group", {
-                    'GroupId': options.GroupId,
-                    'User_Account': options.User_Account
-                },
+                'GroupId': options.GroupId,
+                'User_Account': options.User_Account
+            },
                 cbOk, cbErr);
         };
         //设置取消成员禁言时间
@@ -2404,10 +2406,10 @@ module.exports =  function () {
             if (!checkLogin(cbErr, true)) return;
 
             ConnManager.apiCall(SRV_NAME.GROUP, "forbid_send_msg", {
-                    'GroupId': options.GroupId,
-                    'Members_Account': options.Members_Account,
-                    'ShutUpTime': options.ShutUpTime //单位为秒，为0时表示取消禁言
-                },
+                'GroupId': options.GroupId,
+                'Members_Account': options.Members_Account,
+                'ShutUpTime': options.ShutUpTime //单位为秒，为0时表示取消禁言
+            },
                 cbOk, cbErr);
         };
 
@@ -2422,19 +2424,19 @@ module.exports =  function () {
         var proto_getGroupMsgs = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.GROUP, "group_msg_get", {
-                    "GroupId": options.GroupId,
-                    "ReqMsgSeq": options.ReqMsgSeq,
-                    "ReqMsgNumber": options.ReqMsgNumber
-                },
+                "GroupId": options.GroupId,
+                "ReqMsgSeq": options.ReqMsgSeq,
+                "ReqMsgNumber": options.ReqMsgNumber
+            },
                 cbOk, cbErr);
         };
         //群消息已读上报接口
         var proto_groupMsgReaded = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.GROUP, "msg_read_report", {
-                    'GroupId': options.GroupId,
-                    'MsgReadedSeq': options.MsgReadedSeq
-                },
+                'GroupId': options.GroupId,
+                'MsgReadedSeq': options.MsgReadedSeq
+            },
                 cbOk, cbErr);
         };
         //end
@@ -2474,9 +2476,9 @@ module.exports =  function () {
         var proto_applyAddFriend = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "friend_add", {
-                    'From_Account': ctx.identifier,
-                    'AddFriendItem': options.AddFriendItem
-                },
+                'From_Account': ctx.identifier,
+                'AddFriendItem': options.AddFriendItem
+            },
                 function (resp) {
                     var newResp = convertErrorEn2ZhFriend(resp);
                     if (newResp.ActionStatus == ACTION_STATUS.FAIL) {
@@ -2490,10 +2492,10 @@ module.exports =  function () {
         var proto_deleteFriend = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "friend_delete", {
-                    'From_Account': ctx.identifier,
-                    'To_Account': options.To_Account,
-                    'DeleteType': options.DeleteType
-                },
+                'From_Account': ctx.identifier,
+                'To_Account': options.To_Account,
+                'DeleteType': options.DeleteType
+            },
                 function (resp) {
                     var newResp = convertErrorEn2ZhFriend(resp);
                     if (newResp.ActionStatus == ACTION_STATUS.FAIL) {
@@ -2510,17 +2512,17 @@ module.exports =  function () {
 
             if (options.chatType == 1) {
                 ConnManager.apiCall(SRV_NAME.DEL_CHAT, "delete", {
-                        'From_Account': ctx.identifier,
-                        'Type': options.chatType,
-                        'To_Account': options.To_Account
-                    },
+                    'From_Account': ctx.identifier,
+                    'Type': options.chatType,
+                    'To_Account': options.To_Account
+                },
                     cbOk, cbErr);
             } else {
                 ConnManager.apiCall(SRV_NAME.DEL_CHAT, "delete", {
-                        'From_Account': ctx.identifier,
-                        'Type': options.chatType,
-                        'ToGroupid': options.To_Account
-                    },
+                    'From_Account': ctx.identifier,
+                    'Type': options.chatType,
+                    'ToGroupid': options.To_Account
+                },
                     cbOk, cbErr);
 
             }
@@ -2531,32 +2533,32 @@ module.exports =  function () {
         var proto_getPendency = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "pendency_get", {
-                    "From_Account": ctx.identifier,
-                    "PendencyType": options.PendencyType,
-                    "StartTime": options.StartTime,
-                    "MaxLimited": options.MaxLimited,
-                    "LastSequence": options.LastSequence
-                },
+                "From_Account": ctx.identifier,
+                "PendencyType": options.PendencyType,
+                "StartTime": options.StartTime,
+                "MaxLimited": options.MaxLimited,
+                "LastSequence": options.LastSequence
+            },
                 cbOk, cbErr);
         };
         //好友申请已读上报
         var proto_getPendencyReport = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "PendencyReport", {
-                    "From_Account": ctx.identifier,
-                    "LatestPendencyTimeStamp": options.LatestPendencyTimeStamp
-                },
+                "From_Account": ctx.identifier,
+                "LatestPendencyTimeStamp": options.LatestPendencyTimeStamp
+            },
                 cbOk, cbErr);
         };
         //删除好友申请
         var proto_deletePendency = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "pendency_delete", {
-                    "From_Account": ctx.identifier,
-                    "PendencyType": options.PendencyType,
-                    "To_Account": options.To_Account
+                "From_Account": ctx.identifier,
+                "PendencyType": options.PendencyType,
+                "To_Account": options.To_Account
 
-                },
+            },
                 function (resp) {
                     var newResp = convertErrorEn2ZhFriend(resp);
                     if (newResp.ActionStatus == ACTION_STATUS.FAIL) {
@@ -2570,9 +2572,9 @@ module.exports =  function () {
         var proto_responseFriend = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "friend_response", {
-                    'From_Account': ctx.identifier,
-                    'ResponseFriendItem': options.ResponseFriendItem
-                },
+                'From_Account': ctx.identifier,
+                'ResponseFriendItem': options.ResponseFriendItem
+            },
                 function (resp) {
                     var newResp = convertErrorEn2ZhFriend(resp);
                     if (newResp.ActionStatus == ACTION_STATUS.FAIL) {
@@ -2586,13 +2588,13 @@ module.exports =  function () {
         var proto_getAllFriend = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "friend_get_all", {
-                    'From_Account': ctx.identifier,
-                    'TimeStamp': options.TimeStamp,
-                    'StartIndex': options.StartIndex,
-                    'GetCount': options.GetCount,
-                    'LastStandardSequence': options.LastStandardSequence,
-                    'TagList': options.TagList
-                },
+                'From_Account': ctx.identifier,
+                'TimeStamp': options.TimeStamp,
+                'StartIndex': options.StartIndex,
+                'GetCount': options.GetCount,
+                'LastStandardSequence': options.LastStandardSequence,
+                'TagList': options.TagList
+            },
                 cbOk, cbErr);
         };
 
@@ -2605,11 +2607,11 @@ module.exports =  function () {
             }
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.PROFILE, "portrait_get", {
-                    'From_Account': ctx.identifier,
-                    'To_Account': options.To_Account,
-                    //'LastStandardSequence':options.LastStandardSequence,
-                    'TagList': options.TagList
-                },
+                'From_Account': ctx.identifier,
+                'To_Account': options.To_Account,
+                //'LastStandardSequence':options.LastStandardSequence,
+                'TagList': options.TagList
+            },
                 function (resp) {
                     var errorAccount = [];
                     if (resp.Fail_Account && resp.Fail_Account.length) {
@@ -2649,9 +2651,9 @@ module.exports =  function () {
         var proto_setProfilePortrait = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.PROFILE, "portrait_set", {
-                    'From_Account': ctx.identifier,
-                    'ProfileItem': options.ProfileItem
-                },
+                'From_Account': ctx.identifier,
+                'ProfileItem': options.ProfileItem
+            },
                 function (resp) {
                     for (var i in options.ProfileItem) {
                         var profile = options.ProfileItem[i];
@@ -2668,9 +2670,9 @@ module.exports =  function () {
         var proto_addBlackList = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "black_list_add", {
-                    'From_Account': ctx.identifier,
-                    'To_Account': options.To_Account
-                },
+                'From_Account': ctx.identifier,
+                'To_Account': options.To_Account
+            },
                 function (resp) {
                     var newResp = convertErrorEn2ZhFriend(resp);
                     if (newResp.ActionStatus == ACTION_STATUS.FAIL) {
@@ -2685,9 +2687,9 @@ module.exports =  function () {
         var proto_deleteBlackList = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "black_list_delete", {
-                    'From_Account': ctx.identifier,
-                    'To_Account': options.To_Account
-                },
+                'From_Account': ctx.identifier,
+                'To_Account': options.To_Account
+            },
                 function (resp) {
                     var newResp = convertErrorEn2ZhFriend(resp);
                     if (newResp.ActionStatus == ACTION_STATUS.FAIL) {
@@ -2702,11 +2704,11 @@ module.exports =  function () {
         var proto_getBlackList = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.FRIEND, "black_list_get", {
-                    'From_Account': ctx.identifier,
-                    'StartIndex': options.StartIndex,
-                    'MaxLimited': options.MaxLimited,
-                    'LastSequence': options.LastSequence
-                },
+                'From_Account': ctx.identifier,
+                'StartIndex': options.StartIndex,
+                'MaxLimited': options.MaxLimited,
+                'LastSequence': options.LastSequence
+            },
                 cbOk, cbErr);
         };
 
@@ -2714,9 +2716,9 @@ module.exports =  function () {
         var proto_getRecentContactList = function (options, cbOk, cbErr) {
             if (!checkLogin(cbErr, true)) return;
             ConnManager.apiCall(SRV_NAME.RECENT_CONTACT, "get", {
-                    'From_Account': ctx.identifier,
-                    'Count': options.Count
-                },
+                'From_Account': ctx.identifier,
+                'Count': options.Count
+            },
                 cbOk, cbErr);
         };
 
@@ -2730,23 +2732,23 @@ module.exports =  function () {
                 cmdName = 'pic_up_test';
             }
             ConnManager.apiCall(SRV_NAME.PIC, cmdName, {
-                    'App_Version': VERSION_INFO.APP_VERSION,
-                    'From_Account': ctx.identifier,
-                    'To_Account': options.To_Account,
-                    'Seq': options.Seq,
-                    'Timestamp': options.Timestamp,
-                    'Random': options.Random,
-                    'File_Str_Md5': options.File_Str_Md5,
-                    'File_Size': options.File_Size,
-                    'File_Type': options.File_Type,
-                    'Server_Ver': VERSION_INFO.SERVER_VERSION,
-                    'Auth_Key': authkey,
-                    'Busi_Id': options.Busi_Id,
-                    'PkgFlag': options.PkgFlag,
-                    'Slice_Offset': options.Slice_Offset,
-                    'Slice_Size': options.Slice_Size,
-                    'Slice_Data': options.Slice_Data
-                },
+                'App_Version': VERSION_INFO.APP_VERSION,
+                'From_Account': ctx.identifier,
+                'To_Account': options.To_Account,
+                'Seq': options.Seq,
+                'Timestamp': options.Timestamp,
+                'Random': options.Random,
+                'File_Str_Md5': options.File_Str_Md5,
+                'File_Size': options.File_Size,
+                'File_Type': options.File_Type,
+                'Server_Ver': VERSION_INFO.SERVER_VERSION,
+                'Auth_Key': authkey,
+                'Busi_Id': options.Busi_Id,
+                'PkgFlag': options.PkgFlag,
+                'Slice_Offset': options.Slice_Offset,
+                'Slice_Size': options.Slice_Size,
+                'Slice_Data': options.Slice_Data
+            },
                 cbOk, cbErr);
         };
 
@@ -3512,6 +3514,7 @@ module.exports =  function () {
                     visitSess(function (s) {
                         s._impl.isAutoRead = false;
                     });
+                console.warn(selSess);
                 if (selSess) {
                     selSess._impl.isAutoRead = isOn; //
                     if (isOn) { //是否调用已读上报接口
@@ -3687,29 +3690,29 @@ module.exports =  function () {
                 noticeSeq = 0;
             };
 
-        //设置大群长轮询开关
-        //isOn=true 开启
-        //isOn=false 停止
-        this.setBigGroupLongPollingOn = function (isOn) {
-            bigGroupLongPollingOn = isOn;
-        };
+            //设置大群长轮询开关
+            //isOn=true 开启
+            //isOn=false 停止
+            this.setBigGroupLongPollingOn = function (isOn) {
+                bigGroupLongPollingOn = isOn;
+            };
 
-        //查看是否存在该轮询，防止多次入群
-        this.checkBigGroupLongPollingOn = function ( groupId ) {
-            return !!bigGroupLongPollingKeyMap[groupId]
-        };
-        //设置大群长轮询key
-        this.setBigGroupLongPollingKey = function (GroupId, key) {
-            bigGroupLongPollingKeyMap[GroupId] = key;
-        };
-        //重置大群长轮询变量
-        this.resetBigGroupLongPollingInfo = function ( groupId ) {
-            bigGroupLongPollingOn = false;
-            bigGroupLongPollingStartSeqMap[groupId] = 0;
-            bigGroupLongPollingKeyMap[groupId] = null;
-            bigGroupLongPollingMsgMap[groupId] = {};
+            //查看是否存在该轮询，防止多次入群
+            this.checkBigGroupLongPollingOn = function (groupId) {
+                return !!bigGroupLongPollingKeyMap[groupId]
+            };
+            //设置大群长轮询key
+            this.setBigGroupLongPollingKey = function (GroupId, key) {
+                bigGroupLongPollingKeyMap[GroupId] = key;
+            };
+            //重置大群长轮询变量
+            this.resetBigGroupLongPollingInfo = function (groupId) {
+                bigGroupLongPollingOn = false;
+                bigGroupLongPollingStartSeqMap[groupId] = 0;
+                bigGroupLongPollingKeyMap[groupId] = null;
+                bigGroupLongPollingMsgMap[groupId] = {};
 
-        };
+            };
 
             //设置群消息数据条数
             this.setBigGroupLongPollingMsgMap = function (groupId, count) {
@@ -3761,12 +3764,12 @@ module.exports =  function () {
                 notifySeq = 0; //c2c新消息通知seq
                 noticeSeq = 0; //group新消息seq
 
-            //重置大群长轮询参数
-            onBigGroupMsgCallback = null;
-            bigGroupLongPollingOn = false;
-            bigGroupLongPollingStartSeqMap = {};
-            bigGroupLongPollingKeyMap = {};
-            bigGroupLongPollingMsgMap = {};
+                //重置大群长轮询参数
+                onBigGroupMsgCallback = null;
+                bigGroupLongPollingOn = false;
+                bigGroupLongPollingStartSeqMap = {};
+                bigGroupLongPollingKeyMap = {};
+                bigGroupLongPollingMsgMap = {};
 
                 groupSystemMsgsCache = {};
 
@@ -3778,11 +3781,11 @@ module.exports =  function () {
             //初始化文件下载ip和票据
             var initIpAndAuthkey = function (cbOk, cbErr) {
                 proto_getIpAndAuthkey(function (resp) {
-                        ipList = resp.IpList;
-                        authkey = resp.AuthKey;
-                        expireTime = resp.ExpireTime;
-                        if (cbOk) cbOk(resp);
-                    },
+                    ipList = resp.IpList;
+                    authkey = resp.AuthKey;
+                    expireTime = resp.ExpireTime;
+                    if (cbOk) cbOk(resp);
+                },
                     function (err) {
                         log.error("initIpAndAuthkey failed:" + err.ErrorInfo);
                         if (cbErr) cbErr(err);
@@ -3801,20 +3804,20 @@ module.exports =  function () {
                     ]
                 };
                 proto_getJoinedGroupListHigh(opts, function (resp) {
-                        if (!resp.GroupIdList || resp.GroupIdList.length == 0) {
-                            log.info("initMyGroupMaxSeqs: 目前还没有加入任何群组");
-                            if (cbOk) cbOk(resp);
-                            return;
-                        }
-                        for (var i = 0; i < resp.GroupIdList.length; i++) {
-                            var group_id = resp.GroupIdList[i].GroupId;
-                            var curMaxSeq = resp.GroupIdList[i].NextMsgSeq - 1;
-                            myGroupMaxSeqs[group_id] = curMaxSeq;
-                        }
-
+                    if (!resp.GroupIdList || resp.GroupIdList.length == 0) {
+                        log.info("initMyGroupMaxSeqs: 目前还没有加入任何群组");
                         if (cbOk) cbOk(resp);
+                        return;
+                    }
+                    for (var i = 0; i < resp.GroupIdList.length; i++) {
+                        var group_id = resp.GroupIdList[i].GroupId;
+                        var curMaxSeq = resp.GroupIdList[i].NextMsgSeq - 1;
+                        myGroupMaxSeqs[group_id] = curMaxSeq;
+                    }
 
-                    },
+                    if (cbOk) cbOk(resp);
+
+                },
                     function (err) {
                         log.error("initMyGroupMaxSeqs failed:" + err.ErrorInfo);
                         if (cbErr) cbErr(err);
@@ -4106,13 +4109,13 @@ module.exports =  function () {
                         case FRIEND_NOTICE_TYPE.BLACK_LIST_DELETE: //黑名单删除
                             notify["Accounts"] = friendNotice.BlackListDel_Account;
                             break;
-                            /*case FRIEND_NOTICE_TYPE.PENDENCY_REPORT://未决已读上报
+                        /*case FRIEND_NOTICE_TYPE.PENDENCY_REPORT://未决已读上报
 
-                     break;
-                     case FRIEND_NOTICE_TYPE.FRIEND_UPDATE://好友数据更新
+                 break;
+                 case FRIEND_NOTICE_TYPE.FRIEND_UPDATE://好友数据更新
 
-                     break;
-                     */
+                 break;
+                 */
                         default:
                             log.error("未知好友系统通知类型：friendNotice=" + JSON.stringify(friendNotice));
                             break;
@@ -4347,28 +4350,28 @@ module.exports =  function () {
             };
 
 
-        //大群 长轮询
-        this.bigGroupLongPolling = function (GroupId, cbOk, cbErr) {
-            // if( !GroupId ){
-            //     for(var a in bigGroupLongPollingMsgMap){
-            //         this.bigGroupLongPolling( a )
-            //     }
-            //     return;
-            // }
-            // var GroupId = BigGroupId;
-            var opts = {
-                'USP': 1,
-                'StartSeq': bigGroupLongPollingStartSeqMap[GroupId], //请求拉消息的起始seq
-                'HoldTime': bigGroupLongPollingHoldTime, //客户端长轮询的超时时间，单位是秒
-                'Key': bigGroupLongPollingKeyMap[GroupId] //客户端加入群组后收到的的Key
+            //大群 长轮询
+            this.bigGroupLongPolling = function (GroupId, cbOk, cbErr) {
+                // if( !GroupId ){
+                //     for(var a in bigGroupLongPollingMsgMap){
+                //         this.bigGroupLongPolling( a )
+                //     }
+                //     return;
+                // }
+                // var GroupId = BigGroupId;
+                var opts = {
+                    'USP': 1,
+                    'StartSeq': bigGroupLongPollingStartSeqMap[GroupId], //请求拉消息的起始seq
+                    'HoldTime': bigGroupLongPollingHoldTime, //客户端长轮询的超时时间，单位是秒
+                    'Key': bigGroupLongPollingKeyMap[GroupId] //客户端加入群组后收到的的Key
                 };
 
                 proto_bigGroupLongPolling(opts, function (resp) {
-                // if (GroupId != BigGroupId) return;
+                    // if (GroupId != BigGroupId) return;
                     var msgObjList = [];
-                bigGroupLongPollingStartSeqMap[GroupId] = resp.NextSeq;
-                bigGroupLongPollingHoldTime = resp.HoldTime;
-                bigGroupLongPollingKeyMap[GroupId] = resp.Key;
+                    bigGroupLongPollingStartSeqMap[GroupId] = resp.NextSeq;
+                    bigGroupLongPollingHoldTime = resp.HoldTime;
+                    bigGroupLongPollingKeyMap[GroupId] = resp.Key;
 
                     if (resp.RspMsgList && resp.RspMsgList.length > 0) {
                         var msgCount = 0,
@@ -4450,11 +4453,11 @@ module.exports =  function () {
                     else if (onBigGroupMsgCallback) onBigGroupMsgCallback(msgObjList); //返回新消息
 
                     //重新启动长轮询
-                bigGroupLongPollingOn && MsgManager.bigGroupLongPolling( GroupId );
+                    bigGroupLongPollingOn && MsgManager.bigGroupLongPolling(GroupId);
 
                 }, function (err) {
                     if (err.ErrorCode == longPollingPackageTooLargeErrorCode) {
-                    bigGroupLongPollingStartSeqMap[GroupId] = 0;
+                        bigGroupLongPollingStartSeqMap[GroupId] = 0;
                     } else if (err.ErrorCode != longPollingTimeOutErrorCode) {
                         log.error(err.ErrorInfo);
                         //记录长轮询返回错误次数
@@ -4469,7 +4472,7 @@ module.exports =  function () {
                     }
                     //累计超过一定次数，不再发起长轮询请求
                     if (curBigGroupLongPollingRetErrorCount < LONG_POLLING_MAX_RET_ERROR_COUNT) {
-                    bigGroupLongPollingOn && MsgManager.bigGroupLongPolling( GroupId );
+                        bigGroupLongPollingOn && MsgManager.bigGroupLongPolling(GroupId);
                     } else {
                         var errInfo = {
                             'ActionStatus': ACTION_STATUS.FAIL,
@@ -4554,8 +4557,8 @@ module.exports =  function () {
 
                 for (var i in msgInfos) {
                     var msgInfo = msgInfos[i];
-                var isSendMsg, id;
-                var headUrl =  msgInfo.From_AccountHeadurl || '';
+                    var isSendMsg, id;
+                    var headUrl = msgInfo.From_AccountHeadurl || '';
                     if (msgInfo.From_Account == ctx.identifier) { //当前用户发送的消息
                         isSendMsg = true;
                         id = msgInfo.To_Account; //读取接收者信息
@@ -4567,7 +4570,7 @@ module.exports =  function () {
                     if (!sess) {
                         sess = new Session(SESSION_TYPE.C2C, id, id, headUrl, 0, 0);
                     }
-                	var msg = new Msg(sess, isSendMsg, msgInfo.MsgSeq, msgInfo.MsgRandom, msgInfo.MsgTimeStamp, msgInfo.From_Account, C2C_MSG_SUB_TYPE.COMMON, msgInfo.From_AccountNick, headUrl);
+                    var msg = new Msg(sess, isSendMsg, msgInfo.MsgSeq, msgInfo.MsgRandom, msgInfo.MsgTimeStamp, msgInfo.From_Account, C2C_MSG_SUB_TYPE.COMMON, msgInfo.From_AccountNick, headUrl);
                     var msgBody = null;
                     var msgContent = null;
                     var msgType = null;
@@ -4649,7 +4652,7 @@ module.exports =  function () {
                                     if (data && data.userAction && data.userAction == FRIEND_WRITE_MSG_ACTION.ING) { //过滤安卓或ios的正在输入自定义消息
                                         continue;
                                     }
-                                } catch (e) {}
+                                } catch (e) { }
 
                                 msgType = MSG_ELEMENT_TYPE.CUSTOM;
                                 msgContent = new Msg.Elem.Custom(
@@ -4730,7 +4733,7 @@ module.exports =  function () {
                         if (!sess) {
                             sess = new Session(SESSION_TYPE.C2C, id, id, headUrl, 0, 0);
                         }
-                    var msg = new Msg(sess, isSendMsg, msgInfo.MsgSeq, msgInfo.MsgRandom, msgInfo.MsgTimeStamp, msgInfo.From_Account, C2C_MSG_SUB_TYPE.COMMON, msgInfo.From_AccountNick, msgInfo.From_AccountHeadurl);
+                        var msg = new Msg(sess, isSendMsg, msgInfo.MsgSeq, msgInfo.MsgRandom, msgInfo.MsgTimeStamp, msgInfo.From_Account, C2C_MSG_SUB_TYPE.COMMON, msgInfo.From_AccountNick, msgInfo.From_AccountHeadurl);
                         var msgBody = null;
                         var msgContent = null;
                         var msgType = null;
@@ -4814,7 +4817,7 @@ module.exports =  function () {
                                         if (data && data.userAction && data.userAction == FRIEND_WRITE_MSG_ACTION.ING) { //过滤安卓或ios的正在输入自定义消息
                                             continue;
                                         }
-                                    } catch (e) {}
+                                    } catch (e) { }
 
                                     msgType = MSG_ELEMENT_TYPE.CUSTOM;
                                     msgContent = new Msg.Elem.Custom(
@@ -4899,8 +4902,8 @@ module.exports =  function () {
                     }
                     for (var i in msgInfos) {
                         var msgInfo = msgInfos[i];
-                    var isSendMsg, id;
-                    var headUrl = msgInfo.From_AccountHeadurl || '';
+                        var isSendMsg, id;
+                        var headUrl = msgInfo.From_AccountHeadurl || '';
                         if (msgInfo.From_Account == ctx.identifier) { //当前用户发送的消息
                             isSendMsg = true;
                             id = msgInfo.To_Account; //读取接收者信息
@@ -4908,7 +4911,7 @@ module.exports =  function () {
                             isSendMsg = false;
                             id = msgInfo.From_Account; //读取发送者信息
                         }
-                    var msg = new Msg(sess, isSendMsg, msgInfo.MsgSeq, msgInfo.MsgRandom, msgInfo.MsgTimeStamp, msgInfo.From_Account, C2C_MSG_SUB_TYPE.COMMON, msgInfo.From_AccountNick, headUrl);
+                        var msg = new Msg(sess, isSendMsg, msgInfo.MsgSeq, msgInfo.MsgRandom, msgInfo.MsgTimeStamp, msgInfo.From_Account, C2C_MSG_SUB_TYPE.COMMON, msgInfo.From_AccountNick, headUrl);
                         var msgBody = null;
                         var msgContent = null;
                         var msgType = null;
@@ -5379,11 +5382,11 @@ module.exports =  function () {
                 } else {
                     log.warn('listeners.onKickedEventCall is empty');
                 }
-	    if (listeners.onLongPullingNotify) {
-	        onLongPullingNotify = listeners.onLongPullingNotify;
-            } else {
-                log.warn('listeners.onKickedEventCall is empty');
-            }
+                if (listeners.onLongPullingNotify) {
+                    onLongPullingNotify = listeners.onLongPullingNotify;
+                } else {
+                    log.warn('listeners.onKickedEventCall is empty');
+                }
 
                 if (listeners.onAppliedDownloadUrl) {
                     onAppliedDownloadUrl = listeners.onAppliedDownloadUrl;
@@ -5430,6 +5433,7 @@ module.exports =  function () {
             this.sendMsg = function (msg, cbOk, cbErr) {
                 proto_sendMsg(msg, function (resp) {
                     //私聊时，加入自己的发的消息，群聊时，由于seq和服务器的seq不一样，所以不作处理
+                    console.log(msg.sess.type())
                     if (msg.sess.type() == SESSION_TYPE.C2C) {
                         if (!MsgStore.addMsg(msg)) {
                             var errInfo = "sendMsg: addMsg failed!";

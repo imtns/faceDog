@@ -1,7 +1,7 @@
 <!--  -->
 <template>
     <view class='wrapper'>
-        <van-swipe-cell right-width="{{ 60 }}" async-close bind:close="onClose">
+        <van-swipe-cell right-width="{{ 70 }}" async-close bind:close="onClose">
             <view class="friends-box">
                 <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
                 <view class="msg">
@@ -11,7 +11,7 @@
             </view>
             <view class="delete" slot="right">删除</view>
         </van-swipe-cell>
-        <van-swipe-cell right-width="{{ 60 }}" async-close bind:close="onClose">
+        <van-swipe-cell right-width="{{ 70 }}" async-close bind:close="onClose">
             <view class="friends-box">
                 <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
                 <view class="msg">

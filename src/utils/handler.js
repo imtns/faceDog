@@ -1,6 +1,7 @@
 
 /* eslint-disable */
 var webim = require('./webim.js');
+import { Event } from '@/utils/event.js';
 var selToID,
     loginInfo,
     accountMode,
@@ -8,7 +9,6 @@ var selToID,
     sdkAppID,
     avChatRoomId,
     selType,
-    selToID,
     selSess,
     selSessHeadUrl
     ;
@@ -30,10 +30,10 @@ function onMsgNotify(newMsgList) {
     var newMsg;
     for (var j in newMsgList) { // 遍历新消息
         newMsg = newMsgList[j];
+        // webim.Log.warn('receive a new c2c msg');
         handlderMsg(newMsg);// 处理新消息
     }
 }
-
 // 处理消息（私聊(包括普通消息和全员推送消息)，普通群(非直播聊天室)消息）
 function handlderMsg(msg) {
     var fromAccount, fromAccountNick, sessType, subType, contentHtml;
@@ -58,28 +58,41 @@ function handlderMsg(msg) {
     subType = msg.getSubType();
 
     switch (sessType) {
-    case webim.SESSION_TYPE.C2C:// 私聊消息
-        switch (subType) {
-        case webim.C2C_MSG_SUB_TYPE.COMMON:// c2c普通消息
+        case webim.SESSION_TYPE.C2C:// 私聊消息
+            switch (subType) {
+                case webim.C2C_MSG_SUB_TYPE.COMMON:// c2c普通消息
                     // 业务可以根据发送者帐号fromAccount是否为app管理员帐号，来判断c2c消息是否为全员推送消息，还是普通好友消息
                     // 或者业务在发送全员推送消息时，发送自定义类型(webim.MSG_ELEMENT_TYPE.CUSTOM,即TIMCustomElem)的消息，在里面增加一个字段来标识消息是否为推送消息
-            contentHtml = convertMsgtoHtml(msg);
-            webim.Log.warn('receive a new c2c msg: fromAccountNick=' + fromAccountNick + ', content=' + contentHtml);
+                    contentHtml = convertMsgtoHtml(msg);
+                    webim.Log.warn('receive a new c2c msg: fromAccountNick=' + fromAccountNick + ', content=' + contentHtml);
                     // c2c消息一定要调用已读上报接口
-            var opts = {
-                    'To_Account': fromAccount, // 好友帐号
-                    'LastedMsgTime': msg.getTime()// 消息时间戳
-                };
-            webim.c2CMsgReaded(opts);
-            console.error('收到一条c2c消息(好友消息或者全员推送消息): 发送人=' + fromAccountNick + ', 内容=' + contentHtml);
+                    var opts = {
+                        'To_Account': fromAccount, // 好友帐号
+                        'LastedMsgTime': msg.getTime()// 消息时间戳
+                    };
+                    console.log('hahahaha')
+                    Event.trigger('msgDetect', msg);
+                    Event.trigger('msgDetectChat', msg);
+                    // console.error('收到一条c2c消息(好友消息或者全员推送消息): 发送人=' + fromAccountNick + ', 内容=' + contentHtml);
+                    break;
+            }
             break;
-        }
-        break;
-    case webim.SESSION_TYPE.GROUP:// 普通群消息，对于直播聊天室场景，不需要作处理
-        break;
+        case webim.SESSION_TYPE.GROUP:// 普通群消息，对于直播聊天室场景，不需要作处理
+            break;
     }
 }
-
+function delChat(to_id) {
+    var data = {
+        'To_Account': to_id,
+        'chatType': 1
+    }
+    webim.deleteChat(
+        data,
+        function (resp) {
+            console.log('删除成功');
+        }
+    );
+}
 // sdk登录
 function sdkLogin(userInfo, listeners, options, cb) {
     // web sdk 登录
@@ -89,15 +102,29 @@ function sdkLogin(userInfo, listeners, options, cb) {
             console.debug(identifierNick);
             webim.Log.info('webim登录成功');
             loginInfo = userInfo;
-            setProfilePortrait({
-                'ProfileItem': [{
-                    'Tag': 'Tag_Profile_IM_Nick',
-                    'Value': userInfo.identifierNick
-                }]
-            }, function () {
-  
+            const profile = wx.getStorageSync('profile');
 
-                });
+            setProfilePortrait({
+                'ProfileItem': [
+                    {
+                        'Tag': 'Tag_Profile_IM_Nick',
+                        'Value': profile.nick_name,
+                        // 'Value': '王思聪'
+                    },
+                    {
+                        "Tag": "Tag_Profile_IM_Gender",
+                        "Value": profile.gender == 'male' ? "Gender_Type_Male" : "Gender_Type_Fale"
+                    },
+                    {
+                        "Tag": "Tag_Profile_IM_Image",
+                        "Value": profile.icon
+                        // "Value": 'http://img2.imgtn.bdimg.com/it/u=2427473906,1629620274&fm=26&gp=0.jpg'
+                    }
+                ]
+            }, function () {
+
+
+            });
             cb && cb()
             // hideDiscussForm();//隐藏评论表单
             // initEmotionUL();//初始化表情
@@ -197,21 +224,21 @@ function showMsg(msg) {
     isSelfSend = msg.getIsSend();// 消息是否为自己发的
     var content = '';
     switch (subType) {
-    case webim.GROUP_MSG_SUB_TYPE.COMMON:// 群普通消息
-        content = convertMsgtoHtml(msg);
-        break;
-    case webim.GROUP_MSG_SUB_TYPE.REDPACKET:// 群红包消息
-        content = '[群红包消息]' + convertMsgtoHtml(msg);
-        break;
-    case webim.GROUP_MSG_SUB_TYPE.LOVEMSG:// 群点赞消息
+        case webim.GROUP_MSG_SUB_TYPE.COMMON:// 群普通消息
+            content = convertMsgtoHtml(msg);
+            break;
+        case webim.GROUP_MSG_SUB_TYPE.REDPACKET:// 群红包消息
+            content = '[群红包消息]' + convertMsgtoHtml(msg);
+            break;
+        case webim.GROUP_MSG_SUB_TYPE.LOVEMSG:// 群点赞消息
             // 业务自己可以增加逻辑，比如展示点赞动画效果
-        content = '[群点赞消息]' + convertMsgtoHtml(msg);
+            content = '[群点赞消息]' + convertMsgtoHtml(msg);
             // 展示点赞动画
-        showLoveMsgAnimation();
-        break;
-    case webim.GROUP_MSG_SUB_TYPE.TIP:// 群提示消息
-        content = '[群提示消息]' + convertMsgtoHtml(msg);
-        break;
+            showLoveMsgAnimation();
+            break;
+        case webim.GROUP_MSG_SUB_TYPE.TIP:// 群提示消息
+            content = '[群提示消息]' + convertMsgtoHtml(msg);
+            break;
     }
 
     return {
@@ -229,33 +256,33 @@ function convertMsgtoHtml(msg) {
         type = elem.getType();// 获取元素类型
         content = elem.getContent();// 获取元素对象
         switch (type) {
-        case webim.MSG_ELEMENT_TYPE.TEXT:
-            html += convertTextMsgToHtml(content);
-            break;
-        case webim.MSG_ELEMENT_TYPE.FACE:
-            html += convertFaceMsgToHtml(content);
-            break;
-        case webim.MSG_ELEMENT_TYPE.IMAGE:
-            html += convertImageMsgToHtml(content);
-            break;
-        case webim.MSG_ELEMENT_TYPE.SOUND:
-            html += convertSoundMsgToHtml(content);
-            break;
-        case webim.MSG_ELEMENT_TYPE.FILE:
-            html += convertFileMsgToHtml(content);
-            break;
-        case webim.MSG_ELEMENT_TYPE.LOCATION:// 暂不支持地理位置
+            case webim.MSG_ELEMENT_TYPE.TEXT:
+                html += convertTextMsgToHtml(content);
+                break;
+            case webim.MSG_ELEMENT_TYPE.FACE:
+                html += convertFaceMsgToHtml(content);
+                break;
+            case webim.MSG_ELEMENT_TYPE.IMAGE:
+                html += convertImageMsgToHtml(content);
+                break;
+            case webim.MSG_ELEMENT_TYPE.SOUND:
+                html += convertSoundMsgToHtml(content);
+                break;
+            case webim.MSG_ELEMENT_TYPE.FILE:
+                html += convertFileMsgToHtml(content);
+                break;
+            case webim.MSG_ELEMENT_TYPE.LOCATION:// 暂不支持地理位置
                 // html += convertLocationMsgToHtml(content);
-            break;
-        case webim.MSG_ELEMENT_TYPE.CUSTOM:
-            html += convertCustomMsgToHtml(content);
-            break;
-        case webim.MSG_ELEMENT_TYPE.GROUP_TIP:
-            html += convertGroupTipMsgToHtml(content);
-            break;
-        default:
-            webim.Log.error('未知消息元素类型: elemType=' + type);
-            break;
+                break;
+            case webim.MSG_ELEMENT_TYPE.CUSTOM:
+                html += convertCustomMsgToHtml(content);
+                break;
+            case webim.MSG_ELEMENT_TYPE.GROUP_TIP:
+                html += convertGroupTipMsgToHtml(content);
+                break;
+            default:
+                webim.Log.error('未知消息元素类型: elemType=' + type);
+                break;
         }
     }
     return webim.Tool.formatHtml2Text(html);
@@ -331,105 +358,105 @@ function convertGroupTipMsgToHtml(content) {
     opType = content.getOpType();// 群提示消息类型（操作类型）
     opUserId = content.getOpUserId();// 操作人id
     switch (opType) {
-    case webim.GROUP_TIP_TYPE.JOIN:// 加入群
-        userIdList = content.getUserIdList();
+        case webim.GROUP_TIP_TYPE.JOIN:// 加入群
+            userIdList = content.getUserIdList();
             // text += opUserId + "邀请了";
-        for (var m in userIdList) {
-            text += userIdList[m] + ',';
-            if (userIdList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
+            for (var m in userIdList) {
+                text += userIdList[m] + ',';
+                if (userIdList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
                     text += '等' + userIdList.length + '人';
                     break;
                 }
-        }
-        text = text.substring(0, text.length - 1);
-        text += '进入房间';
+            }
+            text = text.substring(0, text.length - 1);
+            text += '进入房间';
             // 房间成员数加1
             // memberCount = $('#user-icon-fans').html();
-        memberCount = parseInt(memberCount) + 1;
-        break;
-    case webim.GROUP_TIP_TYPE.QUIT:// 退出群
-        text += opUserId + '离开房间';
+            memberCount = parseInt(memberCount) + 1;
+            break;
+        case webim.GROUP_TIP_TYPE.QUIT:// 退出群
+            text += opUserId + '离开房间';
             // 房间成员数减1
-        if (memberCount > 0) {
-            memberCount = parseInt(memberCount) - 1;
-        }
-        break;
-    case webim.GROUP_TIP_TYPE.KICK:// 踢出群
-        text += opUserId + '将';
-        userIdList = content.getUserIdList();
-        for (var m in userIdList) {
-            text += userIdList[m] + ',';
-            if (userIdList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
+            if (memberCount > 0) {
+                memberCount = parseInt(memberCount) - 1;
+            }
+            break;
+        case webim.GROUP_TIP_TYPE.KICK:// 踢出群
+            text += opUserId + '将';
+            userIdList = content.getUserIdList();
+            for (var m in userIdList) {
+                text += userIdList[m] + ',';
+                if (userIdList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
                     text += '等' + userIdList.length + '人';
                     break;
                 }
-        }
-        text += '踢出该群';
-        break;
-    case webim.GROUP_TIP_TYPE.SET_ADMIN:// 设置管理员
-        text += opUserId + '将';
-        userIdList = content.getUserIdList();
-        for (var m in userIdList) {
-            text += userIdList[m] + ',';
-            if (userIdList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
+            }
+            text += '踢出该群';
+            break;
+        case webim.GROUP_TIP_TYPE.SET_ADMIN:// 设置管理员
+            text += opUserId + '将';
+            userIdList = content.getUserIdList();
+            for (var m in userIdList) {
+                text += userIdList[m] + ',';
+                if (userIdList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
                     text += '等' + userIdList.length + '人';
                     break;
                 }
-        }
-        text += '设为管理员';
-        break;
-    case webim.GROUP_TIP_TYPE.CANCEL_ADMIN:// 取消管理员
-        text += opUserId + '取消';
-        userIdList = content.getUserIdList();
-        for (var m in userIdList) {
-            text += userIdList[m] + ',';
-            if (userIdList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
+            }
+            text += '设为管理员';
+            break;
+        case webim.GROUP_TIP_TYPE.CANCEL_ADMIN:// 取消管理员
+            text += opUserId + '取消';
+            userIdList = content.getUserIdList();
+            for (var m in userIdList) {
+                text += userIdList[m] + ',';
+                if (userIdList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
                     text += '等' + userIdList.length + '人';
                     break;
                 }
-        }
-        text += '的管理员资格';
-        break;
+            }
+            text += '的管理员资格';
+            break;
 
-    case webim.GROUP_TIP_TYPE.MODIFY_GROUP_INFO:// 群资料变更
-        text += opUserId + '修改了群资料：';
-        var groupInfoList = content.getGroupInfoList();
-        var type, value;
-        for (var m in groupInfoList) {
-            type = groupInfoList[m].getType();
-            value = groupInfoList[m].getValue();
-            switch (type) {
-                case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.FACE_URL:
-                    text += '群头像为' + value + '; ';
-                    break;
-                case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.NAME:
-                    text += '群名称为' + value + '; ';
-                    break;
-                case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.OWNER:
-                    text += '群主为' + value + '; ';
-                    break;
-                case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.NOTIFICATION:
-                    text += '群公告为' + value + '; ';
-                    break;
-                case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.INTRODUCTION:
-                    text += '群简介为' + value + '; ';
-                    break;
-                default:
-                    text += '未知信息为:type=' + type + ',value=' + value + '; ';
-                    break;
+        case webim.GROUP_TIP_TYPE.MODIFY_GROUP_INFO:// 群资料变更
+            text += opUserId + '修改了群资料：';
+            var groupInfoList = content.getGroupInfoList();
+            var type, value;
+            for (var m in groupInfoList) {
+                type = groupInfoList[m].getType();
+                value = groupInfoList[m].getValue();
+                switch (type) {
+                    case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.FACE_URL:
+                        text += '群头像为' + value + '; ';
+                        break;
+                    case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.NAME:
+                        text += '群名称为' + value + '; ';
+                        break;
+                    case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.OWNER:
+                        text += '群主为' + value + '; ';
+                        break;
+                    case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.NOTIFICATION:
+                        text += '群公告为' + value + '; ';
+                        break;
+                    case webim.GROUP_TIP_MODIFY_GROUP_INFO_TYPE.INTRODUCTION:
+                        text += '群简介为' + value + '; ';
+                        break;
+                    default:
+                        text += '未知信息为:type=' + type + ',value=' + value + '; ';
+                        break;
                 }
-        }
-        break;
+            }
+            break;
 
-    case webim.GROUP_TIP_TYPE.MODIFY_MEMBER_INFO:// 群成员资料变更(禁言时间)
-        text += opUserId + '修改了群成员资料:';
-        var memberInfoList = content.getMemberInfoList();
-        var userId, shutupTime;
-        for (var m in memberInfoList) {
-            userId = memberInfoList[m].getUserId();
-            shutupTime = memberInfoList[m].getShutupTime();
-            text += userId + ': ';
-            if (shutupTime != null && shutupTime !== undefined) {
+        case webim.GROUP_TIP_TYPE.MODIFY_MEMBER_INFO:// 群成员资料变更(禁言时间)
+            text += opUserId + '修改了群成员资料:';
+            var memberInfoList = content.getMemberInfoList();
+            var userId, shutupTime;
+            for (var m in memberInfoList) {
+                userId = memberInfoList[m].getUserId();
+                shutupTime = memberInfoList[m].getShutupTime();
+                text += userId + ': ';
+                if (shutupTime != null && shutupTime !== undefined) {
                     if (shutupTime == 0) {
                         text += '取消禁言; ';
                     } else {
@@ -438,15 +465,15 @@ function convertGroupTipMsgToHtml(content) {
                 } else {
                     text += ' shutupTime为空';
                 }
-            if (memberInfoList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
+                if (memberInfoList.length > WEB_IM_GROUP_TIP_MAX_USER_COUNT && m == maxIndex) {
                     text += '等' + memberInfoList.length + '人';
                     break;
                 }
-        }
-        break;
-    default:
-        text += '未知群提示消息类型：type=' + opType;
-        break;
+            }
+            break;
+        default:
+            text += '未知群提示消息类型：type=' + opType;
+            break;
     }
     return text;
 }
@@ -622,13 +649,15 @@ function onSendMsg(msg, callback) {
             msg.addText(text_obj);
         }
     }
+
+
     webim.sendMsg(msg, function (resp) {
         if (selType == webim.SESSION_TYPE.C2C) { // 私聊时，在聊天窗口手动添加一条发的消息，群聊时，长轮询接口会返回自己发的消息
             showMsg(msg);
         }
         webim.Log.info('发消息成功');
         callback && callback();
-
+        selSess = null;
         // hideDiscussForm();//隐藏评论表单
         // showDiscussTool();//显示评论工具栏
         // hideDiscussEmotion();//隐藏表情
@@ -908,6 +937,8 @@ function init(opts) {
     avChatRoomId = opts.avChatRoomId;
     selType = opts.selType;
     selToID = opts.selToID;
+    selSessHeadUrl = opts.selSessHeadUrl;
+
 }
 
 module.exports = {
@@ -959,6 +990,7 @@ module.exports = {
     onRevokeGroupNotify,
     onCustomGroupNotify,
     onGroupInfoChangeNotify,
-    showGroupSystemMsg
+    showGroupSystemMsg,
+    delChat
 };
 

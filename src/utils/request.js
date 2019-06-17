@@ -15,10 +15,14 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
         let header = props[2] || {};
         if (wx.getStorageSync('token')) {
             Object.assign(header, {
-                Authorization: `Bearer ${wx.getStorageSync('token')}`,
                 latitude: wx.getStorageSync('latitude'),
-                longitude: wx.getStorageSync('longitude'),
+                longitude: wx.getStorageSync('longitude')
             });
+            if (url !== '/api/auth/access_token?') {
+                Object.assign(header, {
+                    Authorization: `Bearer ${wx.getStorageSync('token')}`
+                });
+            }
         }
         wx.request({
             url: domain + url,
@@ -29,7 +33,8 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
                 'content-type': 'application/json',
                 ...header
             },
-            success({data}) {
+            success({ data }) {
+                wx.hideLoading && wx.hideLoading();
                 if (data.return_code === 0) {
                     resolve(data.data);
                 } else {
@@ -37,10 +42,8 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
                 }
             },
             fail(e) {
-                reject(e);
-            },
-            complete() {
                 wx.hideLoading && wx.hideLoading();
+                reject(e);
             }
         });
     } catch (e) {

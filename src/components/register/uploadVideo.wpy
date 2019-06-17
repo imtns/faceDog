@@ -66,6 +66,12 @@ export default class Example extends wepy.component {
                         //     src: result.content,
                         //     cover: thumbTempFilePath
                         // });
+                        setTimeout(() => {
+                            wx.redirectTo({
+                                url: 'index'
+                            });
+                        }, 1500);
+
                         this.$apply();
                     }
                 );
@@ -80,10 +86,10 @@ export default class Example extends wepy.component {
     watch = {};
 
     computed = {};
-    onLoad(){
+    onLoad() {
         this.number = this.RondomPass(5);
         this.$apply();
-        console.log(this.number)
+        console.log(this.number);
     }
 }
 </script>
