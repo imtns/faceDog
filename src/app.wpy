@@ -27,7 +27,8 @@ export default class extends wepy.app {
             'pages/my/editfile',
             'pages/chat/chat',
             'pages/rank/rank', // 排行榜页面
-            'pages/chat/like'
+            'pages/chat/like',
+            'pages/my/mytime'
         ],
         window: {
             backgroundTextStyle: 'light',

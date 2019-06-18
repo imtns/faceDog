@@ -34,7 +34,7 @@
                 </view>
             </view>
             <view class="clearfloat" wx:if="{{item.isSend}}">
-                <view class="author-name">
+                <view class="author-name" wx:if="{{item.showtime}}">
                     <text class="chat-date">{{item.sendTime}}</text>
                 </view>
                 <view class="right">
@@ -126,7 +126,11 @@ export default class Chat extends wepy.page {
                     isSend: true,
                     sendTime: formatDateFromSeconds(
                         parseInt(new Date().getTime() / 1000)
-                    )
+                    ),
+                    showtime:
+                        parseInt(new Date().getTime() / 1000) -
+                            that.msgList[that.msgList.length - 1].time / 1000 >
+                        60
                 });
                 that.setData({
                     msgContent: ''
@@ -203,9 +207,8 @@ export default class Chat extends wepy.page {
                         count: resp.MaxCnt,
                         showtime:
                             index > 0 &&
-                            item.time / 1000 -
-                                resp.MsgList[index - 1].time / 1000 >
-                                60
+                            item.time - resp.MsgList[index - 1].time > 60,
+                        time: item.time
                     };
                 });
                 if (cbOk) cbOk(list);

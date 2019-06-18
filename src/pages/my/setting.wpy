@@ -4,21 +4,21 @@
         <view class='item'>
             <view class="title">只看异性</view>
             <view class="detail2">
-                <van-switch checked="{{ checked.gender }}" @change="onChange('gender')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+                <van-switch checked="{{ gender }}" @change="onChange('gender')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
             </view>
         </view>
         <view class="line"></view>
         <view class='item'>
             <view class="title">只看同城</view>
             <view class="detail2">
-                <van-switch checked="{{ checked.city }}" @change="onChange('city')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+                <van-switch checked="{{ city }}" @change="onChange('city')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
             </view>
         </view>
         <view class="line"></view>
         <view class='item'>
             <view class="title">不参加颜值battle</view>
             <view class="detail2">
-                <van-switch checked="{{ checked.battle }}" @change="onChange('battle')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+                <van-switch checked="{{ battle }}" @change="onChange('battle')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
             </view>
         </view>
         <view class="line"></view>
@@ -54,11 +54,9 @@ export default class Setting extends wepy.page {
     };
 
     data = {
-        checked: {
-            gender: false,
-            city: false,
-            battle: false
-        }
+        gender: false,
+        city: false,
+        battle: false
     };
 
     components = {};
@@ -68,7 +66,7 @@ export default class Setting extends wepy.page {
             console.log(detail);
             console.log(name);
             // 需要手动对 checked 状态进行更新
-            this.checked[name] = detail;
+            this[name] = detail;
         },
         logout() {
             console.log('out');

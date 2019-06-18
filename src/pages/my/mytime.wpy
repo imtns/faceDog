@@ -1,0 +1,108 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view class="top">
+            <view class="sec">
+                <image class="icon" src="../../images/my/hand.png" mode="aspectFill"></image>
+                <view class="title">成为朋友</view>
+                <view class="word">剩余32次</view>
+            </view>
+            <view class="sec">
+                <image class="icon" src="../../images/my/hand.png" mode="aspectFill"></image>
+                <view class="title">成为朋友</view>
+                <view class="word">剩余32次</view>
+            </view>
+            <view class="sec">
+                <image class="icon" src="../../images/my/hand.png" mode="aspectFill"></image>
+                <view class="title">成为朋友</view>
+                <view class="word">剩余32次</view>
+            </view>
+        </view>
+        <view class="line"></view>
+        <view class="desc">
+            <view class="d">通过以下方式可以增加次数：</view>
+            <view class="d">1.通过真人认证，一次获得次数</view>
+            <view class="d">2.颜值Battle界面，随机获得奖励次数</view>
+            <view class="d">3.根据个人颜值排名，每天获得奖励次数</view>
+            <view class="d">4.添加客服小哥哥vx，获赠大量次数</view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class MyTime extends wepy.page {
+    config = {
+        navigationBarTitleText: '我的次数'
+    };
+
+    data = {};
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {}
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.wrapper {
+    width: 100%;
+
+    .top {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 76rpx;
+        padding: 0 74rpx;
+        box-sizing: border-box;
+        .sec {
+            width: 33%;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            .icon {
+                width: 124rpx;
+                height: 124rpx;
+            }
+            .title {
+                margin-top: 20rpx;
+                font-size: 28rpx;
+                font-weight: 600;
+                color: rgba(6, 5, 5, 1);
+            }
+            .word {
+                font-size: 24rpx;
+                font-weight: 400;
+                color: rgba(158, 157, 157, 1);
+            }
+        }
+    }
+    .line {
+        width: 100%;
+        height: 18rpx;
+        background: rgba(246, 246, 246, 1);
+        margin: 87rpx 0 74rpx;
+    }
+    .desc {
+        width: 100%;
+        display:block;
+        margin:0 74rpx;
+
+        .d {
+            font-size: 28rpx;
+            font-weight: 600;
+            margin-bottom: 34rpx;
+            color: rgba(6, 5, 5, 1);
+        }
+    }
+}
+</style>

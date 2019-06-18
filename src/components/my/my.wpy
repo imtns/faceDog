@@ -24,8 +24,8 @@
             </view>
         </view>
         <view class="hr"></view>
-        <view class='item'>
-            <view class="title">我的次数</view>
+        <view class='item' @tap="redirect('mytime')">
+            <view class="title" >我的次数</view>
             <view class="detail2">
                 <van-icon name="arrow" />
             </view>
