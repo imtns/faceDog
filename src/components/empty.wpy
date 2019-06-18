@@ -1,0 +1,32 @@
+<!--  -->
+<template>
+  <view class='empty'>
+      <image src="../../images/empty/i.png" mode="aspectFill"></image>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  export default class Empty extends wepy.component {
+    props = {};
+
+    data = {};
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() { };
+
+    onShow() { };
+  }
+</script>
+
+<style lang='less' scoped>
+</style>
