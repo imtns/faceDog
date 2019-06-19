@@ -1,6 +1,9 @@
 <!--  -->
 <template>
-    <view class='wrapper'>
+    <block wx:if="{{!list.length}}">
+        <empty></empty>
+    </block>
+    <view wx:else class='wrapper'>
         <repeat for="{{list}}" key="index" index="index" item="item">
             <van-swipe-cell id="{{item.To_Account}}" data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
                 <view class="chat-box" @tap="onClick({{item.To_Account}},{{item.C2cNick}},{{item.C2cImage}},{{item.C2cNick}})">
@@ -17,8 +20,8 @@
                 <view class="delete" slot="right">删除</view>
             </van-swipe-cell>
         </repeat>
-
     </view>
+
 </template>
 
 <script>
@@ -26,6 +29,7 @@ import wepy from 'wepy';
 import { formatDateFromSeconds } from '@/utils';
 import webimhandler from '@/utils/handler';
 import webim from '@/utils/webim.js'; //腾讯云im包
+import empty from '@/components/empty';
 var unread = 0;
 export default class Chatlist extends wepy.component {
     props = {};
@@ -35,10 +39,11 @@ export default class Chatlist extends wepy.component {
         initLength: 0
     };
 
-    components = {};
-
+    components = {
+        empty
+    };
     methods = {
-        getChatList(data) {
+        async getChatList(data) {
             data.forEach(item => {
                 item.C2cNick = decodeURIComponent(item.C2cNick);
                 item.MsgShow = decodeURIComponent(item.MsgShow);

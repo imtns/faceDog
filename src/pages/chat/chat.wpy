@@ -128,9 +128,12 @@ export default class Chat extends wepy.page {
                         parseInt(new Date().getTime() / 1000)
                     ),
                     showtime:
-                        parseInt(new Date().getTime() / 1000) -
-                            that.msgList[that.msgList.length - 1].time / 1000 >
-                        60
+                        that.msgList.length > 0
+                            ? parseInt(new Date().getTime() / 1000) -
+                                  that.msgList[that.msgList.length - 1].time /
+                                      1000 >
+                              60
+                            : parseInt(new Date().getTime() / 1000)
                 });
                 that.setData({
                     msgContent: ''

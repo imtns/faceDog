@@ -113,7 +113,7 @@ function sdkLogin(userInfo, listeners, options, cb) {
                     },
                     {
                         "Tag": "Tag_Profile_IM_Gender",
-                        "Value": profile.gender == 'male' ? "Gender_Type_Male" : "Gender_Type_Fale"
+                        "Value": profile.gender == 'male' ? "Gender_Type_Male" : "Gender_Type_Female"
                     },
                     {
                         "Tag": "Tag_Profile_IM_Image",

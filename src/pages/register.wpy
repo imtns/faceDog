@@ -90,6 +90,7 @@ export default class Register extends wepy.page {
         wepy.setStorageSync('welcome', result.welcome);
         wepy.setStorageSync('token', result.access_token);
         wepy.setStorageSync('tencent_token', result.tencent_token);
+        wepy.setStorageSync('identifier', result.identifier);
         if (result.welcome) {
             this.step = 2;
             this.$apply();
@@ -103,7 +104,11 @@ export default class Register extends wepy.page {
 
     computed = {};
 
-    onLoad() {
+    onLoad(options) {
+        if(options.name == 'reg'){
+            this.step = 2;
+            return;
+        }
         wx.login({
             success: res => {
                 console.log(res);

@@ -58,6 +58,7 @@ export default class Chat extends wepy.component {
     methods = {
         tabClick(index) {
             this.tabIndex = index;
+            this.$invoke('like','initData')
         },
         initChat() {
             var selToID = ''; //会话列表不设置对方私聊账号
@@ -78,9 +79,9 @@ export default class Chat extends wepy.component {
                 var loginInfo = {
                     sdkAppID: Config.sdkappid, //用户所属应用id,必填
                     accountType: Config.accountType, //用户所属应用帐号类型，必填
-                    identifier: Config.users[0].identifier, //当前用户ID,必须是否字符串类型，选填
-                    identifierNick: Config.users[0].identifier, //当前用户昵称，选填
-                    userSig: Config.users[0].userSig, //当前用户身份凭证，必须是字符串类型，选填
+                    identifier: wx.getStorageSync('identifier'), //当前用户ID,必须是否字符串类型，选填
+                    identifierNick: wx.getStorageSync('profile').nick_name, //当前用户昵称，选填
+                    userSig: wx.getStorageSync('tencent_token'), //当前用户身份凭证，必须是字符串类型，选填
                     headurl: wx.getStorageSync('profile').icon
                 };
                 //监听连接状态回调变化事件

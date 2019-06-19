@@ -28,14 +28,18 @@
 <script>
 import wepy from 'wepy';
 import { dialog } from '@/utils';
+
 export default class Friends extends wepy.component {
     props = {};
 
-    data = {};
+    data = {
+
+    };
 
     components = {};
 
     methods = {
+
         async onClose(event) {
             const { position, instance } = event.detail;
             switch (position) {
@@ -53,9 +57,8 @@ export default class Friends extends wepy.component {
                             cancelColor: '#000000',
                             confirmText: '确定',
                             confirmColor: '#3CC51F',
-                            success: (result) => {
+                            success: result => {
                                 if (result.confirm) {
-
                                 }
                             },
                             fail: () => {},

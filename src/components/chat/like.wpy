@@ -1,161 +1,70 @@
 <!--  -->
 <template>
     <view class='wrapper'>
-        <view class="like-box">
-            <view class="header">
-                <view class="date"><text>28</text><text>/May</text></view>
-                <view class="all" @tap="redirect('like')">全部
-                    <van-icon name="arrow" />
+        <repeat for="{{list}}" key="index" index="index" item="item">
+            <view class="like-box">
+                <view class="header">
+                    <view class="date"><text>{{item.day}}</text><text>/{{item.month}}</text></view>
+                    <view class="all" @tap="redirect({{item}})">全部
+                        <van-icon name="arrow" />
+                    </view>
                 </view>
+                <repeat for="{{item.users}}" key="index" index="index" item="user">
+                    <view class="like-list">
+                        <view class="like">
+                            <image src="{{user.avatar}}" mode="aspectFill"></image>
+                            <view class="desc">
+                                <view class="left">
+                                    <view class="name">{{user.nick_name}}</view>
+                                    <view class="info">{{user.age}}岁 / {{user.constellation}}</view>
+                                </view>
+                                <view class="right">
+                                    <image src="../../images/chat/icon-{{user.be}}.png" mode="aspectFill"></image>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </repeat>
             </view>
-            <view class="like-list">
-                <view class="like">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="desc">
-                        <view class="left">
-                            <view class="name">黄浪儿</view>
-                            <view class="info">21岁 / 双鱼座</view>
-                        </view>
-                        <view class="right">
-                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
-                        </view>
-                    </view>
-                </view>
-                <view class="like">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="desc">
-                        <view class="left">
-                            <view class="name">黄浪儿</view>
-                            <view class="info">21岁 / 双鱼座</view>
-                        </view>
-                        <view class="right">
-                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
-                        </view>
-                    </view>
-                </view>
-                <view class="like">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="desc">
-                        <view class="left">
-                            <view class="name">黄浪儿</view>
-                            <view class="info">21岁 / 双鱼座</view>
-                        </view>
-                        <view class="right">
-                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
-                        </view>
-                    </view>
-                </view>
-            </view>
-        </view>
-        <view class="like-box">
-            <view class="header">
-                <view class="date"><text>28</text><text>/May</text></view>
-                <view class="all">全部
-                    <van-icon name="arrow" />
-                </view>
-            </view>
-            <view class="like-list">
-                <view class="like">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="desc">
-                        <view class="left">
-                            <view class="name">黄浪儿</view>
-                            <view class="info">21岁 / 双鱼座</view>
-                        </view>
-                        <view class="right">
-                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
-                        </view>
-                    </view>
-                </view>
-                <view class="like">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="desc">
-                        <view class="left">
-                            <view class="name">黄浪儿</view>
-                            <view class="info">21岁 / 双鱼座</view>
-                        </view>
-                        <view class="right">
-                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
-                        </view>
-                    </view>
-                </view>
-                <view class="like">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="desc">
-                        <view class="left">
-                            <view class="name">黄浪儿</view>
-                            <view class="info">21岁 / 双鱼座</view>
-                        </view>
-                        <view class="right">
-                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
-                        </view>
-                    </view>
-                </view>
-            </view>
-        </view>
-        <view class="like-box">
-            <view class="header">
-                <view class="date"><text>28</text><text>/May</text></view>
-                <view class="all">全部
-                    <van-icon name="arrow" />
-                </view>
-            </view>
-            <view class="like-list">
-                <view class="like">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="desc">
-                        <view class="left">
-                            <view class="name">黄浪儿</view>
-                            <view class="info">21岁 / 双鱼座</view>
-                        </view>
-                        <view class="right">
-                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
-                        </view>
-                    </view>
-                </view>
-                <view class="like">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="desc">
-                        <view class="left">
-                            <view class="name">黄浪儿</view>
-                            <view class="info">21岁 / 双鱼座</view>
-                        </view>
-                        <view class="right">
-                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
-                        </view>
-                    </view>
-                </view>
-                <view class="like">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="desc">
-                        <view class="left">
-                            <view class="name">黄浪儿</view>
-                            <view class="info">21岁 / 双鱼座</view>
-                        </view>
-                        <view class="right">
-                            <image src="../../images/chat/icon-lover.png" mode="aspectFill"></image>
-                        </view>
-                    </view>
-                </view>
-            </view>
-        </view>
+        </repeat>
     </view>
 </template>
 
 <script>
 import wepy from 'wepy';
+import { getAge } from '@/utils'
+import { LIKE_ME } from '@/utils/url';
+import { get, post } from '@/utils/request';
 export default class Like extends wepy.component {
     props = {};
 
-    data = {};
+    data = {
+        list: {}
+    };
 
     components = {};
 
     methods = {
-        redirect(url) {
+        redirect(user) {
+            wepy.setStorageSync('currentLike',user);
             wx.navigateTo({
-                url: 'chat/' + url
+                url: 'chat/like'
             });
+        },
+        async initData() {
+            const result = await get(LIKE_ME);
+            this.list = result;
+            console.warn(this.list);
+            this.list.forEach(item => {
+                item.day = item.date_time.split('-')[2];
+                item.month = new Date(item.date_time)
+                    .toDateString()
+                    .split(' ')[1];
+                item.users.forEach(t=>{
+                    t.age = getAge(t.birthday);
+                })
+            });
+            this.$apply();
         }
     };
 
@@ -229,7 +138,7 @@ export default class Like extends wepy.component {
                     display: flex;
                     justify-content: space-between;
                     .left {
-                        width: 55%;
+                        width: 58%;
 
                         .name {
                             color: white;

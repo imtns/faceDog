@@ -15,3 +15,9 @@ export const FABU_FABU_MOMENT = '/api/discover/moments';
 export const FABU_UPLOAD_PIC = '/api​/discover​/moment​/images';
 // 颜值PK
 export const BATTLE = '/api/face/battle';
+// 喜欢某个用户
+export const MAKEFRIEND = '/api/face/enjoy';
+// 喜欢某个人照片3次
+export const BATTLE_COMMIT = '/api/face/battle_commit';
+// 喜欢我的列表
+export const LIKE_ME = '/api/face/enjoy_list';

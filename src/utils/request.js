@@ -39,6 +39,7 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
                     resolve(data.data);
                 } else {
                     toast(data.message || '服务器开小差了, 请稍后再试');
+                    reject(data.message);
                 }
             },
             fail(e) {

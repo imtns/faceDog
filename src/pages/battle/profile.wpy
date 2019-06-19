@@ -2,37 +2,57 @@
 <template>
     <view class='container'>
         <swiper indicator-dots="{{true}}" autoplay="{{false}}" indicator-color="{{indicatorcolor}}" indicator-active-color="{{indicatoractivecolor}}" duration="300">
-            <repeat for="{{imgUrls}}" key="index">
+            <repeat for="{{profile.images}}" key="index">
                 <swiper-item>
-                    <image src="{{item}}" class="slide-image" mode="aspectFill" />
+                    <image src="{{item.image}}" class="slide-image" mode="aspectFill" />
                 </swiper-item>
             </repeat>
         </swiper>
         <view class="battle-profile-wrapper">
             <view class="battle-profile-left flex">
-                <view class="name">宋承昊</view>
-                <view class="info">女/21岁/双鱼座</view>
-                <view class="distance"><text>31.2km</text> 北京市</view>
+                <view class="name">{{profile.nick_name}}</view>
+                <view class="info">{{profile.gender =='female'?'女':'男'}}/{{profile.age}}岁/{{profile.constellation}}</view>
+                <view class="distance"><text>{{profile.distance}}km</text> {{profile.city}}</view>
             </view>
             <view class="battle-profile-right flex">
-                <view class="face-rank">她在<text>北京市</text> 颜值排行<text>70%</text></view>
+                <view class="face-rank">她在<text>{{profile.city}}</text> 颜值排行<text>{{profile.face * 100}}%</text></view>
                 <view class="profile-tags">
                     <view class="tag red">Top100</view>
                     <view class="tag green">颜值杀手</view>
                     <view class="tag blue">性感担当</view>
                 </view>
             </view>
-            <view class="battle-profile-signature">
-                个性签名: 锄禾日当午, 汗滴禾下土, 谁知盘中餐, 粒粒皆辛苦
+            <view class="battle-profile-signature" wx:if="{{profile.signature}}">
+                个性签名: {{profile.signature}}
+            </view>
+            <view class="battle-profile-moments" wx:if="{{profile.discover}}">
+                <view class="tab">
+                    <view class="text1">TA的动态</view>
+                    <view class="text2" @tap="goDiscover">全部
+                        <van-icon name="arrow" />
+                    </view>
+                </view>
+                <view class="moments-box">
+                    <repeat for="{{profile.discover}}" key="index" index="index" item="item">
+                        <image class="moment" src="{{item.image_url}}" mode="aspectFill"></image>
+                    </repeat>
+                </view>
+
             </view>
         </view>
         <view class="bottom-box">
-            <image class="close" src="../../images/profile/close.png"></image>
-            <image class="menu" @tap="showOrHide" src="../../images/profile/menu.png"></image>
+            <block wx:if="{{!profile.is_friend}}">
+                <image class="close" mode="aspectFill" @tap="close" src="../../images/profile/close.png"></image>
+                <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="../../images/profile/menu.png"></image>
+                <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="../../images/profile/icon-clock.png"></image>
+            </block>
+            <block wx:else>
+                <image class="close" mode="aspectFill" src="../../images/profile/icon-chat.png"></image>
+            </block>
         </view>
         <view class="drawer_screen" bindtap="showOrHide" wx:if="{{isShow}}" catchtouchmove="myCatchTouch">
             <view class="drawer-btn">
-                <image src="../../images/profile/lip.png" mode="aspectFill" class="btn" @tap="deleteLots"></image>
+                <image src="../../images/profile/lip.png" mode="aspectFill" class="btn" @tap="makeFriend('close')"></image>
                 <view class="textWrap">
                     <view class="lip">亲密接触</view>
                     <view>剩余1次</view>
@@ -40,14 +60,14 @@
 
             </view>
             <view class="drawer-btn">
-                <image src="../../images/profile/lover.png" mode="aspectFill" class="btn" @tap="deleteLots"></image>
+                <image src="../../images/profile/lover.png" mode="aspectFill" class="btn" @tap="makeFriend('lover')"></image>
                 <view class="textWrap">
                     <view class="lover">成为恋人</view>
                     <view>剩余7次</view>
                 </view>
             </view>
             <view class="drawer-btn">
-                <image src="../../images/profile/friend.png" mode="aspectFill" class="btn" @tap="add"></image>
+                <image src="../../images/profile/friend.png" mode="aspectFill" class="btn" @tap="makeFriend('friend')"></image>
                 <view class="textWrap">
                     <view class="friend">成为朋友</view>
                     <view>剩余12次</view>
@@ -60,10 +80,16 @@
 
 <script>
 import wepy from 'wepy';
+import { PROFILE, MAKEFRIEND, BATTLE_COMMIT } from '@/utils/url';
+import { get, post } from '@/utils/request';
+import { getAge, toast } from '@/utils';
 var systemInfo = wx.getSystemInfoSync();
 export default class Profile extends wepy.page {
     config = {
-        navigationBarTitleText: '颜狗Battle'
+        navigationBarTitleText: '颜狗Battle',
+        usingComponents: {
+            'van-icon': '../../components/vant/icon/index'
+        }
     };
 
     data = {
@@ -77,7 +103,9 @@ export default class Profile extends wepy.page {
         isShow: false,
         animMain: {},
         animAdd: {},
-        animDelLots: {}
+        animDelLots: {},
+        id: '',
+        profile: {}
     };
 
     components = {};
@@ -85,83 +113,31 @@ export default class Profile extends wepy.page {
     methods = {
         showOrHide() {
             if (this.isShow) {
-                // 缩回动画
-                this.takeback();
                 this.isShow = false;
             } else {
-                // 弹出动画
-                this.popp();
                 this.isShow = true;
             }
         },
-        add() {
-            this.triggerEvent('addEvent');
-            this.showOrHide();
+        async makeFriend(type) {
+            await post(MAKEFRIEND, {
+                to_be: type,
+                user_id: this.id
+            });
         },
-        deleteLots() {
-            this.triggerEvent('deleteLotsEvent');
-            this.showOrHide();
+        goDiscover() {
+            wepy.navigateTo({ url: 'url' });
+        },
+        toastTip() {
+            toast('您已发送过好友申请');
+        },
+        close() {
+            wepy.navigateTo({ url: '../chat/chat?id=oHNKp5ayhhMbdNVUsUytykZ0PYkU&nick=强强' });
+
+            // wepy.navigateBack({
+            //     delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+            // });
         }
     };
-    popp() {
-        // main按钮顺时针旋转
-        var animationMain = wx.createAnimation({
-            duration: 500,
-            timingFunction: 'ease-out'
-        });
-        var animationDelLots = wx.createAnimation({
-            duration: 500,
-            timingFunction: 'ease-out'
-        });
-        var animationAdd = wx.createAnimation({
-            duration: 500,
-            timingFunction: 'ease-out'
-        });
-        animationMain.rotateZ(180).step();
-        animationDelLots
-            .translate(0, (-200 / 750) * systemInfo.windowWidth)
-            .rotateZ(180)
-            .opacity(1)
-            .step();
-        animationAdd
-            .translate(0, (-320 / 750) * systemInfo.windowWidth)
-            .rotateZ(180)
-            .opacity(1)
-            .step();
-        this.animMain = animationMain.export();
-        this.animDelLots = animationDelLots.export();
-        this.animAdd = animationAdd.export();
-    }
-    // 收回动画
-    takeback() {
-        // main按钮逆时针旋转
-        var animationMain = wx.createAnimation({
-            duration: 500,
-            timingFunction: 'ease-out'
-        });
-        var animationDelLots = wx.createAnimation({
-            duration: 500,
-            timingFunction: 'ease-out'
-        });
-        var animationAdd = wx.createAnimation({
-            duration: 500,
-            timingFunction: 'ease-out'
-        });
-        animationMain.rotateZ(0).step();
-        animationDelLots
-            .translate(0, 0)
-            .rotateZ(0)
-            .opacity(0)
-            .step();
-        animationAdd
-            .translate(0, 0)
-            .rotateZ(0)
-            .opacity(0)
-            .step();
-        this.animMain = animationMain.export();
-        this.animDelLots = animationDelLots.export();
-        this.animAdd = animationAdd.export();
-    }
     myCatchTouch() {
         return;
     }
@@ -171,13 +147,32 @@ export default class Profile extends wepy.page {
 
     computed = {};
 
-    onLoad() {}
+    async onLoad(options) {
+        this.id = options.id;
+        const result = await get(PROFILE, {
+            user_id: this.id
+        });
+        if (options.notLikeImageId) {
+            try {
+                await post(BATTLE_COMMIT, {
+                    result: {
+                        win: options.imageId,
+                        fail: options.notLikeImageId
+                    }
+                });
+            } catch (e) {}
+        }
+        this.profile = result;
+        this.profile.age = getAge(result.birthday);
+        this.profile.distance = (this.profile.distance / 1000).toFixed(2);
+        this.$apply();
+    }
 
     onShow() {}
 }
 </script>
 
-<style lang='less' scoped>
+<style lang='less'>
 image {
     width: 100%;
     height: 100%;
@@ -233,6 +228,8 @@ swiper {
             color: white;
             font-family: PingFang SC;
             font-weight: 600;
+            position: relative;
+            top: -4rpx;
         }
         .lip {
             color: #a025f1;
@@ -341,6 +338,47 @@ swiper {
             width: 174rpx;
             height: 174rpx;
         }
+    }
+    .battle-profile-moments {
+        width: 100%;
+        margin-top: 58rpx;
+        padding: 0 41rpx;
+        box-sizing: border-box;
+        .tab {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .text1 {
+                font-size: 24rpx;
+                font-weight: 600;
+                color: rgba(0, 0, 0, 1);
+            }
+            .text2 {
+                font-size: 20rpx;
+                font-weight: 400;
+                color: rgba(158, 157, 157, 1);
+                display: flex;
+                position: relative;
+                top: -2rpx;
+            }
+        }
+        .moments-box {
+            display: flex;
+            margin-top: 35rpx;
+            .moment {
+                width: 214rpx;
+                height: 214rpx;
+                margin-right: 9rpx;
+                &:after {
+                    content: '';
+                    flex: auto;
+                }
+            }
+        }
+    }
+    .van-icon {
+        position: relative;
+        top: 3rpx !important;
     }
 }
 </style>

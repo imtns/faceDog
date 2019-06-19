@@ -1,13 +1,14 @@
 <!--  -->
 <template>
-  <view class='empty'>
-      <image src="../../images/empty/i.png" mode="aspectFill"></image>
-  </view>
+    <view class='empty'>
+        <image class="img" src="../../../images/empty/i.png" mode="aspectFill"></image>
+        <view class="text">空空如也...</view>
+    </view>
 </template>
 
 <script>
-  import wepy from 'wepy';
-  export default class Empty extends wepy.component {
+import wepy from 'wepy';
+export default class Empty extends wepy.component {
     props = {};
 
     data = {};
@@ -22,11 +23,31 @@
 
     computed = {};
 
-    onLoad() { };
+    onLoad() {}
 
-    onShow() { };
-  }
+    onShow() {}
+}
 </script>
 
 <style lang='less' scoped>
+.empty {
+    display: flex;
+    justify-content: center;
+    margin-top: 180rpx;
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+    .img {
+        width: 359rpx;
+        height: 359rpx;
+    }
+    .text {
+        font-size: 32rpx;
+        font-weight: 600;
+        color: rgba(40, 40, 40, 1);
+        opacity: 1;
+        margin-top:26rpx;
+    }
+}
 </style>

@@ -80,20 +80,28 @@ export default class Index extends wepy.page {
         }
     };
     async setProfile() {
-        const data = await get(PROFILE);
-        console.log(data);
-        data.age = getAge(data.birthday);
-        this.profile = data;
-        this.profile.images &&
-            this.profile.images.forEach(item => {
-                if (item.is_avatar) {
-                    this.profile.icon = item.image;
-                }
-            });
-        this.profile.images = this.switchOrder(this.profile.images);
-        wepy.setStorageSync('profile',this.profile);
-
-        this.$invoke('my', 'setProfile',this.profile);
+        try {
+            const data = await get(PROFILE);
+            console.error(data);
+            data.age = getAge(data.birthday);
+            this.profile = data;
+            this.profile.images &&
+                this.profile.images.forEach(item => {
+                    if (item.is_avatar) {
+                        this.profile.icon = item.image;
+                    }
+                });
+            this.profile.images = this.switchOrder(this.profile.images);
+            wepy.setStorageSync('profile', this.profile);
+            this.$invoke('my', 'setProfile', this.profile);
+        } catch (e) {
+            console.error(e);
+            if (e == '未完善资料') {
+                setTimeout(() => {
+                    wepy.redirectTo({ url: 'register?name=reg' });
+                }, 1500);
+            }
+        }
     }
     switchOrder(d) {
         var r = [];
@@ -116,12 +124,12 @@ export default class Index extends wepy.page {
                 this.$invoke('discover', 'initList');
             }
         },
-        unreadSet(num){
-            this.$invoke('tabbar','unreadSet', num);
+        unreadSet(num) {
+            this.$invoke('tabbar', 'unreadSet', num);
         }
     };
     onLoad() {
-//  this.$invoke('chat', 'initChat');
+        //  this.$invoke('chat', 'initChat');
     }
 
     onShow() {
