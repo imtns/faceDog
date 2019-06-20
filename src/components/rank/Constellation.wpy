@@ -1,8 +1,7 @@
-<!--  -->
 <template>
   <view class="Constellation-com">
     <repeat for="{{constellationData}}" key="index" index="index" item="constellation">
-        <view class="box" data-value="{{constellation.value}}" data-text="{{constellation.text}}">
+        <view class="box" data-value="{{constellation.value}}" data-text="{{constellation.text}}" @tap="chosedConstellation">
           <image class="icon" src="{{constellation.icon}}" mode="aspectFill"></image>
           <view class="text">{{constellation.text}}</view>
         </view>
@@ -74,7 +73,14 @@ export default class Constellation extends wepy.component {
     watch = {};
 
     computed = {};
-    methods = {}
+    methods = {
+        chosedConstellation(e) {
+            const { text = '' } = e.currentTarget.dataset;
+            this.$emit('getRankListByXZ', {
+                by: text,
+            });
+        },
+    }
     onLoad() {
        
     };

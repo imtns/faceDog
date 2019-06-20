@@ -1,0 +1,46 @@
+<!--  -->
+<template>
+    <view class="ta-moment-detail-page">
+        222222222
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+import { get } from '@/utils/request';
+import momentCard from '@/components/discover/momentCard';
+
+export default class momentDetail extends wepy.page {
+    config = {
+        navigationBarTitleText: 'TA的动态',
+    }
+    data = {
+        userId: '',
+    }
+    components = {
+        momentCard,
+    };
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+    async onLoad(options) {
+        const { momentId } = options;
+        this.momentId = momentId;
+        const data = await get(`/api/discover/moments/${this.momentId}`, {
+            moment_id: this.momentId,
+        });
+        console.log('动态详情', data);
+    };
+
+    onShow() {};
+}
+</script>
+
+<style lang='less'>
+.ta-moment-detail-page{
+    
+}
+</style>

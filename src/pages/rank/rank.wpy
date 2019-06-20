@@ -7,13 +7,31 @@
                 <van-tab title="同城"></van-tab>
                 <van-tab title="星座" title-style="{{showConstellation ? 'background:url(../../images/rank/rank-down.png) no-repeat right center; background-size: 23rpx 20rpx;' : 'background:url(../../images/rank/rank-down.png) no-repeat right center; background-size: 23rpx 20rpx;'}}"></van-tab>
             </van-tabs>
-            <Constellation wx:if="{{showConstellation}}"></Constellation>
+            <Constellation wx:if="{{showConstellation}}"  @getRankListByXZ.user="getRankListByXZ"></Constellation>
         </view>
         <rankList :top3="top3" :topOthers="topOthers"></rankList>
+        <image class="menu" mode="aspectFill" src="../../images/profile/menu.png" @tap="showchangeGenderPop"></image>
+        <view class="drawer_screen" catchtouchmove="myCatchTouch" wx:if="{{changeGenderPop}}">
+            <view class="drawer-btn" @tap="changeGender">
+                <image src="../../images/rank/rank-change-gender.png" mode="aspectFill" class="btn"></image>
+                <view class="textWrap">
+                    <view>切换性别</view>
+                </view>
+            </view>
+            <view class="drawer-btn">
+                <image src="../../images/rank/rank-my-rank.png" mode="aspectFill" class="btn"></image>
+                <view class="textWrap">
+                    <view>我的排名</view>
+                </view>
+            </view>
+            <image src="../../images/profile/close.png" mode="aspectFill" class="layer-close" @tap="hidechangeGenderPop"></image>
+        </view>
     </view>
 </template>
 <script>
 import wepy from 'wepy';
+import { post } from '@/utils/request';
+import { RANK_LIST } from '@/utils/url';
 import rankList from '@/components/rank/rankList';
 import Constellation from '@/components/rank/Constellation';
 export default class fabu extends wepy.page {
@@ -29,6 +47,9 @@ export default class fabu extends wepy.page {
         top3: [1,2,3],
         topOthers: [4,5,6,7],
         showConstellation: false,
+        gender: 'female',
+        changeGenderPop: false,
+        
     };
 
     components = {
@@ -36,13 +57,26 @@ export default class fabu extends wepy.page {
         Constellation,
     };
 
+    myCatchTouch() {
+        return;
+    }
     onChange(event) {
         console.log('event.detail.index', event.detail.index);
         const { index } = event.detail;
-        if ( +index === 2) {
+        if (+index === 2) { // 点击星座tab
             this.showConstellation = true;
-        } else {
+        } else if (+index === 1){ // 点击同城
             this.showConstellation = false;
+            this.getRankList({
+                by: '',
+                gender: this.gender,
+            });
+        } else if (+index === 0) { // 点击全国
+            this.showConstellation = false;
+            this.getRankList({
+                by: 'all',
+                gender: this.gender,
+            });
         }
     }
 
@@ -50,17 +84,51 @@ export default class fabu extends wepy.page {
         return 'background:red';
     }
 
-    methods = {};
-
+    methods = {
+        async getRankListByXZ(obj) {
+            this.showConstellation = false;
+            await this.getRankList(obj);
+        },
+        showchangeGenderPop() {
+            this.changeGenderPop = true;
+        },
+        hidechangeGenderPop() {
+            this.changeGenderPop = false;
+        },
+        changeGender() {
+            this.gender = this.gender === 'female' ? 'male' : 'femal';
+            this.hidechangeGenderPop();
+            this.getRankList({
+                by: 'all',
+                gender: this.gender,
+            });
+        },
+    };
+    hidechangeGenderPop() {
+        this.changeGenderPop = false;
+    }
     events = {};
 
     watch = {};
 
     computed = {};
 
-    onLoad() { };
+    onLoad() {
+        this.getRankList({
+            by: 'all',
+            gender: this.gender,
+        });
+    };
 
     onShow() { };
+
+    async getRankList({ by = '', gender = '' }) {
+        const data = await post(RANK_LIST, {
+            by,
+            gender: gender || this.gender,
+        });
+        console.log(data);
+    }
 }
 </script>
 
@@ -80,6 +148,64 @@ export default class fabu extends wepy.page {
                 width:77rpx !important;
                 height:10rpx !important;
                 bottom: 28% !important;
+            }
+        }
+    }
+    .menu{
+        width: 120rpx;
+        height: 120rpx;
+        border-radius: 100%;
+        position: fixed;
+        bottom: 8%;
+        right: 9%;
+    }
+    .drawer_screen {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        background: rgba(6, 6, 6, .89);
+        overflow: hidden;
+        .layer-close {
+            width: 170rpx;
+            height: 170rpx;
+            position: fixed;
+            bottom: 67rpx;
+            right: 107rpx;
+        }
+        .drawer-btn {
+            display: flex;
+            position: fixed;
+            bottom: 100rpx;
+            width: 300rpx;
+            right: 0;
+            align-items: center;
+            flex-wrap: nowrap;
+            margin-right: 60rpx;
+            &:nth-child(1) {
+                bottom: 418rpx; 
+            }
+            &:nth-child(2) {
+                bottom: 247rpx;
+            }
+            image {
+                width: 174rpx;
+                height: 174rpx;
+                overflow: auto;
+            }
+            view {
+                display: block;
+                width: 123rpx;
+                font-size: 30rpx;
+                color: white;
+                font-family: PingFang SC;
+                font-weight: 600;
+                position: relative;
+                top: -4rpx;
             }
         }
     }

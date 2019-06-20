@@ -2,7 +2,7 @@
 <template>
     <repeat for="{{momentList}}" key="index" index="index" item="item">
         <view class="momentCard">
-            <image  class="header" src="{{item.avatar}}" mode="aspectFill"></image>
+            <image  class="header" src="{{item.avatar}}" mode="aspectFill" @tap="toProfile({{item._id}})"></image>
             <view class="content">
                 <view class="info">
                     <view class="first">
@@ -17,7 +17,7 @@
                         <text class="margin-right">巨蟹座</text>
                         <text class="margin-right">{{item.city}}</text>
                     </view>
-                    <view class="moment">
+                    <view class="moment" @tap="toMomentDetail({{item._id}})">
                         {{item.content}}
                     </view>
                     <view class="imgs">
@@ -49,7 +49,7 @@
                     <view class="comment-who" wx:if="{{item.likes.length}}">
                         <image class="icon" src="../../images/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
-                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}"></image>
+                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
                     </view>
                     <view class="comment-info-box" wx:if="{{item.comments.length}}">
@@ -164,6 +164,18 @@ export default class momentCard extends wepy.component {
                 content: value,
             });
             console.log(data);
+        },
+        // 跳转到他的资料页面
+        toProfile(id) {
+            wepy.navigateTo({
+                url: `battle/profile?id=${id}`,
+            });
+        },
+        // 跳转到动态详情页面
+        toMomentDetail(id) {
+            wepy.navigateTo({
+                url: `/pages/ta/momentDetail?momentId=${id}`,
+            });
         },
     };
     setMomentList(list) {
