@@ -58,7 +58,13 @@ export default class Chat extends wepy.component {
     methods = {
         tabClick(index) {
             this.tabIndex = index;
-            this.$invoke('like','initData')
+            if (index == 2) {
+                this.$invoke('like', 'initData');
+            } else if (index == 3) {
+                this.$invoke('friends', 'getList');
+            } else if (index == 4) {
+                // this.$invoke('notify', 'initData');
+            }
         },
         initChat() {
             var selToID = ''; //会话列表不设置对方私聊账号

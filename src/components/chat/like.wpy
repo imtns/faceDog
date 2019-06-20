@@ -19,7 +19,7 @@
                                     <view class="info">{{user.age}}岁 / {{user.constellation}}</view>
                                 </view>
                                 <view class="right">
-                                    <image src="../../images/chat/icon-{{user.be}}.png" mode="aspectFill"></image>
+                                    <image @tap="agree({{user._id}})" src="../../images/chat/icon-{{user.be}}.png" mode="aspectFill"></image>
                                 </view>
                             </view>
                         </view>
@@ -32,8 +32,8 @@
 
 <script>
 import wepy from 'wepy';
-import { getAge } from '@/utils'
-import { LIKE_ME } from '@/utils/url';
+import { getAge } from '@/utils';
+import { LIKE_ME, AGREE_FRIEND } from '@/utils/url';
 import { get, post } from '@/utils/request';
 export default class Like extends wepy.component {
     props = {};
@@ -45,8 +45,13 @@ export default class Like extends wepy.component {
     components = {};
 
     methods = {
+        agree(id) {
+            get(AGREE_FRIEND, {
+                user_id: id
+            });
+        },
         redirect(user) {
-            wepy.setStorageSync('currentLike',user);
+            wepy.setStorageSync('currentLike', user);
             wx.navigateTo({
                 url: 'chat/like'
             });
@@ -60,9 +65,9 @@ export default class Like extends wepy.component {
                 item.month = new Date(item.date_time)
                     .toDateString()
                     .split(' ')[1];
-                item.users.forEach(t=>{
+                item.users.forEach(t => {
                     t.age = getAge(t.birthday);
-                })
+                });
             });
             this.$apply();
         }

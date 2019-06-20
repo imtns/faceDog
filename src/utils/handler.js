@@ -662,8 +662,10 @@ function onSendMsg(msg, callback) {
         // showDiscussTool();//显示评论工具栏
         // hideDiscussEmotion();//隐藏表情
     }, function (err) {
+        selSess = null;
         webim.Log.error('发消息失败:' + err.ErrorInfo);
         console.error('发消息失败:' + err.ErrorInfo);
+        callback && callback('发送失败')
     });
 }
 

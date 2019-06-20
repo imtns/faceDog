@@ -21,3 +21,7 @@ export const MAKEFRIEND = '/api/face/enjoy';
 export const BATTLE_COMMIT = '/api/face/battle_commit';
 // 喜欢我的列表
 export const LIKE_ME = '/api/face/enjoy_list';
+// 获取用户好友列表
+export const FRIENDS_LIST = '/api/user/contacts';
+// 好友通过
+export const AGREE_FRIEND = '/api/face/join_contact';

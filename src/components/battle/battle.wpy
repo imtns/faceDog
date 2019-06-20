@@ -418,7 +418,7 @@ export default class Battle extends wepy.component {
                 position: absolute;
                 left: 18rpx;
                 bottom: 40rpx;
-                color: peru;
+                color: white;
                 font-size: 22rpx;
                 .name {
                     font-size: 48rpx;
