@@ -18,7 +18,7 @@
                     <view>切换性别</view>
                 </view>
             </view>
-            <view class="drawer-btn">
+            <view class="drawer-btn" @tap="toMyRank">
                 <image src="../../images/rank/rank-my-rank.png" mode="aspectFill" class="btn"></image>
                 <view class="textWrap">
                     <view>我的排名</view>
@@ -49,7 +49,6 @@ export default class fabu extends wepy.page {
         showConstellation: false,
         gender: 'female',
         changeGenderPop: false,
-        
     };
 
     components = {
@@ -101,6 +100,12 @@ export default class fabu extends wepy.page {
             this.getRankList({
                 by: 'all',
                 gender: this.gender,
+            });
+        },
+        toMyRank() {
+            this.hidechangeGenderPop();
+            wepy.navigateTo({
+                url: `/pages/my/myrank`,
             });
         },
     };

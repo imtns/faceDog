@@ -195,7 +195,6 @@ export default class fabu extends wepy.page {
                 width: 28vw;
                 height: 214rpx;
                 display: block;
-                background: red;
             }
             .minus{
                 position: absolute;
