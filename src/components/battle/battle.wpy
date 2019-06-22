@@ -56,6 +56,8 @@ import wepy from 'wepy';
 import { BATTLE } from '@/utils/url';
 import { get } from '@/utils/request';
 import { removeDuplicates } from '@/utils';
+let topIndex = 0;
+let bottomIndex = 0;
 let timeout = 0;
 let buttonDisable = false;
 export default class Battle extends wepy.component {
@@ -63,17 +65,14 @@ export default class Battle extends wepy.component {
         layer: false,
         pop: false,
         gift: false,
-        movedTop: [],
         loaded: false,
-        movedBottom: [],
         topLikedImage: '',
         bottomLikedImage: '',
         topLikedUser: '',
         bottomLikedUser: '',
         topHeart: '',
         bottomHeart: '',
-        battle: {
-        },
+        battle: {},
         heartShow: false,
         heartTop: false,
         heartBottom: false,
@@ -87,56 +86,60 @@ export default class Battle extends wepy.component {
 
     methods = {
         async fly(position, index, imageid, item) {
-            this.$apply();
-            if (position == 'top') {
-                this.$apply();
-                if (index == this.battle.a.length - 1) {
+            if (position == 'bottom') {
+                if (topIndex == this.battle.a.length - 1) {
                     await this.getBattle('a');
+                    topIndex = 0;
                 }
-                this.movedTop[index] = imageid;
-                if (this.battle.a[index + 1]) {
+                topIndex++;
+                if (this.battle.a[topIndex]) {
                     this.animation.translateX('-150%').step();
-                    this.battle.a[index].animation = this.animation.export();
-                    this.topLikedImage = this.battle.a[index + 1].image_id;
-                    this.topLikedUser = this.battle.a[index + 1]._id;
+                    this.battle.a[topIndex - 1].animation = this.animation.export();
+                    this.bottomLikedImage = this.battle.b[index].image_id;
+                    this.bottomLikedUser = this.battle.b[index]._id;
                 } else {
-                    this.movedTop = [];
                     this.animation.translateX('0%').step({ duration: 0 });
                     this.battle.a.forEach(item => {
                         item.animation = this.animation.export();
-                         this.$apply();
                     });
                     this.$apply();
                 }
             } else {
-                this.$apply();
                 if (index == this.battle.b.length - 1) {
                     await this.getBattle('b');
+                    bottomIndex = 0;
                 }
-                this.movedBottom[index] = imageid;
-                if (this.battle.b[index + 1]) {
+                bottomIndex++ ;
+                if (this.battle.b[bottomIndex]) {
                     this.animation.translateX('-150%').step();
-                    this.battle.b[index].animation = this.animation.export();
-                    this.bottomLikedImage = this.battle.b[index + 1].image_id;
-                    this.bottomLikedUser = this.battle.b[index + 1]._id;
+                    this.battle.b[bottomIndex - 1].animation = this.animation.export();
+                    this.topLikedImage = this.battle.a[index].image_id;
+                    this.topLikedUser = this.battle.a[index]._id;
                 } else {
                     this.animation.translateX('0%').step({ duration: 0 });
                     this.battle.b.forEach(item => {
                         item.animation = this.animation.export();
-                         this.$apply();
                     });
                     this.$apply();
-                    this.movedBottom = [];
                 }
             }
 
             let likedImageId =
-                position == 'top' ? this.bottomLikedImage : this.topLikedImage;
+                position == 'bottom'
+                    ? this.bottomLikedImage
+                    : this.topLikedImage;
             let likedUserId =
-                position == 'top' ? this.bottomLikedUser : this.topLikedUser;
-            console.error('index:', index);
+                position == 'bottom' ? this.bottomLikedUser : this.topLikedUser;
+            console.error('topIndex:', topIndex);
             this.flyHeart(position, imageid);
             if (this.likeCount.count[likedImageId] == 3) {
+                var notLikeImageId = '';
+                if (position == 'bottom') {
+                    notLikeImageId = this.battle.a[topIndex - 1]._id;
+                } else {
+                    notLikeImageId = this.battle.b[bottomIndex - 1]._id;
+                }
+
                 console.error(likedImageId + '喜欢了3次');
                 console.error(imageid + '当前点击图片');
                 setTimeout(() => {
@@ -144,7 +147,7 @@ export default class Battle extends wepy.component {
                     this.setHeart('top', 1);
                     this.setHeart('bottom', 1);
                     wepy.navigateTo({
-                        url: `battle/profile?id=${likedUserId}&imageId=${likedImageId}&notLikeImageId=${imageid}`
+                        url: `battle/profile?id=${likedUserId}&imageId=${likedImageId}&notLikeImageId=${notLikeImageId}`
                     });
                 }, 1000);
 
@@ -155,7 +158,7 @@ export default class Battle extends wepy.component {
     flyHeart(type) {
         this.heartShow = true;
         var imageid = '';
-        if (type == 'top') {
+        if (type == 'bottom') {
             this.heartBottom = true;
             imageid = this.bottomLikedImage;
         } else {
@@ -197,11 +200,11 @@ export default class Battle extends wepy.component {
         this.battle = result;
         this.battle.a.forEach(item => {
             item.distance = (item.distance / 1000).toFixed(2);
-            item.animation = {}
+            item.animation = {};
         });
         this.battle.b.forEach(item => {
             item.distance = (item.distance / 1000).toFixed(2);
-            item.animation = {}
+            item.animation = {};
         });
         this.$apply();
         console.warn(result);
@@ -241,7 +244,7 @@ export default class Battle extends wepy.component {
         console.log(windowWidth);
     }
     setHeart(position, index) {
-        if (position == 'bottom') {
+        if (position == 'top') {
             this.topHeart = `../../../images/battle/${index}.png`;
         } else {
             this.bottomHeart = `../../../images/battle/${index}.png`;
