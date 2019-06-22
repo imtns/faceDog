@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-  <scroll-view scroll-y class='discover'>
+  <scroll-view scroll-y class='discover' bindscrolltolower="pageTuring">
       <topBanner></topBanner>
       <view class="content-search">
           <van-tabs class="tabs">
@@ -35,6 +35,7 @@ import momentCard from '@/components/discover/momentCard';
 export default class Discover extends wepy.component {
     data = {
         show: false,
+        momentList: [],
     };
 
     components = {
@@ -64,22 +65,34 @@ export default class Discover extends wepy.component {
         closewarn() {
             this.show = false;
         },
-        async initList() {
+        async initList({
+            page = 1,
+            same_city = 0,
+            opposite = 'not',
+        }) {
             // 请求动态列表
             // todo，全国和同城这个接口还没有弄好
             // const latitude = wepy.getStorageSync('latitude');
             // const longitude = wepy.getStorageSync('longitude');
-            const momentList = await get(DISCOVER_MOMENT_LIST);
-            console.log('动态列表', momentList);
-            this.$invoke('momentCard', 'setMomentList', momentList);
+            console.log('动态列表', this.momentList);
+            const List = await get(DISCOVER_MOMENT_LIST);
+            this.momentList = this.momentList.concat(List);
+            console.log('动态列表', this.momentList);
+            this.$invoke('momentCard', 'setMomentList', this.momentList);
             this.$apply();
+        },
+        pageTuring() {
+            this.methods.initList.call(this, {
+                page: 1,
+                same_city: 0,
+                opposite: 'not',
+            })
+            console.log(this.methods.initList);
         },
     }
     onLoad() {};
 
-    onShow() {
-        console.log(222222);
-    };
+    onShow() {};
 }
 </script>
 
