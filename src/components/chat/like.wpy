@@ -19,7 +19,7 @@
                                     <view class="info">{{user.age}}岁 / {{user.constellation}}</view>
                                 </view>
                                 <view class="right">
-                                    <image @tap="agree({{user._id}})" src="../../images/chat/icon-{{user.be}}.png" mode="aspectFill"></image>
+                                    <image @tap="agree({{user}})" src="../../images/chat/icon-{{user.be}}.png" mode="aspectFill"></image>
                                 </view>
                             </view>
                         </view>
@@ -45,9 +45,12 @@ export default class Like extends wepy.component {
     components = {};
 
     methods = {
-        agree(id) {
+        agree(user) {
             get(AGREE_FRIEND, {
-                user_id: id
+                user_id: user._id
+            });
+            wx.navigateTo({
+                url: `chat/becomeFriend?id=${user.dentifier}&nick=${user.nick_name}&icon=${encodeURI(user.avatar)}`
             });
         },
         redirect(user) {

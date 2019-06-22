@@ -1,0 +1,121 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view class="matched">
+            <image src="../../images/profile/matched.png" mode="aspectFill"></image>
+        </view>
+        <view class="avatars">
+            <image class="avatar" src="{{me.icon}}" mode="aspectFill"></image>
+            <image class="avatar" src="{{friendIcon}}" mode="aspectFill"></image>
+        </view>
+        <view class="text">你 与 <text>{{nick}}</text>互相喜欢了对方匹配成功</view>
+        <view class="goChat" @tap="redirect">
+            发送消息
+        </view>
+        <view class="back">返回</view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class BecomeFriend extends wepy.page {
+    config = {
+        navigationBarTitleText: '成为朋友'
+    };
+
+    data = {
+        friendIcon:'',
+        nick:'',
+        dentifier:'',
+        me:{}
+    };
+
+    components = {};
+
+    methods = {
+        redirect(){
+            wx.redirectTo({
+                url: `chat?id=${this.dentifier}&nick=${this.nick}&icon=${encodeURI(this.friendIcon)}`
+            });
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad(options) {
+        this.friendIcon = decodeURI(options.icon);
+        this.dentifier = options.id;
+        this.nick = options.nick;
+        this.me = wepy.getStorageSync('profile');
+
+        this.$apply();
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.wrapper {
+    width: 100%;
+    background: url(https://i.niupic.com/images/2019/06/22/_383.png);
+    background-size: cover;
+    height: 100vh;
+    text-align: center;
+    .matched {
+        width: 481rpx;
+        height: 81rpx;
+        margin: 0 auto;
+        padding-top: 50rpx;
+        image {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    .avatars {
+        margin-top: 69rpx;
+        .avatar {
+            width: 230rpx;
+            position: relative;
+            height: 230rpx;
+            border: 6rpx solid snow;
+            border-radius: 50%;
+            &:first-child {
+                left: 38rpx;
+            }
+            &:last-child {
+                right: 38rpx;
+            }
+        }
+    }
+    .text {
+        margin: 0 auto;
+        margin-top: 67rpx;
+        text-align: center;
+        font-size: 24rpx;
+        color: white;
+        width: 408rpx;
+    }
+    .goChat {
+        width: 436rpx;
+        height: 113rpx;
+        background: rgba(255, 255, 255, 1);
+        border-radius: 57rpx;
+        text-align: center;
+        line-height: 113rpx;
+        font-size: 32rpx;
+        font-weight: 800;
+        color: rgba(0, 0, 0, 1);
+        margin: 164rpx auto 64rpx;
+    }
+    .back {
+        font-size: 32rpx;
+        font-weight: 800;
+        color: rgba(255, 255, 255, 1);
+    }
+}
+</style>

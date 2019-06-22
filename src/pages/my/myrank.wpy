@@ -1,0 +1,198 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view class="title">你的颜值在北京市超过<text>90%</text></view>
+        <view class="title">你的帅气超过了<text>99%</text>天秤座</view>
+        <view class="bar">“除了帅气，你一无所有”</view>
+        <view class="boxes">
+            <view class="box1">
+                <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="info">
+                    <view class="word">胜率 \ <text> 70%</text></view>
+                    <view class="word">出场率 \ <text> 65%</text></view>
+                </view>
+            </view>
+            <view class="box2"><canvas canvas-id="radarCanvas" class="canvas"></canvas><canvas canvas-id="radarCanvas" class="canvas"></canvas></view>
+            <view class="box3">
+                <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="info">
+                    <view class="word">胜率 \ <text> 70%</text></view>
+                    <view class="word">出场率 \ <text> 65%</text></view>
+                </view>
+            </view>
+            <view class="box3">
+                <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="info">
+                    <view class="word">胜率 \ <text> 70%</text></view>
+                    <view class="word">出场率 \ <text> 65%</text></view>
+                </view>
+            </view>
+        </view>
+        <view class="shareButton" @tap="share">分享有奖</view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import wxCharts from '@/utils/wxcharts';
+var radarChart = null;
+export default class Example extends wepy.page {
+    config = {
+        navigationBarTitleText: '我的排名'
+    };
+
+    data = {};
+
+    components = {};
+
+    methods = {
+        share() {
+            console.log('share');
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {
+        radarChart = new wxCharts({
+            canvasId: 'radarCanvas',
+            type: 'radar',
+            background: 'red',
+            categories: ['帅气', '多金', '智慧', '阳光', '性感'],
+            series: [
+                {
+                    data: [90, 50, 60, 95, 40]
+                }
+            ],
+            width: 158,
+            height: 141,
+            extra: {
+                radar: {
+                    max: 100
+                }
+            }
+        });
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.wrapper {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 78rpx;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    .title {
+        width: 100%;
+        text-align: center;
+        font-size: 24rpx;
+        font-weight: 600;
+        margin: 40rpx 0 0;
+        color: rgba(0, 0, 0, 1);
+        text {
+            font-size: 30rpx;
+            font-weight: 900;
+            color: rgba(225, 18, 32, 1);
+        }
+    }
+    .bar {
+        margin-top: 43rpx;
+        width: 505rpx;
+        height: 69rpx;
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA/MAAACLBAMAAADfS9ShAAAAElBMVEVHcEwWFhYFBQUODg4ODg4DAwPtR3tuAAAABXRSTlMA/8ByLkwegLsAAAOoSURBVHja7d3LctpAFEXR5vEBah5zUMVz4arMoQrmgdj//yuRZPEIIND47n0mybivveg+3WVS+vg2wKxSSgeXAZhjPfk0dh2A+duMPi1dCKb3Kf12IXjZJsUne5+mrgQuxc/oFZ+Xqhv9yKWA5dTO/bMsS9eCNvp66FXa5ZxdC1iOOc9SmuT93g972OT3+828Fj9XaeJq0I52m6bT2RUWerCs0jQ3nc547vEOlm079NT+AFjoEb1v/7HQI6XovFd8ovezrsPPFnqknH629m3Wik/Kn3ri5w5/t0i+0OOkSpPO+9T+7+CSgLxfnEff/P5b6FHy1X7CJ8XnZdXu688ZKz4mx/o4N7+OPlnoYXKt8tK50PMKh+P99mb0FnqYnK9uzvEKB3S02xS3o/cKh5LipsrrHuXOPd4hclvldYWeVzgU72+qPAs9UL4evLfQ43if7ybvFQ4i91VeV+gpfvzcV3nd8c432fFzX+VZ6GFyX+VZ6LG9t9ADpGjvaB8zUnyA97Mnk/dNdvg8q/Iub7I93kXOsyrPQg+Rx6sbCz1Gjr3ee4UD8H7VM/rmZ2LpEkXN/6+w7wo9xY/s/fMqzzfZ8dNX5V3fZLtGgb3f9o7eK5zAeem9VziB07zCXvSP3j+yEDdF+xqnPyMLvajpr/KuhZ5XOEG9373y3kIvbPqvbrzCie99fjl5r3CC5vkr7Ic32R7v4uV1leeb7MB5XeVZ6AXO6yrPQi+298W70fsmO2L6XmH7JhtwtBvP3k7eP7IQMO+rPAu9oHlf5V0KPT/sox3tJgO8bws9t/jRNvijId43hZ7bvGjH+vVq0Oh3i6WLFSu/Bhzt2kLP77iNluN80OTT1F/6gBu9YaN3pcKlGDZ69/cR9/iD4v4+4h5/0Oj9qKd+2Os9Vny9x4rvKlHF13us+HqPFd/9PVV8vceKr/dY8fWeKr7eY8XXe6z4ek8VX++x4us9Vny9p4qv91jx9R4rvt5Txdd7rPh6jxVf76ni6z1WfL3Hiq/3VPH1Hiu+3mPF13uq+HqPFV/vseLrPVV8vceKr/dY8fWeKr7eY8XXe6z4ek8VX++x4us9Vny9p4qv91jx9R4rvt5Txdd7rPgH1wKW41bv4eLrPVZ8vcfu8fWeKr7eY8XXe+wevyzL79KQ8nEqy+rylfUGlOuXGw/8wlMTJrn7SvNJdi1g2XVfbK33WPH1npd1pfdo8fUeK77eU/f4eo8Vf5QNMbX4a1eBmUr6sPkHFSilHlrtL0YAAAAASUVORK5CYII=');
+        background-size: cover;
+        font-size: 35rpx;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 1);
+        text-align: center;
+        line-height: 69rpx;
+        opacity: 1;
+    }
+    .boxes {
+        margin-top: 62rpx;
+        display: flex;
+        flex-wrap: wrap;
+        image {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .box1 {
+            width: 304rpx;
+            height: 304rpx;
+            position: relative;
+            .info {
+                position: absolute;
+                width: 120rpx;
+                height: 62rpx;
+                right: -50rpx;
+                bottom: -10rpx;
+                background: #003000;
+                padding: 6rpx 0 0 18rpx;
+                .word {
+                    font-size: 16rpx;
+                    font-weight: 500;
+                    color: rgba(255, 255, 255, 1);
+                    text {
+                        font-size: 18rpx;
+                        font-weight: 500;
+                        color: rgba(225, 17, 31, 1);
+                    }
+                }
+            }
+        }
+        .box2 {
+            width: 290rpx;
+            position: relative;
+            top: 30rpx;
+        }
+        .box3 {
+            position: relative;
+            margin: 54rpx 60rpx 0 0;
+            width: 250rpx;
+            height: 250rpx;
+            &:last-child {
+                margin-right: 0;
+            }
+            .info {
+                position: absolute;
+                width: 120rpx;
+                height: 62rpx;
+                right: -20rpx;
+                bottom: -10rpx;
+                background: #003000;
+                padding: 6rpx 0 0 18rpx;
+                .word {
+                    font-size: 16rpx;
+                    font-weight: 500;
+                    color: rgba(255, 255, 255, 1);
+                    text {
+                        font-size: 18rpx;
+                        font-weight: 500;
+                        color: rgba(225, 17, 31, 1);
+                    }
+                }
+            }
+        }
+    }
+    .shareButton {
+        margin-top: 100rpx;
+        width: 462rpx;
+        height: 92rpx;
+        background: rgba(0, 0, 0, 1);
+        font-size: 28rpx;
+        line-height: 92rpx;
+        text-align: center;
+        font-weight: 500;
+        color: rgba(252, 252, 252, 1);
+    }
+}
+</style>
