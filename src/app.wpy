@@ -30,7 +30,9 @@ export default class extends wepy.app {
             'pages/chat/like',
             'pages/my/mytime',
             'pages/my/myrank', // 我的排名
-            'pages/chat/becomeFriend'
+            'pages/chat/becomeFriend',
+            'pages/ta/taMomentList', // TA的动态
+            'pages/ta/momentDetail' // 动态详情页面
         ],
         window: {
             backgroundTextStyle: 'light',

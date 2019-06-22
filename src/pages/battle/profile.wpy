@@ -125,7 +125,9 @@ export default class Profile extends wepy.page {
             });
         },
         goDiscover() {
-            wepy.navigateTo({ url: 'url' });
+            wepy.navigateTo({
+                url: `/pages/ta/taMomentList?id=${this.id}`
+            });
         },
         toastTip() {
             toast('您已发送过好友申请');

@@ -25,3 +25,5 @@ export const LIKE_ME = '/api/face/enjoy_list';
 export const FRIENDS_LIST = '/api/user/contacts';
 // 好友通过
 export const AGREE_FRIEND = '/api/face/join_contact';
+// 排行榜页面
+export const RANK_LIST = '/api/face/list';
