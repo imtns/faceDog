@@ -31,7 +31,7 @@
             </view>
         </view>
         <view class="line"></view>
-        <view class='item'>
+        <view class='item' @tap="redirect('myrank')">
             <view class="title">我的排名</view>
             <view class="detail2">
                 <van-icon name="arrow" />
