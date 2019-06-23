@@ -26,6 +26,7 @@ import testMixin from '@/mixins/test';
 import { get } from '@/utils/request';
 import { PROFILE } from '@/utils/url';
 import { getAge } from '@/utils';
+import { Event } from '@/utils/event.js';
 // import { toast } from '@/utils';
 export default class Index extends wepy.page {
     config = {
@@ -131,6 +132,9 @@ export default class Index extends wepy.page {
     onLoad() {
         //  this.$invoke('chat', 'initChat');
         this.$invoke('discover', 'initList');
+        Event.listen('refresh', () => {
+            this.$invoke('discover', 'initList',{page:1});
+        });
     }
 
     onShow() {

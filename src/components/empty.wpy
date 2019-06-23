@@ -1,7 +1,7 @@
 <!--  -->
 <template>
     <view class='empty'>
-        <image class="img" src="../../../images/empty/i.png" mode="aspectFill"></image>
+        <image class="img" src="/images/empty/i.png" mode="aspectFill"></image>
         <view class="text">空空如也...</view>
     </view>
 </template>

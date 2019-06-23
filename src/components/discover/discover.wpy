@@ -1,38 +1,34 @@
 <!--  -->
 <template>
-  <scroll-view scroll-y class='discover' bindscrolltolower="pageTuring">
-      <topBanner></topBanner>
-      <view class="content-search">
-          <van-tabs class="tabs">
-            <van-tab title="全部"></van-tab>
-            <van-tab title="同城"></van-tab>
-          </van-tabs>
-          <view class="change">筛选</view>
-      </view>
-      <view class="card">
-          <momentCard></momentCard>
-          <van-popup
-            class="warn-pop"
-            show="{{ show }}"
-            position="bottom"
-            close-on-click-overlay="{{ true }}"
-            >
-            <view class="warn">匿名举报</view>
-            <view class="warn">加入黑名单</view>
-            <view class="warn last" @tap="closewarn">取消</view>
-          </van-popup>
-      </view>
-      <image  class="make-photo" src="../../images/discover/discover-add.png" @tap="mkPhoto"></image>
-  </scroll-view>
+    <scroll-view scroll-y class='discover' bindscrolltolower="pageTuring">
+        <topBanner></topBanner>
+        <view class="content-search">
+            <van-tabs class="tabs">
+                <van-tab title="全部"></van-tab>
+                <van-tab title="同城"></van-tab>
+            </van-tabs>
+            <view class="change">筛选</view>
+        </view>
+        <view class="card">
+            <momentCard></momentCard>
+            <van-popup class="warn-pop" show="{{ show }}" position="bottom" close-on-click-overlay="{{ true }}">
+                <view class="warn">匿名举报</view>
+                <view class="warn">加入黑名单</view>
+                <view class="warn last" @tap="closewarn">取消</view>
+            </van-popup>
+        </view>
+        <image class="make-photo" src="../../images/discover/discover-add.png" @tap="mkPhoto"></image>
+    </scroll-view>
 </template>
 
 <script>
 import { get } from '@/utils/request';
 import { DISCOVER_MOMENT_LIST } from '@/utils/url.js';
 import wepy from 'wepy';
-import { toast } from '@/utils'
+import { toast } from '@/utils';
 import topBanner from '@/components/discover/topBanner';
 import momentCard from '@/components/discover/momentCard';
+
 let nomore = false;
 export default class Discover extends wepy.component {
     data = {
@@ -40,7 +36,7 @@ export default class Discover extends wepy.component {
         momentList: [],
         page: 1,
         same_city: 0,
-        opposite: 'same',
+        opposite: 'same'
     };
 
     components = {
@@ -55,7 +51,7 @@ export default class Discover extends wepy.component {
         showwarn(id) {
             this.show = true;
             console.log(id);
-        },
+        }
     };
 
     watch = {};
@@ -64,27 +60,27 @@ export default class Discover extends wepy.component {
     methods = {
         mkPhoto() {
             wepy.navigateTo({
-                url: 'fabu/fabu',
+                url: 'fabu/fabu'
             });
         },
         closewarn() {
             this.show = false;
         },
-        async initList({
-            page = 1,
-            same_city = 0,
-            opposite = 'same',
-        }) {
-            if(nomore) return;
+        async initList({ page = 1, same_city = 0, opposite = 'same' }) {
+            if (nomore) return;
             // 请求动态列表
             // todo，全国和同城这个接口还没有弄好
             // const latitude = wepy.getStorageSync('latitude');
             // const longitude = wepy.getStorageSync('longitude');
             console.log('动态列表', this.momentList);
+            if(page == 1){
+                this.momentList = [];
+                this.$apply();
+            }
             const List = await get(DISCOVER_MOMENT_LIST, {
-                page,
+                page
             });
-            if(!List.length){
+            if (!List.length) {
                 nomore = true;
                 toast('已经没有更多了~');
             }
@@ -95,22 +91,23 @@ export default class Discover extends wepy.component {
         },
         pageTuring() {
             this.methods.initList.call(this, {
-                page: this.page += 1,
-            })
+                page: (this.page += 1)
+            });
             console.log(this.methods.initList);
-        },
-    }
-    onLoad() {
+        }
     };
+    onLoad() {
 
-    onShow() {};
+    }
+
+    onShow() {}
 }
 </script>
 
 <style lang='less'>
-.discover{
+.discover {
     height: 100vh;
-    .make-photo{
+    .make-photo {
         display: block;
         position: fixed;
         width: 110rpx;
@@ -118,40 +115,40 @@ export default class Discover extends wepy.component {
         bottom: 145rpx;
         right: 22rpx;
     }
-    .card{
+    .card {
         padding-bottom: 20vh;
-        .warn-pop{
-            .warn{
+        .warn-pop {
+            .warn {
                 height: 120rpx;
                 text-align: center;
-                font-size:32rpx;
-                font-weight:600;
-                line-height:120rpx;
-                color:rgba(0,0,0,1);
-                border-bottom:1px solid rgba(226,225,225,1);
+                font-size: 32rpx;
+                font-weight: 600;
+                line-height: 120rpx;
+                color: rgba(0, 0, 0, 1);
+                border-bottom: 1px solid rgba(226, 225, 225, 1);
             }
         }
     }
-    .content-search{
+    .content-search {
         display: flex;
         justify-content: space-between;
         padding: 0 30rpx;
-        .tabs{
+        .tabs {
             width: 230rpx;
-            .van-tab--active{
+            .van-tab--active {
                 font-size: 42rpx !important;
-                font-weight:600 !important;
-                z-index:1;
+                font-weight: 600 !important;
+                z-index: 1;
             }
-            .van-tabs__line{
-                width:77rpx !important;
-                height:10rpx !important;
+            .van-tabs__line {
+                width: 77rpx !important;
+                height: 10rpx !important;
                 bottom: 28% !important;
             }
         }
-        .change{
+        .change {
             line-height: 44px;
-            color:rgba(158,157,157,1);
+            color: rgba(158, 157, 157, 1);
             font-size: 14px;
         }
     }

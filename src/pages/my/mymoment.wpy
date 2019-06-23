@@ -1,6 +1,9 @@
 <!--  -->
 <template>
-    <view class="mymoment-moment-list-page">
+    <block wx:if="{{!list.length}}">
+        <empty></empty>
+    </block>
+    <view wx:else class="mymoment-moment-list-page">
         <momentCard></momentCard>
     </view>
 </template>
@@ -8,16 +11,18 @@
 import wepy from 'wepy';
 import { get } from '@/utils/request';
 import momentCard from '@/components/discover/momentCard';
-
+import empty from '@/components/empty';
 export default class mymoment extends wepy.page {
     config = {
-        navigationBarTitleText: '我的动态',
-    }
+        navigationBarTitleText: '我的动态'
+    };
     data = {
         userId: '',
-    }
+        list: []
+    };
     components = {
         momentCard,
+        empty
     };
     methods = {};
 
@@ -31,18 +36,19 @@ export default class mymoment extends wepy.page {
         const { id } = options;
         this.userId = id;
         const list = await get(`/api/discover/${this.userId}/moment`, {
-            user_id: this.userId,
+            user_id: this.userId
         });
+        this.list = list;
         console.log('TA的动态', list);
-        this.$invoke('momentCard', 'setMomentList', list);
-    };
+        if (list.length) this.$invoke('momentCard', 'setMomentList', list);
+        this.$apply();
+    }
 
-    onShow() {};
+    onShow() {}
 }
 </script>
 
 <style lang='less'>
-.mymoment-moment-list-page{
-    
+.mymoment-moment-list-page {
 }
 </style>

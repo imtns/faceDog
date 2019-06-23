@@ -6,8 +6,7 @@
             <view class="btn" @tap="publish">发布</view>
         </view>
         <view class="inputArea">
-            <textarea class="desc" placeholder="请输入内容..."
-            placeholder-style="color:#cccccc;" maxlength="1000"  data-type="content" @input="inputDesc" value="{{content}}"/>
+            <textarea class="desc" placeholder="请输入内容..." placeholder-style="color:#cccccc;" maxlength="1000" data-type="content" @input="inputDesc" value="{{content}}" />
             <view class="len">{{ content.length + '/1000'}}</view>
         </view>
         <view class="img-box">
@@ -39,6 +38,7 @@ import wepy from 'wepy';
 import { post, put } from '@/utils/request';
 import { toast } from '@/utils/index';
 import { FABU_FABU_MOMENT, FABU_UPLOAD_PIC } from '@/utils/url';
+import { Event } from '@/utils/event.js';
 export default class fabu extends wepy.page {
     config = {
         navigationBarTitleText: '发布动态',
@@ -52,8 +52,8 @@ export default class fabu extends wepy.page {
         latitude: '',
         longitude: '',
         // tempFilePaths: [],
-        uploadedPics: [],
-    }
+        uploadedPics: []
+    };
 
     components = {};
 
@@ -69,14 +69,14 @@ export default class fabu extends wepy.page {
             }
             // this.tempFilePaths = tempFilePaths;
             wepy.showLoading({ title: '上传中', mask: true });
-            Promise.all(
-                tempFilePaths.map(x => this.methods.wxUploade(x))
-            ).then((res) => {
-                console.log('上传图片成功', res);
-                wepy.hideLoading();
-                this.uploadedPics = this.uploadedPics.concat(res);
-                this.$apply();
-            });
+            Promise.all(tempFilePaths.map(x => this.methods.wxUploade(x))).then(
+                res => {
+                    console.log('上传图片成功', res);
+                    wepy.hideLoading();
+                    this.uploadedPics = this.uploadedPics.concat(res);
+                    this.$apply();
+                }
+            );
             this.$apply();
         },
         wxUploade(tempFilePath) {
@@ -87,17 +87,17 @@ export default class fabu extends wepy.page {
                     name: 'image',
                     header: {
                         Authorization: `Bearer ${wx.getStorageSync('token')}`,
-                        "Content-Type": "multipart/form-data"
+                        'Content-Type': 'multipart/form-data'
                     },
-                    success (res){
+                    success(res) {
                         const data = JSON.parse(res.data).data;
                         resolve(data);
                         //do something
                     },
                     fail(res) {
                         reject(res);
-                    },
-                })
+                    }
+                });
             });
         },
         async choseLocation() {
@@ -105,27 +105,38 @@ export default class fabu extends wepy.page {
                 latitude = 0,
                 longitude = 0,
                 name = '',
-                address ='',
+                address = ''
             } = await wepy.chooseLocation();
             this.region = name;
-            this.longitude = longitude,
-            this.latitude = latitude;
+            (this.longitude = longitude), (this.latitude = latitude);
             this.$apply();
         },
         async publish() {
-            const subData = this.uploadedPics.reduce((sub, file) => {
-                sub.images.push(file.id);
-                return sub;
-            }, {
-                content: this.content,
-                region: this.region,
-                latitude: this.latitude,
-                longitude: this.longitude,
-                images: [],
-            });
+            const subData = this.uploadedPics.reduce(
+                (sub, file) => {
+                    sub.images.push(file.id);
+                    return sub;
+                },
+                {
+                    content: this.content,
+                    region: this.region,
+                    latitude: this.latitude,
+                    longitude: this.longitude,
+                    images: []
+                }
+            );
             const data = await post(FABU_FABU_MOMENT, subData);
+            toast('发布成功');
+
+            setTimeout(() => {
+                Event.trigger('refresh');
+                wx.navigateBack({
+                    delta: 1
+                });
+            }, 1500);
+
             console.log(data);
-        },
+        }
     };
 
     events = {};
@@ -134,111 +145,111 @@ export default class fabu extends wepy.page {
 
     computed = {};
 
-    onLoad() { };
+    onLoad() {}
 
-    onShow() { };
+    onShow() {}
 }
 </script>
 
 <style lang='less' scoped>
-.fabu-page{
+.fabu-page {
     padding: 0 30rpx;
-    .actions{
+    .actions {
         display: flex;
         justify-content: space-between;
         height: 60rpx;
-        .btn{
-            height:45rpx;
-            font-size:32rpx;
-            font-weight:600;
-            line-height:60rpx;
-            color:rgba(7,7,7,1);
+        .btn {
+            height: 45rpx;
+            font-size: 32rpx;
+            font-weight: 600;
+            line-height: 60rpx;
+            color: rgba(7, 7, 7, 1);
         }
     }
-    .inputArea{
+    .inputArea {
         position: relative;
-        .desc{
+        .desc {
             width: 100%;
             height: 200rpx;
-            font-size:28rpx;
+            font-size: 28rpx;
             margin-top: 40rpx;
             line-height: 30rpx;
         }
-        .len{
+        .len {
             position: absolute;
             bottom: 0;
             right: 0;
-            font-size:20rpx;
-            font-weight:500;
-            line-height:38rpx;
-            color:rgba(165,165,165,1);
+            font-size: 20rpx;
+            font-weight: 500;
+            line-height: 38rpx;
+            color: rgba(165, 165, 165, 1);
         }
     }
-    .img-box{
+    .img-box {
         margin-top: 15rpx;
         display: flex;
         flex-wrap: wrap;
-        .addbtn{
+        .addbtn {
             width: 27.8vw;
             height: 214rpx;
             margin: 30rpx 20rpx 0 0;
-            border:1px solid rgba(44,44,44,1);
+            border: 1px solid rgba(44, 44, 44, 1);
             text-align: center;
             line-height: 214rpx;
         }
-        .imgBox{
+        .imgBox {
             width: 28vw;
             height: 214rpx;
             margin: 30rpx 20rpx 0 0;
             position: relative;
-            .items{
+            .items {
                 width: 28vw;
                 height: 214rpx;
                 display: block;
             }
-            .minus{
+            .minus {
                 position: absolute;
                 top: -23rpx;
                 right: -8rpx;
                 width: 46rpx;
                 height: 46rpx;
                 border-radius: 100%;
-                background:rgba(230,0,17,1);
+                background: rgba(230, 0, 17, 1);
                 text-align: center;
                 display: flex;
                 align-items: center;
-                .line{
-                    width:27rpx;
-                    height:4rpx;
-                    background:rgba(255,255,255,1);
+                .line {
+                    width: 27rpx;
+                    height: 4rpx;
+                    background: rgba(255, 255, 255, 1);
                     margin: 0 auto;
                 }
             }
         }
     }
-    .location{
+    .location {
         height: 73rpx;
-        border-bottom:1px solid rgba(226,225,225,1);
+        border-bottom: 1px solid rgba(226, 225, 225, 1);
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-top: 30rpx;
-        .flex{
+        .flex {
             display: flex;
             align-items: center;
-            .location-icon{
+            .location-icon {
                 width: 24rpx;
                 height: 31rpx;
                 margin-right: 16rpx;
             }
-            .location-address{
-                font-size:24rpx;
-                font-weight:500;
-                line-height:38rpx;
-                color:rgba(165,165,165,1);
+            .location-address {
+                font-size: 24rpx;
+                font-weight: 500;
+                line-height: 38rpx;
+                color: rgba(165, 165, 165, 1);
             }
         }
-        .icon{
+        .icon {
             text-align: right;
         }
     }

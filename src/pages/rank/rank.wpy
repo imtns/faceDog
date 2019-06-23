@@ -36,6 +36,7 @@ import { get } from '@/utils/request';
 import { RANK_LIST } from '@/utils/url';
 import rankList from '@/components/rank/rankList';
 import Constellation from '@/components/rank/Constellation';
+import empty from '@/components/empty';
 export default class fabu extends wepy.page {
     config = {
         navigationBarTitleText: '排行榜',
@@ -55,7 +56,8 @@ export default class fabu extends wepy.page {
 
     components = {
         rankList,
-        Constellation
+        Constellation,
+        empty
     };
 
     myCatchTouch() {
