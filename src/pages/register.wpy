@@ -92,7 +92,7 @@ export default class Register extends wepy.page {
         wepy.setStorageSync('tencent_token', result.tencent_token);
         wepy.setStorageSync('identifier', result.identifier);
         if (result.welcome) {
-            this.step = 2;
+            this.step = 5;
             this.$apply();
         } else {
             wx.redirectTo({

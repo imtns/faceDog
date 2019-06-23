@@ -29,3 +29,5 @@ export const AGREE_FRIEND = '/api/face/join_contact';
 export const RANK_LIST = '/api/face/list';
 // 用户设置
 export const USER_SETTING = '/api/user/settings';
+// 获取用户喜欢次数
+export const USER_LIKE_TIME = '/api/user/unread';

@@ -38,7 +38,9 @@ import wxCharts from '@/utils/wxcharts';
 var radarChart = null;
 export default class Example extends wepy.page {
     config = {
-        navigationBarTitleText: '我的排名'
+        navigationBarTitleText: '我的排名',
+         navigationBarBackgroundColor: "#000",
+         navigationBarTextStyle:'white'
     };
 
     data = {};
@@ -153,6 +155,7 @@ export default class Example extends wepy.page {
             width: 290rpx;
             position: relative;
             top: 30rpx;
+            height:100rpx;
         }
         .box3 {
             position: relative;

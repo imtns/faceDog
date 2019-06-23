@@ -80,7 +80,7 @@
 
 <script>
 import wepy from 'wepy';
-import { PROFILE, MAKEFRIEND, BATTLE_COMMIT } from '@/utils/url';
+import { PROFILE, MAKEFRIEND, BATTLE_COMMIT, USER_LIKE_TIME } from '@/utils/url';
 import { get, post } from '@/utils/request';
 import { getAge, toast } from '@/utils';
 var systemInfo = wx.getSystemInfoSync();
@@ -123,6 +123,9 @@ export default class Profile extends wepy.page {
                 to_be: type,
                 user_id: this.id
             });
+            this.profile.is_like = true;
+            toast('已发送好友申请');
+            this.$apply();
         },
         goDiscover() {
             wepy.navigateTo({
@@ -173,6 +176,7 @@ export default class Profile extends wepy.page {
                 });
             } catch (e) {}
         }
+        await get(USER_LIKE_TIME);
         this.profile = result;
         this.profile.age = getAge(result.birthday);
         this.profile.distance = (this.profile.distance / 1000).toFixed(2);

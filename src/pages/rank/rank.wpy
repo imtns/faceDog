@@ -7,7 +7,9 @@
                 <van-tab title="同城"></van-tab>
                 <van-tab title="星座" title-style="{{showConstellation ? 'background:url(../../images/rank/rank-down.png) no-repeat right center; background-size: 23rpx 20rpx;' : 'background:url(../../images/rank/rank-down.png) no-repeat right center; background-size: 23rpx 20rpx;'}}"></van-tab>
             </van-tabs>
-            <Constellation wx:if="{{showConstellation}}"  @getRankListByXZ.user="getRankListByXZ"></Constellation>
+            <block wx:if="{{showConstellation}}">
+                <Constellation @getRankListByXZ.user="getRankListByXZ"></Constellation>
+            </block>
         </view>
         <rankList :top3.sync="top3" :topOthers.sync="topOthers"></rankList>
         <image class="menu" mode="aspectFill" src="../../images/profile/menu.png" @tap="showchangeGenderPop"></image>
@@ -39,21 +41,21 @@ export default class fabu extends wepy.page {
         navigationBarTitleText: '排行榜',
         usingComponents: {
             'van-tabs': '../../components/vant/tabs/index',
-            'van-tab': '../../components/vant/tab/index',
+            'van-tab': '../../components/vant/tab/index'
         }
     };
     data = {
-        all: [1,2,3,4,5,6,7],
+        all: [1, 2, 3, 4, 5, 6, 7],
         top3: [],
         topOthers: [],
         showConstellation: false,
         gender: 'female',
-        changeGenderPop: false,
+        changeGenderPop: false
     };
 
     components = {
         rankList,
-        Constellation,
+        Constellation
     };
 
     myCatchTouch() {
@@ -62,19 +64,22 @@ export default class fabu extends wepy.page {
     onChange(event) {
         console.log('event.detail.index', event.detail.index);
         const { index } = event.detail;
-        if (+index === 2) { // 点击星座tab
+        if (+index === 2) {
+            // 点击星座tab
             this.showConstellation = true;
-        } else if (+index === 1){ // 点击同城
+        } else if (+index === 1) {
+            // 点击同城
             this.showConstellation = false;
             this.getRankList({
                 by: '',
-                gender: this.gender,
+                gender: this.gender
             });
-        } else if (+index === 0) { // 点击全国
+        } else if (+index === 0) {
+            // 点击全国
             this.showConstellation = false;
             this.getRankList({
                 by: 'all',
-                gender: this.gender,
+                gender: this.gender
             });
         }
     }
@@ -99,15 +104,15 @@ export default class fabu extends wepy.page {
             this.hidechangeGenderPop();
             this.getRankList({
                 by: 'all',
-                gender: this.gender,
+                gender: this.gender
             });
         },
         toMyRank() {
             this.hidechangeGenderPop();
             wepy.navigateTo({
-                url: `/pages/my/myrank`,
+                url: `/pages/my/myrank`
             });
-        },
+        }
     };
     hidechangeGenderPop() {
         this.changeGenderPop = false;
@@ -121,16 +126,16 @@ export default class fabu extends wepy.page {
     onLoad() {
         this.getRankList({
             by: 'all',
-            gender: this.gender,
+            gender: this.gender
         });
-    };
+    }
 
-    onShow() { };
+    onShow() {}
 
     async getRankList({ by = '', gender = '' }) {
         const data = await get(RANK_LIST, {
             by,
-            gender: gender || this.gender,
+            gender: gender || this.gender
         });
         this.top3 = data.filter((x, index) => index <= 2);
         this.topOthers = data.filter((x, index) => index > 2);
@@ -141,25 +146,25 @@ export default class fabu extends wepy.page {
 </script>
 
 <style lang='less'>
-.rank-page{
-    .rank-search{
+.rank-page {
+    .rank-search {
         width: 50vw;
         margin-bottom: 30rpx;
         position: relative;
-        .tabs{
-            .van-tab--active{
+        .tabs {
+            .van-tab--active {
                 font-size: 42rpx !important;
-                font-weight:600 !important;
-                z-index:1;
+                font-weight: 600 !important;
+                z-index: 1;
             }
-            .van-tabs__line{
-                width:77rpx !important;
-                height:10rpx !important;
+            .van-tabs__line {
+                width: 77rpx !important;
+                height: 10rpx !important;
                 bottom: 28% !important;
             }
         }
     }
-    .menu{
+    .menu {
         width: 120rpx;
         height: 120rpx;
         border-radius: 100%;
@@ -176,7 +181,7 @@ export default class fabu extends wepy.page {
         right: 0;
         bottom: 0;
         z-index: 1000;
-        background: rgba(6, 6, 6, .89);
+        background: rgba(6, 6, 6, 0.89);
         overflow: hidden;
         .layer-close {
             width: 170rpx;
@@ -195,7 +200,7 @@ export default class fabu extends wepy.page {
             flex-wrap: nowrap;
             margin-right: 60rpx;
             &:nth-child(1) {
-                bottom: 418rpx; 
+                bottom: 418rpx;
             }
             &:nth-child(2) {
                 bottom: 247rpx;

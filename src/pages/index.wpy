@@ -121,7 +121,7 @@ export default class Index extends wepy.page {
             if (this.selectedTab == 3) {
                 // this.$invoke('my', 'setProfile');
             } else if (this.selectedTab == 1) {
-                this.$invoke('discover', 'initList');
+                // this.$invoke('discover', 'initList');
             }
         },
         unreadSet(num) {
@@ -130,6 +130,7 @@ export default class Index extends wepy.page {
     };
     onLoad() {
         //  this.$invoke('chat', 'initChat');
+        this.$invoke('discover', 'initList');
     }
 
     onShow() {

@@ -11,7 +11,7 @@
       </view>
       <view class="card">
           <momentCard></momentCard>
-          <van-popup    
+          <van-popup
             class="warn-pop"
             show="{{ show }}"
             position="bottom"
@@ -28,10 +28,12 @@
 
 <script>
 import { get } from '@/utils/request';
-import { DISCOVER_MOMENT_LIST } from '../../utils/url.js';
+import { DISCOVER_MOMENT_LIST } from '@/utils/url.js';
 import wepy from 'wepy';
+import { toast } from '@/utils'
 import topBanner from '@/components/discover/topBanner';
 import momentCard from '@/components/discover/momentCard';
+let nomore = false;
 export default class Discover extends wepy.component {
     data = {
         show: false,
@@ -73,6 +75,7 @@ export default class Discover extends wepy.component {
             same_city = 0,
             opposite = 'same',
         }) {
+            if(nomore) return;
             // 请求动态列表
             // todo，全国和同城这个接口还没有弄好
             // const latitude = wepy.getStorageSync('latitude');
@@ -81,6 +84,10 @@ export default class Discover extends wepy.component {
             const List = await get(DISCOVER_MOMENT_LIST, {
                 page,
             });
+            if(!List.length){
+                nomore = true;
+                toast('已经没有更多了~');
+            }
             this.momentList = this.momentList.concat(List);
             console.log('动态列表', this.momentList);
             this.$invoke('momentCard', 'setMomentList', this.momentList);
@@ -93,7 +100,8 @@ export default class Discover extends wepy.component {
             console.log(this.methods.initList);
         },
     }
-    onLoad() {};
+    onLoad() {
+    };
 
     onShow() {};
 }

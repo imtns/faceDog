@@ -50,7 +50,10 @@ export default class Example extends wepy.component {
                 const {
                     tempFilePath,
                     thumbTempFilePath
-                } = await wepy.chooseVideo();
+                } = await wepy.chooseVideo({
+                    camera:'front',
+                    sourceType:['camera']
+                });
                 uploader(
                     tempFilePath,
                     {
