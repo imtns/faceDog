@@ -2,7 +2,7 @@
 <template>
     <repeat for="{{momentList}}" key="index" index="index" item="item">
         <view class="momentCard">
-            <image  class="header" src="{{item.avatar}}" mode="aspectFill" @tap="toProfile({{item._id}})"></image>
+            <image  class="header" src="{{item.avatar}}" mode="aspectFill" @tap="toProfile({{item.user_id}})"></image>
             <view class="content">
                 <view class="info">
                     <view class="first">
@@ -17,7 +17,7 @@
                         <text class="margin-right">巨蟹座</text>
                         <text class="margin-right">{{item.city}}</text>
                     </view>
-                    <view class="moment" @tap="toMomentDetail({{item._id}})">
+                    <view class="moment" @tap="toMomentDetail({{item.user_id}})">
                         {{item.content}}
                     </view>
                     <view class="imgs">
@@ -34,7 +34,7 @@
                             <view wx:else class="text">{{item.likes.length || 0}}</view>
                         </view>
                         <view class="box" @tap="comment" data-id="{{item._id}}"
-                        data-index="{{index}}">
+                        data-index="{{index}}" data-userid="{{item.user_id}}">
                             <image class="icon" src="../../images/discover/discover-commen.png"></image>
                             <view class="text">私密评论</view>
                         </view>
@@ -73,7 +73,8 @@
             confirm-type="send" bindblur="closeComment"
             bindconfirm="sendComment"
             data-componentId="{{componentId}}"
-            data-componentIndex="{{componentIndex}}"/>
+            data-componentIndex="{{componentIndex}}"
+            data-commentUser="{{commentUser}}"/>
         </view>
     </view>
 </template>
@@ -86,8 +87,9 @@ export default class momentCard extends wepy.component {
     data = {
         momentList: [],
         isShowComment: false,
-        componentId: '',
-        componentIndex: '',
+        componentId: '', // 回复的动态id
+        componentIndex: '', // 列表中的index
+        commentUser: '', // 该动态的发布人id
     };
 
     components = {};
@@ -141,22 +143,26 @@ export default class momentCard extends wepy.component {
                 return;
             }
             const data =  await get(`/api/discover/moment/${id}/like`);
-            this.momentList[index].likes.length += 1;
+            // this.momentList[index].likes.length += 1;
+            const me = wepy.getStorageSync('profile');
+            this.momentList[index].likes.push({
+                avatar: me.icon,
+                user_id: me._id,
+            });
             this.momentList[index].liked = true;
             this.$apply();
         },
         // 私密评论
         comment(e) {
             this.isShowComment = true;
-            const { id, index } = e.currentTarget.dataset; 
-            this.componentId = id;
+            const { id, index, userid } = e.currentTarget.dataset; 
+            this.componentId = id; // 动态id
             this.componentIndex = index;
+            this.commentUser = userid;
         },
         // 关闭评论
         closeComment() {
             this.isShowComment = false;
-            this.componentId = '';
-            this.componentIndex = '';
         },
         // 发送评论
         async sendComment(e) {
@@ -165,6 +171,16 @@ export default class momentCard extends wepy.component {
                 moment_id: this.componentId,
                 content: value,
             });
+            const me = wepy.getStorageSync('profile');
+            this.momentList[this.componentIndex].comments.push({
+                _id: data,
+                user_nick_name: me.nick_name,
+                user_id: me._id,
+                replay_user_id: '',
+                replay_user_nick_name: '',
+                content: value,
+            });
+            this.$apply();
             console.log(data);
         },
         // 跳转到他的资料页面

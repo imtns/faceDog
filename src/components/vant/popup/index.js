@@ -20,7 +20,7 @@ VantComponent({
         overlayStyle: String,
         zIndex: {
             type: Number,
-            value: 100
+            value: 20000
         },
         overlay: {
             type: Boolean,

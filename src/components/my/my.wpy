@@ -38,7 +38,7 @@
             </view>
         </view>
         <view class="line"></view>
-        <view class='item'>
+        <view class='item' @tap="redirect('mymoment')">
             <view class="title">我的动态</view>
             <view class="detail2">
                 <van-icon name="arrow" />
@@ -79,6 +79,12 @@ export default class My extends wepy.component {
 
     methods = {
         redirect(name) {
+            // 跳转到我的动态页面需要带参数
+            if (name === 'mymoment') {
+                wepy.navigateTo({
+                    url: `/pages/my/mymoment?id=${this.profile._id}`,
+                });
+            }
             wepy.navigateTo({ url: `my/${name}` });
         },
         setProfile(profile) {

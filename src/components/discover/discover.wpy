@@ -113,7 +113,6 @@ export default class Discover extends wepy.component {
     .card{
         padding-bottom: 20vh;
         .warn-pop{
-            background: red;
             .warn{
                 height: 120rpx;
                 text-align: center;
@@ -122,9 +121,6 @@ export default class Discover extends wepy.component {
                 line-height:120rpx;
                 color:rgba(0,0,0,1);
                 border-bottom:1px solid rgba(226,225,225,1);
-            }
-            .last{
-                margin-bottom: 10vh;
             }
         }
     }
