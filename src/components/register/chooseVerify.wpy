@@ -51,7 +51,7 @@ export default class ChooseVerify extends wepy.component {
         },
         async verify(){
             const data = await post(VERIFY,{
-                code:this.inviteCode
+                number:this.inviteCode
             })
             wx.redirectTo({
                 url: 'index'
