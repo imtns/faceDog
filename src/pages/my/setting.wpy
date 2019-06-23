@@ -4,21 +4,21 @@
         <view class='item'>
             <view class="title">只看异性</view>
             <view class="detail2">
-                <van-switch checked="{{ gender }}" @change="onChange('gender')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+                <van-switch checked="{{ opposite_sex }}" @change="onChange('opposite_sex')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
             </view>
         </view>
         <view class="line"></view>
         <view class='item'>
             <view class="title">只看同城</view>
             <view class="detail2">
-                <van-switch checked="{{ city }}" @change="onChange('city')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+                <van-switch checked="{{ in_city }}" @change="onChange('in_city')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
             </view>
         </view>
         <view class="line"></view>
         <view class='item'>
             <view class="title">不参加颜值battle</view>
             <view class="detail2">
-                <van-switch checked="{{ battle }}" @change="onChange('battle')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+                <van-switch checked="{{ no_battle }}" @change="onChange('no_battle')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
             </view>
         </view>
         <view class="line"></view>
@@ -42,6 +42,8 @@
 
 <script>
 import wepy from 'wepy';
+import { USER_SETTING } from '@/utils/url';
+import { get, put } from '@/utils/request';
 export default class Setting extends wepy.page {
     config = {
         navigationBarTitleText: '设置',
@@ -54,19 +56,22 @@ export default class Setting extends wepy.page {
     };
 
     data = {
-        gender: false,
-        city: false,
-        battle: false
+        opposite_sex: false,
+        in_city: false,
+        no_battle: false
     };
 
     components = {};
 
     methods = {
-        onChange(name, { detail }) {
+        async onChange(name, { detail }) {
             console.log(detail);
             console.log(name);
             // 需要手动对 checked 状态进行更新
             this[name] = detail;
+            await put(USER_SETTING,{
+                [name]:detail
+            })
         },
         logout() {
             console.log('out');
@@ -79,7 +84,13 @@ export default class Setting extends wepy.page {
 
     computed = {};
 
-    onLoad() {}
+    async onLoad() {
+        const result = await get(USER_SETTING);
+        this.city = result.in_city;
+        this.gender = result.opposite_sex;
+        this.battle = result.no_battle;
+        this.$apply();
+    }
 
     onShow() {}
 }

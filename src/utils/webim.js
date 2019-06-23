@@ -1288,7 +1288,7 @@ module.exports = function () {
 
         //发起ajax请求
         var ajaxRequest = function (meth, url, req, timeout, isLongPolling, cbOk, cbErr) {
-
+            wx.hideLoading();
             wx.request({
                 url: url,
                 data: req,
