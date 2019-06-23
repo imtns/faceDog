@@ -242,7 +242,7 @@ export default class Chat extends wepy.page {
             title: options.nick
         });
         this.nick = options.nick;
-        this.icon = decodeURI(options.icon) || wx.getStorageSync('chatIcon');
+        this.icon = (options.icon && decodeURI(options.icon)) || wx.getStorageSync('chatIcon');
         this.profile = wx.getStorageSync('profile');
         this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
         this.msgReaded();
