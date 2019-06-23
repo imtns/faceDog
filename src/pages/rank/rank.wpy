@@ -95,7 +95,7 @@ export default class fabu extends wepy.page {
             this.changeGenderPop = false;
         },
         changeGender() {
-            this.gender = this.gender === 'female' ? 'male' : 'femal';
+            this.gender = this.gender === 'female' ? 'male' : 'female';
             this.hidechangeGenderPop();
             this.getRankList({
                 by: 'all',

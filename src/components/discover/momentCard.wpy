@@ -9,7 +9,7 @@
                         <view class="name">{{item.nickname}}</view>
                         <view class="other">
                             <text class="location">距您 {{item.distance}}km</text>
-                            <text class="online-time">7小时前</text>
+                            <text class="online-time">{{item.juli}}</text>
                         </view>
                     </view>
                     <view class="second">
@@ -79,7 +79,9 @@
 </template>
 <script>
 import wepy from 'wepy';
-import { get, post } from '../../utils/request'
+import { get, post } from '../../utils/request';
+import { formatDateFromSeconds } from '../../utils/index';
+
 export default class momentCard extends wepy.component {
     data = {
         momentList: [],
@@ -186,6 +188,7 @@ export default class momentCard extends wepy.component {
             if (item.birthday) {
                 item.age = this.methods.handleAge(item.birthday);
             }
+            item.juli = formatDateFromSeconds(item.create_time);
             res.push(item);
             return res;
         }, []);
