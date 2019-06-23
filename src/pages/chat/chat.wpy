@@ -51,7 +51,7 @@
         <!-- </view> -->
     </scroll-view>
     <view class="chatInput" style="height:82rpx">
-        <input type="text" adjust-position="true" placeholder="请输入消息~" bindconfirm="bindConfirm" value="{{msgContent}}" class="input_text"></input>
+        <input type="text" adjust-position="true" confirm-type="send" placeholder="请输入消息~" bindconfirm="bindConfirm" value="{{msgContent}}" class="input_text"></input>
     </view>
 
 </template>
@@ -73,7 +73,7 @@ export default class Chat extends wepy.page {
     };
     data = {
         id: '',
-        msgList: {},
+        msgList: [],
         msgContent: '',
         LastMsgTime: 0, //最近的消息时间，即从这个时间点向前拉取历史消息
         MsgKey: '',
@@ -118,31 +118,32 @@ export default class Chat extends wepy.page {
             var that = this;
             var content = e.detail.value;
             if (!content.replace(/^\s*|\s*$/g, '')) return;
-
+            that.msgList.push({
+                msg: content,
+                icon: that.profile.icon,
+                isSend: true,
+                sendTime: formatDateFromSeconds(
+                    parseInt(new Date().getTime() / 1000)
+                ),
+                showtime:
+                    that.msgList.length > 0
+                        ? parseInt(new Date().getTime() / 1000) -
+                              that.msgList[that.msgList.length - 1].time /
+                                  1000 >
+                          60
+                        : parseInt(new Date().getTime() / 1000)
+            });
+            that.setData({
+                msgContent: ''
+            });
+            that.toview = `chat${that.msgList.length - 1}`;
             webimhandler.onSendMsg(encodeURIComponent(content), function(e) {
-                if(e){
-                    toast('发送失败')
+                if (e) {
+                    toast('发送失败');
+                    that.msgList.pop();
                     return;
                 }
-                that.msgList.push({
-                    msg: content,
-                    icon: that.profile.icon,
-                    isSend: true,
-                    sendTime: formatDateFromSeconds(
-                        parseInt(new Date().getTime() / 1000)
-                    ),
-                    showtime:
-                        that.msgList.length > 0
-                            ? parseInt(new Date().getTime() / 1000) -
-                                  that.msgList[that.msgList.length - 1].time /
-                                      1000 >
-                              60
-                            : parseInt(new Date().getTime() / 1000)
-                });
-                that.setData({
-                    msgContent: ''
-                });
-                that.toview = `chat${that.msgList.length - 1}`;
+
                 var skey = that.id; // 拼装 skey
                 var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
                 var selSess = sessMap[skey]; // 获取 Session 的实例
@@ -160,7 +161,7 @@ export default class Chat extends wepy.page {
 
     computed = {};
     initChat() {
-        console.error(this.id)
+        console.error(this.id);
         webimhandler.init({
             selToID: this.id,
             selType: webim.SESSION_TYPE.C2C,
@@ -242,7 +243,9 @@ export default class Chat extends wepy.page {
             title: options.nick
         });
         this.nick = options.nick;
-        this.icon = decodeURI(options.icon) || wx.getStorageSync('chatIcon');
+        this.icon =
+            (options.icon && decodeURI(options.icon)) ||
+            wx.getStorageSync('chatIcon');
         this.profile = wx.getStorageSync('profile');
         this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
         this.msgReaded();

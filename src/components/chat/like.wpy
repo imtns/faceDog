@@ -1,6 +1,9 @@
 <!--  -->
 <template>
-    <view class='wrapper'>
+    <block wx:if="{{!list.length}}">
+        <empty></empty>
+    </block>
+    <view class='wrapper' wx:else>
         <repeat for="{{list}}" key="index" index="index" item="item">
             <view class="like-box">
                 <view class="header">
@@ -35,6 +38,7 @@ import wepy from 'wepy';
 import { getAge } from '@/utils';
 import { LIKE_ME, AGREE_FRIEND } from '@/utils/url';
 import { get, post } from '@/utils/request';
+import empty from '@/components/empty';
 export default class Like extends wepy.component {
     props = {};
 
@@ -42,7 +46,9 @@ export default class Like extends wepy.component {
         list: {}
     };
 
-    components = {};
+    components = {
+        empty
+    };
 
     methods = {
         agree(user) {
@@ -50,7 +56,9 @@ export default class Like extends wepy.component {
                 user_id: user._id
             });
             wx.navigateTo({
-                url: `chat/becomeFriend?id=${user.dentifier}&nick=${user.nick_name}&icon=${encodeURI(user.avatar)}`
+                url: `chat/becomeFriend?id=${user.dentifier}&nick=${
+                    user.nick_name
+                }&icon=${encodeURI(user.avatar)}`
             });
         },
         redirect(user) {

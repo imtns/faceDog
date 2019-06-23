@@ -1,16 +1,20 @@
 <!--  -->
 <template>
-    <view class='wrapper'>
+    <block wx:if="{{!list.length}}">
+        <empty></empty>
+    </block>
+    <view class='wrapper' wx:else>
+
         <repeat for="{{list}}" key="index" index="index" item="item">
             <!-- <van-swipe-cell right-width="{{ 70 }}" async-close bind:close="onClose"> -->
-                <view class="friends-box" @tap="goChat({{item.dentifier}},{{item.nick_name}})">
-                    <image class="icon" src="{{item.avatar}}" mode="aspectFill"></image>
-                    <view class="msg">
-                        <view class="name">{{item.nick_name}}</view>
-                        <view class="distance">匹配于{{item.month}}/{{item.day}}</view>
-                    </view>
+            <view class="friends-box" @tap="goChat({{item.dentifier}},{{item.nick_name}})">
+                <image class="icon" src="{{item.avatar}}" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">{{item.nick_name}}</view>
+                    <view class="distance">匹配于{{item.month}}/{{item.day}}</view>
                 </view>
-                <!-- <view class="delete" slot="right">删除</view>
+            </view>
+            <!-- <view class="delete" slot="right">删除</view>
             </van-swipe-cell> -->
         </repeat>
     </view>
@@ -22,6 +26,7 @@ import wepy from 'wepy';
 import { dialog } from '@/utils';
 import { get } from '@/utils/request';
 import { FRIENDS_LIST } from '@/utils/url';
+import empty from '@/components/empty';
 export default class Friends extends wepy.component {
     props = {};
 
@@ -29,12 +34,13 @@ export default class Friends extends wepy.component {
         list: {}
     };
 
-    components = {};
+    components = {
+        empty
+    };
 
     methods = {
-        goChat(id,name){
+        goChat(id, name) {
             wepy.navigateTo({ url: `chat/chat?id=${id}&nick=${name}` });
-
         },
         async onClose(event) {
             const { position, instance } = event.detail;
@@ -78,10 +84,10 @@ export default class Friends extends wepy.component {
         async getList() {
             const result = await get(FRIENDS_LIST);
             this.list = result;
-            this.list.forEach(item=>{
+            this.list.forEach(item => {
                 item.month = item.create_time.split(' ')[0].split('-')[1];
                 item.day = item.create_time.split(' ')[0].split('-')[2];
-            })
+            });
             this.$apply();
         }
     };

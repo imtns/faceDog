@@ -27,3 +27,5 @@ export const FRIENDS_LIST = '/api/user/contacts';
 export const AGREE_FRIEND = '/api/face/join_contact';
 // 排行榜页面
 export const RANK_LIST = '/api/face/list';
+// 用户设置
+export const USER_SETTING = '/api/user/settings';
