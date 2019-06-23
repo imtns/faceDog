@@ -9,7 +9,7 @@
             </van-tabs>
             <Constellation wx:if="{{showConstellation}}"  @getRankListByXZ.user="getRankListByXZ"></Constellation>
         </view>
-        <rankList :top3="top3" :topOthers="topOthers"></rankList>
+        <rankList :top3.sync="top3" :topOthers.sync="topOthers"></rankList>
         <image class="menu" mode="aspectFill" src="../../images/profile/menu.png" @tap="showchangeGenderPop"></image>
         <view class="drawer_screen" catchtouchmove="myCatchTouch" wx:if="{{changeGenderPop}}">
             <view class="drawer-btn" @tap="changeGender">
@@ -30,7 +30,7 @@
 </template>
 <script>
 import wepy from 'wepy';
-import { post } from '@/utils/request';
+import { get } from '@/utils/request';
 import { RANK_LIST } from '@/utils/url';
 import rankList from '@/components/rank/rankList';
 import Constellation from '@/components/rank/Constellation';
@@ -44,8 +44,8 @@ export default class fabu extends wepy.page {
     };
     data = {
         all: [1,2,3,4,5,6,7],
-        top3: [1,2,3],
-        topOthers: [4,5,6,7],
+        top3: [],
+        topOthers: [],
         showConstellation: false,
         gender: 'female',
         changeGenderPop: false,
@@ -128,10 +128,13 @@ export default class fabu extends wepy.page {
     onShow() { };
 
     async getRankList({ by = '', gender = '' }) {
-        const data = await post(RANK_LIST, {
+        const data = await get(RANK_LIST, {
             by,
             gender: gender || this.gender,
         });
+        this.top3 = data.filter((x, index) => index <= 2);
+        this.topOthers = data.filter((x, index) => index > 2);
+        this.$apply();
         console.log(data);
     }
 }

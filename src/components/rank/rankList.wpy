@@ -2,34 +2,34 @@
 <template>
   <view class="rankList">
       <view class="top3">
-          <view wx:if="{{top3[0]}}" class="top1">
+          <view wx:if="{{top3[0]}}" class="top1" @tap="toProfile" data-id="{{top3[0]._id}}">
               <image  class="img" mode="aspectFill" src="https://hbimg.huabanimg.com/67c38e7eda7771ab8f3872482142c7d73c062b7b2b554-qz0r39_fw658" ></image>
               <view class="rate top1rate">1</view>
-              <view class="name">会跳舞的皮开启</view>
-              <view class="location">距离您 23km</view>
+              <view class="name">{{top3[0].nick_name}}</view>
+              <view class="location">距离您 200km</view>
           </view>
           <view wx:if="{{top3[1] || top3[2]}}" class="others">
-              <view class="box">
+              <view class="box" @tap="toProfile" data-id="{{top3[1]._id}}">
                   <image  class="img" mode="aspectFill" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992074212&di=82d72712e0dbd99ec35fbfb34a656eaf&imgtype=0&src=http%3A%2F%2Fp2.qhimgs4.com%2Ft018d58a96ea8fe66a8.jpg" ></image>
                   <view class="rate top2rate">2</view>
-                  <view class="name">会跳舞的皮开启</view>
-                  <view class="location">距离您 23km</view>
+                  <view class="name">{{top3[1].nick_name}}</view>
+                  <view class="location">距离您 200km</view>
               </view>
-              <view class="box">
+              <view class="box" wx:if="{{top3[2]}}" @tap="toProfile" data-id="{{top3[2]._id}}">
                   <image  class="img" mode="aspectFill" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992270149&di=113c7c3cc1623fa5ef3b9c4b88809ad4&imgtype=0&src=http%3A%2F%2Fwww.js.xinhuanet.com%2Ftitlepic%2F111724%2F1117245314_1448349306603_title0h.jpg" ></image>
                   <view class="rate top3rate">3</view>
-                  <view class="name">会跳舞的皮开启</view>
-                  <view class="location">距离您 23km</view>
+                  <view class="name">{{top3[2].nick_name}}</view>
+                  <view class="location">距离您 200km</view>
               </view>
           </view>
       </view>
       <view class="others">
-          <repeat for="{{topOthers}}" key="index" index="index">
-             <view class="other-box">
+          <repeat for="{{topOthers}}" key="index" index="index" item="item">
+             <view class="other-box" @tap="toProfile" data-id="{{item._id}}">
                  <image  class="img" mode="aspectFill" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559992270149&di=113c7c3cc1623fa5ef3b9c4b88809ad4&imgtype=0&src=http%3A%2F%2Fwww.js.xinhuanet.com%2Ftitlepic%2F111724%2F1117245314_1448349306603_title0h.jpg" ></image>
                  <view class="rate otherrate">{{index + 4}}</view>
-                 <view class="name">会跳舞的皮开启</view>
-                 <view class="location">距离您 23km</view>
+                 <view class="name">{{item.nick_name}}</view>
+                 <view class="location">距离您 200km</view>
              </view>
           </repeat>
       </view>
@@ -61,9 +61,20 @@ export default class Discover extends wepy.component {
     onLoad() {
         console.log(this.top3);
         console.log(this.topOthers);
-    };
+    }
 
-    onShow() {};
+    onShow() {
+        console.log(this.top3);
+        console.log(this.topOthers);
+    }
+    methods = {
+        toProfile(e) {
+            const { id } = e.currentTarget.dataset;
+            wepy.navigateTo({
+                url: `/pages/battle/profile?id=${id}`,
+            });
+        },
+    }
 }
 </script>
 
