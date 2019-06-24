@@ -1,7 +1,7 @@
 <!--  -->
 <template>
     <view class="ta-moment-detail-page">
-        222222222
+        <momentCard></momentCard>
     </view>
 </template>
 <script>
@@ -11,7 +11,10 @@ import momentCard from '@/components/discover/momentCard';
 
 export default class momentDetail extends wepy.page {
     config = {
-        navigationBarTitleText: 'TA的动态',
+        navigationBarTitleText: '动态详情',
+        usingComponents: {
+            'van-popup': '../../components/vant/popup/index',
+        }
     }
     data = {
         userId: '',
@@ -33,6 +36,7 @@ export default class momentDetail extends wepy.page {
             moment_id: this.momentId,
         });
         console.log('动态详情', data);
+        this.$invoke('momentCard', 'setMomentList', [data]);
     };
 
     onShow() {};
@@ -41,6 +45,16 @@ export default class momentDetail extends wepy.page {
 
 <style lang='less'>
 .ta-moment-detail-page{
-    
+    .warn-pop{
+        .warn{
+            height: 120rpx;
+            text-align: center;
+            font-size:32rpx;
+            font-weight:600;
+            line-height:120rpx;
+            color:rgba(0,0,0,1);
+            border-bottom:1px solid rgba(226,225,225,1);
+        }
+    }
 }
 </style>

@@ -6,7 +6,7 @@
             <view class="content">
                 <view class="info">
                     <view class="first">
-                        <view class="name">{{item.nickname}}</view>
+                        <view class="name">{{item.nickname || item.nick_name}}</view>
                         <view class="other">
                             <text class="location">距您 {{item.distance}}km</text>
                             <text class="online-time">{{item.juli}}</text>
@@ -17,7 +17,7 @@
                         <text class="margin-right">巨蟹座</text>
                         <text class="margin-right">{{item.city}}</text>
                     </view>
-                    <view class="moment" @tap="toMomentDetail({{item.user_id}})">
+                    <view class="moment" @tap="toMomentDetail({{item._id}})">
                         {{item.content}}
                     </view>
                     <view class="imgs">
@@ -54,7 +54,7 @@
                     </view>
                     <view class="comment-info-box" wx:if="{{item.comments.length}}">
                         <repeat for="{{item.comments}}" key="indexcomments" index="indexcomments" item="comments">
-                            <view class="comment-info">
+                            <view class="comment-info" @tap="handleCommentAction" data-index="{{index}}" data-commentindex="{{indexcomments}}">
                                 <view class="from">{{comments.user_nick_name}}</view>
                                 <view class="reply" wx:if="{{comments.replay_user_nick_name}}">回复</view>
                                 <view class="to" wx:if="{{comments.replay_user_nick_name}}">{{comments.replay_user_nick_name}}</view>
@@ -77,10 +77,19 @@
             data-commentUser="{{commentUser}}"/>
         </view>
     </view>
+    <van-popup    
+    class="warn-pop"
+    show="{{ showDelete }}"
+    position="bottom"
+    close-on-click-overlay="{{ true }}"
+    >
+    <view class="warn" @tap="deleteComment">删除</view>
+    <view class="warn" @tap="cancaleComment">取消</view>
+    </van-popup>
 </template>
 <script>
 import wepy from 'wepy';
-import { get, post } from '../../utils/request';
+import { get, post, del } from '../../utils/request';
 import { formatDateFromSeconds } from '../../utils/index';
 
 export default class momentCard extends wepy.component {
@@ -90,8 +99,10 @@ export default class momentCard extends wepy.component {
         componentId: '', // 回复的动态id
         componentIndex: '', // 列表中的index
         commentUser: '', // 该动态的发布人id
+        showDelete: false,
+        actionCommentIndex: '', // 删除的评论index
+        actionItemIndex: '', // 删除评论的动态index
     };
-
     components = {};
 
     methods = {
@@ -194,6 +205,31 @@ export default class momentCard extends wepy.component {
             wepy.navigateTo({
                 url: `/pages/ta/momentDetail?momentId=${id}`,
             });
+        },
+        // 点击某一条评论
+        handleCommentAction(e) {
+            const { index, commentindex } = e.currentTarget.dataset; 
+            const comment = this.momentList[index].comments[commentindex];
+            console.log('点击某一个评论', comment);
+            const me = wepy.getStorageSync('profile');
+            const ownerId = me._id;
+            if (ownerId == comment.user_id) {
+                this.actionCommentIndex = commentindex;
+                this.actionItemIndex = index;
+                this.showDelete = true;
+                console.log('点击某一个评论', '应该是删除评论');
+            } else {
+                console.log('点击某一个评论', '应该是回复评论');
+            }
+        },
+        // 确认删除评论
+        async deleteComment() {
+            const comment = this.momentList[this.actionItemIndex].comments[this.actionCommentIndex];
+            await del(`/api/discover/comment`, comment._id);
+        },
+        // 取消删除弹窗
+        cancaleComment() {
+            this.showDelete = false;
         },
     };
     setMomentList(list) {

@@ -12,6 +12,9 @@ import momentCard from '@/components/discover/momentCard';
 export default class mymoment extends wepy.page {
     config = {
         navigationBarTitleText: '我的动态',
+        usingComponents: {
+            'van-popup': '../../components/vant/popup/index',
+        }
     }
     data = {
         userId: '',
@@ -43,6 +46,16 @@ export default class mymoment extends wepy.page {
 
 <style lang='less'>
 .mymoment-moment-list-page{
-    
+    .warn-pop{
+        .warn{
+            height: 120rpx;
+            text-align: center;
+            font-size:32rpx;
+            font-weight:600;
+            line-height:120rpx;
+            color:rgba(0,0,0,1);
+            border-bottom:1px solid rgba(226,225,225,1);
+        }
+    }
 }
 </style>
