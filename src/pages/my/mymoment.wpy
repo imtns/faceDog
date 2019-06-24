@@ -52,7 +52,6 @@ export default class mymoment extends wepy.page {
 </script>
 
 <style lang='less'>
-<<<<<<< HEAD
 .mymoment-moment-list-page{
     .warn-pop{
         .warn{
@@ -65,8 +64,5 @@ export default class mymoment extends wepy.page {
             border-bottom:1px solid rgba(226,225,225,1);
         }
     }
-=======
-.mymoment-moment-list-page {
->>>>>>> 08fd0b4972767174ad2c88a401499ea6df4bae18
 }
 </style>
