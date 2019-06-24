@@ -54,7 +54,7 @@
                     </view>
                     <view class="comment-info-box" wx:if="{{item.comments.length}}">
                         <repeat for="{{item.comments}}" key="indexcomments" index="indexcomments" item="comments">
-                            <view class="comment-info" @tap="handleCommentAction" data-index="{{index}}" data-commentindex="{{indexcomments}}">
+                            <view class="comment-info" @tap="handleCommentAction" data-index="{{index}}" data-commentindex="{{indexcomments}}" data-username="{{comments.user_nick_name}}">
                                 <view class="from">{{comments.user_nick_name}}</view>
                                 <view class="reply" wx:if="{{comments.replay_user_nick_name}}">回复</view>
                                 <view class="to" wx:if="{{comments.replay_user_nick_name}}">{{comments.replay_user_nick_name}}</view>
@@ -77,6 +77,13 @@
             data-commentUser="{{commentUser}}"/>
         </view>
     </view>
+    <view class="moment-mask" wx:if="{{isShowCommentReply}}" @tap="closeCommentCommentReply">
+        <view class="inputbox">
+            <input placeholder="回复{{replyUserName}}" focus="{{isShowCommentReply}}" class="inputview"
+            confirm-type="send" bindblur="closeCommentCommentReply"
+            bindconfirm="sendReply"/>
+        </view>
+    </view>
     <van-popup    
     class="warn-pop"
     show="{{ showDelete }}"
@@ -96,12 +103,14 @@ export default class momentCard extends wepy.component {
     data = {
         momentList: [],
         isShowComment: false,
-        componentId: '', // 回复的动态id
-        componentIndex: '', // 列表中的index
+        componentId: '', // 私密回复的动态id
+        componentIndex: '', // 私密回复列表中的index
         commentUser: '', // 该动态的发布人id
         showDelete: false,
         actionCommentIndex: '', // 删除的评论index
         actionItemIndex: '', // 删除评论的动态index
+        isShowCommentReply: false, // 回复某一条动态
+        replyUserName: '', 
     };
     components = {};
 
@@ -178,6 +187,10 @@ export default class momentCard extends wepy.component {
         closeComment() {
             this.isShowComment = false;
         },
+        // 关闭回复某条评论
+        closeCommentCommentReply() {
+            this.isShowCommentReply = false;
+        },
         // 发送评论
         async sendComment(e) {
             const { value } = e.detail; 
@@ -197,6 +210,25 @@ export default class momentCard extends wepy.component {
             this.$apply();
             console.log(data);
         },
+        // 发表回复某一条评论
+        async sendReply(e) {
+            const me = wepy.getStorageSync('profile');
+            const { value } = e.detail; 
+            const commentId = this.momentList[this.actionItemIndex].comments[this.actionCommentIndex]._id;
+            const { user_id, user_nick_name } = this.momentList[this.actionItemIndex].comments[this.actionCommentIndex];
+            const data = await post(`/api/discover/comment/${commentId}/reply`, {
+                content: value,
+            });
+            this.momentList[this.actionItemIndex].comments.push({
+                content: value,
+                replay_user_id: user_id,
+                replay_user_nick_name: user_nick_name,
+                user_id: me._id,
+                user_nick_name: me.nick_name,
+                _id: data,
+            });
+            console.log('回复某一评论', value);
+        },
         // 跳转到他的资料页面
         toProfile(id) {
             wepy.navigateTo({
@@ -211,7 +243,7 @@ export default class momentCard extends wepy.component {
         },
         // 点击某一条评论
         handleCommentAction(e) {
-            const { index, commentindex } = e.currentTarget.dataset; 
+            const { index, commentindex, username } = e.currentTarget.dataset; 
             const comment = this.momentList[index].comments[commentindex];
             console.log('点击某一个评论', comment);
             const me = wepy.getStorageSync('profile');
@@ -223,6 +255,10 @@ export default class momentCard extends wepy.component {
                 console.log('点击某一个评论', '应该是删除评论');
             } else {
                 console.log('点击某一个评论', '应该是回复评论');
+                this.actionCommentIndex = commentindex;
+                this.actionItemIndex = index;
+                this.replyUserName = username;
+                this.isShowCommentReply = true;
             }
         },
         // 确认删除评论
