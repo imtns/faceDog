@@ -10,7 +10,12 @@
             <view class="change">筛选</view>
         </view>
         <view class="card">
-            <momentCard></momentCard>
+            <block wx:if="{{momentList.length}}">
+                <momentCard></momentCard>
+            </block>
+            <block wx:else>
+                <empty></empty>
+            </block>
             <van-popup class="warn-pop" show="{{ show }}" position="bottom" close-on-click-overlay="{{ true }}">
                 <view class="warn">匿名举报</view>
                 <view class="warn">加入黑名单</view>
@@ -28,6 +33,7 @@ import wepy from 'wepy';
 import { toast } from '@/utils';
 import topBanner from '@/components/discover/topBanner';
 import momentCard from '@/components/discover/momentCard';
+import empty from '@/components/empty';
 
 let nomore = false;
 export default class Discover extends wepy.component {
@@ -41,7 +47,8 @@ export default class Discover extends wepy.component {
 
     components = {
         topBanner,
-        momentCard
+        momentCard,
+        empty,
     };
     onClose() {
         this.show = false;
@@ -78,7 +85,7 @@ export default class Discover extends wepy.component {
                 this.$apply();
             }
             const List = await get(DISCOVER_MOMENT_LIST, {
-                page
+                page,
             });
             if (!List.length) {
                 nomore = true;

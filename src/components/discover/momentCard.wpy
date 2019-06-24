@@ -27,7 +27,7 @@
                     </view>
                     <view class="actions">
                         <view class="box" @tap="zan" data-id="{{item._id}}"
-                        data-index="{{index}}">
+                        data-index="{{index}}" data-liked="{{item.liked}}">
                             <image class="icon" src="../../images/discover/discover-zaned.png" wx:if="{{item.liked}}"></image>
                             <image class="icon" src="../../images/discover/discover-zan.png" wx:else></image>
                             <view wx:if="{{item.liked}}" class="text red">{{item.likes.length || 0}}</view>
@@ -150,17 +150,20 @@ export default class momentCard extends wepy.component {
         // 点赞
         async zan(e) {
             const { id, index } = e.currentTarget.dataset; 
-            if (this.momentList[index].liked) {
-                return;
-            }
-            const data =  await get(`/api/discover/moment/${id}/like`);
-            // this.momentList[index].likes.length += 1;
             const me = wepy.getStorageSync('profile');
-            this.momentList[index].likes.push({
-                avatar: me.icon,
-                user_id: me._id,
-            });
-            this.momentList[index].liked = true;
+            if (this.momentList[index].liked) { // 取消点赞
+                await get(`/api/discover/moment/${id}/unlike`);
+                this.momentList[index].likes = this.momentList[index].likes.filter(x => x.user_id !== me._id);
+                this.momentList[index].liked = false;
+            } else { // 点赞
+                const data =  await get(`/api/discover/moment/${id}/like`);
+                // this.momentList[index].likes.length += 1;
+                this.momentList[index].likes.push({
+                    avatar: me.icon,
+                    user_id: me._id,
+                });
+                this.momentList[index].liked = true;
+            }
             this.$apply();
         },
         // 私密评论

@@ -11,7 +11,12 @@
                 <Constellation @getRankListByXZ.user="getRankListByXZ"></Constellation>
             </block>
         </view>
-        <rankList :top3.sync="top3" :topOthers.sync="topOthers"></rankList>
+        <block wx:if="{{top3.length}}">
+            <rankList :top3.sync="top3" :topOthers.sync="topOthers"></rankList>
+        </block>
+        <block wx:else>
+            <empty></empty>
+        </block>
         <image class="menu" mode="aspectFill" src="../../images/profile/menu.png" @tap="showchangeGenderPop"></image>
         <view class="drawer_screen" catchtouchmove="myCatchTouch" wx:if="{{changeGenderPop}}">
             <view class="drawer-btn" @tap="changeGender">
@@ -57,7 +62,7 @@ export default class fabu extends wepy.page {
     components = {
         rankList,
         Constellation,
-        empty
+        empty,
     };
 
     myCatchTouch() {
