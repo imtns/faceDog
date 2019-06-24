@@ -58,15 +58,19 @@ export default class Chatlist extends wepy.component {
         receivingMsg(sessMap, msg) {
             var sess = null;
             unread = 0;
-            console.error(sessMap);
-            console.error(msg);
+
+            console.error('msg',msg);
             for (var i in sessMap) {
                 sess = sessMap[i];
-                var isnew = this.list.filter(item => {
-                    return item.To_Account == msg.fromAccount;
+                console.error('sess',sess);
+                var isnew = true;
+                this.list.forEach(item => {
+                    if(item.To_Account == sess.id()){
+                        isnew = false
+                    }
                 });
                 console.error('isnew', isnew);
-                if (!isnew.length && Object.keys(msg).length !== 0) {
+                if (isnew && Object.keys(msg).length !== 0) {
                     console.log('no!!!!!!');
                     webim.getProfilePortrait(
                         {
@@ -99,14 +103,16 @@ export default class Chatlist extends wepy.component {
                         }
                     );
                 } else {
+
                     this.list.forEach(item => {
                         if (item.To_Account == sess.id()) {
                             item.UnreadMsgCount = sess.unread();
                         }
                         if (
-                            item.To_Account == msg.fromAccount &&
+                            item.To_Account == sess.id() &&
                             Object.keys(msg).length !== 0
                         ) {
+                            console.error('hahaha')
                             item.MsgShow = decodeURIComponent(
                                 msg.elems[0].content.text
                             );
