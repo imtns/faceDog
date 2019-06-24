@@ -1,6 +1,9 @@
 <!--  -->
 <template>
-    <view class='wrapper'>
+    <block wx:if="{{!list.length}}">
+        <empty></empty>
+    </block>
+    <view class='wrapper' wx:else>
         <view class="notify-box">
             <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
             <view class="msg">
@@ -42,12 +45,17 @@
 
 <script>
 import wepy from 'wepy';
+import empty from '@/components/empty';
 export default class Notify extends wepy.component {
     props = {};
 
-    data = {};
+    data = {
+        list:[]
+    };
 
-    components = {};
+    components = {
+        empty
+    };
 
     methods = {};
 
