@@ -1,0 +1,64 @@
+.draw-container {
+    position: relative;
+}
+
+.draw-loading {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+}
+
+.spinner {
+    width: 40rpx;
+    height: 40rpx;
+    position: relative;
+    left:50%;
+    margin-left:-100rpx;
+    top:-15%;
+}
+
+.bounce,
+.spinner::before,
+.spinner::after {
+    width: 40rpx;
+    height: 40rpx;
+    background-color: rgba(0, 0, 0, 0.514);
+    border-radius: 100%;
+    animation: bouncedelay 1.4s infinite ease-in-out;
+    animation-fill-mode: both;
+}
+
+.spinner::before {
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: -60rpx;
+    animation-delay: -0.32s;
+}
+
+.bounce {
+    animation-delay: -0.16s;
+}
+
+.spinner::after {
+    content: ' ';
+    position: absolute;
+    top: 0;
+    right: -60rpx;
+}
+
+@keyframes bouncedelay {
+    0%,
+    80%,
+    100% {
+        transform: scale(0.0);
+    }
+    40% {
+        transform: scale(1.0);
+    }
+}

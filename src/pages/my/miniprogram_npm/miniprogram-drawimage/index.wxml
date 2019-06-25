@@ -1,0 +1,9 @@
+<view class="draw-container" style="width: {{width}}rpx; height: {{height}}rpx;">
+    <view wx:if="{{!imageUrl}}" class="draw-loading">
+        <view class="spinner">
+            <view class="bounce"/>
+        </view>
+    </view>
+    <canvas wx:if="{{!imageUrl}}" style="width: {{width}}rpx; height: {{height}}rpx;position: absolute; right: -1000px;" canvas-id="draw-canvas"></canvas>
+    <image wx:if="{{imageUrl}}" src="{{imageUrl}}" style="width: 500rpx; height: 889rpx;" mode="aspectFit"/>
+</view>

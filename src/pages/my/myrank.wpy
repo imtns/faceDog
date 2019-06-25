@@ -1,6 +1,7 @@
 <!--  -->
 <template>
     <view class='wrapper'>
+        
         <view class="title">你的颜值在北京市超过<text>90%</text></view>
         <view class="title">你的帅气超过了<text>99%</text>天秤座</view>
         <view class="bar">“除了帅气，你一无所有”</view>
@@ -29,28 +30,94 @@
             </view>
         </view>
         <view class="shareButton" @tap="share">分享有奖</view>
+        <block wx:if="{{ready}}">
+            <drawimage id="drawimage" width="750" height="1333"  background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile"/>
+        </block>
     </view>
 </template>
 
 <script>
 import wepy from 'wepy';
 import wxCharts from '@/utils/wxcharts';
+import { getTmpFilePath } from '@/utils/index' ;
+
 var radarChart = null;
 export default class Example extends wepy.page {
     config = {
         navigationBarTitleText: '我的排名',
-         navigationBarBackgroundColor: "#000",
-         navigationBarTextStyle:'white'
+        navigationBarBackgroundColor: "#000",
+        navigationBarTextStyle:'white',
+        usingComponents: {
+            drawimage: './miniprogram_npm/miniprogram-drawimage/index',
+        },
     };
 
-    data = {};
+    data = {
+        ready: false,
+        background: {
+            imageResource: '',
+            dx: 0,
+            dy: 0,
+            dWidth: 750,
+            dHeight: 1333,
+        },
+        layers: [{
+            type: 'text', // 城市
+            fontSize: 22,
+            text: '北京市',
+            textAlign: 'center',
+            x: 253,
+            y: 299,
+            color: '#000000',
+        }, {
+            type: 'text', // 排名的百分比
+            fontSize: 30,
+            text: '95%',
+            textAlign: 'center',
+            x: 370,
+            y: 290,
+            color: '#E11220',
+        }, {
+            type: 'text', // 帅气百分比
+            fontSize: 30,
+            text: '95%',
+            textAlign: 'center',
+            x: 310,
+            y: 333,
+            color: '#E11220',
+        }, {
+            type: 'text', // 城市
+            fontSize: 22,
+            text: '巨蟹座',
+            textAlign: 'center',
+            x: 380,
+            y: 340,
+            color: '#000000',
+        }, {
+            type: 'text', // 城市
+            fontSize: 35,
+            text: '一个集美貌和才华的萌妹子',
+            textAlign: 'center',
+            x: 350,
+            y: 415,
+            color: '#000000',
+        }],
+        headImg1: '',
+    };
 
     components = {};
 
     methods = {
         share() {
             console.log('share');
-        }
+        },
+        toTempFile(res) {
+            console.log('花花哈 u 啊啊哈 u 啊', res);
+            const { tempFilePath } = res.detail;
+
+            this.styleImage1 = tempFilePath;
+            this.$apply();
+        },
     };
 
     events = {};
@@ -59,7 +126,7 @@ export default class Example extends wepy.page {
 
     computed = {};
 
-    onLoad() {
+    async onLoad() {
         radarChart = new wxCharts({
             canvasId: 'radarCanvas',
             type: 'radar',
@@ -78,8 +145,48 @@ export default class Example extends wepy.page {
                 }
             }
         });
+        await this.initStyleList();
+        this.ready = true;
+        this.$apply();
     }
-
+    async initStyleList() {
+        this.background.imageResource = await getTmpFilePath('http://pic1.58cdn.com.cn/bizmp/n_v2316c41156a8a40318632c39987265e23_bc943f71d9f4b87c.png?w=600');
+        this.headImg1 = await getTmpFilePath('http://ygo.oss-cn-beijing.aliyuncs.com/discover%2Fdiscover-5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1561307424.817633.jpeg');
+        this.layers.push({
+            type: 'image', //  我的头像
+            imageResource: this.headImg1,
+            dx: 79,
+            dy: 513,
+            dWidth: 310,
+            dHeight: 310,
+        });
+        this.layers.push({
+            type: 'image', //  我的头像
+            imageResource: this.headImg1,
+            dx: 79,
+            dy: 850,
+            dWidth: 250,
+            dHeight: 250,
+        });
+        this.layers.push({
+            type: 'image', //  我的头像
+            imageResource: this.headImg1,
+            dx: 393,
+            dy: 850,
+            dWidth: 250,
+            dHeight: 250,
+        });
+        this.layers.push({
+            type: 'image', //  我的头像
+            imageResource: this.headImg1,
+            dx: 527,
+            dy: 1193,
+            dWidth: 130,
+            dHeight: 130,
+        });
+        // this.background.imageResource = '../../../../images/my/myrank-bg';
+        this.$apply();
+    }
     onShow() {}
 }
 </script>

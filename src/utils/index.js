@@ -107,6 +107,21 @@ function formatDateFromSeconds(timestamp) {
     }
 };
 
+// 下载网络图片到本地
+function getTmpFilePath(url) {
+    return new Promise((resolve, reject) => {
+        wx.downloadFile({
+            url,
+            success(res) {
+                resolve(res.tempFilePath);
+            },
+            fail(err) {
+                reject(err);
+            },
+        });
+    });
+}
+
 module.exports = {
     formatDate,
     formatTime,
@@ -117,5 +132,6 @@ module.exports = {
     getAge,
     sleep,
     formatDateFromSeconds,
-    removeDuplicates
+    removeDuplicates,
+    getTmpFilePath
 };
