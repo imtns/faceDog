@@ -25,7 +25,7 @@
             <view class="battle-profile-signature" wx:if="{{profile.signature}}">
                 个性签名: {{profile.signature}}
             </view>
-            <view class="battle-profile-moments" wx:if="{{profile.discover}}">
+            <view class="battle-profile-moments" wx:if="{{profile.discover && profile.discover.length}}">
                 <view class="tab">
                     <view class="text1">TA的动态</view>
                     <view class="text2" @tap="goDiscover">全部
@@ -80,7 +80,12 @@
 
 <script>
 import wepy from 'wepy';
-import { PROFILE, MAKEFRIEND, BATTLE_COMMIT, USER_LIKE_TIME } from '@/utils/url';
+import {
+    PROFILE,
+    MAKEFRIEND,
+    BATTLE_COMMIT,
+    USER_LIKE_TIME
+} from '@/utils/url';
 import { get, post } from '@/utils/request';
 import { getAge, toast } from '@/utils';
 var systemInfo = wx.getSystemInfoSync();
@@ -105,6 +110,7 @@ export default class Profile extends wepy.page {
         animAdd: {},
         animDelLots: {},
         id: '',
+        dentifier:'',
         profile: {}
     };
 
@@ -163,9 +169,11 @@ export default class Profile extends wepy.page {
 
     async onLoad(options) {
         this.id = options.id;
-        const result = await get(PROFILE, {
-            user_id: this.id
-        });
+        this.dentifier = options.dentifier;
+        var data = this.id
+            ? { user_id: this.id }
+            : { dentifier: this.dentifier };
+        const result = await get(PROFILE, data);
         if (options.notLikeImageId) {
             try {
                 await post(BATTLE_COMMIT, {

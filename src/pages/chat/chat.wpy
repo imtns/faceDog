@@ -8,14 +8,14 @@
                 </view>
                 <view class="left" style="margin-bottom:40rpx;" wx:if="{{Complete}}">
                     <view class="chat-avatars">
-                        <image src="{{item.icon}}" class="avatar" mode="aspectFill" bindtap="gotoInfo"></image>
+                        <image src="{{item.avatar}}" class="avatar" mode="aspectFill" bindtap="goProfile"></image>
                     </view>
                     <view class="profile-image" wx:if="{{index==0}}">
-                        <image class="thumb" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                        <image class="thumb" src="{{item.avatar}}" mode="aspectFill"></image>
                         <view class="profile-desc">
                             <view class="left-container">
-                                <view class="top">小嘻嘻 21岁/双鱼座</view>
-                                <view class="bottom">在全国颜值排名前3%</view>
+                                <view class="top">{{item.nick_name}} {{item.age}}岁/{{item.constellation}}</view>
+                                <view class="bottom">在全国颜值排名前{{item.face*100}}%</view>
                             </view>
                             <view class="right-container">
                                 <image class="like-icon" src="../../images/profile/friend.png" mode="aspectFill"></image>
@@ -23,9 +23,9 @@
                         </view>
                     </view>
                 </view>
-                <view class="left">
+                <view class="left" wx:if="{{index != 0}}">
                     <view class="chat-avatars">
-                        <image src="{{item.icon}}" class="avatar" mode="aspectFill" bindtap="gotoInfo"></image>
+                        <image src="{{item.icon}}" class="avatar" mode="aspectFill" bindtap="goProfile"></image>
                     </view>
                     <view class="chat-message">
                         <!-- <image src="../../images/profile/model.jpg" mode="aspectFill"></image> -->
@@ -43,7 +43,7 @@
                         <view>{{item.msg}}</view>
                     </view>
                     <view class="chat-avatars">
-                        <image class="avatar" src="{{item.icon}}" mode="aspectFill"></image>
+                        <image class="avatar" src="{{item.icon}}" mode="aspectFill" @tap="goProfile('self')"></image>
                     </view>
                 </view>
             </view>
@@ -63,6 +63,9 @@ import webimhandler from '@/utils/handler';
 import { formatDateFromSeconds, toast } from '@/utils';
 import Config from '@/utils/config';
 import { Event } from '@/utils/event.js';
+import { PROFILE } from '@/utils/url';
+import { get } from '@/utils/request';
+import { getAge } from '@/utils';
 var loading = false;
 export default class Chat extends wepy.page {
     config = {
@@ -84,7 +87,8 @@ export default class Chat extends wepy.page {
         msg: '',
         Complete: false,
         nick: '',
-        count: 0
+        count: 0,
+        user: {}
     };
 
     components = {};
@@ -113,6 +117,17 @@ export default class Chat extends wepy.page {
                     console.log(err);
                 }
             );
+        },
+        goProfile(self) {
+            if (self != 'self') {
+                wx.navigateTo({
+                    url: `../battle/profile?dentifier=${this.id}`
+                });
+            } else {
+                wx.navigateTo({
+                    url: `../battle/profile?dentifier=${this.profile.dentifier}`
+                });
+            }
         },
         bindConfirm(e) {
             var that = this;
@@ -202,6 +217,26 @@ export default class Chat extends wepy.page {
                     webim.Log.error(
                         '没有历史消息了:data=' + JSON.stringify(options)
                     );
+                    var temp = {
+                        msg: '',
+                        avatar: that.user.avatar,
+                        nick_name: that.user.nick_name,
+                        constellation: that.user.constellation,
+                        age: getAge(that.user.birthday),
+                        face: that.user.face,
+                        isSend: false,
+                        sendTime: formatDateFromSeconds(
+                            parseInt(new Date().getTime() / 1000)
+                        ),
+                        showtime: parseInt(new Date().getTime() / 1000)
+                    };
+                    if (that.msgList.length == 0) {
+                        that.msgList.push(temp);
+                    } else {
+                        that.msgList.unshift(temp);
+                    }
+                    that.Complete = true;
+                    that.$apply();
                     return;
                 }
                 const list = resp.MsgList.map((item, index) => {
@@ -237,7 +272,7 @@ export default class Chat extends wepy.page {
         this.toview = `chat${this.msgList.length - 1}`;
         this.$apply();
     }
-    onLoad(options) {
+    async onLoad(options) {
         this.id = options.id;
         wx.setNavigationBarTitle({
             title: options.nick
@@ -248,8 +283,16 @@ export default class Chat extends wepy.page {
             wx.getStorageSync('chatIcon');
         this.profile = wx.getStorageSync('profile');
         this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
+        const result = await get(PROFILE, { dentifier: this.id });
+        this.user = result;
+        this.user.images.forEach(item => {
+            if (item.is_avatar) {
+                this.user.avatar = item.image;
+            }
+        });
         this.msgReaded();
         this.initChat();
+        this.$apply();
     }
     msgDetect(msg) {
         console.warn('msgDetect', msg);
