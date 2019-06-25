@@ -7,7 +7,7 @@
                 <van-tab title="全部"></van-tab>
                 <van-tab title="同城"></van-tab>
             </van-tabs>
-            <view class="change">筛选</view>
+            <view class="change" @tap="sbowshowGender">筛选</view>
         </view>
         <view class="card">
             <block wx:if="{{momentList.length}}">
@@ -16,14 +16,16 @@
             <block wx:else>
                 <empty></empty>
             </block>
-            <van-popup class="warn-pop" show="{{ show }}" position="bottom" close-on-click-overlay="{{ true }}">
-                <view class="warn">匿名举报</view>
-                <view class="warn">加入黑名单</view>
-                <view class="warn last" @tap="closewarn">取消</view>
-            </van-popup>
         </view>
         <image class="make-photo" src="../../images/discover/discover-add.png" @tap="mkPhoto"></image>
     </scroll-view>
+    <!--筛选的弹窗-->
+    <van-popup class="warn-pop" show="{{ showGender }}" position="bottom" close-on-click-overlay="{{ true }}">
+        <view class="warn">全部</view>
+        <view class="warn">只看同性</view>
+        <view class="warn">只看异性</view>
+        <view class="warn last" @tap="closeshowGender">取消</view>
+    </van-popup>
 </template>
 
 <script>
@@ -38,7 +40,7 @@ import empty from '@/components/empty';
 let nomore = false;
 export default class Discover extends wepy.component {
     data = {
-        show: false,
+        showGender: false,
         momentList: [],
         page: 1,
         same_city: 0,
@@ -54,24 +56,20 @@ export default class Discover extends wepy.component {
         this.show = false;
     }
 
-    events = {
-        showwarn(id) {
-            this.show = true;
-            console.log(id);
-        }
-    };
-
     watch = {};
 
     computed = {};
     methods = {
+        closeshowGender() {
+            this.showGender = false;
+        },
+        sbowshowGender() {
+            this.showGender = true;
+        },
         mkPhoto() {
             wepy.navigateTo({
                 url: 'fabu/fabu'
             });
-        },
-        closewarn() {
-            this.show = false;
         },
         async initList({ page = 1, same_city = 0, opposite = 'same' }) {
             if (nomore) return;
@@ -112,6 +110,17 @@ export default class Discover extends wepy.component {
 </script>
 
 <style lang='less'>
+.warn-pop {
+    .warn {
+        height: 120rpx;
+        text-align: center;
+        font-size: 32rpx;
+        font-weight: 600;
+        line-height: 120rpx;
+        color: rgba(0, 0, 0, 1);
+        border-bottom: 1px solid rgba(226, 225, 225, 1);
+    }
+}
 .discover {
     height: 100vh;
     .make-photo {
@@ -124,17 +133,6 @@ export default class Discover extends wepy.component {
     }
     .card {
         padding-bottom: 20vh;
-        .warn-pop {
-            .warn {
-                height: 120rpx;
-                text-align: center;
-                font-size: 32rpx;
-                font-weight: 600;
-                line-height: 120rpx;
-                color: rgba(0, 0, 0, 1);
-                border-bottom: 1px solid rgba(226, 225, 225, 1);
-            }
-        }
     }
     .content-search {
         display: flex;
