@@ -1,6 +1,9 @@
 <!--  -->
 <template>
-    <view class='container' wx:if="{{loaded}}">
+    <block wx:if="{{loading}}">
+        <empty></empty>
+    </block>
+    <view class='container' wx:if="{{loaded && !loading}}">
         <view class="battle-container">
             <repeat key="index" for="{{battle.a}}">
                 <view animation="{{item.animation}}" style="z-index:{{battle.a.length - index}};" id="{{item._id}}" class="battle-box top " @tap="fly('top',{{index}},{{item.image_id}})">
@@ -56,11 +59,13 @@ import wepy from 'wepy';
 import { BATTLE } from '@/utils/url';
 import { get } from '@/utils/request';
 import { removeDuplicates } from '@/utils';
-let empty = false;
+import empty from '@/components/empty';
+let emptyData = false;
 let timeout = 0;
 let buttonDisable = false;
 export default class Battle extends wepy.component {
     data = {
+        loading: true,
         layer: false,
         pop: false,
         gift: false,
@@ -86,7 +91,9 @@ export default class Battle extends wepy.component {
         animationData: {}
     };
 
-    components = {};
+    components = {
+        empty
+    };
 
     methods = {
         async fly(position, index, imageid, item) {
@@ -95,7 +102,7 @@ export default class Battle extends wepy.component {
                     try {
                         await this.getBattle('a');
                     } catch (e) {
-                        empty = true;
+                        emptyData = true;
                     }
                 }
                 this.topIndex++;
@@ -110,7 +117,7 @@ export default class Battle extends wepy.component {
                     try {
                         await this.getBattle('b');
                     } catch (e) {
-                        empty = true;
+                        emptyData = true;
                     }
                 }
                 this.bottomIndex++;
@@ -160,10 +167,10 @@ export default class Battle extends wepy.component {
         }
     };
     handleEmpty() {
-        console.error(empty);
-        if (empty) {
+        // console.error(empty);
+        if (emptyData) {
             setTimeout(async () => {
-                empty = false;
+                emptyData = false;
                 this.battle.a = [];
                 this.battle.b = [];
                 this.$apply();
@@ -214,7 +221,6 @@ export default class Battle extends wepy.component {
                 (position == 'a' && !result.a.length) ||
                 (position == 'b' && !result.b.length)
             ) {
-
                 reject('empty');
                 return;
             }
@@ -232,6 +238,11 @@ export default class Battle extends wepy.component {
                 item.distance = (item.distance / 1000).toFixed(2);
                 item.animation = {};
             });
+            setTimeout(() => {
+                this.loading = false;
+                this.$apply();
+            }, 1000);
+
             this.$apply();
             resolve();
         });
@@ -405,7 +416,7 @@ export default class Battle extends wepy.component {
     }
     .divider {
         position: absolute;
-        top: 44.5%;
+        top: 532rpx;
         left: 50%;
         transform: translate(-50%, -50%);
         width: 693rpx;
