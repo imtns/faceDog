@@ -34,7 +34,7 @@
             <view class="shareButton" @tap="share">分享有奖</view>
         </view>
         <block wx:if="{{ready}}">
-            <drawimage id="drawimage" width="750" height="1333"  background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile"/>
+            <drawimage id="drawimage" width="750" height="1333"  background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile" fileType="'jpg'"/>
         </block>
     </view>
 </template>

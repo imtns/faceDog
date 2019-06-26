@@ -37,7 +37,7 @@
                             <view class="text">私密评论</view>
                         </view>
                         <view class="last">
-                            <view class="lastbox" @tap="warn" data-userid="{{item.user_id}}" data-index="{{index}}" data-commentid="{{item._id}}">
+                            <view class="lastbox" @tap="warn" data-userid="{{item.user_id}}" data-index="{{index}}" data-momentid="{{item._id}}">
                                 <image class="action-icon" src="../../images/discover/discover-actions.png"></image>
                             </view>
                         </view>
@@ -86,8 +86,8 @@
 
     <!--别人点击三个点 是举报加入黑名单等-->
     <van-popup class="warn-pop" z-index="99999" show="{{ show }}" position="bottom" bind:close="onClose">
-        <view class="warn">匿名举报</view>
-        <view class="warn">加入黑名单</view>
+        <view class="warn" @tap="reporting">匿名举报</view>
+        <view class="warn" @tap="addBlackList">加入黑名单</view>
         <view class="warn last" @tap="closewarn">取消</view>
     </van-popup>
 
@@ -124,6 +124,24 @@ export default class momentCard extends wepy.component {
     components = {};
 
     methods = {
+        // 匿名举报
+        async reporting() {
+            await post(`/api/discover/report_moment/${this.clickMomentId}`, {
+                moment_id: this.clickMomentId,
+            });
+            toast('匿名举报成功！');
+            this.show = false;
+            this.$apply();
+        },
+        // 加入黑名单
+        async addBlackList() {
+            await post(`/api/discover/shielding/${this.clickMomentId}`, {
+                moment_id: this.clickMomentId,
+            });
+            toast('加入黑名单成功！');
+            this.show = false;
+            this.$apply();
+        },
         onClose() {
             this.show = false;
             this.showPointsByme = false;
@@ -135,20 +153,20 @@ export default class momentCard extends wepy.component {
             toast('删除成功');
             this.show = false;
             this.showPointsByme = false;
-            this.$emit('showtab', true);
+            // this.$emit('showtab', true);
             this.$apply();
         },
         warn(e) {
             const me = wepy.getStorageSync('profile');
             const ownerId = me._id;
-            const { userid, commentid, index } = e.currentTarget.dataset;
+            const { userid, momentid, index } = e.currentTarget.dataset;
             if (ownerId == userid) {
                 this.showPointsByme = true;
             } else {
                 this.show = true;
             }
-            this.$emit('showtab', false);
-            this.clickMomentId = commentid;
+            // this.$emit('showtab', false);
+            this.clickMomentId = momentid;
             this.clickIndex = index;
             console.log('2222');
         },

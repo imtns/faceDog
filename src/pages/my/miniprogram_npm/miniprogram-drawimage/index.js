@@ -105,6 +105,7 @@ function drawed() {
     const {
         width,
         height,
+        fileType,
     } = this.data;
 
     const self = this;
@@ -114,7 +115,7 @@ function drawed() {
         destWidth,
         destHeight,
         canvasId: 'draw-canvas',
-        fileType: 'jpg',
+        fileType,
         success(res) {
             self.setData({
                 imageUrl: res.tempFilePath,
@@ -141,6 +142,10 @@ Component({
         background: {
             type: Object,
             value: null,
+        },
+        fileType: {
+            type: String,
+            value: 'png',
         },
     },
 
