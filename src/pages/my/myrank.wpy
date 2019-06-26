@@ -33,7 +33,6 @@
             </view>
             <view class="shareButton" @tap="share">分享有奖</view>
         </view>
-        <view class="shareButton" @tap="share">分享有奖</view>
         <block wx:if="{{ready}}">
             <drawimage id="drawimage" width="750" height="1333"  background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile"/>
         </block>
@@ -43,7 +42,7 @@
 <script>
 import wepy from 'wepy';
 import wxCharts from '@/utils/wxcharts';
-import { getTmpFilePath } from '@/utils/index' ;
+import { getTmpFilePath, toast } from '@/utils/index' ;
 
 var radarChart = null;
 export default class Example extends wepy.page {
@@ -108,22 +107,35 @@ export default class Example extends wepy.page {
             color: '#000000',
         }],
         headImg1: '',
+        styleImage1: '',
     };
 
     components = {};
 
     methods = {
-        share() {
-            console.log('share');
+        async share() {
+            if (!this.ready) return;
+            const path = this.styleImage1;
+            await this.savePhotosAlbum(path);
         },
         toTempFile(res) {
-            console.log('花花哈 u 啊啊哈 u 啊', res);
             const { tempFilePath } = res.detail;
-
             this.styleImage1 = tempFilePath;
             this.$apply();
         },
     };
+
+    // 保存
+    async savePhotosAlbum(path) {
+        try {
+            await wepy.saveImageToPhotosAlbum({ filePath: path });
+            toast('保存成功！');
+        } catch (e) {
+            toast('由于您拒绝了相册授权，无法自动保存到本地相册，请截图保存');
+            console.log('savePhotosAlbum', e);
+        }
+        this.$apply();
+    }
 
     events = {};
 
