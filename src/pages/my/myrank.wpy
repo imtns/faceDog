@@ -1,8 +1,6 @@
 <!--  -->
 <template>
     <view class='wrapper'>
-<<<<<<< HEAD
-        
         <view class="title">你的颜值在北京市超过<text>90%</text></view>
         <view class="title">你的帅气超过了<text>99%</text>天秤座</view>
         <view class="bar">“除了帅气，你一无所有”</view>
@@ -12,21 +10,6 @@
                 <view class="info">
                     <view class="word">胜率 \ <text> 70%</text></view>
                     <view class="word">出场率 \ <text> 65%</text></view>
-=======
-        <view class="header">
-            <view class="title">你的颜值在北京市超过<text>90%</text></view>
-            <view class="title">你的帅气超过了<text>99%</text>天秤座</view>
-            <view class="bar">“除了帅气，你一无所有”</view>
-        </view>
-        <view class="w">
-            <view class="boxes">
-                <view class="box1">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                    <view class="info">
-                        <view class="word">胜 率 \ <text> 70%</text></view>
-                        <view class="word">出场率 \ <text> 65%</text></view>
-                    </view>
->>>>>>> 90df084e05ac175112c8296acefa3a1aebcc3b80
                 </view>
                 <view class="box2"><canvas canvas-id="radarCanvas" class="canvas"></canvas><canvas canvas-id="radarCanvas" class="canvas"></canvas></view>
                 <view class="box3">
@@ -46,13 +29,10 @@
             </view>
             <view class="shareButton" @tap="share">分享有奖</view>
         </view>
-<<<<<<< HEAD
         <view class="shareButton" @tap="share">分享有奖</view>
         <block wx:if="{{ready}}">
             <drawimage id="drawimage" width="750" height="1333"  background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile"/>
         </block>
-=======
->>>>>>> 90df084e05ac175112c8296acefa3a1aebcc3b80
     </view>
 </template>
 
