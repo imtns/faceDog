@@ -8,12 +8,14 @@
         <view class="word">“颜狗认证，{{number}}”</view>
         <button class="button" @tap="uploadVideo">开始录制</button>
     </view>
+    <van-toast id="van-toast" />
 </template>
 
 <script>
 import wepy from 'wepy';
 import { uploader } from '@/utils/uploader';
-import { toast } from '@/utils';
+import { toast, sleep } from '@/utils';
+import Toast from '@/components/vant/toast/toast';
 export default class Example extends wepy.component {
     props = {
         step: {
@@ -51,8 +53,8 @@ export default class Example extends wepy.component {
                     tempFilePath,
                     thumbTempFilePath
                 } = await wepy.chooseVideo({
-                    camera:'front',
-                    sourceType:['camera']
+                    camera: 'front',
+                    sourceType: ['camera']
                 });
                 uploader(
                     tempFilePath,
@@ -63,19 +65,22 @@ export default class Example extends wepy.component {
                         },
                         name: 'files'
                     },
-                    result => {
-                        toast('上传成功。');
-                        // Object.assign(this.video, {
-                        //     src: result.content,
-                        //     cover: thumbTempFilePath
-                        // });
-                        setTimeout(() => {
+                    async result => {
+                        if (result == 'ok') {
+                            Toast.success('上传成功');
+                            // Object.assign(this.video, {
+                            //     src: result.content,
+                            //     cover: thumbTempFilePath
+                            // });
+                            this.$apply();
+                            await sleep(2);
+
                             wx.redirectTo({
                                 url: 'index'
                             });
-                        }, 1500);
-
-                        this.$apply();
+                        }else{
+                            Toast.fail(result);
+                        }
                     }
                 );
             } catch (e) {

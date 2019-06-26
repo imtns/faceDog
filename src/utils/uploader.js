@@ -30,7 +30,8 @@ module.exports.uploader = (tempFilePath, ...props) => {
             if (data.return_code == 0) {
                 callback('ok');
             } else {
-                toast(data.message || '上传失败');
+                // toast(data.message || '上传失败');
+                callback(data.message);
             }
         },
         fail() {

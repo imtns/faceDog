@@ -42,7 +42,7 @@
         </view>
         <view class="bottom-box">
             <block wx:if="{{!profile.is_friend}}">
-                <image class="close" mode="aspectFill" @tap="close" src="../../images/profile/close.png"></image>
+                <image class="close" mode="aspectFill" @tap="close" src="../../images/profile/close1.png"></image>
                 <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="../../images/profile/menu.png"></image>
                 <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="../../images/profile/icon-clock.png"></image>
             </block>
@@ -55,7 +55,7 @@
                 <image src="../../images/profile/lip.png" mode="aspectFill" class="btn" @tap="makeFriend('close')"></image>
                 <view class="textWrap">
                     <view class="lip">亲密接触</view>
-                    <view>剩余1次</view>
+                    <view>剩余{{timeLeft.close}}次</view>
                 </view>
 
             </view>
@@ -63,17 +63,17 @@
                 <image src="../../images/profile/lover.png" mode="aspectFill" class="btn" @tap="makeFriend('lover')"></image>
                 <view class="textWrap">
                     <view class="lover">成为恋人</view>
-                    <view>剩余7次</view>
+                    <view>剩余{{timeLeft.lover}}次</view>
                 </view>
             </view>
             <view class="drawer-btn">
                 <image src="../../images/profile/friend.png" mode="aspectFill" class="btn" @tap="makeFriend('friend')"></image>
                 <view class="textWrap">
                     <view class="friend">成为朋友</view>
-                    <view>剩余12次</view>
+                    <view>剩余{{timeLeft.friend}}次</view>
                 </view>
             </view>
-            <image src="../../images/profile/close.png" mode="aspectFill" class="layer-close" @tap.stop="showOrHide"></image>
+            <image src="../../images/profile/close1.png" mode="aspectFill" class="layer-close" @tap.stop="showOrHide"></image>
         </view>
     </view>
 </template>
@@ -111,7 +111,8 @@ export default class Profile extends wepy.page {
         animDelLots: {},
         id: '',
         dentifier:'',
-        profile: {}
+        profile: {},
+        timeLeft:{},
     };
 
     components = {};
@@ -169,6 +170,7 @@ export default class Profile extends wepy.page {
 
     async onLoad(options) {
         this.id = options.id;
+        this.timeLeft = await get(MAKEFRIEND);
         this.dentifier = options.dentifier;
         var data = this.id
             ? { user_id: this.id }

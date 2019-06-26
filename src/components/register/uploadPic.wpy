@@ -11,15 +11,17 @@
     <view wx:if="{{show}}">
         <cropper :options="cropperOpt" @beforeImageLoad="bl"></cropper>
     </view>
+    <van-toast id="van-toast" />
 </template>
 
 <script>
 import wepy from 'wepy';
 import { uploader } from '@/utils/uploader';
 import { get } from '@/utils/request';
-import { toast } from '@/utils';
+import { toast, sleep } from '@/utils';
 import cropper from '../cropper';
 import { PROFILE } from '@/utils/url';
+import Toast from '@/components/vant/toast/toast';
 const device = wx.getSystemInfoSync();
 const width = device.windowWidth;
 const height = device.windowHeight - 50;
@@ -65,7 +67,7 @@ export default class uploadPic extends wepy.component {
             }
         },
         next() {
-            this.$emit('changeStep',4)
+            this.$emit('changeStep', 4);
         }
     };
 
@@ -95,18 +97,22 @@ export default class uploadPic extends wepy.component {
                             data: wepy.getStorageSync('reg_profile'),
                             name: 'avatar'
                         },
-                        result => {
-                            toast('上传成功');
-                            setTimeout(() => {
-                                this.show = false;
-                                this.$apply();
+                        async result => {
+                            this.show = false;
+                            this.$apply();
+                            if (result == 'ok') {
+                                Toast.success('上传成功');
+                                await sleep(2);
                                 this.$emit('changeStep', 4);
-                            }, 1500);
+                            } else {
+                                Toast.fail(result);
+                            }
                         }
                     );
                 })
-                .catch(err => {
-                    toast('error')
+                .catch(async err => {
+                    // toast('error');
+                    this.show = false;
                     console.log(err + '获取图片地址失败，请稍后重试');
                 });
         }
