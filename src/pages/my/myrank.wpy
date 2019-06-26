@@ -92,6 +92,10 @@ export default class Example extends wepy.page {
         try {
             // await wepy.saveImageToPhotosAlbum({ filePath: path });
             console.error(path);
+            wx.previewImage({
+                current: path, // 当前显示图片的http链接
+                urls: [path] // 需要预览的图片http链接列表
+            });
             toast('保存成功！');
         } catch (e) {
             toast('由于您拒绝了相册授权，无法自动保存到本地相册，请截图保存');
@@ -142,7 +146,7 @@ export default class Example extends wepy.page {
                     console.log(res);
                 }
             });
-        }, 2000);
+        }, 1000);
         var that = this;
 
         this.$apply();
