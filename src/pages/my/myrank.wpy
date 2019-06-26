@@ -65,16 +65,11 @@ var radarChart = null;
 export default class Example extends wepy.page {
     config = {
         navigationBarTitleText: '我的排名',
-<<<<<<< HEAD
         navigationBarBackgroundColor: "#000",
         navigationBarTextStyle:'white',
         usingComponents: {
             drawimage: './miniprogram_npm/miniprogram-drawimage/index',
         },
-=======
-        navigationBarBackgroundColor: '#000',
-        navigationBarTextStyle: 'white'
->>>>>>> 90df084e05ac175112c8296acefa3a1aebcc3b80
     };
 
     data = {
