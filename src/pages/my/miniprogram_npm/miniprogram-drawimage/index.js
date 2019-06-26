@@ -114,6 +114,7 @@ function drawed() {
         destWidth,
         destHeight,
         canvasId: 'draw-canvas',
+        fileType: 'jpg',
         success(res) {
             self.setData({
                 imageUrl: res.tempFilePath,
