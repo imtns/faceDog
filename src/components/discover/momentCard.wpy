@@ -2,7 +2,7 @@
 <template>
     <repeat for="{{momentList}}" key="index" index="index" item="item">
         <view class="momentCard">
-            <image  class="header" src="{{item.avatar}}" mode="aspectFill" @tap="toProfile({{item.user_id}})"></image>
+            <image class="header" src="{{item.avatar}}" mode="aspectFill" @tap="toProfile({{item.user_id}})"></image>
             <view class="content">
                 <view class="info">
                     <view class="first">
@@ -22,24 +22,22 @@
                     </view>
                     <view class="imgs">
                         <repeat for="{{item.images}}" key="indeximages" index="indeximages" item="pic">
-                            <image class="img" src="{{pic.image_url}}" data-index="{{index}}" data-picIndex="{{indeximages}}"  @tap="preview" mode="aspectFill"></image>
+                            <image class="img" src="{{pic.image_url}}" data-index="{{index}}" data-picIndex="{{indeximages}}" @tap="preview" mode="aspectFill"></image>
                         </repeat>
                     </view>
                     <view class="actions">
-                        <view class="box" @tap="zan" data-id="{{item._id}}"
-                        data-index="{{index}}" data-liked="{{item.liked}}">
+                        <view class="box" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
                             <image class="icon" src="../../images/discover/discover-zaned.png" wx:if="{{item.liked}}"></image>
                             <image class="icon" src="../../images/discover/discover-zan.png" wx:else></image>
                             <view wx:if="{{item.liked}}" class="text red">{{item.likes.length || 0}}</view>
                             <view wx:else class="text">{{item.likes.length || 0}}</view>
                         </view>
-                        <view class="box" @tap="comment" data-id="{{item._id}}"
-                        data-index="{{index}}" data-userid="{{item.user_id}}">
+                        <view class="box" @tap="comment" data-id="{{item._id}}" data-index="{{index}}" data-userid="{{item.user_id}}">
                             <image class="icon" src="../../images/discover/discover-commen.png"></image>
                             <view class="text">私密评论</view>
                         </view>
                         <view class="last">
-                            <view class="lastbox" @tap="warn" data-userid="{{item.user_id}}" data-commentid="{{item._id}}">
+                            <view class="lastbox" @tap="warn" data-userid="{{item.user_id}}" data-index="{{index}}" data-commentid="{{item._id}}">
                                 <image class="action-icon" src="../../images/discover/discover-actions.png"></image>
                             </view>
                         </view>
@@ -70,44 +68,32 @@
     <!--点击私密评论的input-->
     <view class="moment-mask" wx:if="{{isShowComment}}" @tap="closeComment">
         <view class="inputbox">
-            <input placeholder="发送私密评论，只有她能看到哦~" focus="{{isShowComment}}" class="inputview"
-            confirm-type="send" bindblur="closeComment"
-            bindconfirm="sendComment"
-            data-componentId="{{componentId}}"
-            data-componentIndex="{{componentIndex}}"
-            data-commentUser="{{commentUser}}"/>
+            <input placeholder="发送私密评论，只有她能看到哦~" focus="{{isShowComment}}" class="inputview" confirm-type="send" bindblur="closeComment" bindconfirm="sendComment" data-componentId="{{componentId}}" data-componentIndex="{{componentIndex}}" data-commentUser="{{commentUser}}" />
         </view>
     </view>
     <!--回复某个评论的input-->
     <view class="moment-mask" wx:if="{{isShowCommentReply}}" @tap="closeCommentCommentReply">
         <view class="inputbox">
-            <input placeholder="回复{{replyUserName}}" focus="{{isShowCommentReply}}" class="inputview"
-            confirm-type="send" bindblur="closeCommentCommentReply"
-            bindconfirm="sendReply"/>
+            <input placeholder="回复{{replyUserName}}" focus="{{isShowCommentReply}}" class="inputview" confirm-type="send" bindblur="closeCommentCommentReply" bindconfirm="sendReply" />
         </view>
     </view>
 
     <!--自己点击自己的评论-->
-    <van-popup    
-    class="warn-pop"
-    show="{{ showDelete }}"
-    position="bottom"
-    close-on-click-overlay="{{ true }}"
-    >
-    <view class="warn" @tap="deleteComment">删除</view>
-    <view class="warn" @tap="cancaleComment">取消</view>
+    <van-popup class="warn-pop" z-index="99999" show="{{ showDelete }}" position="bottom" bind:close="onClose">
+        <view class="warn" @tap="deleteComment">删除</view>
+        <view class="warn" @tap="cancaleComment">取消</view>
     </van-popup>
 
     <!--别人点击三个点 是举报加入黑名单等-->
-    <van-popup class="warn-pop" show="{{ show }}" position="bottom" close-on-click-overlay="{{ true }}">
+    <van-popup class="warn-pop" z-index="99999" show="{{ show }}" position="bottom" bind:close="onClose">
         <view class="warn">匿名举报</view>
         <view class="warn">加入黑名单</view>
         <view class="warn last" @tap="closewarn">取消</view>
     </van-popup>
 
     <!--自己点击三个点 删除动态和取消-->
-    <van-popup class="warn-pop" show="{{ showPointsByme }}" position="bottom" close-on-click-overlay="{{ true }}">
-        <view class="warn">删除动态</view>
+    <van-popup class="warn-pop" z-index="99999" show="{{ showPointsByme }}" position="bottom" bind:close="onClose">
+        <view class="warn" @tap="deleteMoment">删除动态</view>
         <view class="warn last" @tap="closeshowPointsByme">取消</view>
     </van-popup>
 </template>
@@ -115,6 +101,8 @@
 import wepy from 'wepy';
 import { get, post, del } from '../../utils/request';
 import { formatDateFromSeconds } from '../../utils/index';
+import { DELETE_MOMENT } from '@/utils/url';
+import { toast } from '@/utils';
 
 export default class momentCard extends wepy.component {
     data = {
@@ -127,26 +115,46 @@ export default class momentCard extends wepy.component {
         actionCommentIndex: '', // 删除的评论index
         actionItemIndex: '', // 删除评论的动态index
         isShowCommentReply: false, // 回复某一条动态
-        replyUserName: '', 
+        replyUserName: '',
         show: false, // 别人举报的pop
         showPointsByme: false, // 自己点击三个点，是删除动态
+        clickMomentId: '',
+        clickIndex: 0
     };
     components = {};
 
     methods = {
+        onClose() {
+            this.show = false;
+            this.showPointsByme = false;
+            this.$emit('showtab', true);
+        },
+        async deleteMoment() {
+            await del(DELETE_MOMENT,this.clickMomentId);
+            this.momentList.splice(this.clickIndex, 1);
+            toast('删除成功');
+            this.show = false;
+            this.showPointsByme = false;
+            this.$emit('showtab', true);
+            this.$apply();
+        },
         warn(e) {
             const me = wepy.getStorageSync('profile');
             const ownerId = me._id;
-            const { userid,  commentid } = e.currentTarget.dataset;
+            const { userid, commentid, index } = e.currentTarget.dataset;
             if (ownerId == userid) {
                 this.showPointsByme = true;
             } else {
                 this.show = true;
             }
+            this.$emit('showtab', false);
+            this.clickMomentId = commentid;
+            this.clickIndex = index;
+            console.log('2222');
         },
         // 点击图片预览
         preview(e) {
-            const { index, picindex } = e.currentTarget.dataset; 
+            const { index, picindex } = e.currentTarget.dataset;
             const urls = this.momentList.reduce((res, item, i) => {
                 if (+index === +i) {
                     res = item.images.map(x => x.image_url);
@@ -157,13 +165,13 @@ export default class momentCard extends wepy.component {
             console.log(urls, current);
             wepy.previewImage({
                 current, // 当前显示图片的http链接
-                urls, // 需要预览的图片http链接列表
+                urls // 需要预览的图片http链接列表
             });
         },
         // 处理接口的年龄字段
         handleAge(birthday) {
             const arr = birthday.split('-');
-            const time = new Date;
+            const time = new Date();
             const cur_year = time.getFullYear();
             const cur_month = time.getMonth();
             const cur_day = time.getDate();
@@ -183,18 +191,22 @@ export default class momentCard extends wepy.component {
         },
         // 点赞
         async zan(e) {
-            const { id, index } = e.currentTarget.dataset; 
+            const { id, index } = e.currentTarget.dataset;
             const me = wepy.getStorageSync('profile');
-            if (this.momentList[index].liked) { // 取消点赞
+            if (this.momentList[index].liked) {
+                // 取消点赞
                 await get(`/api/discover/moment/${id}/unlike`);
-                this.momentList[index].likes = this.momentList[index].likes.filter(x => x.user_id !== me._id);
+                this.momentList[index].likes = this.momentList[
+                    index
+                ].likes.filter(x => x.user_id !== me._id);
                 this.momentList[index].liked = false;
-            } else { // 点赞
-                const data =  await get(`/api/discover/moment/${id}/like`);
+            } else {
+                // 点赞
+                const data = await get(`/api/discover/moment/${id}/like`);
                 // this.momentList[index].likes.length += 1;
                 this.momentList[index].likes.push({
                     avatar: me.icon,
-                    user_id: me._id,
+                    user_id: me._id
                 });
                 this.momentList[index].liked = true;
             }
@@ -203,7 +215,7 @@ export default class momentCard extends wepy.component {
         // 私密评论
         comment(e) {
             this.isShowComment = true;
-            const { id, index, userid } = e.currentTarget.dataset; 
+            const { id, index, userid } = e.currentTarget.dataset;
             this.componentId = id; // 动态id
             this.componentIndex = index;
             this.commentUser = userid;
@@ -218,11 +230,14 @@ export default class momentCard extends wepy.component {
         },
         // 发送评论
         async sendComment(e) {
-            const { value } = e.detail; 
-            const data = await post(`/api/discover/comment/${this.componentId}`, {
-                moment_id: this.componentId,
-                content: value,
-            });
+            const { value } = e.detail;
+            const data = await post(
+                `/api/discover/comment/${this.componentId}`,
+                {
+                    moment_id: this.componentId,
+                    content: value
+                }
+            );
             const me = wepy.getStorageSync('profile');
             this.momentList[this.componentIndex].comments.push({
                 _id: data,
@@ -230,7 +245,7 @@ export default class momentCard extends wepy.component {
                 user_id: me._id,
                 replay_user_id: '',
                 replay_user_nick_name: '',
-                content: value,
+                content: value
             });
             this.$apply();
             console.log(data);
@@ -238,37 +253,44 @@ export default class momentCard extends wepy.component {
         // 发表回复某一条评论
         async sendReply(e) {
             const me = wepy.getStorageSync('profile');
-            const { value } = e.detail; 
-            const commentId = this.momentList[this.actionItemIndex].comments[this.actionCommentIndex]._id;
-            const { user_id, user_nick_name } = this.momentList[this.actionItemIndex].comments[this.actionCommentIndex];
-            const data = await post(`/api/discover/comment/${commentId}/reply`, {
-                content: value,
-            });
+            const { value } = e.detail;
+            const commentId = this.momentList[this.actionItemIndex].comments[
+                this.actionCommentIndex
+            ]._id;
+            const { user_id, user_nick_name } = this.momentList[
+                this.actionItemIndex
+            ].comments[this.actionCommentIndex];
+            const data = await post(
+                `/api/discover/comment/${commentId}/reply`,
+                {
+                    content: value
+                }
+            );
             this.momentList[this.actionItemIndex].comments.push({
                 content: value,
                 replay_user_id: user_id,
                 replay_user_nick_name: user_nick_name,
                 user_id: me._id,
                 user_nick_name: me.nick_name,
-                _id: data._id,
+                _id: data._id
             });
             this.$apply();
         },
         // 跳转到他的资料页面
         toProfile(id) {
             wepy.navigateTo({
-                url: `battle/profile?id=${id}`,
+                url: `battle/profile?id=${id}`
             });
         },
         // 跳转到动态详情页面
         toMomentDetail(id) {
             wepy.navigateTo({
-                url: `/pages/ta/momentDetail?momentId=${id}`,
+                url: `/pages/ta/momentDetail?momentId=${id}`
             });
         },
         // 点击某一条评论
         handleCommentAction(e) {
-            const { index, commentindex, username } = e.currentTarget.dataset; 
+            const { index, commentindex, username } = e.currentTarget.dataset;
             const comment = this.momentList[index].comments[commentindex];
             console.log('点击某一个评论', comment);
             const me = wepy.getStorageSync('profile');
@@ -288,21 +310,26 @@ export default class momentCard extends wepy.component {
         },
         // 确认删除评论
         async deleteComment() {
-            const comment = this.momentList[this.actionItemIndex].comments[this.actionCommentIndex];
+            const comment = this.momentList[this.actionItemIndex].comments[
+                this.actionCommentIndex
+            ];
             await del(`/api/discover/comment`, comment._id);
         },
         // 取消删除弹窗
         cancaleComment() {
+            this.$emit('showtab', true);
             this.showDelete = false;
         },
         // 关闭举报等的pop
         closewarn() {
             this.show = false;
+            this.$emit('showtab', true);
         },
         // 关闭自己点击三个点的pop
         closeshowPointsByme() {
             this.showPointsByme = false;
-        },
+            this.$emit('showtab',true);
+        }
     };
     setMomentList(list) {
         console.log(list);
@@ -317,142 +344,142 @@ export default class momentCard extends wepy.component {
             return res;
         }, []);
         this.$apply();
-    };
+    }
     events = {};
 
     watch = {};
 
     computed = {};
 
-    onLoad() { };
+    onLoad() {}
 
-    onShow() { };
+    onShow() {}
 }
 </script>
 
 <style lang='less' scoped>
-.moment-mask{
+.moment-mask {
     position: fixed;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,.7);
+    background: rgba(0, 0, 0, 0.7);
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 1000;
-    .inputbox{
+    .inputbox {
         position: absolute;
         bottom: 15vh;
         height: 147rpx;
         width: 100%;
         background: white;
-        .inputview{
+        .inputview {
             width: 92%;
             margin: 32rpx auto;
-            background:rgba(230,229,232,1);
+            background: rgba(230, 229, 232, 1);
             height: 82rpx;
             line-height: 82rpx;
-            font-size:24rpx;
-            color:rgba(158,157,157,1);
+            font-size: 24rpx;
+            color: rgba(158, 157, 157, 1);
             padding-left: 22rpx;
         }
     }
 }
-.momentCard{
+.momentCard {
     display: flex;
     padding: 0 26rpx;
     margin-top: 47rpx;
-    .header{
+    .header {
         width: 100rpx;
         height: 100rpx;
         border-radius: 100%;
         display: block;
         margin-right: 16rpx;
     }
-    .content{
+    .content {
         flex: 1;
-        .info{
-            .first{
+        .info {
+            .first {
                 display: flex;
                 justify-content: space-between;
                 width: 100%;
                 line-height: 55rpx;
-                .name{
-                    font-size:32rpx;
-                    font-weight:600;
-                    color:rgba(0,0,0,1);
+                .name {
+                    font-size: 32rpx;
+                    font-weight: 600;
+                    color: rgba(0, 0, 0, 1);
                 }
-                .other{
-                    font-size:20rpx;
-                    font-weight:400;
-                    color:rgba(158,157,157,1);
-                    .location{
+                .other {
+                    font-size: 20rpx;
+                    font-weight: 400;
+                    color: rgba(158, 157, 157, 1);
+                    .location {
                         margin-right: 18rpx;
                     }
                 }
             }
-            .second{
-                font-size:20rpx;
-                font-weight:400;
-                line-height:28rpx;
-                color:rgba(158,157,157,1);
-                .margin-right{
+            .second {
+                font-size: 20rpx;
+                font-weight: 400;
+                line-height: 28rpx;
+                color: rgba(158, 157, 157, 1);
+                .margin-right {
                     margin-right: 20rpx;
                 }
             }
-            .moment{
+            .moment {
                 margin-top: 40rpx;
-                font-size:24rpx;
-                line-height:36rpx;
-                color:rgba(0,0,0,1);
+                font-size: 24rpx;
+                line-height: 36rpx;
+                color: rgba(0, 0, 0, 1);
             }
-            .imgs{
+            .imgs {
                 display: flex;
                 flex-wrap: wrap;
                 align-content: flex-start;
                 margin-top: 30rpx;
-                .img{
+                .img {
                     width: 182rpx;
                     height: 182rpx;
                     margin: 10rpx 10rpx 0 0;
                 }
             }
-            .actions{
+            .actions {
                 display: flex;
                 margin-top: 30rpx;
                 font-size: 0;
-                .box{
-                    background:rgba(245,245,245,1);
+                .box {
+                    background: rgba(245, 245, 245, 1);
                     padding: 0 20rpx;
                     margin-right: 40rpx;
                     height: 45rpx;
-                    .icon{
+                    .icon {
                         width: 24rpx;
                         height: 22rpx;
                     }
-                    .text{
-                        font-size:24rpx;
+                    .text {
+                        font-size: 24rpx;
                         height: 45rpx;
                         line-height: 45rpx;
-                        color:rgba(158,157,157,1);
+                        color: rgba(158, 157, 157, 1);
                         display: inline-block;
                         margin-left: 5rpx;
                     }
-                    .red{
-                        color: #E60011;
+                    .red {
+                        color: #e60011;
                     }
                 }
-                .last{
+                .last {
                     flex: 1;
                     text-align: right;
                     display: flex;
                     flex-direction: column;
-                    .lastbox{
+                    .lastbox {
                         width: 66rpx;
                         height: 45rpx;
                         align-self: flex-end;
-                        .action-icon{
+                        .action-icon {
                             width: 37rpx;
                             height: 9rpx;
                             margin: 18rpx 0;
@@ -462,39 +489,40 @@ export default class momentCard extends wepy.component {
             }
         }
     }
-    .comment-box{
-        background:rgba(245,245,245,1);
+    .comment-box {
+        background: rgba(245, 245, 245, 1);
         margin-top: 30rpx;
-        .comment-who{
+        .comment-who {
             display: flex;
             flex-wrap: wrap;
-            border-bottom: 1px solid rgba(212,212,213,1);
+            border-bottom: 1px solid rgba(212, 212, 213, 1);
             padding-bottom: 23rpx;
-            .icon{
+            .icon {
                 width: 24rpx;
                 height: 21rpx;
                 margin: 44rpx 11rpx 21rpx 30rpx;
             }
-            .img{
+            .img {
                 width: 60rpx;
                 height: 60rpx;
                 border-radius: 100%;
                 margin: 23rpx 10rpx 0 10rpx;
             }
         }
-        .comment-info-box{
+        .comment-info-box {
             padding: 19rpx 0;
-            .comment-info{
+            .comment-info {
                 margin: 5rpx 30rpx;
-                font-size:24rpx;
-                view{
+                font-size: 24rpx;
+                view {
                     display: inline-block;
                 }
-                .from, .to{
-                    color:rgba(230,0,17,1);
+                .from,
+                .to {
+                    color: rgba(230, 0, 17, 1);
                     font-weight: 600;
                 }
-                .reply{
+                .reply {
                     margin: 0 5rpx;
                 }
             }

@@ -18,7 +18,7 @@
                                 <view class="bottom">在全国颜值排名前{{item.face*100}}%</view>
                             </view>
                             <view class="right-container">
-                                <image class="like-icon" src="../../images/profile/friend.png" mode="aspectFill"></image>
+                                <image class="like-icon" src="../../images/profile/{{item.be}}.png" mode="aspectFill"></image>
                             </view>
                         </view>
                     </view>
@@ -225,6 +225,7 @@ export default class Chat extends wepy.page {
                         age: getAge(that.user.birthday),
                         face: that.user.face,
                         isSend: false,
+                        be:that.user.be,
                         sendTime: formatDateFromSeconds(
                             parseInt(new Date().getTime() / 1000)
                         ),

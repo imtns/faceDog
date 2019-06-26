@@ -31,3 +31,5 @@ export const RANK_LIST = '/api/face/list';
 export const USER_SETTING = '/api/user/settings';
 // 获取用户喜欢次数
 export const USER_LIKE_TIME = '/api/user/unread';
+// 删除动态
+export const DELETE_MOMENT = '/api/discover/moments';
