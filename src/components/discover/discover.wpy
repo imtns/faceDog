@@ -3,7 +3,7 @@
     <scroll-view scroll-y class='discover' bindscrolltolower="pageTuring">
         <topBanner></topBanner>
         <view class="content-search">
-            <van-tabs class="tabs">
+            <van-tabs class="tabs" bind:change="onChange" v-model="activeIndex">
                 <van-tab title="全部"></van-tab>
                 <van-tab title="同城"></van-tab>
             </van-tabs>
@@ -21,9 +21,9 @@
     </scroll-view>
     <!--筛选的弹窗-->
     <van-popup class="warn-pop" show="{{ showGender }}" position="bottom" close-on-click-overlay="{{ true }}">
-        <view class="warn">全部</view>
-        <view class="warn">只看同性</view>
-        <view class="warn">只看异性</view>
+        <view class="warn" @tap="genderBy('')">全部</view>
+        <view class="warn" @tap="genderBy('same')">只看同性</view>
+        <view class="warn" @tap="genderBy('not')">只看异性</view>
         <view class="warn last" @tap="closeshowGender">取消</view>
     </van-popup>
 </template>
@@ -44,7 +44,7 @@ export default class Discover extends wepy.component {
         momentList: [],
         page: 1,
         same_city: 0,
-        opposite: 'same'
+        opposite: '',
     };
 
     components = {
@@ -59,7 +59,51 @@ export default class Discover extends wepy.component {
     watch = {};
 
     computed = {};
+
+    onChange(event) {
+        console.log('event.detail.index', event.detail.index);
+        const { index } = event.detail;
+        if (+index === 0) {
+            this.same_city = 0;
+            this.methods.initList.call(this, {
+                page: 1,
+                same_city: 0,
+            });
+        } else if (+index === 1) {
+            this.same_city = 1;
+            this.methods.initList.call(this, {
+                page: 1,
+                same_city: 1,
+            });
+        }
+        this.$apply();
+    }
+    
     methods = {
+        genderBy(opposite) {
+            const same_city = this.same_city;
+            this.methods.initList.call(this, {
+                page: 1,
+                same_city,
+                opposite,
+            });
+            this.showGender = false;
+        },
+        onChange(event) {
+            console.log('event.detail.index', event.detail.index);
+            const { index } = event.detail;
+            if (+index === 0) {
+                this.methods.initList.call(this, {
+                    page: 1,
+                    same_city: 0,
+                });
+            } else if (+index === 1) {
+                this.methods.initList.call(this, {
+                    page: 1,
+                    same_city: 1,
+                });
+            }
+        },
         closeshowGender() {
             this.showGender = false;
         },
@@ -71,7 +115,7 @@ export default class Discover extends wepy.component {
                 url: 'fabu/fabu'
             });
         },
-        async initList({ page = 1, same_city = 0, opposite = 'same' }) {
+        async initList({ page = 1, same_city = 0, opposite = '' }) {
             if (nomore) return;
             // 请求动态列表
             // todo，全国和同城这个接口还没有弄好
@@ -84,6 +128,8 @@ export default class Discover extends wepy.component {
             }
             const List = await get(DISCOVER_MOMENT_LIST, {
                 page,
+                same_city,
+                opposite,
             });
             if (!List.length) {
                 nomore = true;
