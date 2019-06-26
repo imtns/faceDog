@@ -3,19 +3,19 @@
     <view class='wrapper'>
         <view class="top">
             <view class="sec">
-                <image class="icon" src="../../images/my/hand.png" mode="aspectFill"></image>
+                <image class="icon" src="../../images/my/friend.png" mode="aspectFill"></image>
                 <view class="title">成为朋友</view>
-                <view class="word">剩余32次</view>
+                <view class="word">剩余{{time.friend}}次</view>
             </view>
             <view class="sec">
-                <image class="icon" src="../../images/my/hand.png" mode="aspectFill"></image>
-                <view class="title">成为朋友</view>
-                <view class="word">剩余32次</view>
+                <image class="icon" src="../../images/my/lover.png" mode="aspectFill"></image>
+                <view class="title">想成为恋人</view>
+                <view class="word">剩余{{time.lover}}次</view>
             </view>
             <view class="sec">
-                <image class="icon" src="../../images/my/hand.png" mode="aspectFill"></image>
-                <view class="title">成为朋友</view>
-                <view class="word">剩余32次</view>
+                <image class="icon" src="../../images/my/close.png" mode="aspectFill"></image>
+                <view class="title">想亲密接触</view>
+                <view class="word">剩余{{time.close}}次</view>
             </view>
         </view>
         <view class="line"></view>
@@ -31,12 +31,16 @@
 
 <script>
 import wepy from 'wepy';
+import { MAKEFRIEND } from '@/utils/url';
+import { get } from '@/utils/request';
 export default class MyTime extends wepy.page {
     config = {
         navigationBarTitleText: '我的次数'
     };
 
-    data = {};
+    data = {
+        time: {}
+    };
 
     components = {};
 
@@ -48,7 +52,10 @@ export default class MyTime extends wepy.page {
 
     computed = {};
 
-    onLoad() {}
+    async onLoad() {
+        this.time = await get(MAKEFRIEND);
+        this.$apply();
+    }
 
     onShow() {}
 }
@@ -94,8 +101,8 @@ export default class MyTime extends wepy.page {
     }
     .desc {
         width: 100%;
-        display:block;
-        margin:0 74rpx;
+        display: block;
+        margin: 0 74rpx;
 
         .d {
             font-size: 28rpx;

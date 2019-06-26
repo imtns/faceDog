@@ -29,6 +29,7 @@ import chooseVerify from '@/components/register/chooseVerify';
 import uploadVideo from '@/components/register/uploadVideo';
 import { post } from '@/utils/request';
 import { LOGIN } from '@/utils/url';
+
 export default class Register extends wepy.page {
     config = {
         navigationBarTitleText: '颜狗',
@@ -38,7 +39,8 @@ export default class Register extends wepy.page {
             'van-cell-group': '../components/vant/cell-group/index',
             'van-field': '../components/vant/field/index',
             'van-datetime-picker': '../components/vant/datetime-picker/index',
-            'van-action-sheet': '../components/vant/action-sheet/index'
+            'van-action-sheet': '../components/vant/action-sheet/index',
+            "van-toast": "../components/vant/toast/index"
         }
     };
 
@@ -92,7 +94,7 @@ export default class Register extends wepy.page {
         wepy.setStorageSync('tencent_token', result.tencent_token);
         wepy.setStorageSync('identifier', result.identifier);
         if (result.welcome) {
-            this.step = 5;
+            this.step = 2;
             this.$apply();
         } else {
             wx.redirectTo({

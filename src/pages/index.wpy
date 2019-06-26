@@ -11,7 +11,9 @@
     <view wx:if="{{selectedTab === 3}}">
         <my />
     </view>
-    <tabbar :tabIndex.sync="selectedTab" />
+    <block wx:if="{{tabbarshow}}">
+        <tabbar :tabIndex.sync="selectedTab" />
+    </block>
 </template>
 
 <script>
@@ -58,7 +60,8 @@ export default class Index extends wepy.page {
         userInfo: {
             nickName: '加载中...'
         },
-        selectedTab: 0
+        selectedTab: 0,
+        tabbarshow: true
     };
     computed = {
         now() {
@@ -127,13 +130,18 @@ export default class Index extends wepy.page {
         },
         unreadSet(num) {
             this.$invoke('tabbar', 'unreadSet', num);
+        },
+        showtab(status) {
+            this.tabbarshow = status;
+            console.log('44444');
+            this.$apply();
         }
     };
     onLoad() {
         //  this.$invoke('chat', 'initChat');
         this.$invoke('discover', 'initList');
         Event.listen('refresh', () => {
-            this.$invoke('discover', 'initList',{page:1});
+            this.$invoke('discover', 'initList', { page: 1 });
         });
     }
 

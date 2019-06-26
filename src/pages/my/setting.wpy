@@ -69,9 +69,8 @@ export default class Setting extends wepy.page {
             console.log(name);
             // 需要手动对 checked 状态进行更新
             this[name] = detail;
-            await put(USER_SETTING,{
-                [name]:detail
-            })
+            this.$apply();
+            await put(USER_SETTING,this.data)
         },
         logout() {
             console.log('out');
