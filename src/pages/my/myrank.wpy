@@ -1,15 +1,19 @@
 <!--  -->
 <template>
     <view class='wrapper'>
-        <view class="title">你的颜值在北京市超过<text>90%</text></view>
-        <view class="title">你的帅气超过了<text>99%</text>天秤座</view>
-        <view class="bar">“除了帅气，你一无所有”</view>
-        <view class="boxes">
-            <view class="box1">
-                <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                <view class="info">
-                    <view class="word">胜率 \ <text> 70%</text></view>
-                    <view class="word">出场率 \ <text> 65%</text></view>
+        <view class="header">
+            <view class="title">你的颜值在北京市超过<text>90%</text></view>
+            <view class="title">你的帅气超过了<text>99%</text>天秤座</view>
+            <view class="bar">“除了帅气，你一无所有”</view>
+        </view>
+        <view class="w">
+            <view class="boxes">
+                <view class="box1">
+                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <view class="info">
+                        <view class="word">胜 率 \ <text> 70%</text></view>
+                        <view class="word">出场率 \ <text> 65%</text></view>
+                    </view>
                 </view>
                 <view class="box2"><canvas canvas-id="radarCanvas" class="canvas"></canvas><canvas canvas-id="radarCanvas" class="canvas"></canvas></view>
                 <view class="box3">
@@ -50,6 +54,7 @@ export default class Example extends wepy.page {
         usingComponents: {
             drawimage: './miniprogram_npm/miniprogram-drawimage/index',
         },
+        navigationBarTextStyle: 'white'
     };
 
     data = {
