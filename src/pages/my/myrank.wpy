@@ -223,10 +223,13 @@ export default class Example extends wepy.page {
         this.layers.push({
             type: 'image', //  我的头像1
             imageResource: this.headImg1,
+            cut:true,
+            sHeight:550,
+            sWidth:550,
             dx: 79,
-            dy: 513,
-            dWidth: 310,
-            dHeight: 310
+            dy: 113,
+            dWidth: 150,
+            dHeight: 155
         });
         this.layers.push({
             type: 'image', //  我的头像1

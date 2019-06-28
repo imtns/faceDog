@@ -1,13 +1,13 @@
 const {
     windowWidth,
-    pixelRatio,
+    pixelRatio
 } = wx.getSystemInfoSync();
 
 const px = (n) => {
     if (typeof n === 'undefined') return void 0;
     if (!n) return 0;
     return parseInt(n, 10) / 750 * windowWidth;
-}
+};
 
 /**
     shape Radial/Linear
@@ -56,7 +56,7 @@ const roundRect = (ctx, px, py, width, height, radius, lineWidth) => {
     ctx.lineTo(x, y + r);
     ctx.arc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
     ctx.clip();
-}
+};
 
 const formatBorder = (border) => {
     if (!border) return [0, 'rgba(0,0,0,0)'];
@@ -64,7 +64,7 @@ const formatBorder = (border) => {
     borderArr[0] = px(borderArr[0]);
     if (!borderArr[1]) borderArr[1] = 'rgba(0,0,0,0)';
     return borderArr;
-}
+};
 
 const formatPadding = (padding) => {
     let paddingArr = [];
@@ -75,7 +75,7 @@ const formatPadding = (padding) => {
         paddingArr = padding.split(' ').map(p => px(p));
     }
     return paddingArr;
-}
+};
 
 const formatText = (ctx, text, pxMW, pxLH) => {
     const textArr = [];
@@ -99,13 +99,13 @@ const formatText = (ctx, text, pxMW, pxLH) => {
     const textWidth = textArr.length > 1 ? pxMW : ctx.measureText(text).width;
     const textHeight = textArr.length * pxLH;
     return {textArr, textWidth, textHeight};
-}
+};
 
 function drawed() {
     const {
         width,
         height,
-        fileType,
+        fileType
     } = this.data;
 
     const self = this;
@@ -118,7 +118,7 @@ function drawed() {
         fileType,
         success(res) {
             self.setData({
-                imageUrl: res.tempFilePath,
+                imageUrl: res.tempFilePath
             });
             self.triggerEvent('toTempFile', res);
         }
@@ -129,28 +129,28 @@ Component({
     properties: {
         width: {
             type: Number,
-            value: 750,
+            value: 750
         },
         height: {
             type: Number,
-            value: 500,
+            value: 500
         },
         layers: {
             type: Array,
-            value: [],
+            value: []
         },
         background: {
             type: Object,
-            value: null,
+            value: null
         },
         fileType: {
             type: String,
-            value: 'png',
-        },
+            value: 'png'
+        }
     },
 
     data: {
-        imageUrl: null,
+        imageUrl: null
     },
 
     attached() {
@@ -158,7 +158,7 @@ Component({
             background,
             layers,
             width,
-            height,
+            height
         } = this.data;
         console.log(background, layers, width, height);
         const ctx = wx.createCanvasContext('draw-canvas', this);
@@ -204,7 +204,7 @@ Component({
                     padding = 0,
                     bgColor = null,
                     maxLine = 0,
-                    bold = false,
+                    bold = false
                 } = layer;
                 const pxx = px(x);
                 const pxy = px(y);
@@ -215,7 +215,7 @@ Component({
                 if (bold) {
                     ctx.font = 'normal bold 20px/30px PingFangSC-Regular';
                 } else {
-                    ctx.font = 'normal normal 20px/30px PingFangSC-Regular'
+                    ctx.font = 'normal normal 20px/30px PingFangSC-Regular';
                 }
                 ctx.setFontSize(pxFS);
 
@@ -299,13 +299,17 @@ Component({
                     radius = 0,
                     dWidth = width,
                     dHeight = height,
+                    sWidth,
+                    sHeight,
+                    cut,
                     border
                 } = layer;
                 const [pxbw, bc] = formatBorder(border);
                 const [pxdx, pxdy, pxdWidth, pxdHeight, pxdRadius] =
                     [px(dx), px(dy), px(dWidth), px(dHeight), px(radius)];
-
-                if (radius) {
+                if (cut) {
+                    ctx.drawImage(imageResource, 0, 0, sWidth, sHeight, dx, dy, dWidth, dHeight);
+                } else if (radius) {
                     ctx.save();
                     ctx.setStrokeStyle(bc);
                     roundRect(ctx, pxdx, pxdy, pxdWidth, pxdHeight, pxdRadius, pxbw);
@@ -321,11 +325,11 @@ Component({
         });
 
         setTimeout(() => {
-            drawed.call(this)
-        },1000);
+            drawed.call(this);
+        }, 1000);
 
         setTimeout(() => {
-            drawed.call(this)
-        },1000);
+            drawed.call(this);
+        }, 1000);
     }
 });
