@@ -29,15 +29,15 @@
             </view>
         </view>
         <view class="line"></view>
-        <view class="item">
+        <!-- <view class="item">
             <view class="title">修改密码</view>
             <view class="detail2">
                 <van-icon name="arrow" />
             </view>
         </view>
-        <view class="line"></view>
+        <view class="line"></view> -->
     </view>
-    <view class="logout" @tap="logout">退出登录</view>
+    <!-- <view class="logout" @tap="logout">退出登录</view> -->
 </template>
 
 <script>
@@ -70,7 +70,7 @@ export default class Setting extends wepy.page {
             // 需要手动对 checked 状态进行更新
             this[name] = detail;
             this.$apply();
-            await put(USER_SETTING,this.data)
+            await put(USER_SETTING, this.data);
         },
         logout() {
             console.log('out');
@@ -85,9 +85,7 @@ export default class Setting extends wepy.page {
 
     async onLoad() {
         const result = await get(USER_SETTING);
-        this.city = result.in_city;
-        this.gender = result.opposite_sex;
-        this.battle = result.no_battle;
+        Object.assign(this, result);
         this.$apply();
     }
 

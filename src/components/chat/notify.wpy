@@ -4,60 +4,67 @@
         <empty></empty>
     </block>
     <view class='wrapper' wx:else>
-        <view class="notify-box">
-            <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
-            <view class="msg">
-                <view class="name">小橘子</view>
-                <view class="content">5-30 18:20</view>
-                <view class="delete">删除</view>
+        <repeat for="{{list}}" key="index" index="index" item="item">
+            <view class="notify-box">
+                <image class="icon" src="{{item.avatar}}" mode="aspectFill"></image>
+                <view class="msg">
+                    <view class="name">{{item.nick_name}} {{type[item.type]}} 你的动态</view>
+                    <view class="content">{{item.create_time}}</view>
+                    <view class="delete" @tap="read({{item._id}},{{item.type}},{{index}})">删除</view>
+                </view>
+                <view class="right-part">
+                    <image class="thumb" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                </view>
+                <view class="line"></view>
             </view>
-            <view class="right-part">
-                <image class="thumb" src="../../images/profile/model.jpg" mode="aspectFill"></image>
-            </view>
-            <view class="line"></view>
-        </view>
-        <view class="notify-box">
-            <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
-            <view class="msg">
-                <view class="name">小橘子</view>
-                <view class="content">5-30 18:20</view>
-                <view class="delete">删除</view>
-            </view>
-            <view class="right-part">
-                <image class="thumb" src="../../images/profile/model.jpg" mode="aspectFill"></image>
-            </view>
-            <view class="line"></view>
-        </view>
-        <view class="notify-box">
-            <image class="icon" src="../../images/profile/model.jpg" mode="aspectFill"></image>
-            <view class="msg">
-                <view class="name">小橘子</view>
-                <view class="content">5-30 18:20</view>
-                <view class="delete">删除</view>
-            </view>
-            <view class="right-part">
-                <image class="thumb" src="../../images/profile/model.jpg" mode="aspectFill"></image>
-            </view>
-            <view class="line"></view>
-        </view>
+        </repeat>
+
     </view>
 </template>
 
 <script>
 import wepy from 'wepy';
 import empty from '@/components/empty';
+import { dialog, toast } from '@/utils';
+import { get, post } from '@/utils/request';
+import { USER_MSG_UNREAD } from '@/utils/url';
+import Toast from '@/components/vant/toast/toast';
 export default class Notify extends wepy.component {
     props = {};
 
     data = {
-        list:[]
+        list: [],
+        type: {
+            comment: '评论',
+            like: '喜欢',
+            reply: '回复'
+        }
     };
 
     components = {
         empty
     };
 
-    methods = {};
+    methods = {
+        async initData() {
+            const result = await get(USER_MSG_UNREAD);
+            this.list = result;
+            this.$apply();
+        },
+        async read(id, type, index) {
+            try {
+                await post(USER_MSG_UNREAD, {
+                    id,
+                    unread_type: type
+                });
+                this.list.splice(index, 1);
+                Toast('删除成功');
+                this.$apply();
+            } catch (e) {
+
+            }
+        }
+    };
 
     events = {};
 
@@ -81,8 +88,8 @@ export default class Notify extends wepy.component {
         align-items: center;
         padding: 40rpx 30rpx 40rpx 30rpx;
         position: relative;
-        &:nth-child(1){
-            padding-top:0;
+        &:nth-child(1) {
+            padding-top: 0;
         }
         .line {
             width: 564rpx;

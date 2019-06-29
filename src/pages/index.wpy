@@ -14,6 +14,7 @@
     <block wx:if="{{tabbarshow}}">
         <tabbar :tabIndex.sync="selectedTab" />
     </block>
+    <van-toast id="van-toast" />
 </template>
 
 <script>
@@ -32,7 +33,7 @@ import { Event } from '@/utils/event.js';
 // import { toast } from '@/utils';
 export default class Index extends wepy.page {
     config = {
-        navigationBarTitleText: '颜狗',
+        navigationBarTitleText: '颜狗FaceDog',
         disableScroll: true,
         usingComponents: {
             'van-button': '../components/vant/button/index',
@@ -44,7 +45,8 @@ export default class Index extends wepy.page {
             'van-tab': '../components/vant/tab/index',
             'van-popup': '../components/vant/popup/index',
             'van-overlay': '../components/vant/overlay/index',
-            'van-swipe-cell': '../components/vant/swipe-cell/index'
+            'van-swipe-cell': '../components/vant/swipe-cell/index',
+            'van-toast': '../components/vant/toast/index'
         }
     };
     components = {
@@ -77,9 +79,7 @@ export default class Index extends wepy.page {
         counterEmit(...args) {
             let $event = args[args.length - 1];
             console.log(
-                `${this.$name} receive ${$event.name} from ${
-                    $event.source.$name
-                }`
+                `${this.$name} receive ${$event.name} from ${$event.source.$name}`
             );
         }
     };
@@ -126,6 +126,7 @@ export default class Index extends wepy.page {
                 // this.$invoke('my', 'setProfile');
             } else if (this.selectedTab == 1) {
                 // this.$invoke('discover', 'initList');
+                this.$invoke('discover', 'initList');
             }
         },
         unreadSet(num) {
@@ -133,13 +134,12 @@ export default class Index extends wepy.page {
         },
         showtab(status) {
             this.tabbarshow = status;
-            console.log('44444');
             this.$apply();
         }
     };
     onLoad() {
         //  this.$invoke('chat', 'initChat');
-        this.$invoke('discover', 'initList');
+
         Event.listen('refresh', () => {
             this.$invoke('discover', 'initList', { page: 1 });
         });
@@ -148,6 +148,9 @@ export default class Index extends wepy.page {
     onShow() {
         this.setProfile();
         this.$invoke('chat', 'initChat');
+        if (this.selectedTab === 1) {
+            // this.$invoke('chat', 'initChat');
+        }
     }
 }
 </script>

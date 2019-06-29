@@ -5,13 +5,18 @@
     </block>
     <view wx:else class='wrapper'>
         <repeat for="{{list}}" key="index" index="index" item="item">
-            <van-swipe-cell id="{{item.To_Account}}" data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
-                <view class="chat-box" @tap="onClick({{item.To_Account}},{{item.C2cNick}},{{item.C2cImage}},{{item.C2cNick}})">
-                    <image class="icon" src="{{item.C2cImage}}" mode="aspectFill"></image>
-                    <view class="msg">
+            <van-swipe-cell class="swipe" id="{{item.To_Account}}" async-close data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
+                <view class="chat-box" >
+                    <image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" src="{{item.C2cImage}}" mode="aspectFill"></image>
+                    <view class="msg" @tap.capture.stop="onClick({{item.To_Account}},{{item.C2cNick}},{{item.C2cImage}},{{item.C2cNick}})">
                         <view class="name">{{item.C2cNick}}</view>
                         <view class="content">{{item.MsgShow}}</view>
                     </view>
+                     <!-- <image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" slot="left" src="{{item.C2cImage}}" mode="aspectFill"></image>
+                    <view class="msg">
+                        <view class="name">{{item.C2cNick}}</view>
+                        <view class="content">{{item.MsgShow}}</view>
+                    </view> -->
                     <view class="right-part">
                         <view class="time">{{item.showTime}}</view>
                         <view class="unread" wx:if="{{item.UnreadMsgCount>0}}">{{item.UnreadMsgCount}}</view>
@@ -28,7 +33,7 @@
 import wepy from 'wepy';
 import { formatDateFromSeconds } from '@/utils';
 import webimhandler from '@/utils/handler';
-import webim from '@/utils/webim.js'; //腾讯云im包
+import webim from '@/utils/webim.js'; // 腾讯云im包
 import empty from '@/components/empty';
 var unread = 0;
 export default class Chatlist extends wepy.component {
@@ -43,6 +48,16 @@ export default class Chatlist extends wepy.component {
         empty
     };
     methods = {
+        goProfile(id) {
+            wx.navigateTo({
+                url: 'battle/profile?dentifier=' + id,
+                success: (result) => {
+
+                },
+                fail: () => {},
+                complete: () => {}
+            });
+        },
         async getChatList(data) {
             data.forEach(item => {
                 item.C2cNick = decodeURIComponent(item.C2cNick);
@@ -59,14 +74,14 @@ export default class Chatlist extends wepy.component {
             var sess = null;
             unread = 0;
 
-            console.error('msg',msg);
+            console.error('msg', msg);
             for (var i in sessMap) {
                 sess = sessMap[i];
-                console.error('sess',sess);
+                console.error('sess', sess);
                 var isnew = true;
                 this.list.forEach(item => {
-                    if(item.To_Account == sess.id()){
-                        isnew = false
+                    if (item.To_Account == sess.id()) {
+                        isnew = false;
                     }
                 });
                 console.error('isnew', isnew);
@@ -103,7 +118,6 @@ export default class Chatlist extends wepy.component {
                         }
                     );
                 } else {
-
                     this.list.forEach(item => {
                         if (item.To_Account == sess.id()) {
                             item.UnreadMsgCount = sess.unread();
@@ -112,7 +126,7 @@ export default class Chatlist extends wepy.component {
                             item.To_Account == sess.id() &&
                             Object.keys(msg).length !== 0
                         ) {
-                            console.error('hahaha')
+                            console.error('hahaha');
                             item.MsgShow = decodeURIComponent(
                                 msg.elems[0].content.text
                             );
@@ -143,28 +157,30 @@ export default class Chatlist extends wepy.component {
             });
         },
         onDelete(event) {
+            console.error(event.detail);
             const { position, instance } = event.detail;
             switch (position) {
-                case 'left':
-                case 'cell':
-                    instance.close();
-                    break;
-                case 'right':
-                    console.log(instance);
-                    instance.close();
-                    var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
-                    var skey = 'C2C' + instance.id; // 拼装 skey
-                    var selSess = sessMap[skey]; // 获取 Session 的实例
-                    webim.setAutoRead(selSess, true, false);
-                    setTimeout(() => {
-                        webim.setAutoRead(selSess, false, false);
-                    }, 2000);
-                    webimhandler.delChat(instance.id);
-                    this.list.splice(instance.dataset.index, 1);
-                    unread = unread - instance.dataset.unread;
-                    this.$emit('unreadSet', unread);
-                    this.$apply();
-                    break;
+            case 'left':
+            case 'cell':
+                instance.close();
+                event.preventDefault();
+                break;
+            case 'right':
+                console.log(this);
+                instance.close();
+                // var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
+                // var skey = 'C2C' + instance.id; // 拼装 skey
+                // var selSess = sessMap[skey]; // 获取 Session 的实例
+                // webim.setAutoRead(selSess, true, false);
+                // setTimeout(() => {
+                //     webim.setAutoRead(selSess, false, false);
+                // }, 2000);
+                // webimhandler.delChat(instance.id);
+                this.list.splice(instance.dataset.index, 1);
+                // unread = unread - instance.dataset.unread;
+                // this.$emit('unreadSet', unread);
+                this.$apply();
+                break;
             }
         }
     };
@@ -175,7 +191,9 @@ export default class Chatlist extends wepy.component {
 
     computed = {};
 
-    onLoad() {}
+    onLoad() {
+
+    }
 
     onShow() {}
 }

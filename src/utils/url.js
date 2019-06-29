@@ -33,3 +33,5 @@ export const USER_SETTING = '/api/user/settings';
 export const USER_LIKE_TIME = '/api/user/unread';
 // 删除动态
 export const DELETE_MOMENT = '/api/discover/moments';
+// 获取系统消息
+export const USER_MSG_UNREAD = '/api/user/unread';

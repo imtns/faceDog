@@ -63,7 +63,7 @@ export default class Chat extends wepy.component {
             } else if (index == 3) {
                 this.$invoke('friends', 'getList');
             } else if (index == 4) {
-                // this.$invoke('notify', 'initData');
+                this.$invoke('notify', 'initData');
             }
         },
         initChat() {

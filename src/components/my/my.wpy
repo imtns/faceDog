@@ -2,7 +2,7 @@
 <template>
     <view class="wrapper">
         <view class="head">
-            <view class="headIcon">
+            <view class="headIcon" @tap="goProfile">
                 <image src="{{profile.icon}}" style="width:172rpx;height:172rpx;"></image>
             </view>
             <view class="box">
@@ -78,11 +78,21 @@ export default class My extends wepy.component {
     components = {};
 
     methods = {
+        goProfile() {
+            wx.navigateTo({
+                url: 'battle/profile?id=' + this.profile._id,
+                success: (result) => {
+
+                },
+                fail: () => {},
+                complete: () => {}
+            });
+        },
         redirect(name) {
             // 跳转到我的动态页面需要带参数
             if (name === 'mymoment') {
                 wepy.navigateTo({
-                    url: `/pages/my/mymoment?id=${this.profile._id}`,
+                    url: `/pages/my/mymoment?id=${this.profile._id}`
                 });
             }
             wepy.navigateTo({ url: `my/${name}` });

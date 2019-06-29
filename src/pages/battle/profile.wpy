@@ -11,11 +11,11 @@
         <view class="battle-profile-wrapper">
             <view class="battle-profile-left flex">
                 <view class="name">{{profile.nick_name}}</view>
-                <view class="info">{{profile.gender =='female'?'女':'男'}}/{{profile.age}}岁/{{profile.constellation}}</view>
-                <view class="distance"><text>{{profile.distance}}km</text> {{profile.city}}</view>
+                <view class="info">{{profile.gender =='female'?'女':'男'}} / {{profile.age}} / {{profile.constellation}}</view>
+                <view class="distance"><text>{{profile.distance}} km</text><text>  {{profile.city}}</text></view>
             </view>
             <view class="battle-profile-right flex">
-                <view class="face-rank">她在<text>{{profile.city}}</text> 颜值排行<text>{{profile.face * 100}}%</text></view>
+                <view class="face-rank">她在<text> {{profile.city}} </text> 颜值排行 <text> {{profile.face * 100}}%</text></view>
                 <view class="profile-tags">
                     <view class="tag red">Top100</view>
                     <view class="tag green">颜值杀手</view>
@@ -23,12 +23,12 @@
                 </view>
             </view>
             <view class="battle-profile-signature" wx:if="{{profile.signature}}">
-                个性签名: {{profile.signature}}
+                个性签名：{{profile.signature}}
             </view>
             <view class="battle-profile-moments" wx:if="{{profile.discover && profile.discover.length}}">
-                <view class="tab">
+                <view class="tab" @tap="goDiscover">
                     <view class="text1">TA的动态</view>
-                    <view class="text2" @tap="goDiscover">全部
+                    <view class="text2" >查看全部
                         <van-icon name="arrow" />
                     </view>
                 </view>
@@ -52,7 +52,7 @@
         </view>
         <view class="drawer_screen" bindtap="showOrHide" wx:if="{{isShow}}" catchtouchmove="myCatchTouch">
             <view class="drawer-btn">
-                <image src="../../images/profile/lip.png" mode="aspectFill" class="btn" @tap="makeFriend('close')"></image>
+                <image src="../../images/profile/close.png" mode="aspectFill" class="btn" @tap="makeFriend('close')"></image>
                 <view class="textWrap">
                     <view class="lip">亲密接触</view>
                     <view>剩余{{timeLeft.close}}次</view>
@@ -76,6 +76,7 @@
             <image src="../../images/profile/close1.png" mode="aspectFill" class="layer-close" @tap.stop="showOrHide"></image>
         </view>
     </view>
+     <van-toast id="van-toast" />
 </template>
 
 <script>
@@ -86,23 +87,23 @@ import {
     BATTLE_COMMIT,
     USER_LIKE_TIME
 } from '@/utils/url';
+import Toast from '@/components/vant/toast/toast';
 import { get, post } from '@/utils/request';
 import { getAge, toast } from '@/utils';
+import { Event } from '@/utils/event.js';
+var index = 0;
+var position = '';
 var systemInfo = wx.getSystemInfoSync();
 export default class Profile extends wepy.page {
     config = {
-        navigationBarTitleText: '颜狗Battle',
+        navigationBarTitleText: '',
         usingComponents: {
-            'van-icon': '../../components/vant/icon/index'
+            'van-icon': '../../components/vant/icon/index',
+            'van-toast': '../components/vant/toast/index'
         }
     };
 
     data = {
-        imgUrls: [
-            '../../images/profile/model.jpg',
-            'https://images.unsplash.com/photo-1551214012-84f95e060dee?w=640',
-            'https://images.unsplash.com/photo-1551446591-142875a901a1?w=640'
-        ],
         indicatoractivecolor: '#fff',
         indicatorcolor: 'rgba(255,255,255,.3)',
         isShow: false,
@@ -110,9 +111,14 @@ export default class Profile extends wepy.page {
         animAdd: {},
         animDelLots: {},
         id: '',
-        dentifier:'',
+        dentifier: '',
         profile: {},
-        timeLeft:{},
+        timeLeft: {},
+        likeType: {
+            'friend': '有好感',
+            'close': '一见钟情',
+            'lover': '真爱降临'
+        }
     };
 
     components = {};
@@ -131,7 +137,8 @@ export default class Profile extends wepy.page {
                 user_id: this.id
             });
             this.profile.is_like = true;
-            toast('已发送好友申请');
+
+            Toast(this.likeType[type]);
             this.$apply();
         },
         goDiscover() {
@@ -147,11 +154,12 @@ export default class Profile extends wepy.page {
             });
         },
         toastTip() {
-            toast('您已发送过好友申请');
+            Toast('已发送过好友申请');
         },
         close() {
+            if (position) { Event.trigger('changeBattle', index, position); }
             wepy.navigateBack({
-                delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+                delta: 1 // 返回的页面数，如果 delta 大于现有页面数，则返回到首页,
             });
 
             // wepy.navigateBack({
@@ -160,16 +168,20 @@ export default class Profile extends wepy.page {
         }
     };
     myCatchTouch() {
-        return;
+
     }
     events = {};
 
     watch = {};
 
     computed = {};
-
+    onUnload() {
+        if (position) { Event.trigger('changeBattle', index, position); }
+    }
     async onLoad(options) {
         this.id = options.id;
+        index = options.index;
+        position = options.position;
         this.timeLeft = await get(MAKEFRIEND);
         this.dentifier = options.dentifier;
         var data = this.id
@@ -190,6 +202,15 @@ export default class Profile extends wepy.page {
         this.profile = result;
         this.profile.age = getAge(result.birthday);
         this.profile.distance = (this.profile.distance / 1000).toFixed(2);
+        wx.setNavigationBarTitle({
+            title: result.nick_name,
+            success: (result) => {
+
+            },
+            fail: () => {},
+            complete: () => {}
+        });
+
         this.$apply();
     }
 
@@ -197,7 +218,10 @@ export default class Profile extends wepy.page {
 }
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
+#van-toast{
+    font-size:24rpx;
+}
 image {
     width: 100%;
     height: 100%;
@@ -310,6 +334,7 @@ swiper {
             margin-top: 31rpx;
             .face-rank {
                 font-size: 24rpx;
+                font-weight: 600;
                 color: #0c0c0c;
                 text {
                     color: #e60012;
@@ -345,6 +370,7 @@ swiper {
             width: 100%;
             font-size: 24rpx;
             color: #000;
+            font-weight: 600;
             margin: 25rpx 0 25rpx 41rpx;
         }
     }
@@ -375,12 +401,12 @@ swiper {
             align-items: center;
             .text1 {
                 font-size: 24rpx;
-                font-weight: 600;
+                font-weight: 700;
                 color: rgba(0, 0, 0, 1);
             }
             .text2 {
                 font-size: 20rpx;
-                font-weight: 400;
+                font-weight: 600;
                 color: rgba(158, 157, 157, 1);
                 display: flex;
                 position: relative;
