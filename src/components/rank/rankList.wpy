@@ -6,20 +6,26 @@
               <image  class="img" mode="aspectFill" src="{{top3[0].avatar}}" ></image>
               <view class="rate top1rate">1</view>
               <view class="name">{{top3[0].nick_name}}</view>
-              <view class="location">距离您 200km</view>
+              <view class="location" wx:if="{{by === ''}}">距离您 {{top3[0].distance}}km</view>
+              <view class="location" wx:if="{{by === 'all'}}">{{top3[0].province}}</view>
+              <view class="location" wx:if="{{by !== 'all' && by !== ''}}">{{top3[0].birthday}}</view>
           </view>
           <view wx:if="{{top3[1] || top3[2]}}" class="others">
               <view class="box" @tap="toProfile" data-id="{{top3[1]._id}}">
                   <image  class="img" mode="aspectFill" src="{{top3[1].avatar}}" ></image>
                   <view class="rate top2rate">2</view>
                   <view class="name">{{top3[1].nick_name}}</view>
-                  <view class="location">距离您 200km</view>
+                  <view class="location" wx:if="{{by === ''}}">距离您 {{top3[1].distance}}km</view>
+                  <view class="location" wx:if="{{by === 'all'}}">{{top3[1].province}}</view>
+                  <view class="location" wx:if="{{by !== 'all' && by !== ''}}">{{top3[1].birthday}}</view>
               </view>
               <view class="box" wx:if="{{top3[2]}}" @tap="toProfile" data-id="{{top3[2]._id}}">
                   <image  class="img" mode="aspectFill" src="{{top3[2].avatar}}" ></image>
                   <view class="rate top3rate">3</view>
                   <view class="name">{{top3[2].nick_name}}</view>
-                  <view class="location">距离您 200km</view>
+                  <view class="location" wx:if="{{by === ''}}">距离您 {{top3[2].distance}}km</view>
+                  <view class="location" wx:if="{{by === 'all'}}">{{top3[2].province}}</view>
+                  <view class="location" wx:if="{{by !== 'all' && by !== ''}}">{{top3[2].birthday}}</view>
               </view>
           </view>
       </view>
@@ -29,7 +35,9 @@
                  <image  class="img" mode="aspectFill" src="{{item.avatar}}" ></image>
                  <view class="rate otherrate">{{index + 4}}</view>
                  <view class="name">{{item.nick_name}}</view>
-                 <view class="location">距离您 200km</view>
+                 <view class="location" wx:if="{{by === ''}}">距离您 {{item.distance}}km</view>
+                 <view class="location" wx:if="{{by === 'all'}}">{{item.province}}</view>
+                 <view class="location" wx:if="{{by !== 'all' && by !== ''}}">{{item.birthday}}</view>
              </view>
           </repeat>
       </view>
@@ -48,6 +56,10 @@ export default class Discover extends wepy.component {
         topOthers: {
             type: Array,
             default: [],
+        },
+        by: {
+            type: String,
+            default: 'all',
         },
     };
     components = {};

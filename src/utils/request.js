@@ -24,6 +24,7 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
                 });
             }
         }
+        console.log('请求参数-》', data);
         wx.request({
             url: domain + url,
             data,
