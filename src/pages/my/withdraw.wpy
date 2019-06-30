@@ -1,0 +1,96 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view class="form">
+            <view class="field">
+                <view class="label">输入微信号</view>
+                <input class="input" placeholder="请输入微信号" />
+            </view>
+            <view class="field">
+                <view class="label">转出金额</view>
+                <input class="input" placeholder="请输入昵称" />
+                <view class="all">全部</view>
+            </view>
+        </view>
+        <view class="withdraw">
+            确认提现
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class WithDraw extends wepy.page {
+    config = {
+        navigationBarTitleText: '红包提现'
+    };
+
+    data = {};
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {}
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.wrapper {
+    width: 100%;
+    padding: 0 65rpx;
+    box-sizing: border-box;
+    .form {
+        .field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 60rpx;
+            font-size: 28rpx;
+            color: rgba(0, 0, 0, 1);
+            flex-wrap: wrap;
+            text-align: left;
+            .label {
+                width: 100%;
+                font-weight: 600;
+                margin-bottom: 22rpx;
+            }
+            .input {
+                width: 620rpx;
+                height: 80rpx;
+                border: 2rpx solid rgba(0, 0, 0, 1);
+                box-sizing: border-box;
+                line-height: 80rpx;
+                padding-left: 24rpx;
+            }
+            .all{
+                position:absolute;
+                right:30rpx;
+                top:80rpx;
+                font-weight: 600;
+                font-size:28rpx;
+                color:#000;
+            }
+        }
+    }
+    .withdraw {
+        width: 411rpx;
+        height: 92rpx;
+        background: rgba(0, 0, 0, 1);
+        text-align: center;
+        line-height: 92rpx;
+        margin:107rpx auto;
+        color:white;
+        opacity: 1;
+    }
+}
+</style>
