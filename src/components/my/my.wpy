@@ -45,7 +45,7 @@
             </view>
         </view>
         <view class="line"></view>
-        <view class="item">
+        <view class="item" @tap="redirect('propaganda')">
             <view class="title">推广有奖</view>
             <view class="detail2">
                 <van-icon name="arrow" />
