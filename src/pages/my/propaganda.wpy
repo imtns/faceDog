@@ -56,7 +56,7 @@
                     <view class="withdraw-box">
                         <view><text>￥</text><text class="money">50</text></view>
                         <view class="tip">累计获得红包</view>
-                        <view class="withdraw">
+                        <view class="withdraw" @tap="redirect">
                             满50元即可提现
                         </view>
                     </view>
@@ -113,7 +113,7 @@
 
 <script>
 import wepy from 'wepy';
-export default class Example extends wepy.page {
+export default class Propaganda extends wepy.page {
     config = {
         navigationBarTitleText: '推广有奖',
         usingComponents: {
@@ -129,6 +129,9 @@ export default class Example extends wepy.page {
     components = {};
 
     methods = {
+        redirect() {
+            wepy.navigateTo({ url: 'withdraw' });
+        },
         onClose() {
             this.show = false;
         },
