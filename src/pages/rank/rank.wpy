@@ -34,7 +34,7 @@
                     <view>我的排名</view>
                 </view>
             </view>
-            <image src="../../images/profile/close.png" mode="aspectFill" class="layer-close" @tap="hidechangeGenderPop"></image>
+            <image src="../../images/profile/close1.png" mode="aspectFill" class="layer-close" @tap="hidechangeGenderPop"></image>
         </view>
     </view>
 </template>
@@ -58,7 +58,7 @@ export default class fabu extends wepy.page {
         top3: [],
         topOthers: [],
         showConstellation: false,
-        gender: 'female',
+        gender: '1',
         changeGenderPop: false,
         by: 'all',
         active: 0,
@@ -125,7 +125,7 @@ export default class fabu extends wepy.page {
             this.changeGenderPop = false;
         },
         changeGender() {
-            this.gender = this.gender === 'female' ? 'male' : 'female';
+            this.gender = this.gender === '1' ? '0'  : '1';
             this.hidechangeGenderPop();
             this.getRankList({
                 by: this.by,
@@ -209,6 +209,7 @@ export default class fabu extends wepy.page {
                 width: 77rpx !important;
                 height: 10rpx !important;
                 bottom: 28% !important;
+                left:-1% !important;
             }
         }
     }

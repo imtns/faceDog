@@ -74,6 +74,7 @@ export default class Discover extends wepy.component {
             this.showGender = false;
         },
         onChange(event) {
+            nomore = false;
             console.log('event.detail.index', event.detail.index);
             const { index } = event.detail;
             if (+index === 0) {
@@ -103,11 +104,8 @@ export default class Discover extends wepy.component {
         },
         async initList({ page = 1, same_city = 0, opposite = '' }) {
             this.loading = true;
-            // if (nomore) return;
+            if (nomore) return;
             // 请求动态列表
-            // todo，全国和同城这个接口还没有弄好
-            // const latitude = wepy.getStorageSync('latitude');
-            // const longitude = wepy.getStorageSync('longitude');
             console.log('动态列表', this.momentList);
             if(page == 1){
                 this.momentList = [];
@@ -119,10 +117,10 @@ export default class Discover extends wepy.component {
                 opposite,
             });
             this.loading = false;
-            // if (!List.length) {
-            //     nomore = true;
-            //     toast('已经没有更多了~');
-            // }
+            if (!List.length) {
+                nomore = true;
+                toast('已经没有更多了~');
+            }
             this.momentList = this.momentList.concat(List);
             console.log('动态列表', this.momentList);
             this.$invoke('momentCard', 'setMomentList', this.momentList);
@@ -135,6 +133,7 @@ export default class Discover extends wepy.component {
             console.log(this.methods.initList);
         },
         refresh() {
+            nomore = false;
             setTimeout(() => {
                 this.methods.initList.call(this, {
                     page: 1,
@@ -192,6 +191,7 @@ export default class Discover extends wepy.component {
                 width: 77rpx !important;
                 height: 10rpx !important;
                 bottom: 28% !important;
+                left:-4% !important;
             }
         }
         .change {
