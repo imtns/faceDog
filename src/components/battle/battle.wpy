@@ -305,7 +305,7 @@ export default class Battle extends wepy.component {
             }
             setTimeout(() => {
                 this.methods.fly(position, indexNext, imgId, this);
-            }, 400);
+            }, 300);
         });
         this.animation = wx.createAnimation({
             duration: 300,
