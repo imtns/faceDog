@@ -333,6 +333,10 @@ export default class momentCard extends wepy.component {
                 this.actionCommentIndex
             ];
             await del(`/api/discover/comment`, comment._id);
+            this.momentList[this.actionItemIndex].comments.splice(this.actionCommentIndex, 1);
+            this.$emit('showtab', true);
+            this.showDelete = false;
+            this.$apply();
         },
         // 取消删除弹窗
         cancaleComment() {

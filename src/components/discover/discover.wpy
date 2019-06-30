@@ -61,29 +61,11 @@ export default class Discover extends wepy.component {
     watch = {};
 
     computed = {};
-
-    onChange(event) {
-        console.log('event.detail.index', event.detail.index);
-        const { index } = event.detail;
-        if (+index === 0) {
-            this.same_city = 0;
-            this.methods.initList.call(this, {
-                page: 1,
-                same_city: 0,
-            });
-        } else if (+index === 1) {
-            this.same_city = 1;
-            this.methods.initList.call(this, {
-                page: 1,
-                same_city: 1,
-            });
-        }
-        this.$apply();
-    }
     
     methods = {
         genderBy(opposite) {
             const same_city = this.same_city;
+            this.opposite = opposite;
             this.methods.initList.call(this, {
                 page: 1,
                 same_city,
@@ -95,11 +77,13 @@ export default class Discover extends wepy.component {
             console.log('event.detail.index', event.detail.index);
             const { index } = event.detail;
             if (+index === 0) {
+                this.same_city = 0;
                 this.methods.initList.call(this, {
                     page: 1,
                     same_city: 0,
                 });
             } else if (+index === 1) {
+                this.same_city = 1;
                 this.methods.initList.call(this, {
                     page: 1,
                     same_city: 1,
@@ -119,7 +103,7 @@ export default class Discover extends wepy.component {
         },
         async initList({ page = 1, same_city = 0, opposite = '' }) {
             this.loading = true;
-            if (nomore) return;
+            // if (nomore) return;
             // 请求动态列表
             // todo，全国和同城这个接口还没有弄好
             // const latitude = wepy.getStorageSync('latitude');
@@ -135,10 +119,10 @@ export default class Discover extends wepy.component {
                 opposite,
             });
             this.loading = false;
-            if (!List.length) {
-                nomore = true;
-                toast('已经没有更多了~');
-            }
+            // if (!List.length) {
+            //     nomore = true;
+            //     toast('已经没有更多了~');
+            // }
             this.momentList = this.momentList.concat(List);
             console.log('动态列表', this.momentList);
             this.$invoke('momentCard', 'setMomentList', this.momentList);
@@ -154,6 +138,8 @@ export default class Discover extends wepy.component {
             setTimeout(() => {
                 this.methods.initList.call(this, {
                     page: 1,
+                    same_city: this.same_city,
+                    opposite: this.opposite,
                 });
             }, 500);
         },
