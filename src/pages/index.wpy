@@ -143,13 +143,14 @@ export default class Index extends wepy.page {
         Event.listen('refresh', () => {
             this.$invoke('discover', 'initList', { page: 1 });
         });
+        this.setProfile();
     }
 
     onShow() {
-        this.setProfile();
-        this.$invoke('chat', 'initChat');
-        if (this.selectedTab === 1) {
-            // this.$invoke('chat', 'initChat');
+        // this.setProfile();
+        // this.$invoke('chat', 'initChat');
+        if (this.selectedTab === 2) {
+            this.$invoke('chat', 'initChat');
         }
     }
 }

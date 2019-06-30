@@ -1,6 +1,7 @@
 <!--  -->
 <template>
-    <scroll-view scroll-y class='discover' bindscrolltolower="pageTuring">
+    <scroll-view scroll-y class='discover' bindscrolltolower="pageTuring"
+    bindscrolltoupper="refresh">
         <topBanner></topBanner>
         <view class="content-search">
             <van-tabs class="tabs" bind:change="onChange" v-model="activeIndex">
@@ -13,7 +14,7 @@
             <block wx:if="{{momentList.length}}">
                 <momentCard></momentCard>
             </block>
-            <block wx:else>
+            <block wx:if="{{momentList.length === 0 && !loading}}">
                 <empty></empty>
             </block>
         </view>
@@ -45,6 +46,7 @@ export default class Discover extends wepy.component {
         page: 1,
         same_city: 0,
         opposite: '',
+        loading: false,
     };
 
     components = {
@@ -116,6 +118,7 @@ export default class Discover extends wepy.component {
             });
         },
         async initList({ page = 1, same_city = 0, opposite = '' }) {
+            this.loading = true;
             if (nomore) return;
             // 请求动态列表
             // todo，全国和同城这个接口还没有弄好
@@ -131,6 +134,7 @@ export default class Discover extends wepy.component {
                 same_city,
                 opposite,
             });
+            this.loading = false;
             if (!List.length) {
                 nomore = true;
                 toast('已经没有更多了~');
@@ -145,7 +149,14 @@ export default class Discover extends wepy.component {
                 page: (this.page += 1)
             });
             console.log(this.methods.initList);
-        }
+        },
+        refresh() {
+            setTimeout(() => {
+                this.methods.initList.call(this, {
+                    page: 1,
+                });
+            }, 500);
+        },
     };
     onLoad() {
 
