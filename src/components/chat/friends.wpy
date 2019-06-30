@@ -6,7 +6,7 @@
     <view class='wrapper' wx:else>
 
         <repeat for="{{list}}" key="index" index="index" item="item">
-            <!-- <van-swipe-cell right-width="{{ 70 }}" async-close bind:close="onClose"> -->
+            <van-swipe-cell class="swipe" right-width="{{ 70 }}" data-userid="{{item._id}}" data-index="{{index}}" async-close bind:close="onClose">
             <view class="friends-box" >
                 <image class="icon" @tap="goProfile({{item.dentifier}})" src="{{item.avatar}}" mode="aspectFill"></image>
                 <view class="msg" @tap="goChat({{item.dentifier}},{{item.nick_name}})">
@@ -14,8 +14,8 @@
                     <view class="distance">匹配于{{item.month}}/{{item.day}}</view>
                 </view>
             </view>
-            <!-- <view class="delete" slot="right">删除</view>
-            </van-swipe-cell> -->
+            <view class="delete" slot="right">删除</view>
+            </van-swipe-cell>
         </repeat>
     </view>
 
@@ -24,7 +24,7 @@
 <script>
 import wepy from 'wepy';
 import { dialog } from '@/utils';
-import { get } from '@/utils/request';
+import { get, deltemp } from '@/utils/request';
 import { FRIENDS_LIST } from '@/utils/url';
 import empty from '@/components/empty';
 export default class Friends extends wepy.component {
@@ -53,34 +53,19 @@ export default class Friends extends wepy.component {
                 instance.close();
                 break;
             case 'right':
-                try {
-                    await wx.showModal({
-                            title: '确认删除',
-                            content: '',
-                            showCancel: true,
-                            cancelText: '取消',
-                            cancelColor: '#000000',
-                            confirmText: '确定',
-                            confirmColor: '#3CC51F',
-                            success: result => {
-                                if (result.confirm) {
-                                }
-                            },
-                            fail: () => {},
-                            complete: () => {}
-                        });
+                // await deltemp(FRIENDS_LIST, {
+                //     user_id: instance.dataset.userid
+                // });
+                let query = wx.createSelectorQuery();
+                query.selectAll('.swipe');
+                query.exec(function(res) {
+                    console.log(res);
+                });
 
-                        // await dialog({
-                        //     message: '确认删除吗?',
-                        //     confirmButtonText: '删除',
-                        //     showCancelButton: true,
-                        //     cancelButtonText: '取消'
-                        // });
-                    instance.close();
-                } catch (e) {
-                    console.log(2);
-                }
-
+                this.list.splice(instance.dataset.index, 1);
+                console.log(instance.dataset.userid);
+                this.$apply();
+                // instance.close();
                 break;
             }
         },

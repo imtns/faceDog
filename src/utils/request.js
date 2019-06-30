@@ -28,7 +28,7 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
         wx.request({
             url: domain + url,
             data,
-            method,
+            method: method === 'DELETETEMP' ? 'DELETE' : method,
             dataType: 'json',
             header: {
                 'content-type': 'application/json',
@@ -58,3 +58,4 @@ module.exports.get = (...props) => http('GET', ...props);
 module.exports.post = (...props) => http('POST', ...props);
 module.exports.put = (...props) => http('PUT', ...props);
 module.exports.del = (...props) => http('DELETE', ...props);
+module.exports.deltemp = (...props) => http('DELETETEMP', ...props);
