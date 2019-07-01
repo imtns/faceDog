@@ -2,8 +2,8 @@
 <template>
     <view class='wrapper'>
         <view class="header">
-            <view class="title">你的颜值在北京市超过<text>{{face}}%</text></view>
-            <view class="title">你的帅气超过了<text>{{constellation}}%</text>{{myConstellation}}</view>
+            <view class="title">你在全国颜值排名<text>{{face}}%</text></view>
+            <view class="title">你在{{position}}颜值排名第<text>{{city}}名</text></view>
             <view class="bar">“除了帅气，你一无所有”</view>
         </view>
         <view class="w">
@@ -58,8 +58,8 @@ export default class Example extends wepy.page {
     };
 
     data = {
-        myConstellation: '', // 我的星座
-        constellation: 0, // 星座排名
+        position: '', // 省份
+        city: 0, // 城市名次
         image1: '',
         face: 0, // 颜值排名
         play1: 0, // 出场？
@@ -119,18 +119,17 @@ export default class Example extends wepy.page {
 
     async onLoad() {
         const info = await get(USER_RANK);
-        const { face, constellation } =  info;
+        const { face, city, position } =  info;
         // 颜值排名
         this.face = face;
-        // 星座排名
-        this.constellation = constellation;
-        const me = wepy.getStorageSync('profile');
-        // 星座
-        this.myConstellation =  me.constellation;
+        // 城市排名
+        this.city = city;
+        // 省份
+        this.position = position;
         // 图片1
         this.image1 = info.images.image;
         this.play1 = info.images.play;
-        this.rate1 = (+info.images.win / +info.images.play).toFixed(2) + '%';
+        this.rate1 = (+info.images.win / +info.images.play).toFixed(2) * 100 + '%';
         this.$apply();
         radarChart = new wxCharts({
             canvasId: 'radarCanvas',
