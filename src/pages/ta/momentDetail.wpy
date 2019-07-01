@@ -13,14 +13,14 @@ export default class momentDetail extends wepy.page {
     config = {
         navigationBarTitleText: '动态详情',
         usingComponents: {
-            'van-popup': '../../components/vant/popup/index',
+            'van-popup': '../../components/vant/popup/index'
         }
     }
     data = {
-        userId: '',
+        userId: ''
     }
     components = {
-        momentCard,
+        momentCard
     };
     methods = {};
 
@@ -32,9 +32,7 @@ export default class momentDetail extends wepy.page {
     async onLoad(options) {
         const { momentId } = options;
         this.momentId = momentId;
-        const data = await get(`/api/discover/moments/${this.momentId}`, {
-            moment_id: this.momentId,
-        });
+        const data = await get(`/api/discover/moments/${this.momentId}`);
         console.log('动态详情', data);
         this.$invoke('momentCard', 'setMomentList', [data]);
     };

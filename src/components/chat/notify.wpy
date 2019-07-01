@@ -5,15 +5,15 @@
     </block>
     <view class='wrapper' wx:else>
         <repeat for="{{list}}" key="index" index="index" item="item">
-            <view class="notify-box">
-                <image class="icon" src="{{item.avatar}}" mode="aspectFill"></image>
+            <view class="notify-box" @tap="redirect({{item.moment_id}})">
+                <image class="icon" @tap.stop="goProfile({{item.user_id}})" src="{{item.avatar}}" mode="aspectFill"></image>
                 <view class="msg">
                     <view class="name">{{item.nick_name}} {{type[item.type]}} 你的动态</view>
                     <view class="content">{{item.create_time}}</view>
-                    <view class="delete" @tap="read({{item._id}},{{item.type}},{{index}})">删除</view>
+                    <view class="delete" @tap.stop="read({{item._id}},{{item.type}},{{index}})">删除</view>
                 </view>
                 <view class="right-part">
-                    <image class="thumb" src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                    <image class="thumb" src="{{item.image}}" mode="aspectFill"></image>
                 </view>
                 <view class="line"></view>
             </view>
@@ -51,6 +51,9 @@ export default class Notify extends wepy.component {
             this.list = result;
             this.$apply();
         },
+        goProfile(id) {
+            wepy.navigateTo({ url: `battle/profile?id=${id}` });
+        },
         async read(id, type, index) {
             try {
                 await post(USER_MSG_UNREAD, {
@@ -63,6 +66,9 @@ export default class Notify extends wepy.component {
             } catch (e) {
 
             }
+        },
+        redirect(id) {
+            wepy.navigateTo({ url: `ta/momentDetail?momentId=${id}` });
         }
     };
 

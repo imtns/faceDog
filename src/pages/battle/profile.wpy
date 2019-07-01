@@ -311,6 +311,7 @@ swiper {
         .battle-profile-left {
             padding-left: 40rpx;
             padding-top: 28rpx;
+            font-weight: 800;
             width: 40%;
             .name {
                 color: #0c0c0c;
