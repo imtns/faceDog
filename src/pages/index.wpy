@@ -138,7 +138,7 @@ export default class Index extends wepy.page {
         }
     };
     onLoad() {
-        //  this.$invoke('chat', 'initChat');
+        this.$invoke('chat', 'initChat');
 
         Event.listen('refresh', () => {
             this.$invoke('discover', 'initList', { page: 1 });
@@ -147,9 +147,9 @@ export default class Index extends wepy.page {
     }
 
     onShow() {
-        // this.setProfile();
         // this.$invoke('chat', 'initChat');
         if (this.selectedTab === 2) {
+            this.setProfile();
             this.$invoke('chat', 'initChat');
         }
     }

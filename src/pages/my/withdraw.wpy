@@ -20,7 +20,7 @@
 
 <script>
 import wepy from 'wepy';
-export default class WithDraw extends wepy.page {
+export default class Withdraw extends wepy.page {
     config = {
         navigationBarTitleText: '红包提现'
     };

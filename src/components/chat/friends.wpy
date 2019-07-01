@@ -53,15 +53,9 @@ export default class Friends extends wepy.component {
                 instance.close();
                 break;
             case 'right':
-                // await deltemp(FRIENDS_LIST, {
-                //     user_id: instance.dataset.userid
-                // });
-                let query = wx.createSelectorQuery();
-                query.selectAll('.swipe');
-                query.exec(function(res) {
-                    console.log(res);
+                await deltemp(FRIENDS_LIST, {
+                    user_id: instance.dataset.userid
                 });
-
                 this.list.splice(instance.dataset.index, 1);
                 console.log(instance.dataset.userid);
                 this.$apply();

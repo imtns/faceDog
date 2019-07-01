@@ -42,6 +42,8 @@
 <script>
 import wepy from 'wepy';
 import wxCharts from '@/utils/wxcharts';
+import { get } from '@/utils/request';
+import { USER_RANK } from '@/utils/url';
 import { getTmpFilePath, toast } from '@/utils/index';
 
 var radarChart = null;
@@ -52,8 +54,7 @@ export default class Example extends wepy.page {
         navigationBarTextStyle: 'white',
         usingComponents: {
             drawimage: './miniprogram_npm/miniprogram-drawimage/index'
-        },
-        navigationBarTextStyle: 'white'
+        }
     };
 
     data = {
@@ -111,6 +112,7 @@ export default class Example extends wepy.page {
     computed = {};
 
     async onLoad() {
+        await get(USER_RANK);
         radarChart = new wxCharts({
             canvasId: 'radarCanvas',
             type: 'radar',
@@ -132,7 +134,7 @@ export default class Example extends wepy.page {
         setTimeout(() => {
             wx.canvasToTempFilePath({
                 canvasId: 'radarCanvas',
-                success: async function(res) {
+                async success(res) {
                     var tempFilePath = res.tempFilePath;
                     // console.error(tempFilePath);
                     console.error('2222');
@@ -142,7 +144,7 @@ export default class Example extends wepy.page {
                     that.ready = true;
                     that.$apply();
                 },
-                fail: function(res) {
+                fail(res) {
                     console.log(res);
                 }
             });
@@ -223,9 +225,9 @@ export default class Example extends wepy.page {
         this.layers.push({
             type: 'image', //  我的头像1
             imageResource: this.headImg1,
-            cut:true,
-            sHeight:550,
-            sWidth:550,
+            cut: true,
+            sHeight: 550,
+            sWidth: 550,
             dx: 79,
             dy: 113,
             dWidth: 150,

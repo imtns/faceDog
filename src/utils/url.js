@@ -35,3 +35,5 @@ export const USER_LIKE_TIME = '/api/user/unread';
 export const DELETE_MOMENT = '/api/discover/moments';
 // 获取系统消息
 export const USER_MSG_UNREAD = '/api/user/unread';
+// 个人接口
+export const USER_RANK = '/api/user/ranking';
