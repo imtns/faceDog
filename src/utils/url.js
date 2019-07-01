@@ -37,3 +37,5 @@ export const DELETE_MOMENT = '/api/discover/moments';
 export const USER_MSG_UNREAD = '/api/user/unread';
 // 个人接口
 export const USER_RANK = '/api/user/ranking';
+// 推广记录
+export const INVATATION = '/api/user/invitation';

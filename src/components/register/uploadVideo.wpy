@@ -39,11 +39,11 @@ export default class Example extends wepy.component {
         for (var i = 0; i < number; i++) {
             var n = Math.floor(Math.random() * 10);
             arr[i] = arr1[n];
-            //document.write(arr1[n]);
+            // document.write(arr1[n]);
         }
 
         val = arr.join('');
-        //document.write(val);
+        // document.write(val);
         return val;
     }
     methods = {
@@ -78,7 +78,7 @@ export default class Example extends wepy.component {
                             wx.redirectTo({
                                 url: 'index'
                             });
-                        }else{
+                        } else {
                             Toast.fail(result);
                         }
                     }
@@ -97,7 +97,6 @@ export default class Example extends wepy.component {
     onLoad() {
         this.number = this.RondomPass(5);
         this.$apply();
-        console.log(this.number);
     }
 }
 </script>

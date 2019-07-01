@@ -135,6 +135,9 @@ export default class Index extends wepy.page {
         showtab(status) {
             this.tabbarshow = status;
             this.$apply();
+        },
+        getProfile() {
+            this.setProfile();
         }
     };
     onLoad() {
@@ -149,8 +152,10 @@ export default class Index extends wepy.page {
     onShow() {
         // this.$invoke('chat', 'initChat');
         if (this.selectedTab === 2) {
-            this.setProfile();
             this.$invoke('chat', 'initChat');
+        } else if (this.selectedTab === 3) {
+            this.setProfile();
+            // this.$invoke('my', 'setProfile', this.profile);
         }
     }
 }

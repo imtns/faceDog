@@ -12,10 +12,10 @@
             <view class="battle-profile-left flex">
                 <view class="name">{{profile.nick_name}}</view>
                 <view class="info">{{profile.gender =='female'?'女':'男'}} / {{profile.age}} / {{profile.constellation}}</view>
-                <view class="distance"><text>{{profile.distance}} km</text><text>  {{profile.city}}</text></view>
+                <view class="distance"><text>{{profile.distance}}km</text> {{profile.city}}</view>
             </view>
             <view class="battle-profile-right flex">
-                <view class="face-rank">她在<text> {{profile.city}} </text> 颜值排行 <text> {{profile.face * 100}}%</text></view>
+                <view class="face-rank">{{profile.gender=='female'?'她':'他'}}的颜值在全国排名前 <text> {{profile.face * 100}}%</text></view>
                 <view class="profile-tags">
                     <view class="tag red">Top100</view>
                     <view class="tag green">颜值杀手</view>
@@ -40,7 +40,7 @@
 
             </view>
         </view>
-        <view class="bottom-box">
+        <view class="bottom-box" wx:if="{{!self}}">
             <block wx:if="{{!profile.is_friend}}">
                 <image class="close" mode="aspectFill" @tap="close" src="../../images/profile/close1.png"></image>
                 <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="../../images/profile/menu.png"></image>
@@ -118,7 +118,8 @@ export default class Profile extends wepy.page {
             'friend': '有好感',
             'close': '一见钟情',
             'lover': '真爱降临'
-        }
+        },
+        self: false
     };
 
     components = {};
@@ -200,6 +201,9 @@ export default class Profile extends wepy.page {
         }
         await get(USER_LIKE_TIME);
         this.profile = result;
+        if (result.dentifier === wepy.getStorageSync('identifier')) {
+            this.self = true;
+        }
         this.profile.age = getAge(result.birthday);
         this.profile.distance = (this.profile.distance / 1000).toFixed(2);
         wx.setNavigationBarTitle({
@@ -326,7 +330,7 @@ swiper {
                 font-size: 24rpx;
                 margin-top: 6rpx;
                 text {
-                    color: #e60012;
+                    color: #FFC125;
                 }
             }
         }

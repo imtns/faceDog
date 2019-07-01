@@ -14,12 +14,12 @@ export default class Mixin extends wepy.mixin {
         }
     }
     // 设置默认头像
-    async changeAvatar(param) {
+    async changeAvatar(param, noToast) {
         const data = await put(HANDLE_PICTURE, {
             ...param
         });
         console.log(data);
-        toast('修改成功');
+        if (!noToast) { toast('修改成功'); }
     }
     // 修改个人资料
     async submit(param, back = true) {
@@ -55,6 +55,11 @@ export default class Mixin extends wepy.mixin {
     async getProfile() {
         const data = await get(PROFILE);
         data.images = this.switchOrder(data.images);
+        if (data.images.length === 1) {
+            this.changeAvatar({
+                image_id: data.images[0]._id
+            }, true);
+        }
         this.profile = data;
         wepy.setStorageSync('profile', this.profile);
         this.$apply();
