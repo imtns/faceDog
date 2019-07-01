@@ -94,7 +94,7 @@
     </van-popup>
 
     <!--自己点击三个点 删除动态和取消-->
-    <van-popup class="warn-pop" zIndex="999999" show="{{ showPointsByme }}" position="bottom" bind:close="onClose" z>
+    <van-popup class="warn-pop" zIndex="999999" show="{{ showPointsByme }}" position="bottom" bind:close="onClose" >
         <view class="warn" @tap="deleteMoment">删除动态</view>
         <view class="warn last" @tap="closeshowPointsByme">取消</view>
     </van-popup>
@@ -129,7 +129,7 @@ export default class momentCard extends wepy.component {
         // 匿名举报
         async reporting() {
             await post(`/api/discover/report_moment/${this.clickMomentId}`, {
-                moment_id: this.clickMomentId,
+                moment_id: this.clickMomentId
             });
             toast('匿名举报成功！');
             this.show = false;
@@ -138,7 +138,7 @@ export default class momentCard extends wepy.component {
         // 加入黑名单
         async addBlackList() {
             await post(`/api/discover/shielding/${this.clickMomentId}`, {
-                moment_id: this.clickMomentId,
+                moment_id: this.clickMomentId
             });
             toast('加入黑名单成功！');
             this.show = false;
@@ -147,10 +147,11 @@ export default class momentCard extends wepy.component {
         onClose() {
             this.show = false;
             this.showPointsByme = false;
+            this.showDelete = false;
             this.$emit('showtab', true);
         },
         async deleteMoment() {
-            await del(DELETE_MOMENT,this.clickMomentId);
+            await del(DELETE_MOMENT, this.clickMomentId);
             this.momentList.splice(this.clickIndex, 1);
             toast('删除成功');
             this.show = false;
@@ -353,7 +354,7 @@ export default class momentCard extends wepy.component {
         // 关闭自己点击三个点的pop
         closeshowPointsByme() {
             this.showPointsByme = false;
-            this.$emit('showtab',true);
+            this.$emit('showtab', true);
         }
     };
     setMomentList(list) {
