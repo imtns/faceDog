@@ -119,7 +119,7 @@ export default class Example extends wepy.page {
 
     async onLoad() {
         const info = await get(USER_RANK);
-        const { face, city, position } =  info;
+        const { face, city, position } = info;
         // 颜值排名
         this.face = face;
         // 城市排名

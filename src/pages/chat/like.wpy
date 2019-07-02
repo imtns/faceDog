@@ -27,7 +27,7 @@
 
 <script>
 import wepy from 'wepy';
-import { getAge } from '@/utils'
+import { getAge } from '@/utils';
 export default class Like extends wepy.page {
     config = {
         navigationBarTitleText: '喜欢我的'
@@ -51,9 +51,9 @@ export default class Like extends wepy.page {
 
     onShow() {
         this.liked = wepy.getStorageSync('currentLike');
-        this.liked.users.forEach(item=>{
+        this.liked.users.forEach(item => {
             item.age = getAge(item.birthday);
-        })
+        });
         this.$apply();
     }
 }
@@ -126,6 +126,10 @@ export default class Like extends wepy.page {
                             color: white;
                             font-size: 22rpx;
                             margin: 12rpx 0 0 20rpx;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                            width: 120rpx;
                         }
                         .info {
                             color: #979797;

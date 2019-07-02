@@ -168,17 +168,17 @@ export default class Chatlist extends wepy.component {
             case 'right':
                 console.log(this);
                 instance.close();
-                // var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
-                // var skey = 'C2C' + instance.id; // 拼装 skey
-                // var selSess = sessMap[skey]; // 获取 Session 的实例
-                // webim.setAutoRead(selSess, true, false);
-                // setTimeout(() => {
-                //     webim.setAutoRead(selSess, false, false);
-                // }, 2000);
-                // webimhandler.delChat(instance.id);
+                var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
+                var skey = 'C2C' + instance.id; // 拼装 skey
+                var selSess = sessMap[skey]; // 获取 Session 的实例
+                webim.setAutoRead(selSess, true, false);
+                setTimeout(() => {
+                    webim.setAutoRead(selSess, false, false);
+                }, 2000);
+                webimhandler.delChat(instance.id);
                 this.list.splice(instance.dataset.index, 1);
-                // unread = unread - instance.dataset.unread;
-                // this.$emit('unreadSet', unread);
+                unread = unread - instance.dataset.unread;
+                this.$emit('unreadSet', unread);
                 this.$apply();
                 break;
             }

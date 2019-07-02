@@ -114,7 +114,7 @@
 <script>
 import wepy from 'wepy';
 import {get} from '@/utils/request';
-import {INVATATION} from '@/utils/url';
+import { INVATATION } from '@/utils/url';
 export default class Propaganda extends wepy.page {
     config = {
         navigationBarTitleText: '推广有奖',

@@ -46,13 +46,13 @@ export default class Discover extends wepy.component {
         page: 1,
         same_city: 0,
         opposite: '',
-        loading: false,
+        loading: false
     };
 
     components = {
         topBanner,
         momentCard,
-        empty,
+        empty
     };
     onClose() {
         this.show = false;
@@ -61,7 +61,7 @@ export default class Discover extends wepy.component {
     watch = {};
 
     computed = {};
-    
+
     methods = {
         genderBy(opposite) {
             const same_city = this.same_city;
@@ -69,7 +69,7 @@ export default class Discover extends wepy.component {
             this.methods.initList.call(this, {
                 page: 1,
                 same_city,
-                opposite,
+                opposite
             });
             this.showGender = false;
         },
@@ -81,13 +81,13 @@ export default class Discover extends wepy.component {
                 this.same_city = 0;
                 this.methods.initList.call(this, {
                     page: 1,
-                    same_city: 0,
+                    same_city: 0
                 });
             } else if (+index === 1) {
                 this.same_city = 1;
                 this.methods.initList.call(this, {
                     page: 1,
-                    same_city: 1,
+                    same_city: 1
                 });
             }
         },
@@ -107,14 +107,14 @@ export default class Discover extends wepy.component {
             if (nomore) return;
             // 请求动态列表
             console.log('动态列表', this.momentList);
-            if(page == 1){
+            if (page == 1) {
                 this.momentList = [];
                 this.$apply();
             }
             const List = await get(DISCOVER_MOMENT_LIST, {
                 page,
                 same_city,
-                opposite,
+                opposite
             });
             this.loading = false;
             if (!List.length) {
@@ -133,15 +133,15 @@ export default class Discover extends wepy.component {
             console.log(this.methods.initList);
         },
         refresh() {
-            nomore = false;
-            setTimeout(() => {
-                this.methods.initList.call(this, {
-                    page: 1,
-                    same_city: this.same_city,
-                    opposite: this.opposite,
-                });
-            }, 500);
-        },
+            // nomore = false;
+            // setTimeout(() => {
+            //     this.methods.initList.call(this, {
+            //         page: 1,
+            //         same_city: this.same_city,
+            //         opposite: this.opposite,
+            //     });
+            // }, 500);
+        }
     };
     onLoad() {
 

@@ -6,11 +6,11 @@
                 <view class="author-name" wx:if="{{item.showtime}}">
                     <text class="chat-date">{{item.sendTime}}</text>
                 </view>
-                <view class="left" style="margin-bottom:40rpx;" wx:if="{{Complete}}">
+                <view class="left" style="margin-bottom:40rpx;" wx:if="{{Complete && index == 0}}">
                     <view class="chat-avatars">
                         <image src="{{item.avatar}}" class="avatar" mode="aspectFill" bindtap="goProfile"></image>
                     </view>
-                    <view class="profile-image" wx:if="{{index==0}}">
+                    <view class="profile-image" wx:if="{{index==0}}" bindtap="goProfile">
                         <image class="thumb" src="{{item.avatar}}" mode="aspectFill"></image>
                         <view class="profile-desc">
                             <view class="left-container">
@@ -29,7 +29,7 @@
                     </view>
                     <view class="chat-message">
                         <!-- <image src="../../images/profile/model.jpg" mode="aspectFill"></image> -->
-                        {{item.msg}}
+                         <text selectable="true">{{item.msg}}</text>
                     </view>
                 </view>
             </view>
@@ -40,7 +40,7 @@
                 <view class="right">
                     <view class="chat-message">
                         <!-- <image src="{{item.item}}" wx:if="{{item.typ =='images'}}"></image> -->
-                        <view>{{item.msg}}</view>
+                        <text selectable="true">{{item.msg}}</text>
                     </view>
                     <view class="chat-avatars">
                         <image class="avatar" src="{{item.icon}}" mode="aspectFill" @tap="goProfile('self')"></image>
@@ -58,27 +58,23 @@
 
 <script>
 import wepy from 'wepy';
-import webim from '@/utils/webim.js'; //腾讯云im包
+import webim from '@/utils/webim.js'; // 腾讯云im包
 import webimhandler from '@/utils/handler';
-import { formatDateFromSeconds, toast } from '@/utils';
-import Config from '@/utils/config';
+import { formatDateFromSeconds, toast, getAge } from '@/utils';
 import { Event } from '@/utils/event.js';
 import { PROFILE } from '@/utils/url';
 import { get } from '@/utils/request';
-import { getAge } from '@/utils';
+
 var loading = false;
 export default class Chat extends wepy.page {
     config = {
-        navigationBarTitleText: '',
-        usingComponents: {
-            'van-field': '../components/vant/field/index'
-        }
+        navigationBarTitleText: ''
     };
     data = {
         id: '',
         msgList: [],
         msgContent: '',
-        LastMsgTime: 0, //最近的消息时间，即从这个时间点向前拉取历史消息
+        LastMsgTime: 0, // 最近的消息时间，即从这个时间点向前拉取历史消息
         MsgKey: '',
         icon: '',
         toview: '',
@@ -184,7 +180,7 @@ export default class Chat extends wepy.page {
         });
         var that = this;
         if (webim.checkLogin()) {
-            //检查是否登录返回true和false,不登录则重新登录
+            // 检查是否登录返回true和false,不登录则重新登录
             console.log('已登录');
             this.getLastC2CHistoryMsgs((list, err) => {
                 this.msgList = list;
@@ -197,22 +193,22 @@ export default class Chat extends wepy.page {
     getLastC2CHistoryMsgs(cbOk, cbError) {
         var that = this;
         var options = {
-            Peer_Account: this.id, //好友帐号，selToID 为全局变量，表示当前正在进行的聊天 ID，当聊天类型为私聊时，该值为好友帐号，否则为群号。
-            MaxCnt: 15, //拉取消息条数
-            LastMsgTime: this.LastMsgTime, //最近的消息时间，即从这个时间点向前拉取历史消息
+            Peer_Account: this.id, // 好友帐号，selToID 为全局变量，表示当前正在进行的聊天 ID，当聊天类型为私聊时，该值为好友帐号，否则为群号。
+            MaxCnt: 15, // 拉取消息条数
+            LastMsgTime: this.LastMsgTime, // 最近的消息时间，即从这个时间点向前拉取历史消息
             MsgKey: this.MsgKey
         };
         webim.getC2CHistoryMsgs(
             options,
             function(resp) {
-                var complete = resp.Complete; //是否还有历史消息可以拉取，1-表示没有，0-表示有
-                var retMsgCount = resp.MsgCount; //返回的消息条数，小于或等于请求的消息条数，小于的时候，说明没有历史消息可拉取了
+                var complete = resp.Complete; // 是否还有历史消息可以拉取，1-表示没有，0-表示有
+                var retMsgCount = resp.MsgCount; // 返回的消息条数，小于或等于请求的消息条数，小于的时候，说明没有历史消息可拉取了
                 that.LastMsgTime = resp.LastMsgTime;
                 that.MsgKey = resp.MsgKey;
                 that.count = resp.MaxCnt;
-                that.Complete = resp.MsgList.length == 0 ? true : false;
+                that.Complete = resp.MsgList.length == 0;
                 that.$apply();
-                if (resp.MsgList.length == 0) {
+                if (complete === 1) {
                     wx.hideLoading();
                     webim.Log.error(
                         '没有历史消息了:data=' + JSON.stringify(options)
@@ -225,13 +221,13 @@ export default class Chat extends wepy.page {
                         age: getAge(that.user.birthday),
                         face: that.user.face,
                         isSend: false,
-                        be:that.user.be,
+                        be: that.user.be,
                         sendTime: formatDateFromSeconds(
                             parseInt(new Date().getTime() / 1000)
                         ),
                         showtime: parseInt(new Date().getTime() / 1000)
                     };
-                    if (that.msgList.length == 0) {
+                    if (that.msgList.length === 0) {
                         that.msgList.push(temp);
                     } else {
                         that.msgList.unshift(temp);

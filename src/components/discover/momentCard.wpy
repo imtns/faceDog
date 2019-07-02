@@ -24,7 +24,7 @@
                     </view>
                     <view class="imgs">
                         <repeat for="{{item.images}}" key="indeximages" index="indeximages" item="pic">
-                            <image class="img" src="{{pic.image_url}}" data-index="{{index}}" data-picIndex="{{indeximages}}" @tap="preview" mode="aspectFill"></image>
+                            <image class="img" src="{{pic.thumbnail_url}}" data-index="{{index}}" data-picIndex="{{indeximages}}" @tap="preview" mode="aspectFill"></image>
                         </repeat>
                     </view>
                     <view class="actions">
@@ -300,7 +300,7 @@ export default class momentCard extends wepy.component {
         // 跳转到他的资料页面
         toProfile(id) {
             wepy.navigateTo({
-                url: `battle/profile?id=${id}`
+                url: `/pages/battle/profile?id=${id}`
             });
         },
         // 跳转到动态详情页面

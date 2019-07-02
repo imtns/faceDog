@@ -1,4 +1,4 @@
-<!--  -->
+
 <template>
     <block wx:if="{{!list.length}}">
         <empty></empty>
@@ -32,6 +32,7 @@
         </repeat>
     </view>
 </template>
+
 
 <script>
 import wepy from 'wepy';
@@ -154,12 +155,16 @@ export default class Like extends wepy.component {
                     display: flex;
                     justify-content: space-between;
                     .left {
-                        width: 58%;
+                        width: 65%;
 
                         .name {
                             color: white;
                             font-size: 22rpx;
                             margin: 12rpx 0 0 20rpx;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                            width: 120rpx;
                         }
                         .info {
                             color: #979797;

@@ -120,7 +120,7 @@ export default class Battle extends wepy.component {
             }
             console.error(position);
             if (position == 'bottom') {
-                if (self.topIndex == self.battle.a.length - 1) {
+                if (self.topIndex == self.battle.a.length - 2) {
                     try {
                         await self.getBattle('a');
                     } catch (e) {
@@ -139,7 +139,7 @@ export default class Battle extends wepy.component {
                 self.bottomLikedImage = self.battle.b[index].image_id;
                 self.bottomLikedUser = self.battle.b[index]._id;
             } else {
-                if (self.bottomIndex == self.battle.b.length - 1) {
+                if (self.bottomIndex == self.battle.b.length - 2) {
                     try {
                         await self.getBattle('b');
                     } catch (e) {
@@ -261,17 +261,24 @@ export default class Battle extends wepy.component {
                 return;
             }
             if (!position || position === 'a') {
+                result.a.forEach(item => {
+                    item.distance = (item.distance / 1000).toFixed(2);
+                    item.animation = {};
+                });
+
                 this.battle.a.unshift(...result.a);
             }
             if (!position || position === 'b') {
+                result.b.forEach(item => {
+                    item.distance = (item.distance / 1000).toFixed(2);
+                    item.animation = {};
+                });
                 this.battle.b.unshift(...result.b);
             }
             this.battle.a.forEach(item => {
-                item.distance = (item.distance / 1000).toFixed(2);
                 item.animation = {};
             });
             this.battle.b.forEach(item => {
-                item.distance = (item.distance / 1000).toFixed(2);
                 item.animation = {};
             });
             setTimeout(() => {

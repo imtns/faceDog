@@ -39,3 +39,5 @@ export const USER_MSG_UNREAD = '/api/user/unread';
 export const USER_RANK = '/api/user/ranking';
 // 推广记录
 export const INVATATION = '/api/user/invitation';
+// 红包提现
+export const WITHDRAW = '/api/user/take_money';

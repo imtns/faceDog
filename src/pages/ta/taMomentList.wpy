@@ -13,14 +13,14 @@ export default class taMomentList extends wepy.page {
     config = {
         navigationBarTitleText: 'TA的动态',
         usingComponents: {
-            'van-popup': '../../components/vant/popup/index',
+            'van-popup': '../../components/vant/popup/index'
         }
     }
     data = {
-        userId: '',
+        userId: ''
     }
     components = {
-        momentCard,
+        momentCard
     };
     methods = {};
 
@@ -34,7 +34,7 @@ export default class taMomentList extends wepy.page {
         const { id } = options;
         this.userId = id;
         const list = await get(`/api/discover/${this.userId}/moment`, {
-            user_id: this.userId,
+            user_id: this.userId
         });
         console.log('TA的动态', list);
         this.$invoke('momentCard', 'setMomentList', list);

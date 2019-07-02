@@ -25,8 +25,8 @@
             <view class="battle-profile-signature" wx:if="{{profile.signature}}">
                 个性签名：{{profile.signature}}
             </view>
-            <view class="battle-profile-moments" wx:if="{{profile.discover && profile.discover.length}}">
-                <view class="tab" @tap="goDiscover">
+            <view class="battle-profile-moments" @tap="goDiscover" wx:if="{{profile.discover && profile.discover.length}}">
+                <view class="tab" >
                     <view class="text1">TA的动态</view>
                     <view class="text2" >查看全部
                         <van-icon name="arrow" />
@@ -54,7 +54,7 @@
             <view class="drawer-btn">
                 <image src="../../images/profile/close.png" mode="aspectFill" class="btn" @tap="makeFriend('close')"></image>
                 <view class="textWrap">
-                    <view class="lip">亲密接触</view>
+                    <view class="lip">真爱降临</view>
                     <view>剩余{{timeLeft.close}}次</view>
                 </view>
 
@@ -62,14 +62,14 @@
             <view class="drawer-btn">
                 <image src="../../images/profile/lover.png" mode="aspectFill" class="btn" @tap="makeFriend('lover')"></image>
                 <view class="textWrap">
-                    <view class="lover">成为恋人</view>
+                    <view class="lover">一见钟情</view>
                     <view>剩余{{timeLeft.lover}}次</view>
                 </view>
             </view>
             <view class="drawer-btn">
                 <image src="../../images/profile/friend.png" mode="aspectFill" class="btn" @tap="makeFriend('friend')"></image>
                 <view class="textWrap">
-                    <view class="friend">成为朋友</view>
+                    <view class="friend">有好感</view>
                     <view>剩余{{timeLeft.friend}}次</view>
                 </view>
             </view>
@@ -139,12 +139,12 @@ export default class Profile extends wepy.page {
             });
             this.profile.is_like = true;
 
-            Toast(this.likeType[type]);
+            Toast(this.likeType[type] + '发送成功');
             this.$apply();
         },
         goDiscover() {
             wepy.navigateTo({
-                url: `/pages/ta/taMomentList?id=${this.id}`
+                url: `/pages/ta/taMomentList?id=${this.profile._id}`
             });
         },
         gochat() {
