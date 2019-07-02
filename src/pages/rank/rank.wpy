@@ -14,6 +14,7 @@
                 <Constellation @getRankListByXZ.user="getRankListByXZ"></Constellation>
             </block>
         </view>
+        <view class="tips">排行榜每天下午5:00更新</view>
         <block wx:if="{{top3.length}}">
             <rankList :top3.sync="top3" :topOthers.sync="topOthers" :by.sync="by"></rankList>
         </block>
@@ -182,6 +183,7 @@ export default class fabu extends wepy.page {
         width: 50vw;
         margin-bottom: 30rpx;
         position: relative;
+        display: inline-block;
         .rank-down-pic{
             position: absolute;
             display: inline-block;
@@ -212,6 +214,17 @@ export default class fabu extends wepy.page {
                 left:-1% !important;
             }
         }
+    }
+    .tips{
+        display: inline-block;
+        font-size: 20rpx;
+        color: darkgrey;
+        width: 40vw;
+        height:44px;
+        line-height: 44px;
+        text-align: right;
+        vertical-align: top;
+        padding-right: 30rpx;
     }
     .menu {
         width: 120rpx;

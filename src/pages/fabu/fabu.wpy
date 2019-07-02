@@ -12,7 +12,7 @@
         <view class="img-box">
             <repeat for="{{uploadedPics}}" key="index" index="index" item="item">
                 <view class="imgBox">
-                    <image class="items" src="{{item.image_url}}" mode="aspectFill"></image>
+                    <image class="items" src="{{item.image_url}}" mode="aspectFill" @tap="preview(item.image_url)"></image>
                     <view class="minus" data-index="{{index}}" @tap="minus">
                         <view class="line"></view>
                     </view>
@@ -58,6 +58,13 @@ export default class fabu extends wepy.page {
     components = {};
 
     methods = {
+        preview(url) {
+            const urls = this.uploadedPics.map(x => x.image_url);
+            wepy.previewImage({
+                url, // 当前显示图片的http链接
+                urls, // 需要预览的图片http链接列表
+            });
+        },
         // 点击取消
         prepareToCancle() {
             wx.showModal({
