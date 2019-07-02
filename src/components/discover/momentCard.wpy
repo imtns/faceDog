@@ -13,11 +13,9 @@
                         </view>
                     </view>
                     <view class="second">
-                        <text class="margin-right" wx:if="{{item.gender === 'male'}}">♂{{item.age}}岁</text>
-                        <text class="margin-right" wx:else>♀{{item.age}}岁</text>
-                        <text class="margin-right">{{item.constellation}}</text>
-                        <text class="margin-right">{{item.city}}</text>
-                        <text class="margin-right">{{item.distance}}km</text>
+                        <!-- <text class="margin-right" wx:if="{{item.gender === 'male'}}">{{item.age}}岁</text>
+                        <text class="margin-right" wx:else>{{item.age}}岁</text> -->
+                        <text class="margin-right">{{item.age}}岁 | {{item.constellation}} | {{item.city}} | {{item.distance}}km</text>
                     </view>
                     <view class="moment" @tap="toMomentDetail({{item._id}})">
                         {{item.content}}
