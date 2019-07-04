@@ -11,11 +11,12 @@
             <uploadPic></uploadPic>
         </block>
         <block wx:if="{{step===4}}">
-            <chooseVerify></chooseVerify>
+            <chooseVerify :code.sync="code"></chooseVerify>
         </block>
         <block wx:if="{{step===5}}">
             <uploadVideo></uploadVideo>
         </block>
+         <van-toast id="van-toast" />
     </view>
 
 </template>
@@ -40,14 +41,16 @@ export default class Register extends wepy.page {
             'van-field': '../components/vant/field/index',
             'van-datetime-picker': '../components/vant/datetime-picker/index',
             'van-action-sheet': '../components/vant/action-sheet/index',
-            "van-toast": "../components/vant/toast/index"
+            'van-toast': '../components/vant/toast/index',
+            'van-loading': '../components/vant/loading/index'
         }
     };
 
     data = {
         step: 1,
         scopeUser: false,
-        userInfo: {}
+        userInfo: {},
+        code: ''
     };
 
     components = {
@@ -107,7 +110,11 @@ export default class Register extends wepy.page {
     computed = {};
 
     onLoad(options) {
-        if(options.name == 'reg'){
+        if (options.userid) {
+            console.error(options.userid);
+            this.code = options.userid;
+        }
+        if (options.name == 'reg') {
             this.step = 2;
             return;
         }

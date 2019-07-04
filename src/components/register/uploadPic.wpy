@@ -11,7 +11,9 @@
     <view wx:if="{{show}}">
         <cropper :options="cropperOpt" @beforeImageLoad="bl"></cropper>
     </view>
-    <van-toast id="van-toast" />
+    <block wx:if="{{loading}}">
+        <loading></loading>
+    </block>
 </template>
 
 <script>
@@ -22,6 +24,7 @@ import { toast, sleep } from '@/utils';
 import cropper from '../cropper';
 import { PROFILE } from '@/utils/url';
 import Toast from '@/components/vant/toast/toast';
+import loading from '@/components/loading';
 const device = wx.getSystemInfoSync();
 const width = device.windowWidth;
 const height = device.windowHeight - 50;
@@ -38,6 +41,8 @@ export default class uploadPic extends wepy.component {
     data = {
         src: '../images/reg/upload.png',
         show: false,
+        loading: false,
+        uploaded: false,
         cropperOpt: {
             width,
             height,
@@ -53,7 +58,8 @@ export default class uploadPic extends wepy.component {
     };
 
     components = {
-        cropper
+        cropper,
+        loading
     };
 
     methods = {
@@ -67,6 +73,10 @@ export default class uploadPic extends wepy.component {
             }
         },
         next() {
+            if (!this.uploaded) {
+                toast('请上传图片');
+                return;
+            }
             this.$emit('changeStep', 4);
         }
     };
@@ -88,6 +98,7 @@ export default class uploadPic extends wepy.component {
             this.show = false;
         },
         getCropImage: () => {
+            this.loading = true;
             this.$invoke('cropper', 'getCropperImage')
                 .then(src => {
                     console.log(src);
@@ -95,19 +106,22 @@ export default class uploadPic extends wepy.component {
                         src,
                         {
                             data: wepy.getStorageSync('reg_profile'),
-                            name: 'avatar'
+                            name: 'avatar',
+                            noLoading: true
                         },
                         async result => {
                             this.show = false;
-                            this.$apply();
-                            if (result == 'ok') {
+                            this.loading = false;
+                            if (result === 'ok') {
+                                this.uploaded = true;
                                 Toast.success('上传成功');
-                                await sleep(2);
-                                this.$emit('changeStep', 4);
+                                // await sleep(2);
+                                // this.$emit('changeStep', 4);
                             } else {
                                 Toast.fail(result);
                             }
-                        }
+                            this.$apply();
+                        },
                     );
                 })
                 .catch(async err => {

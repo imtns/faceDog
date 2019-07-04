@@ -53,7 +53,8 @@ export default class extends wepy.app {
     globalData = {
         userInfo: {},
         location: {},
-        welcome: false
+        welcome: false,
+        inviteCode: ''
     };
 
     constructor() {

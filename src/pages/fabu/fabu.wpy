@@ -62,7 +62,7 @@ export default class fabu extends wepy.page {
             const urls = this.uploadedPics.map(x => x.image_url);
             wepy.previewImage({
                 url, // 当前显示图片的http链接
-                urls, // 需要预览的图片http链接列表
+                urls // 需要预览的图片http链接列表
             });
         },
         // 点击取消
@@ -73,13 +73,13 @@ export default class fabu extends wepy.page {
                 success (res) {
                     if (res.confirm) {
                         wx.navigateBack({
-                            delta: 1,
+                            delta: 1
                         });
                     } else if (res.cancel) {
-                        console.log('用户点击取消')
+                        console.log('用户点击取消');
                     }
                 }
-            })
+            });
         },
         // 删除照片
         minus(e) {
@@ -121,7 +121,7 @@ export default class fabu extends wepy.page {
                     success(res) {
                         const data = JSON.parse(res.data).data;
                         resolve(data);
-                        //do something
+                        // do something
                     },
                     fail(res) {
                         reject(res);

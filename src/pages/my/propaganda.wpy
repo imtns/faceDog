@@ -125,7 +125,8 @@ export default class Propaganda extends wepy.page {
 
     data = {
         show: false,
-        clickIndex: 0
+        clickIndex: 0,
+        profile: wepy.getStorageSync('profile')
     };
 
     components = {};
@@ -158,7 +159,19 @@ export default class Propaganda extends wepy.page {
     async onLoad() {
         await get(INVATATION);
     }
+    onShareAppMessage () {
+        return {
+            title: '邀请好友获得10元现金红包',
+            path: '/pages/register?userid=' + this.profile._id,
+            success: (res) => {
 
+            },
+            fail (res) {
+          // 分享失败
+                console.log(res);
+            }
+        };
+    }
     onShow() {}
 }
 </script>

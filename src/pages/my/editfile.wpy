@@ -62,6 +62,10 @@
     <view wx:if="{{showCrop}}">
         <cropper :options="cropperOpt" @beforeImageLoad="bl"></cropper>
     </view>
+    <block wx:if="{{loading}}">
+        <loading></loading>
+    </block>
+    <van-toast id="van-toast" />
     <van-action-sheet cancel-text="取消" show="{{ show }}" actions="{{ actions }}" bind:cancel="onClose" bind:close="onClose" bind:select="onSelect" />
 </template>
 
@@ -70,9 +74,11 @@ import wepy from 'wepy';
 import { uploader } from '@/utils/uploader';
 import { get } from '@/utils/request';
 import { toast, sleep } from '@/utils';
+import Toast from '@/components/vant/toast/toast';
 import cropper from '@/components/cropper';
 import { PROFILE } from '@/utils/url';
 import mixin from '@/mixins/editMixin';
+import loading from '@/components/loading';
 const device = wx.getSystemInfoSync();
 const width = device.windowWidth;
 const height = device.windowHeight - 50;
@@ -84,7 +90,9 @@ export default class EditFile extends wepy.page {
             'van-button': '../../components/vant/button/index',
             'van-icon': '../../components/vant/icon/index',
             'van-switch': '../../components/vant/switch/index',
-            'van-action-sheet': '../../components/vant/action-sheet/index'
+            'van-action-sheet': '../../components/vant/action-sheet/index',
+            'van-toast': '../../components/vant/toast/index',
+            'van-loading': '../../components/vant/loading/index'
         }
     };
 
@@ -93,6 +101,7 @@ export default class EditFile extends wepy.page {
         show: false,
         showCrop: false,
         disabled: false,
+        loading: false,
         actions: [
             {
                 name: '设为默认头像',
@@ -118,7 +127,8 @@ export default class EditFile extends wepy.page {
     };
     mixins = [mixin];
     components = {
-        cropper
+        cropper,
+        loading
     };
 
     methods = {
@@ -128,7 +138,7 @@ export default class EditFile extends wepy.page {
 
         async onSelect({ detail }) {
             console.log(detail);
-            if (detail.name == '删除此照片') {
+            if (detail.name === '删除此照片') {
                 this.del(this.profile.images[this.clickIndex]._id);
                 this.show = false;
                 this.$apply();
@@ -146,7 +156,7 @@ export default class EditFile extends wepy.page {
         },
         async upload(index) {
             try {
-                if (index == 0) this.actions[0].disabled = true;
+                if (index === 0) this.actions[0].disabled = true;
                 else this.actions[0].disabled = false;
                 this.clickIndex = index;
                 if (this.profile.images[index]) {
@@ -193,9 +203,12 @@ export default class EditFile extends wepy.page {
             this.showCrop = false;
         },
         getCropImage: () => {
+            this.loading = true;
             this.$invoke('cropper', 'getCropperImage')
                 .then(src => {
                     console.log(src);
+                    this.showCrop = false;
+                    this.$apply();
                     uploader(
                         src,
                         {
@@ -207,14 +220,14 @@ export default class EditFile extends wepy.page {
                                             ._id) ||
                                     ''
                             },
-                            name: 'files'
+                            name: 'files',
+                            noLoading: true
                         },
-                        result => {
-                            toast('上传成功', async () => {
-                                this.getProfile();
-                                this.showCrop = false;
-                                this.$apply();
-                            });
+                        async result => {
+                            this.loading = false;
+                            await this.getProfile();
+                            this.$apply();
+                            Toast.success('上传成功');
                         }
                     );
                 })
@@ -230,14 +243,15 @@ export default class EditFile extends wepy.page {
 
     onLoad() {}
 
-    onShow() {
-    }
+    onShow() {}
 }
 </script>
 
 <style lang='less'>
-.van-action-sheet__cancel,.van-action-sheet__item{
-    font-size:32rpx !important;
+
+.van-action-sheet__cancel,
+.van-action-sheet__item {
+    font-size: 32rpx !important;
 }
 .wrapper {
     width: 100%;

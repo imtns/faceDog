@@ -13,7 +13,7 @@ module.exports.uploader = (tempFilePath, ...props) => {
 
     const formData = params && params.data || {};
     const name = params && params.name || '';
-    wx.showLoading && wx.showLoading({ title: '上传中', mask: true });
+    !params.noLoading && wx.showLoading && wx.showLoading({ title: '上传中', mask: true });
     console.log(name);
     return wx.uploadFile({
         url: uploadUrl,
@@ -28,17 +28,20 @@ module.exports.uploader = (tempFilePath, ...props) => {
             console.log(data);
             data = JSON.parse(data);
             if (data.return_code == 0) {
+                !params.noLoading && wx.hideLoading && wx.hideLoading();
                 callback('ok');
             } else {
                 // toast(data.message || '上传失败');
                 callback(data.message);
+
+                !params.noLoading && wx.hideLoading && wx.hideLoading();
             }
         },
         fail() {
             callback('上传失败');
         },
-        complete() {
-            wx.hideLoading && wx.hideLoading();
-        },
+        // complete() {
+        //     wx.hideLoading && wx.hideLoading();
+        // },
     });
 };

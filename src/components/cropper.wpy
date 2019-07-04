@@ -20,9 +20,9 @@ export default class Cropper extends wepy.component {
     data = {
         $: null,
         id: 'cropper',
-        targetId: 'targetCropper'
+        targetId: 'targetCropper',
+        loading: false
     };
-
     props = {
         options: Object
     };
@@ -40,6 +40,9 @@ export default class Cropper extends wepy.component {
     };
 
     methods = {
+        hideLoading() {
+            this.loading = false;
+        },
         ts(e) {
             this.$.touchStart(e);
         },
@@ -53,6 +56,7 @@ export default class Cropper extends wepy.component {
             console.error(e.detail.errMsg);
         },
         getFinalImage() {
+            this.loading = true;
             this.$emit('getCropImage');
         },
         cancel() {
@@ -96,15 +100,16 @@ export default class Cropper extends wepy.component {
 </script>
 
 <style lang='less'>
+
 .cropper-buttons {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     position: fixed;
-    z-index: 9999;
+    z-index: 9998;
     color: white;
-    background:#242424;
+    background: #242424;
     bottom: 0;
     left: 0;
     width: 100%;

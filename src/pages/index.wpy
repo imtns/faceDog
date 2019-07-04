@@ -142,7 +142,6 @@ export default class Index extends wepy.page {
     };
     onLoad() {
         this.$invoke('chat', 'initChat');
-
         Event.listen('refresh', () => {
             this.$invoke('discover', 'initList', { page: 1 });
         });

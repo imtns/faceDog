@@ -7,7 +7,7 @@
         <view class="form">
             <view class="field">
                 <view class="label">填写推荐人编号</view>
-                <input class="input" type="number" value="{{ inviteCode }}" @input="onChangeName"  placeholder="" />
+                <input class="input" type="text" disabled value="{{ code }}"  placeholder="" />
             </view>
             <view class="verify-box">
                 <view class="box">
@@ -36,6 +36,10 @@ export default class ChooseVerify extends wepy.component {
             type: Number,
             default: 0,
             twoWay: true
+        },
+        code: {
+            type: String,
+            defalut: ''
         }
     };
 
@@ -46,20 +50,17 @@ export default class ChooseVerify extends wepy.component {
     components = {};
 
     methods = {
-        onChangeName(event){
-            this.inviteCode = event.detail.value;
-        },
-        async verify(){
-            const data = await post(VERIFY,{
-                number:this.inviteCode
-            })
+        async verify() {
+            const data = await post(VERIFY, {
+                number: this.code
+            });
             wx.redirectTo({
                 url: 'index'
             });
 
-            console.log(data)
+            console.log(data);
         },
-        redirect(){
+        redirect() {
             // this.step = 5;
             this.$emit('changeStep', 5);
         }
