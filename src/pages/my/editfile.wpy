@@ -82,7 +82,6 @@ import loading from '@/components/loading';
 const device = wx.getSystemInfoSync();
 const width = device.windowWidth;
 const height = device.windowHeight - 50;
-let disabled = false;
 export default class EditFile extends wepy.page {
     config = {
         navigationBarTitleText: '编辑资料',
@@ -100,15 +99,16 @@ export default class EditFile extends wepy.page {
         birth: '',
         show: false,
         showCrop: false,
-        disabled: false,
         loading: false,
+        deleteDisable: false,
         actions: [
             {
                 name: '设为默认头像',
-                disabled
+                disabled: false
             },
             {
-                name: '删除此照片'
+                name: '删除此照片',
+                disabled: false
             }
         ],
         cropperOpt: {
@@ -156,7 +156,8 @@ export default class EditFile extends wepy.page {
         },
         async upload(index) {
             try {
-                if (index === 0) this.actions[0].disabled = true;
+                console.log(index);
+                if (index == 0) this.actions[0].disabled = true;
                 else this.actions[0].disabled = false;
                 this.clickIndex = index;
                 if (this.profile.images[index]) {
@@ -164,6 +165,7 @@ export default class EditFile extends wepy.page {
                 } else {
                     this.chooseImage();
                 }
+                this.$apply();
             } catch (e) {
                 console.log(e);
             }
@@ -180,7 +182,9 @@ export default class EditFile extends wepy.page {
             this.profile.birthday = event.detail.value;
             this.$apply();
         }
+
     };
+
     async chooseImage() {
         const { tempFilePaths } = await wepy.chooseImage({ count: 1 });
         this.$invoke('cropper', 'pushOrigin', tempFilePaths[0]);
@@ -248,7 +252,6 @@ export default class EditFile extends wepy.page {
 </script>
 
 <style lang='less'>
-
 .van-action-sheet__cancel,
 .van-action-sheet__item {
     font-size: 32rpx !important;

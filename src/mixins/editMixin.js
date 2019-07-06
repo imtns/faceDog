@@ -62,6 +62,11 @@ export default class Mixin extends wepy.mixin {
         }
         this.profile = data;
         wepy.setStorageSync('profile', this.profile);
+        if (this.profile.images.length == 1) {
+            this.actions[1].disabled = true;
+        } else {
+            this.actions[1].disabled = false;
+        }
         this.$apply();
     }
     onShow() {
