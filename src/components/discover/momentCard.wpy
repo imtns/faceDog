@@ -45,26 +45,27 @@
                     </view>
                 </view>
                 <view class="comment-box">
-                    <view class="comment-who" wx:if="{{item.likes.length}}">
+                    <view class="comment-who" wx:if="{{item.likes.length <= 6}}">
                         <image class="icon" src="../../images/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
-                        <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                          <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                            <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                              <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                  <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                    <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                      <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                        <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                          <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                            <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                              <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                                <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                                  <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
-                                                    <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                    </view>
+                    <view class="comment-who expand" wx:if="{{item.likes.length > 6 && !item.expanded}}">
+                        <image class="icon" src="../../images/discover/discover-zan.png"></image>
+                        <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
+                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar && indexlikes !== 5 }}" @tap="toProfile({{pic.user_id}})"></image>
+                            <view class="expand-btn" wx:if="{{ indexlikes === 5 && !item.expanded}}" @tap="expandNow({{index}})">展开</view>
+                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{ indexlikes === 5 && item.expanded}}" @tap="toProfile({{pic.user_id}})"></image>
+                        </repeat>
+                    </view>
+                    <view class="comment-who" wx:if="{{item.likes.length > 6 && item.expanded}}">
+                        <image class="icon" src="../../images/discover/discover-zan.png"></image>
+                        <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
+                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar && indexlikes !== 5 }}" @tap="toProfile({{pic.user_id}})"></image>
+                            <view class="expand-btn" wx:if="{{ indexlikes === 5 && !item.expanded}}" @tap="expandNow({{index}})">展开</view>
+                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{ indexlikes === 5 && item.expanded}}" @tap="toProfile({{pic.user_id}})"></image>
+                        </repeat>
                     </view>
                     <view class="comment-info-box" wx:if="{{item.comments.length}}">
                         <repeat for="{{item.comments}}" key="indexcomments" index="indexcomments" item="comments">
@@ -135,11 +136,16 @@ export default class momentCard extends wepy.component {
         show: false, // 别人举报的pop
         showPointsByme: false, // 自己点击三个点，是删除动态
         clickMomentId: '',
-        clickIndex: 0
+        clickIndex: 0,
     };
     components = {};
 
     methods = {
+        // 展开
+        expandNow(index) {
+            this.momentList[index].expanded = true;
+            this.$apply();
+        },
         // 匿名举报
         async reporting() {
             await post(`/api/discover/report_moment/${this.clickMomentId}`, {
@@ -382,6 +388,35 @@ export default class momentCard extends wepy.component {
                 item.age = this.methods.handleAge(item.birthday);
             }
             item.juli = formatDateFromSeconds(item.create_time);
+            // 这里是测试的假数据，记得删除
+            const MOOK_LIKES = [{
+                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+                user_id: '5d0de34a563b8b10021cce32',
+            }, {
+                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+                user_id: '5d0de34a563b8b10021cce32',
+            }, {
+                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+                user_id: '5d0de34a563b8b10021cce32',
+            }, {
+                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+                user_id: '5d0de34a563b8b10021cce32',
+            }, {
+                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+                user_id: '5d0de34a563b8b10021cce32',
+            }, {
+                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+                user_id: '5d0de34a563b8b10021cce32',
+            }, {
+                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+                user_id: '5d0de34a563b8b10021cce32',
+            }, {
+                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+                user_id: '5d0de34a563b8b10021cce32',
+            }];
+            item.likes =  item.likes.concat(MOOK_LIKES);
+            // 以上内容记得删除，调试展开功能用的
+            item.expanded = false,
             res.push(item);
             return res;
         }, []);
@@ -542,6 +577,10 @@ export default class momentCard extends wepy.component {
         background:rgba(250,251,252,1);
         margin-top: 30rpx;
         border-radius:10px;
+        .expand{
+            height: 85rpx;
+            overflow: hidden;
+        }
         .comment-who {
             display: flex;
             flex-wrap: wrap;
@@ -557,6 +596,15 @@ export default class momentCard extends wepy.component {
                 height: 60rpx;
                 border-radius: 100%;
                 margin: 23rpx 10rpx 0 10rpx;
+            }
+            .expand-btn{
+                width: 80rpx;
+                height: 60rpx;
+                margin: 23rpx 10rpx 0 10rpx;
+                color:rgba(230,0,17,1);
+                font-size: 24rpx;
+                line-height: 60rpx;
+                text-align: center;
             }
         }
         .comment-info-box {
