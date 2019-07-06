@@ -62,10 +62,9 @@
                     <view class="comment-who" wx:if="{{item.likes.length > 6 && item.expanded}}">
                         <image class="icon" src="../../images/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
-                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar && indexlikes !== 5 }}" @tap="toProfile({{pic.user_id}})"></image>
-                            <view class="expand-btn" wx:if="{{ indexlikes === 5 && !item.expanded}}" @tap="expandNow({{index}})">展开</view>
-                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{ indexlikes === 5 && item.expanded}}" @tap="toProfile({{pic.user_id}})"></image>
+                            <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
+                        <view class="expand-btn" @tap="expandFasle({{index}})">收起</view>
                     </view>
                     <view class="comment-info-box" wx:if="{{item.comments.length}}">
                         <repeat for="{{item.comments}}" key="indexcomments" index="indexcomments" item="comments">
@@ -141,6 +140,11 @@ export default class momentCard extends wepy.component {
     components = {};
 
     methods = {
+        // 收起
+        expandFasle(index) {
+            this.momentList[index].expanded = false;
+            this.$apply();
+        },
         // 展开
         expandNow(index) {
             this.momentList[index].expanded = true;
@@ -241,6 +245,7 @@ export default class momentCard extends wepy.component {
                     index
                 ].likes.filter(x => x.user_id !== me._id);
                 this.momentList[index].liked = false;
+                this.$apply();
             } else {
                 // 点赞
                 const data = await get(`/api/discover/moment/${id}/like`);
@@ -250,6 +255,7 @@ export default class momentCard extends wepy.component {
                     user_id: me._id
                 });
                 this.momentList[index].liked = true;
+                this.$apply();
             }
             this.$apply();
         },
@@ -388,7 +394,7 @@ export default class momentCard extends wepy.component {
                 item.age = this.methods.handleAge(item.birthday);
             }
             item.juli = formatDateFromSeconds(item.create_time);
-            // 这里是测试的假数据，记得删除
+            // // 这里是测试的假数据，记得删除
             const MOOK_LIKES = [{
                 avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
                 user_id: '5d0de34a563b8b10021cce32',
@@ -578,7 +584,7 @@ export default class momentCard extends wepy.component {
         margin-top: 30rpx;
         border-radius:10px;
         .expand{
-            height: 85rpx;
+            height: 80rpx;
             overflow: hidden;
         }
         .comment-who {
