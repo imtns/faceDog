@@ -53,13 +53,13 @@ export default class Like extends wepy.component {
 
     methods = {
         async agree(user) {
-            get(AGREE_FRIEND, {
+            // get(AGREE_FRIEND, {
+            //     user_id: user._id
+            // });
+            await post(MAKEFRIEND, {
+                to_be: user.be,
                 user_id: user._id
             });
-            // await post(MAKEFRIEND, {
-            //     to_be: type,
-            //     user_id: this.id
-            // });
             wx.navigateTo({
                 url: `chat/becomeFriend?id=${user.dentifier}&nick=${
                     user.nick_name

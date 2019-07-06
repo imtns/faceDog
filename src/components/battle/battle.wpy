@@ -177,9 +177,9 @@ export default class Battle extends wepy.component {
             if (self.likeCount.count[likedImageId] == 2) {
                 var notLikeImageId = '';
                 if (position == 'bottom') {
-                    notLikeImageId = self.battle.a[self.topIndex - 1]._id;
+                    notLikeImageId = self.battle.a[self.topIndex - 1].image_id;
                 } else {
-                    notLikeImageId = self.battle.b[self.bottomIndex - 1]._id;
+                    notLikeImageId = self.battle.b[self.bottomIndex - 1].image_id;
                 }
 
                 console.error(likedImageId + '喜欢了3次');
