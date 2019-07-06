@@ -15,15 +15,16 @@
                     <view class="second">
                         <!-- <text class="margin-right" wx:if="{{item.gender === 'male'}}">{{item.age}}岁</text>
                         <text class="margin-right" wx:else>{{item.age}}岁</text> -->
-                        <text class="margin-right">{{item.age}}岁 | {{item.constellation}} | {{item.city}} | {{item.distance}}km</text>
+                        <text class="margin-right">{{item.age}}岁 | {{item.constellation}} | {{item.city}}  {{item.distance ? ' | ' + item.distance + 'km' : ''}}</text>
                     </view>
                     <view class="moment" @tap="toMomentDetail({{item._id}})">
                         {{item.content}}
                     </view>
                     <view class="imgs">
-                        <repeat for="{{item.images}}" key="indeximages" index="indeximages" item="pic">
+                        <repeat for="{{item.images}}" key="indeximages" index="indeximages" item="pic" wx:if="{{item.images.length > 1}}">
                             <image class="img" src="{{pic.thumbnail_url}}" data-index="{{index}}" data-picIndex="{{indeximages}}" @tap="preview" mode="aspectFill"></image>
                         </repeat>
+                        <image class="imgOne" src="{{item.images[0].thumbnail_url}}" data-index="{{index}}" data-picIndex="{{0}}" @tap="preview" mode="aspectFill" wx:if="{{item.images.length == 1}}"></image>
                     </view>
                     <view class="actions">
                         <view class="box" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
@@ -359,7 +360,9 @@ export default class momentCard extends wepy.component {
         console.log(list);
         this.momentList = list.reduce((res, item) => {
             // 处理距离
-            item.distance = (item.distance / 1000).toFixed(2);
+            if (item.distance || +item.distance === 0) {
+                item.distance = (item.distance / 1000).toFixed(2);
+            }
             if (item.birthday) {
                 item.age = this.methods.handleAge(item.birthday);
             }
@@ -466,6 +469,11 @@ export default class momentCard extends wepy.component {
                 .img {
                     width: 182rpx;
                     height: 182rpx;
+                    margin: 10rpx 10rpx 0 0;
+                }
+                .imgOne{
+                    width: 364rpx;
+                    height: 364rpx;
                     margin: 10rpx 10rpx 0 0;
                 }
             }
