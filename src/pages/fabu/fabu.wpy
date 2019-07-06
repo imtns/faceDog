@@ -155,10 +155,10 @@ export default class fabu extends wepy.page {
                 }
             );
             const data = await post(FABU_FABU_MOMENT, subData);
+            Event.trigger('refresh');
             toast('发布成功');
 
             setTimeout(() => {
-                Event.trigger('refresh');
                 wx.navigateBack({
                     delta: 1
                 });

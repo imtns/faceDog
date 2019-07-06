@@ -413,11 +413,13 @@ page {
         justify-content: space-between;
         top: -30rpx;
         .left-container {
-            margin-top: 12rpx;
+            margin-top: 10rpx;
             margin-right: auto;
             margin-left: 20rpx;
             .top {
-                font-size: 20rpx;
+                font-size: 22rpx;
+                font-weight:600;
+                margin-bottom:5rpx;
             }
             .bottom {
                 font-size: 18rpx;

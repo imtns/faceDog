@@ -28,7 +28,7 @@
 <script>
 import wepy from 'wepy';
 import { post } from '@/utils/request';
-import { toast } from '@/utils';
+import { toast, sleep } from '@/utils';
 import { VERIFY } from '../../utils/url.js';
 export default class ChooseVerify extends wepy.component {
     props = {
@@ -51,14 +51,19 @@ export default class ChooseVerify extends wepy.component {
 
     methods = {
         async verify() {
-            const data = await post(VERIFY, {
-                number: this.code
-            });
-            wx.redirectTo({
-                url: 'index'
-            });
-
-            console.log(data);
+            try {
+                const data = await post(VERIFY, {
+                    number: this.code
+                });
+                console.log(data);
+                toast('认证成功');
+                await sleep(2);
+                wx.redirectTo({
+                    url: 'index'
+                });
+            } catch (e) {
+                toast('认证失败');
+            }
         },
         redirect() {
             // this.step = 5;

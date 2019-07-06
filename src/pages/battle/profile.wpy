@@ -51,23 +51,23 @@
             </block>
         </view>
         <view class="drawer_screen" bindtap="showOrHide" wx:if="{{isShow}}" catchtouchmove="myCatchTouch">
-            <view class="drawer-btn">
-                <image src="../../images/profile/close.png" mode="aspectFill" class="btn" @tap="makeFriend('close')"></image>
+            <view class="drawer-btn" @tap="makeFriend('close')">
+                <image src="../../images/profile/close.png" mode="aspectFill" class="btn" ></image>
                 <view class="textWrap">
                     <view class="lip">真爱降临</view>
                     <view>剩余{{timeLeft.close}}次</view>
                 </view>
 
             </view>
-            <view class="drawer-btn">
-                <image src="../../images/profile/lover.png" mode="aspectFill" class="btn" @tap="makeFriend('lover')"></image>
+            <view class="drawer-btn" @tap="makeFriend('lover')">
+                <image src="../../images/profile/lover.png" mode="aspectFill" class="btn" ></image>
                 <view class="textWrap">
                     <view class="lover">一见钟情</view>
                     <view>剩余{{timeLeft.lover}}次</view>
                 </view>
             </view>
-            <view class="drawer-btn">
-                <image src="../../images/profile/friend.png" mode="aspectFill" class="btn" @tap="makeFriend('friend')"></image>
+            <view class="drawer-btn" @tap="makeFriend('friend')">
+                <image src="../../images/profile/friend.png" mode="aspectFill" class="btn" ></image>
                 <view class="textWrap">
                     <view class="friend">有好感</view>
                     <view>剩余{{timeLeft.friend}}次</view>

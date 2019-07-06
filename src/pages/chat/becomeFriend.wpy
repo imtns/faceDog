@@ -24,16 +24,16 @@ export default class BecomeFriend extends wepy.page {
     };
 
     data = {
-        friendIcon:'',
-        nick:'',
-        dentifier:'',
-        me:{}
+        friendIcon: '',
+        nick: '',
+        dentifier: '',
+        me: {}
     };
 
     components = {};
 
     methods = {
-        redirect(){
+        redirect() {
             wx.redirectTo({
                 url: `chat?id=${this.dentifier}&nick=${this.nick}&icon=${encodeURI(this.friendIcon)}`
             });
