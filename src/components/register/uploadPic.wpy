@@ -6,7 +6,7 @@
         </view>
         <view class="desc">在颜狗里，颜值就是王道！请上传你本人最好看的一张 照片它将直接关系到你的各项权益（照片可以随时修改）</view>
         <image class="thumb" src="{{src}}" @tap="uploadPic" mode="aspectFill"></image>
-        <button class="button" @tap="next">下一步</button>
+        <!-- <button class="button" @tap="next">下一步</button> -->
     </view>
     <view wx:if="{{show}}">
         <cropper :options="cropperOpt" @beforeImageLoad="bl"></cropper>
@@ -98,10 +98,12 @@ export default class uploadPic extends wepy.component {
             this.show = false;
         },
         getCropImage: () => {
-            this.loading = true;
             this.$invoke('cropper', 'getCropperImage')
                 .then(src => {
                     console.log(src);
+                    this.loading = true;
+                    this.show = false;
+                    this.$apply();
                     uploader(
                         src,
                         {
@@ -112,11 +114,12 @@ export default class uploadPic extends wepy.component {
                         async result => {
                             this.show = false;
                             this.loading = false;
+                            this.src = src;
                             if (result === 'ok') {
                                 this.uploaded = true;
                                 Toast.success('上传成功');
-                                // await sleep(2);
-                                // this.$emit('changeStep', 4);
+                                await sleep(2);
+                                this.$emit('changeStep', 4);
                             } else {
                                 Toast.fail(result);
                             }

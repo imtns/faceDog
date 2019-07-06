@@ -36,21 +36,13 @@
             </view>
             <view class="box-container">
                 <block wx:if="{{clickIndex == 0}}">
-                    <view class="box">
-                        <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                        <text class="name">赵小姐</text>
-                        <text class="time">2019-3-3</text>
-                    </view>
-                    <view class="box">
-                        <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                        <text class="name">赵小姐</text>
-                        <text class="time">2019-3-3</text>
-                    </view>
-                    <view class="box">
-                        <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
-                        <text class="name">赵小姐</text>
-                        <text class="time">2019-3-3</text>
-                    </view>
+                    <repeat for="{{inviteList}}" key="index" index="index" item="item">
+                        <view class="box">
+                            <image src="{{item.avatar}}" mode="aspectFill"></image>
+                            <text class="name">{{item.nick_name}}</text>
+                            <text class="time">2019-3-3</text>
+                        </view>
+                    </repeat>
                 </block>
                 <block wx:else>
                     <view class="withdraw-box">
@@ -113,7 +105,7 @@
 
 <script>
 import wepy from 'wepy';
-import {get} from '@/utils/request';
+import { get } from '@/utils/request';
 import { INVATATION } from '@/utils/url';
 export default class Propaganda extends wepy.page {
     config = {
@@ -124,6 +116,8 @@ export default class Propaganda extends wepy.page {
     };
 
     data = {
+        inviteList: {},
+        withdrawList: {},
         show: false,
         clickIndex: 0,
         profile: wepy.getStorageSync('profile')
@@ -157,17 +151,17 @@ export default class Propaganda extends wepy.page {
     computed = {};
 
     async onLoad() {
-        await get(INVATATION);
+        const data = await get(INVATATION);
+        this.inviteList = data.invitation;
+        this.$apply();
     }
-    onShareAppMessage () {
+    onShareAppMessage() {
         return {
             title: '邀请好友获得10元现金红包',
-            path: '/pages/register?userid=' + this.profile._id,
-            success: (res) => {
-
-            },
-            fail (res) {
-          // 分享失败
+            path: '/pages/register?userid=' + this.profile.ID,
+            success: res => {},
+            fail(res) {
+                // 分享失败
                 console.log(res);
             }
         };
@@ -324,7 +318,7 @@ button {
                 justify-content: center;
                 border-bottom: 1rpx solid rgba(232, 231, 231, 1);
                 padding-top: 52rpx;
-                padding-bottom:80rpx;
+                padding-bottom: 80rpx;
                 .money {
                     font-size: 100rpx;
                     line-height: 100rpx;
@@ -350,7 +344,7 @@ button {
                 font-weight: 600;
                 margin-top: 12rpx;
                 color: rgba(40, 40, 40, 1);
-                margin-top:19rpx;
+                margin-top: 19rpx;
                 margin-bottom: 30rpx;
             }
             .withdraw-list {

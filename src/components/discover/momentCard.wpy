@@ -26,10 +26,10 @@
                         </repeat>
                     </view>
                     <view class="actions">
-                        <view class="box" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
+                        <view class="box {{item.liked?'red':''}}" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
                             <image class="icon" src="../../images/discover/discover-zaned.png" wx:if="{{item.liked}}"></image>
                             <image class="icon" src="../../images/discover/discover-zan.png" wx:else></image>
-                            <view wx:if="{{item.liked}}" class="text red">{{item.likes.length || 0}}</view>
+                            <view wx:if="{{item.liked}}" class="text">{{item.likes.length || 0}}</view>
                             <view wx:else class="text">{{item.likes.length || 0}}</view>
                         </view>
                         <view class="box" @tap="comment" data-id="{{item._id}}" data-index="{{index}}" data-userid="{{item.user_id}}">
@@ -49,6 +49,21 @@
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
+                        <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                          <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                            <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                              <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                  <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                    <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                      <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                        <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                          <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                            <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                              <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                                <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                                  <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
+                                                    <image class="img" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png"></image>
                     </view>
                     <view class="comment-info-box" wx:if="{{item.comments.length}}">
                         <repeat for="{{item.comments}}" key="indexcomments" index="indexcomments" item="comments">
@@ -415,8 +430,8 @@ export default class momentCard extends wepy.component {
     padding: 0 26rpx;
     margin-top: 47rpx;
     .header {
-        width: 100rpx;
-        height: 100rpx;
+        width: 80rpx;
+        height: 80rpx;
         border-radius: 100%;
         display: block;
         margin-right: 16rpx;
@@ -453,7 +468,7 @@ export default class momentCard extends wepy.component {
                 }
             }
             .moment {
-                margin-top: 40rpx;
+                margin-top: 20rpx;
                 font-size: 24rpx;
                 line-height: 36rpx;
                 color: rgba(0, 0, 0, 1);
@@ -462,11 +477,11 @@ export default class momentCard extends wepy.component {
                 display: flex;
                 flex-wrap: wrap;
                 align-content: flex-start;
-                margin-top: 30rpx;
+                margin-top: 17rpx;
                 .img {
                     width: 182rpx;
                     height: 182rpx;
-                    margin: 10rpx 10rpx 0 0;
+                    margin:0rpx 10rpx 10rpx 0;
                 }
             }
             .actions {
@@ -477,6 +492,7 @@ export default class momentCard extends wepy.component {
                     background: rgba(245, 245, 245, 1);
                     padding: 0 20rpx;
                     margin-right: 40rpx;
+                    border-radius:10rpx;
                     height: 45rpx;
                     .icon {
                         width: 24rpx;
@@ -486,12 +502,13 @@ export default class momentCard extends wepy.component {
                         font-size: 24rpx;
                         height: 45rpx;
                         line-height: 45rpx;
-                        color: rgba(158, 157, 157, 1);
+                        // color: rgba(158, 157, 157, 1);
                         display: inline-block;
                         margin-left: 5rpx;
                     }
-                    .red {
-                        color: #e60011;
+                    &.red {
+                        color: white !important;
+                        background:#e60011;
                     }
                 }
                 .last {
@@ -514,12 +531,13 @@ export default class momentCard extends wepy.component {
         }
     }
     .comment-box {
-        background: rgba(245, 245, 245, 1);
+        background:rgba(250,251,252,1);
         margin-top: 30rpx;
+        border-radius:10px;
         .comment-who {
             display: flex;
             flex-wrap: wrap;
-            border-bottom: 1px solid rgba(212, 212, 213, 1);
+            // border-bottom: 1px solid rgba(212, 212, 213, 1);
             padding-bottom: 23rpx;
             .icon {
                 width: 24rpx;
