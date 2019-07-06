@@ -37,7 +37,7 @@
 <script>
 import wepy from 'wepy';
 import { getAge } from '@/utils';
-import { LIKE_ME, AGREE_FRIEND } from '@/utils/url';
+import { LIKE_ME, AGREE_FRIEND, MAKEFRIEND } from '@/utils/url';
 import { get, post } from '@/utils/request';
 import empty from '@/components/empty';
 export default class Like extends wepy.component {
@@ -52,10 +52,14 @@ export default class Like extends wepy.component {
     };
 
     methods = {
-        agree(user) {
+        async agree(user) {
             get(AGREE_FRIEND, {
                 user_id: user._id
             });
+            // await post(MAKEFRIEND, {
+            //     to_be: type,
+            //     user_id: this.id
+            // });
             wx.navigateTo({
                 url: `chat/becomeFriend?id=${user.dentifier}&nick=${
                     user.nick_name
