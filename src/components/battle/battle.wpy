@@ -62,17 +62,11 @@
 
 <script>
 import wepy from 'wepy';
-// import { dialog } from '@/utils';
-// let prex = 0;
 import { BATTLE } from '@/utils/url';
 import { get } from '@/utils/request';
-// import { removeDuplicates } from '@/utils';
-// import lottie from '@/lottie/index';
 import { Event } from '@/utils/event.js';
 import empty from '@/components/empty';
 let emptyData = false;
-// let timeout = 0;
-// let buttonDisable = false;
 export default class Battle extends wepy.component {
     data = {
         loading: true,
@@ -340,7 +334,7 @@ export default class Battle extends wepy.component {
         console.log(windowWidth);
     }
     setHeart(position, index) {
-        if (index == 2) {
+        if (index === 2) {
             index = 3;
         }
         if (position === 'top') {

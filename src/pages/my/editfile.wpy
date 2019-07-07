@@ -143,7 +143,7 @@ export default class EditFile extends wepy.page {
                 this.show = false;
                 this.$apply();
                 await sleep(1);
-                this.getProfile();
+                this.getProfile(true, true);
             } else {
                 this.changeAvatar({
                     image_id: this.profile.images[this.clickIndex]._id

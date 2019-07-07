@@ -45,13 +45,13 @@
                     </view>
                 </view>
                 <view class="comment-box">
-                    <view class="comment-who" wx:if="{{item.likes.length <= 6 && item.likes.length}}">
+                    <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length <= 6 && item.likes.length}}">
                         <image class="icon" src="../../images/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
                     </view>
-                    <view class="comment-who expand" wx:if="{{item.likes.length > 6 && !item.expanded}}">
+                    <view class="comment-who expand {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && !item.expanded}}">
                         <image class="icon" src="../../images/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar && indexlikes !== 5 }}" @tap="toProfile({{pic.user_id}})"></image>
@@ -59,7 +59,7 @@
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{ indexlikes === 5 && item.expanded}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
                     </view>
-                    <view class="comment-who" wx:if="{{item.likes.length > 6 && item.expanded}}">
+                    <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && item.expanded}}">
                         <image class="icon" src="../../images/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
@@ -590,7 +590,9 @@ export default class momentCard extends wepy.component {
         .comment-who {
             display: flex;
             flex-wrap: wrap;
-            // border-bottom: 1px solid rgba(212, 212, 213, 1);
+            &.border{
+                border-bottom: 1px solid rgba(212, 212, 213, 1);
+            }
             padding-bottom: 23rpx;
             .icon {
                 width: 24rpx;

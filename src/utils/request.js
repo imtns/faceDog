@@ -1,6 +1,6 @@
 import { toast } from './index';
 
-const domain = 'http://www.molineapp.cn';
+const domain = 'https://www.molineapp.cn';
 
 const http = (method, ...props) => new Promise((resolve, reject) => {
     try {

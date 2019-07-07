@@ -1,11 +1,11 @@
 /*eslint-disable */
-let uploadUrl = 'http://www.molineapp.cn/api/user/profile';
+let uploadUrl = 'httpxs://www.molineapp.cn/api/user/profile';
 // uploadUrl = 'https://yaofa.58.com/fileUpload'
 import { toast } from './index';
 module.exports.uploader = (tempFilePath, ...props) => {
     let [params, callback] = props;
-    if (params && params.isVideo) uploadUrl = 'http://www.molineapp.cn/api/user/certify/video';
-    if (params && params.profile) uploadUrl = 'http://www.molineapp.cn/api/user/image';
+    if (params && params.isVideo) uploadUrl = 'https://www.molineapp.cn/api/user/certify/video';
+    if (params && params.profile) uploadUrl = 'https://www.molineapp.cn/api/user/image';
     if (typeof params === 'function') {
         callback = params;
         params = {};

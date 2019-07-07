@@ -111,7 +111,7 @@ export default class fabu extends wepy.page {
         wxUploade(tempFilePath) {
             return new Promise((resolve, reject) => {
                 wx.uploadFile({
-                    url: 'http://www.molineapp.cn/api/discover/moment/images',
+                    url: 'https://www.molineapp.cn/api/discover/moment/images',
                     filePath: tempFilePath,
                     name: 'image',
                     header: {
