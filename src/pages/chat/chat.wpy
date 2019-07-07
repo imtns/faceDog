@@ -91,21 +91,15 @@ export default class Chat extends wepy.page {
 
     methods = {
         getMoreData() {
-            if (loading) return;
+            if (loading || this.Complete) return;
             loading = true;
             wx.showLoading();
             this.getLastC2CHistoryMsgs(
                 (list, err) => {
                     loading = false;
                     wx.hideLoading();
-                    var c = 14;
-
                     this.msgList.unshift(...list);
                     this.$apply();
-                    setTimeout(() => {
-                        // this.toview = `chat${c}`;
-                        // this.$apply();
-                    }, 1000);
                 },
                 err => {
                     loading = false;
@@ -178,7 +172,6 @@ export default class Chat extends wepy.page {
             selType: webim.SESSION_TYPE.C2C,
             selSessHeadUrl: this.icon
         });
-        var that = this;
         if (webim.checkLogin()) {
             // 检查是否登录返回true和false,不登录则重新登录
             console.log('已登录');
@@ -202,18 +195,17 @@ export default class Chat extends wepy.page {
             options,
             function(resp) {
                 var complete = resp.Complete; // 是否还有历史消息可以拉取，1-表示没有，0-表示有
-                var retMsgCount = resp.MsgCount; // 返回的消息条数，小于或等于请求的消息条数，小于的时候，说明没有历史消息可拉取了
                 that.LastMsgTime = resp.LastMsgTime;
                 that.MsgKey = resp.MsgKey;
                 that.count = resp.MaxCnt;
-                that.Complete = resp.MsgList.length == 0;
                 that.$apply();
+                var temp = null;
                 if (complete === 1) {
                     wx.hideLoading();
                     webim.Log.error(
                         '没有历史消息了:data=' + JSON.stringify(options)
                     );
-                    var temp = {
+                    temp = {
                         msg: '',
                         avatar: that.user.avatar,
                         nick_name: that.user.nick_name,
@@ -227,14 +219,8 @@ export default class Chat extends wepy.page {
                         ),
                         showtime: parseInt(new Date().getTime() / 1000)
                     };
-                    if (that.msgList.length === 0) {
-                        that.msgList.push(temp);
-                    } else {
-                        that.msgList.unshift(temp);
-                    }
                     that.Complete = true;
                     that.$apply();
-                    return;
                 }
                 const list = resp.MsgList.map((item, index) => {
                     console.log(item);
@@ -252,6 +238,13 @@ export default class Chat extends wepy.page {
                         time: item.time
                     };
                 });
+                if (temp) {
+                    if (list.length === 0) {
+                        list.push(temp);
+                    } else {
+                        list.unshift(temp);
+                    }
+                }
                 if (cbOk) cbOk(list);
             },
             cbError

@@ -266,21 +266,15 @@ export default class Battle extends wepy.component {
                     item.animation = {};
                 });
 
-                this.battle.a.unshift(...result.a);
+                this.battle.a.push(...result.a);
             }
             if (!position || position === 'b') {
                 result.b.forEach(item => {
                     item.distance = (item.distance / 1000).toFixed(2);
                     item.animation = {};
                 });
-                this.battle.b.unshift(...result.b);
+                this.battle.b.push(...result.b);
             }
-            this.battle.a.forEach(item => {
-                item.animation = {};
-            });
-            this.battle.b.forEach(item => {
-                item.animation = {};
-            });
             setTimeout(() => {
                 this.loading = false;
                 this.$apply();

@@ -27,7 +27,7 @@
                         <image class="imgOne" src="{{item.images[0].thumbnail_url}}" data-index="{{index}}" data-picIndex="{{0}}" @tap="preview" mode="aspectFill" wx:if="{{item.images.length == 1}}"></image>
                     </view>
                     <view class="actions">
-                        <view class="box {{item.liked?'red':''}}" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
+                        <view  class="box  {{item.liked?'red':''}}" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
                             <image class="icon" src="../../images/discover/discover-zaned.png" wx:if="{{item.liked}}"></image>
                             <image class="icon" src="../../images/discover/discover-zan.png" wx:else></image>
                             <view wx:if="{{item.liked}}" class="text">{{item.likes.length || 0}}</view>
@@ -45,7 +45,7 @@
                     </view>
                 </view>
                 <view class="comment-box">
-                    <view class="comment-who" wx:if="{{item.likes.length <= 6}}">
+                    <view class="comment-who" wx:if="{{item.likes.length <= 6 && item.likes.length}}">
                         <image class="icon" src="../../images/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
@@ -135,7 +135,7 @@ export default class momentCard extends wepy.component {
         show: false, // 别人举报的pop
         showPointsByme: false, // 自己点击三个点，是删除动态
         clickMomentId: '',
-        clickIndex: 0,
+        clickIndex: 0
     };
     components = {};
 
@@ -397,32 +397,32 @@ export default class momentCard extends wepy.component {
             // // 这里是测试的假数据，记得删除
             const MOOK_LIKES = [{
                 avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32',
+                user_id: '5d0de34a563b8b10021cce32'
             }, {
                 avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32',
+                user_id: '5d0de34a563b8b10021cce32'
             }, {
                 avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32',
+                user_id: '5d0de34a563b8b10021cce32'
             }, {
                 avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32',
+                user_id: '5d0de34a563b8b10021cce32'
             }, {
                 avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32',
+                user_id: '5d0de34a563b8b10021cce32'
             }, {
                 avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32',
+                user_id: '5d0de34a563b8b10021cce32'
             }, {
                 avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32',
+                user_id: '5d0de34a563b8b10021cce32'
             }, {
                 avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32',
+                user_id: '5d0de34a563b8b10021cce32'
             }];
-            item.likes =  item.likes.concat(MOOK_LIKES);
+            // item.likes =  item.likes.concat(MOOK_LIKES);
             // 以上内容记得删除，调试展开功能用的
-            item.expanded = false,
+            item.expanded = false;
             res.push(item);
             return res;
         }, []);
