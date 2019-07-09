@@ -7,7 +7,7 @@
         <view class="form">
             <view class="field">
                 <view class="label">填写推荐人编号</view>
-                <input class="input" type="text" disabled value="{{ code }}"  placeholder="" />
+                <input class="input" type="text" disabled="{{disabled}}" value="{{ code }}"  placeholder="" />
             </view>
             <view class="verify-box">
                 <view class="box">
@@ -40,13 +40,16 @@ export default class ChooseVerify extends wepy.component {
         code: {
             type: String,
             defalut: ''
+        },
+        disabled: {
+            type: Boolean,
+            default: false
         }
     };
 
     data = {
         inviteCode: ''
     };
-
     components = {};
 
     methods = {

@@ -11,7 +11,7 @@
             <uploadPic></uploadPic>
         </block>
         <block wx:if="{{step===4}}">
-            <chooseVerify :code.sync="code"></chooseVerify>
+            <chooseVerify :code.sync="code" :disabled.sync="disabled"></chooseVerify>
         </block>
         <block wx:if="{{step===5}}">
             <uploadVideo></uploadVideo>
@@ -50,7 +50,8 @@ export default class Register extends wepy.page {
         step: 1,
         scopeUser: false,
         userInfo: {},
-        code: ''
+        code: '',
+        disabled: false
     };
 
     components = {
@@ -113,6 +114,7 @@ export default class Register extends wepy.page {
         if (options.userid) {
             console.error(options.userid);
             this.code = options.userid;
+            this.disabled = true;
         }
         if (options.name == 'reg') {
             this.step = 2;

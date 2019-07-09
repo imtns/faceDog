@@ -8,34 +8,34 @@
         </view>
         <view class="w">
             <view class="boxes">
-                <view class="box1">
-                    <image src="{{image1}}"></image>
+                <view class="box1" wx:if="{{images[0]}}">
+                    <image src="{{images[0].image}}"></image>
                     <view class="info">
-                        <view class="word">胜 率 \ <text> {{rate1}}</text></view>
-                        <view class="word">出场数 \ <text> {{play1}}</text></view>
+                        <view class="word">胜 率 \ <text> {{images[0].win / 100}}%</text></view>
+                        <view class="word">出场数 \ <text> {{images[0].play / 100}}%</text></view>
                     </view>
                 </view>
                 <view class="box2"><canvas canvas-id="radarCanvas" class="canvas"></canvas></view>
-                <view class="box3">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="box3" wx:if="{{images[1]}}">
+                    <image src="{{images[1].image}}" mode="aspectFill"></image>
                     <view class="info">
-                        <view class="word">胜 率 \ <text> 70%</text></view>
-                        <view class="word">出场率 \ <text> 65%</text></view>
+                        <view class="word">胜 率 \ <text> {{images[0].win / 100}}%</text></view>
+                        <view class="word">出场数 \ <text> {{images[0].play / 100}}%</text></view>
                     </view>
                 </view>
-                <view class="box3">
-                    <image src="../../images/profile/model.jpg" mode="aspectFill"></image>
+                <view class="box3" wx:if="{{images[2]}}">
+                    <image src="{{images[2].image}}" mode="aspectFill"></image>
                     <view class="info">
-                        <view class="word">胜率 \ <text> 70%</text></view>
-                        <view class="word">出场率 \ <text> 65%</text></view>
+                        <view class="word">胜 率 \ <text> {{images[0].win / 100}}%</text></view>
+                        <view class="word">出场数 \ <text> {{images[0].play / 100}}%</text></view>
                     </view>
                 </view>
             </view>
             <view class="shareButton" @tap="share">分享有奖</view>
         </view>
-        <block wx:if="{{ready}}">
+        <view class="drawImage" wx:if="{{ready}}">
             <drawimage id="drawimage" width="750" height="1333" background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile" fileType="'jpg'" />
-        </block>
+        </view>
     </view>
 </template>
 
@@ -60,10 +60,8 @@ export default class Example extends wepy.page {
     data = {
         position: '', // 省份
         city: 0, // 城市名次
-        image1: '',
+        images: [],
         face: 0, // 颜值排名
-        play1: 0, // 出场？
-        rate1: 0, // 胜利？
         ready: false,
         canvasImage: '',
         background: {
@@ -127,9 +125,7 @@ export default class Example extends wepy.page {
         // 省份
         this.position = position;
         // 图片1
-        this.image1 = info.images.image;
-        this.play1 = info.images.play;
-        this.rate1 = (+info.images.win / +info.images.play).toFixed(2) * 100 + '%';
+        this.images = info.images;
         this.$apply();
         radarChart = new wxCharts({
             canvasId: 'radarCanvas',
@@ -173,18 +169,18 @@ export default class Example extends wepy.page {
     }
 
     async initStyleList() {
-        this.background.imageResource = await getTmpFilePath(
-            'http://pic1.58cdn.com.cn/bizmp/n_v2316c41156a8a40318632c39987265e23_bc943f71d9f4b87c.png?w=600'
-        );
-        const bg = await getTmpFilePath(
-            'http://pic1.58cdn.com.cn/bizmp/n_v2316c41156a8a40318632c39987265e23_bc943f71d9f4b87c.png?w=600'
-        );
-        this.headImg1 = await getTmpFilePath(
-            'http://ygo.oss-cn-beijing.aliyuncs.com/discover%2Fdiscover-5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1561307424.817633.jpeg'
-        );
-        this.blackbg = await getTmpFilePath(
-            'http://pic1.58cdn.com.cn/bizmp/n_v28a66fe7cf2a44f8fa96c3acc0c7df695_d1aef30ede23e5bc.png?w=200'
-        );
+        // this.background.imageResource = await getTmpFilePath(
+        //     'http://pic1.58cdn.com.cn/bizmp/n_v2316c41156a8a40318632c39987265e23_bc943f71d9f4b87c.png?w=600'
+        // );
+        // const bg = await getTmpFilePath(
+        //     'http://pic1.58cdn.com.cn/bizmp/n_v2316c41156a8a40318632c39987265e23_bc943f71d9f4b87c.png?w=600'
+        // );
+        // this.headImg1 = await getTmpFilePath(
+        //     'http://ygo.oss-cn-beijing.aliyuncs.com/discover%2Fdiscover-5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1561307424.817633.jpeg'
+        // );
+        // this.blackbg = await getTmpFilePath(
+        //     'http://pic1.58cdn.com.cn/bizmp/n_v28a66fe7cf2a44f8fa96c3acc0c7df695_d1aef30ede23e5bc.png?w=200'
+        // );
         this.layers = [
             {
                 type: 'image', //  我的头像1
@@ -370,6 +366,11 @@ export default class Example extends wepy.page {
 </script>
 
 <style lang='less'>
+.drawImage{
+    position:absolute;
+    top:0;
+    left:0;
+}
 .canvas {
     width: 355rpx;
     height: 282rpx;

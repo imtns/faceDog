@@ -1,5 +1,5 @@
 /*eslint-disable */
-let uploadUrl = 'httpxs://www.molineapp.cn/api/user/profile';
+let uploadUrl = 'https://www.molineapp.cn/api/user/profile';
 // uploadUrl = 'https://yaofa.58.com/fileUpload'
 import { toast } from './index';
 module.exports.uploader = (tempFilePath, ...props) => {

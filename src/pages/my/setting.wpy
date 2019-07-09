@@ -44,6 +44,7 @@
 import wepy from 'wepy';
 import { USER_SETTING } from '@/utils/url';
 import { get, put } from '@/utils/request';
+import { Event } from '@/utils/event.js';
 export default class Setting extends wepy.page {
     config = {
         navigationBarTitleText: '设置',
@@ -71,6 +72,7 @@ export default class Setting extends wepy.page {
             this[name] = detail;
             this.$apply();
             await put(USER_SETTING, this.data);
+            Event.trigger('battleFresh');
         },
         logout() {
             console.log('out');
