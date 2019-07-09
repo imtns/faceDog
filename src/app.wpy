@@ -36,13 +36,14 @@ export default class extends wepy.app {
             'pages/my/mymoment', // 我的动态
             'pages/my/propaganda', // 我的推广
             'pages/my/withdraw', // 红包提现
-            'pages/my/activityRule',
-            'pages/my/contactService'
+            'pages/my/activityRule', // 活动规则
+            'pages/my/contactService', // 联系客服
+            'pages/my/myCard' // 生成美图
         ],
         window: {
             backgroundTextStyle: 'light',
             navigationBarBackgroundColor: '#fff',
-            navigationBarTitleText: 'WeChat',
+            navigationBarTitleText: '颜狗',
             navigationBarTextStyle: 'black'
         },
         permission: {
