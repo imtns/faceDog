@@ -11,23 +11,23 @@
                 <view class="box1" wx:if="{{images[0]}}">
                     <image src="{{images[0].image}}"></image>
                     <view class="info">
-                        <view class="word">胜 率 \ <text> {{images[0].win / 100}}%</text></view>
-                        <view class="word">出场数 \ <text> {{images[0].play / 100}}%</text></view>
+                        <view class="word">胜 率 \ <text> {{images[0].win * 100}}%</text></view>
+                        <view class="word">出场数 \ <text> {{images[0].play}}</text></view>
                     </view>
                 </view>
                 <view class="box2"><canvas canvas-id="radarCanvas" class="canvas"></canvas></view>
                 <view class="box3" wx:if="{{images[1]}}">
                     <image src="{{images[1].image}}" mode="aspectFill"></image>
                     <view class="info">
-                        <view class="word">胜 率 \ <text> {{images[0].win / 100}}%</text></view>
-                        <view class="word">出场数 \ <text> {{images[0].play / 100}}%</text></view>
+                        <view class="word">胜 率 \ <text> {{images[1].win * 100}}%</text></view>
+                        <view class="word">出场数 \ <text> {{images[1].play}}</text></view>
                     </view>
                 </view>
                 <view class="box3" wx:if="{{images[2]}}">
                     <image src="{{images[2].image}}" mode="aspectFill"></image>
                     <view class="info">
-                        <view class="word">胜 率 \ <text> {{images[0].win / 100}}%</text></view>
-                        <view class="word">出场数 \ <text> {{images[0].play / 100}}%</text></view>
+                        <view class="word">胜 率 \ <text> {{images[2].win * 100}}%</text></view>
+                        <view class="word">出场数 \ <text> {{images[2].play}}</text></view>
                     </view>
                 </view>
             </view>
@@ -124,6 +124,9 @@ export default class Example extends wepy.page {
         this.city = city;
         // 省份
         this.position = position;
+        info.images && info.images.forEach(item => {
+            item.image = item.image.replace('http', 'https');
+        });
         // 图片1
         this.images = info.images;
         this.$apply();
