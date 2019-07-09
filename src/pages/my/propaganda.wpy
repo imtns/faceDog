@@ -40,41 +40,29 @@
                         <view class="box">
                             <image src="{{item.avatar}}" mode="aspectFill"></image>
                             <text class="name">{{item.nick_name}}</text>
-                            <text class="time">2019-3-3</text>
+                            <text class="time">{{item.create_time}}</text>
                         </view>
                     </repeat>
                 </block>
                 <block wx:else>
                     <view class="withdraw-box">
-                        <view><text>￥</text><text class="money">50</text></view>
+                        <view><text>￥</text><text class="money">{{balance}}</text></view>
                         <view class="tip">累计获得红包</view>
-                        <view class="withdraw" @tap="redirect">
+                        <view class="withdraw {{balance>=50?'active':''}}" @tap="redirect">
                             满50元即可提现
                         </view>
                     </view>
                     <view class="title">提现记录</view>
                     <view class="withdraw-list">
-                        <view class="list">
-                            <view class="left-part">
-                                <view class="amount">50元</view>
-                                <view class="time">2019-03-13</view>
+                        <repeat for="{{withdrawList}}" key="index" index="index" item="item">
+                            <view class="list">
+                                <view class="left-part">
+                                    <view class="amount">{{item.amount}}元</view>
+                                    <view class="time">{{item.create_time}}</view>
+                                </view>
+                                <view class="right-part">{{item.finish?'已完成':'审核中'}}</view>
                             </view>
-                            <view class="right-part">审核中</view>
-                        </view>
-                        <view class="list">
-                            <view class="left-part">
-                                <view class="amount">50元</view>
-                                <view class="time">2019-03-13</view>
-                            </view>
-                            <view class="right-part">审核中</view>
-                        </view>
-                        <view class="list">
-                            <view class="left-part">
-                                <view class="amount">50元</view>
-                                <view class="time">2019-03-13</view>
-                            </view>
-                            <view class="right-part">审核中</view>
-                        </view>
+                        </repeat>
                     </view>
                 </block>
             </view>
@@ -106,6 +94,7 @@
 <script>
 import wepy from 'wepy';
 import { get } from '@/utils/request';
+import { toast } from '@/utils';
 import { INVATATION } from '@/utils/url';
 export default class Propaganda extends wepy.page {
     config = {
@@ -120,6 +109,7 @@ export default class Propaganda extends wepy.page {
         withdrawList: {},
         show: false,
         clickIndex: 0,
+        balance: 0,
         profile: wepy.getStorageSync('profile')
     };
 
@@ -127,6 +117,10 @@ export default class Propaganda extends wepy.page {
 
     methods = {
         redirect() {
+            if (this.balance < 50) {
+                toast('满50即可提现');
+                return;
+            }
             wepy.navigateTo({ url: 'withdraw' });
         },
         onClose() {
@@ -152,7 +146,11 @@ export default class Propaganda extends wepy.page {
 
     async onLoad() {
         const data = await get(INVATATION);
+        this.balance = data.balance;
+        wepy.setStorageSync('balance', data.balance);
+
         this.inviteList = data.invitation;
+        this.withdrawList = data.record;
         this.$apply();
     }
     onShareAppMessage() {
@@ -336,6 +334,9 @@ button {
                     text-align: center;
                     font-size: 28rpx;
                     color: white;
+                    &.active{
+                        background: rgb(46, 38, 38);
+                    }
                 }
             }
             .title {

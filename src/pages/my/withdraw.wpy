@@ -4,15 +4,15 @@
         <view class="form">
             <view class="field">
                 <view class="label">输入微信号</view>
-                <input class="input" placeholder="请输入微信号" />
+                <input class="input" @input="accountChange"  value="{{account}}" placeholder="请输入微信号" />
             </view>
             <view class="field">
                 <view class="label">转出金额</view>
-                <input class="input" placeholder="请输入昵称" />
-                <view class="all">全部</view>
+                <input class="input" @input="moneyChange" value="{{money}}" type="number" placeholder="请输入金额" />
+                <view class="all" @tap="takeAll">全部</view>
             </view>
         </view>
-        <view class="withdraw">
+        <view class="withdraw" @tap="take">
             确认提现
         </view>
     </view>
@@ -20,16 +20,58 @@
 
 <script>
 import wepy from 'wepy';
+import { post } from '@/utils/request';
+import { WITHDRAW } from '@/utils/url';
+import { toast } from '@/utils';
 export default class Withdraw extends wepy.page {
     config = {
         navigationBarTitleText: '红包提现'
     };
 
-    data = {};
+    data = {
+        account: '',
+        money: ''
+    };
 
     components = {};
 
-    methods = {};
+    methods = {
+        async take() {
+            if (!this.account) {
+                toast('请填写微信号');
+                return;
+            }
+            if (!this.money || this.money == 0) {
+                toast('请填写金额');
+                return;
+            }
+            if (this.money > wepy.getStorageSync('balance')) {
+                toast('提现金额大于账户余额');
+                return;
+            }
+            try {
+                await post(WITHDRAW, {
+                    wechat_code: this.account,
+                    balance: this.money
+                });
+                toast('提现申请已提交, 工作人员确认后会加微信转账', null, 3000);
+            } catch (e) {
+                toast('提现失败,请稍后重试');
+            }
+        },
+        accountChange({detail}) {
+            this.account = detail.value;
+        },
+        moneyChange({detail}) {
+            this.money = detail.value;
+        },
+        takeAll() {
+            const balance = wepy.getStorageSync('balance');
+            console.log(balance);
+            this.money = balance;
+            this.$apply();
+        }
+    };
 
     events = {};
 
@@ -76,6 +118,7 @@ export default class Withdraw extends wepy.page {
                 position:absolute;
                 right:30rpx;
                 top:80rpx;
+                z-index: 999;
                 font-weight: 600;
                 font-size:28rpx;
                 color:#000;

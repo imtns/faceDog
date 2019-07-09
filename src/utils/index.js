@@ -64,11 +64,11 @@ function removeDuplicates(originalArray, prop) {
     }
     return newArray;
 }
-function toast(title, cb) {
+function toast(title, cb, time = 2000) {
     wx.showToast({
         title,
         icon: 'none',
-        duration: 2000,
+        duration: time,
         success: () => {
             cb && cb();
         }
@@ -117,7 +117,7 @@ function getTmpFilePath(url) {
             },
             fail(err) {
                 reject(err);
-            },
+            }
         });
     });
 }
