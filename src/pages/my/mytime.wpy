@@ -4,27 +4,27 @@
         <view class="top">
             <view class="sec">
                 <image class="icon" src="../../images/my/friend.png" mode="aspectFill"></image>
-                <view class="title">成为朋友</view>
-                <view class="word">剩余{{time.friend}}次</view>
+                <view class="title">有好感</view>
+                <view class="word">剩余 {{time.friend}} 次</view>
             </view>
             <view class="sec">
                 <image class="icon" src="../../images/my/lover.png" mode="aspectFill"></image>
-                <view class="title">想成为恋人</view>
-                <view class="word">剩余{{time.lover}}次</view>
+                <view class="title">一见钟情</view>
+                <view class="word">剩余 {{time.lover}} 次</view>
             </view>
             <view class="sec">
                 <image class="icon" src="../../images/my/close.png" mode="aspectFill"></image>
-                <view class="title">想亲密接触</view>
-                <view class="word">剩余{{time.close}}次</view>
+                <view class="title">真爱降临</view>
+                <view class="word">剩余 {{time.close}} 次</view>
             </view>
         </view>
         <view class="line"></view>
         <view class="desc">
             <view class="d">通过以下方式可以增加次数：</view>
-            <view class="d">1.通过真人认证，一次获得次数</view>
-            <view class="d">2.颜值Battle界面，随机获得奖励次数</view>
-            <view class="d">3.根据个人颜值排名，每天获得奖励次数</view>
-            <view class="d">4.添加客服小哥哥vx，获赠大量次数</view>
+            <view class="d">1.通过真人认证，一次性获得次数</view>
+            <view class="d">2.每天参与颜值Battle，随机获得奖励次数</view>
+            <view class="d">3.根据个人颜值排名，每天获得不同奖励次数</view>
+            <view class="d">4.添加客服小哥哥/小姐姐，随机获赠稀有次数</view>
         </view>
     </view>
 </template>

@@ -1,0 +1,57 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view class="desc">
+            <view class="d">审核及使用问题请通过以下方式联系客服：</view>
+            <view class="d">子澈（小哥哥）微信号：yanzc1023</view>
+            <view class="d">静妮（小姐姐）微信号：P526034465</view>
+            <view class="d">或关注微信公众号：facedogclub</view>
+            <view class="d">商务、推广、合作请联系微信号：15810233527</view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class ContactService extends wepy.page {
+    config = {
+        navigationBarTitleText: '联系客服'
+    };
+
+    data = {
+    };
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    async onLoad() {
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.wrapper {
+    width: 100%;
+    .desc {
+        width: 690rpx;
+        display: block;
+        margin:20rpx auto;
+        box-sizing: border-box;
+        .d {
+            font-size: 28rpx;
+            font-weight: 600;
+            margin-bottom: 34rpx;
+            color: rgba(6, 5, 5, 1);
+        }
+    }
+}
+</style>

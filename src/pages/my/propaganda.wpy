@@ -26,7 +26,9 @@
                 </view>
             </view>
         </view>
-        <view class="rules">活动规则 ></view>
+        <navigator url="activityRule" open-type="navigate" hover-class="none">
+            <view class="rules">活动规则 ></view>
+        </navigator>
         <view class="line"></view>
         <view class="invite-box">
             <view class="header">

@@ -52,13 +52,15 @@
             </view>
         </view>
         <view class="line"></view>
-        <view class="item">
-            <view class="title">联系客服</view>
-            <view class="detail2">
-                <van-icon name="arrow" />
+        <navigator url="my/contactService" open-type="navigate" hover-class="none">
+            <view class="item">
+                <view class="title">联系客服</view>
+                <view class="detail2">
+                    <van-icon name="arrow" />
+                </view>
             </view>
-        </view>
-        <view class="line"></view>
+            <view class="line"></view>
+         </navigator>
     </view>
 </template>
 

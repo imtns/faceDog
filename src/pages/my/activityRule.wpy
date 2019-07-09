@@ -1,0 +1,57 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view class="desc">
+            <view class="d">1.活动时间：2019年7月15日-2019年12月31日</view>
+            <view class="d">2.已注册并通过审核的用户，可以通过「推广有奖」和「我的排名」页面，邀请身边的朋友注册“颜狗”小程序</view>
+            <view class="d">3.被邀请用户需要通过邀请者分享的小程序链接或二维码进行注册并通过审核，才算一个成功邀请的用户，可以获得奖励</view>
+            <view class="d">4.每邀请成功一个人，邀请者可获得10元奖励，被邀请人也可获得10元奖励，红包奖励只有在50元或以上时才可以申请进行提现，奖励将于1-5个工作日内发放</view>
+            <view class="d">5.请在提现页面填写正确的微信号，并保证可以通过该微信号查找和添加邀请者，否则将可能出现无法发放红包奖励的情况</view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class ActivityRule extends wepy.page {
+    config = {
+        navigationBarTitleText: '活动规则'
+    };
+
+    data = {
+    };
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    async onLoad() {
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.wrapper {
+    width: 100%;
+    .desc {
+        width: 690rpx;
+        display: block;
+        margin:20rpx auto;
+        box-sizing: border-box;
+        .d {
+            font-size: 28rpx;
+            font-weight: 600;
+            margin-bottom: 34rpx;
+            color: rgba(6, 5, 5, 1);
+        }
+    }
+}
+</style>

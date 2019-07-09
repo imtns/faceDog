@@ -35,7 +35,9 @@ export default class extends wepy.app {
             'pages/ta/momentDetail', // 动态详情页面
             'pages/my/mymoment', // 我的动态
             'pages/my/propaganda', // 我的推广
-            'pages/my/withdraw' // 红包提现
+            'pages/my/withdraw', // 红包提现
+            'pages/my/activityRule',
+            'pages/my/contactService'
         ],
         window: {
             backgroundTextStyle: 'light',

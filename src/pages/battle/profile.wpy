@@ -15,7 +15,7 @@
                 <view class="distance"><text>{{profile.distance}}km</text> {{profile.city}}</view>
             </view>
             <view class="battle-profile-right flex">
-                <view class="face-rank">{{profile.gender=='female'?'她':'他'}}的颜值在全国排名前 <text> {{profile.face * 100}}%</text></view>
+                <view class="face-rank">{{profile.gender=='female'?'她':'他'}}的颜值在全国排名前 <text> {{profile.face}}%</text></view>
                 <view class="profile-tags">
                     <view class="tag red">Top100</view>
                     <view class="tag green">颜值杀手</view>
@@ -205,6 +205,7 @@ export default class Profile extends wepy.page {
             this.self = true;
         }
         this.profile.age = getAge(result.birthday);
+        this.profile.face = result.face !== 0 ? (result.face * 100).toFixed(1) : 0;
         this.profile.distance = (this.profile.distance / 1000).toFixed(2);
         wx.setNavigationBarTitle({
             title: result.nick_name,
