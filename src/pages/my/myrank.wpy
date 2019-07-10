@@ -83,6 +83,7 @@ export default class Example extends wepy.page {
         async share() {
             if (!this.ready) return;
             const path = this.styleImage1;
+            console.error(path);
             await this.savePhotosAlbum(path);
         },
         toTempFile(res) {
@@ -124,9 +125,9 @@ export default class Example extends wepy.page {
         this.city = city;
         // 省份
         this.position = position;
-        info.images && info.images.forEach(item => {
-            item.image = item.image.replace('http', 'https');
-        });
+        // info.images && info.images.forEach(item => {
+        //     item.image = item.image.replace('http', 'https');
+        // });
         // 图片1
         this.images = info.images;
         this.$apply();
@@ -172,18 +173,9 @@ export default class Example extends wepy.page {
     }
 
     async initStyleList() {
-        // this.background.imageResource = await getTmpFilePath(
-        //     'http://pic1.58cdn.com.cn/bizmp/n_v2316c41156a8a40318632c39987265e23_bc943f71d9f4b87c.png?w=600'
-        // );
-        // const bg = await getTmpFilePath(
-        //     'http://pic1.58cdn.com.cn/bizmp/n_v2316c41156a8a40318632c39987265e23_bc943f71d9f4b87c.png?w=600'
-        // );
-        // this.headImg1 = await getTmpFilePath(
-        //     'http://ygo.oss-cn-beijing.aliyuncs.com/discover%2Fdiscover-5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1561307424.817633.jpeg'
-        // );
-        // this.blackbg = await getTmpFilePath(
-        //     'http://pic1.58cdn.com.cn/bizmp/n_v28a66fe7cf2a44f8fa96c3acc0c7df695_d1aef30ede23e5bc.png?w=200'
-        // );
+        this.background.imageResource = '../../../../images/my/myrank-bg.png';
+        const bg = '../../../../images/my/myrank-bg.png'
+        this.headImg1 = await getTmpFilePath(this.images[0].image);
         this.layers = [
             {
                 type: 'image', //  我的头像1
@@ -196,38 +188,29 @@ export default class Example extends wepy.page {
             {
                 type: 'text', // 城市
                 fontSize: 22,
-                text: '北京市',
+                text: this.position,
                 textAlign: 'center',
                 x: 253,
-                y: 299,
+                y: 301,
                 color: '#000000'
             },
             {
                 type: 'text', // 排名的百分比
                 fontSize: 30,
-                text: '95%',
+                text: `${this.city}`,
                 textAlign: 'center',
                 x: 370,
-                y: 290,
+                y: 299,
                 color: '#E11220'
             },
             {
                 type: 'text', // 帅气百分比
                 fontSize: 30,
-                text: '95%',
+                text: `${100 - this.face}%`,
                 textAlign: 'center',
                 x: 310,
-                y: 333,
+                y: 341,
                 color: '#E11220'
-            },
-            {
-                type: 'text', // 城市
-                fontSize: 22,
-                text: '巨蟹座',
-                textAlign: 'center',
-                x: 380,
-                y: 340,
-                color: '#000000'
             },
             {
                 type: 'text', // 城市
@@ -239,17 +222,6 @@ export default class Example extends wepy.page {
                 color: '#000000'
             }
         ];
-        this.layers.push({
-            type: 'image', //  我的头像1
-            imageResource: this.headImg1,
-            cut: true,
-            sHeight: 550,
-            sWidth: 550,
-            dx: 79,
-            dy: 113,
-            dWidth: 150,
-            dHeight: 155
-        });
         this.layers.push({
             type: 'image', //  我的头像1
             imageResource: this.canvasImage,
@@ -284,7 +256,7 @@ export default class Example extends wepy.page {
         });
         this.layers.push({
             type: 'image', //  黑色1
-            imageResource: this.blackbg,
+            imageResource: '../../../../images/my/myrank-black.png',
             dx: 306,
             dy: 773,
             dWidth: 120,
@@ -293,7 +265,7 @@ export default class Example extends wepy.page {
         this.layers.push({
             type: 'text', // 黑色1 胜率
             fontSize: 18,
-            text: '70%',
+            text: `${this.images[0].win * 100}%`,
             textAlign: 'center',
             x: 385,
             y: 780,
@@ -302,15 +274,15 @@ export default class Example extends wepy.page {
         this.layers.push({
             type: 'text', // 黑色1 出场率
             fontSize: 18,
-            text: '70%',
+            text: `${this.images[0].play}`,
             textAlign: 'center',
             x: 400,
-            y: 802,
+            y: 807,
             color: '#E1111F'
         });
         this.layers.push({
             type: 'image', //  黑色2
-            imageResource: this.blackbg,
+            imageResource: '../../../../images/my/myrank-black.png',
             dx: 258,
             dy: 1047,
             dWidth: 120,
@@ -319,24 +291,24 @@ export default class Example extends wepy.page {
         this.layers.push({
             type: 'text', // 黑色2 胜率
             fontSize: 18,
-            text: '70%',
+            text: `${this.images[1].win * 100}%`,
             textAlign: 'center',
             x: 343,
-            y: 1052,
+            y: 1054,
             color: '#E1111F'
         });
         this.layers.push({
             type: 'text', // 黑色2 出场率
             fontSize: 18,
-            text: '70%',
+            text: `${this.images[0].play}`,
             textAlign: 'center',
             x: 350,
-            y: 1082,
+            y: 1084,
             color: '#E1111F'
         });
         this.layers.push({
             type: 'image', //  黑色3
-            imageResource: this.blackbg,
+            imageResource: '../../../../images/my/myrank-black.png',
             dx: 548,
             dy: 1047,
             dWidth: 120,
@@ -345,23 +317,21 @@ export default class Example extends wepy.page {
         this.layers.push({
             type: 'text', // 黑色3 胜率
             fontSize: 18,
-            text: '70%',
+            text: `${this.images[2].win * 100}%`,
             textAlign: 'center',
-            x: 630,
+            x: 632,
             y: 1052,
             color: '#E1111F'
         });
         this.layers.push({
             type: 'text', // 黑色3 出场率
             fontSize: 18,
-            text: '70%',
+            text: `${this.images[0].play}`,
             textAlign: 'center',
             x: 639,
-            y: 1082,
+            y: 1084,
             color: '#E1111F'
         });
-        // this.background.imageResource = '../../../../images/my/myrank-bg';
-        this.$apply();
         this.$apply();
     }
     onShow() {}
@@ -369,11 +339,6 @@ export default class Example extends wepy.page {
 </script>
 
 <style lang='less'>
-.drawImage{
-    position:absolute;
-    top:0;
-    left:0;
-}
 .canvas {
     width: 355rpx;
     height: 282rpx;
