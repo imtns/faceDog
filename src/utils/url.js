@@ -41,3 +41,5 @@ export const USER_RANK = '/api/user/ranking';
 export const INVATATION = '/api/user/invitation';
 // 红包提现
 export const WITHDRAW = '/api/user/take_money';
+// 获取小程序二维码
+export const QRCODE = '/api/auth/qrcode';

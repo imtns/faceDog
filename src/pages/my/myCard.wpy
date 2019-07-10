@@ -3,11 +3,11 @@
     <view class='wrapper'>
         <view class="card">
             <view class="image">
-                <image mode="aspectFill" src="http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d143a169f58ef9a2e2be7bc-d41d8cd98f00b204e9800998ecf8427e-1561606800.739185.jpg"></image>
+                <image mode="aspectFill" src="{{profile.icon}}"></image>
             </view>
             <view class="box">
                 <view class="left">
-                    <view class="text1">小花花邀请您加入<text>”颜狗”</text></view>
+                    <view class="text1">{{profile.nick_name}}邀请您加入<text>”颜狗”</text></view>
                     <view class="text2">颜狗，好看的人才能加入的高颜值社交圈</view>
                 </view>
                 <view class="right">
@@ -21,19 +21,22 @@
 
 <script>
 import wepy from 'wepy';
+import { get } from '@/utils/request';
+import { QRCODE } from '@/utils/url';
 export default class MyCard extends wepy.page {
     config = {
         navigationBarTitleText: '生成美图'
     };
 
-    data = {};
+    data = {
+        profile: {},
+        qrcode: ''
+    };
 
     components = {};
 
     methods = {
-        save() {
-
-        }
+        save() {}
     };
 
     events = {};
@@ -42,15 +45,19 @@ export default class MyCard extends wepy.page {
 
     computed = {};
 
-    onLoad() {}
+    async onLoad() {
+        this.profile = wepy.getStorageSync('profile');
+        this.qrcode = await get(QRCODE, {ID: this.profile.ID});
+        this.$apply();
+    }
 
     onShow() {}
 }
 </script>
 
 <style lang='less'>
-page{
-    background:rgba(245,245,245,1);
+page {
+    background: rgba(245, 245, 245, 1);
 }
 .wrapper {
     width: 100%;
@@ -73,13 +80,13 @@ page{
             width: 570rpx;
             height: 168rpx;
             background: white;
-            display:flex;
-            box-shadow:0px 20rpx 30rpx rgba(0,0,0,0.05);
+            display: flex;
+            box-shadow: 0px 20rpx 30rpx rgba(0, 0, 0, 0.05);
             justify-content: space-between;
-            .left{
-                width:500rpx;
+            .left {
+                width: 500rpx;
                 text-align: right;
-                margin-top:48rpx;
+                margin-top: 48rpx;
                 .text1 {
                     font-size: 28rpx;
                     font-weight: 600;
@@ -94,13 +101,13 @@ page{
                     color: rgba(59, 66, 102, 1);
                 }
             }
-            .right{
+            .right {
                 margin: 30rpx;
-                width:128rpx;
-                margin-top:20rpx;
-                height:128rpx;
-                image{
-                    width:100%;
+                width: 128rpx;
+                margin-top: 20rpx;
+                height: 128rpx;
+                image {
+                    width: 100%;
                     height: 100%;
                 }
             }
