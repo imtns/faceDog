@@ -78,16 +78,18 @@
                         <view>微信好友</view>
                     </button>
                 </view>
-                <view class="little-box">
-                    <image src="../../images/my/moment.png" mode="aspectFill"></image>
-                    <view>朋友圈</view>
-                </view>
-
-                <view class="little-box">
-                    <image src="../../images/my/picture.png" mode="aspectFill"></image>
-                    <view>生成美图</view>
-                </view>
-
+                <navigator url="myCard" open-type="navigate" hover-class="none">
+                    <view class="little-box">
+                        <image src="../../images/my/moment.png" mode="aspectFill"></image>
+                        <view>朋友圈</view>
+                    </view>
+                </navigator>
+                <navigator url="myCard" open-type="navigate" hover-class="none">
+                    <view class="little-box">
+                        <image src="../../images/my/picture.png" mode="aspectFill"></image>
+                        <view>生成美图</view>
+                    </view>
+                </navigator>
             </view>
         </van-action-sheet>
     </view>
@@ -193,6 +195,8 @@ button {
         font-weight: 300;
         color: rgba(162, 162, 162, 1);
         text-align: center;
+        z-index: 9999;
+        position:relative;
         margin-top: 79rpx;
         image {
             width: 123rpx;
@@ -336,7 +340,7 @@ button {
                     text-align: center;
                     font-size: 28rpx;
                     color: white;
-                    &.active{
+                    &.active {
                         background: rgb(46, 38, 38);
                     }
                 }
