@@ -74,6 +74,7 @@ export default class Example extends wepy.page {
         layers: [],
         headImg1: '',
         styleImage1: '',
+        qrcode: '',
         blackbg: '' // 黑色的部分，胜率等
     };
 
@@ -155,7 +156,6 @@ export default class Example extends wepy.page {
                 async success(res) {
                     var tempFilePath = res.tempFilePath;
                     // console.error(tempFilePath);
-                    console.error('2222');
                     that.canvasImage = tempFilePath;
 
                     await that.initStyleList();
@@ -174,8 +174,11 @@ export default class Example extends wepy.page {
 
     async initStyleList() {
         this.background.imageResource = '../../../../images/my/myrank-bg.png';
-        const bg = '../../../../images/my/myrank-bg.png'
+        const bg = '../../../../images/my/myrank-bg.png';
         this.headImg1 = await getTmpFilePath(this.images[0].image);
+        this.headImg2 = this.images[1] && await getTmpFilePath(this.images[1].image);
+        this.headImg3 = this.images[2] && await getTmpFilePath(this.images[2].image);
+        this.qrcode = '';
         this.layers = [
             {
                 type: 'image', //  我的头像1
@@ -230,30 +233,35 @@ export default class Example extends wepy.page {
             dWidth: 310,
             dHeight: 310
         });
-        this.layers.push({
-            type: 'image', //  我的头像2
-            imageResource: this.headImg1,
-            dx: 79,
-            dy: 850,
-            dWidth: 250,
-            dHeight: 250
-        });
-        this.layers.push({
-            type: 'image', //  我的头像3
-            imageResource: this.headImg1,
-            dx: 393,
-            dy: 850,
-            dWidth: 250,
-            dHeight: 250
-        });
+        if (this.images[1]) {
+            this.layers.push({
+                type: 'image', //  我的头像2
+                imageResource: this.headImg2,
+                dx: 79,
+                dy: 850,
+                dWidth: 250,
+                dHeight: 250
+            });
+        }
+        if (this.images[2]) {
+            this.layers.push({
+                type: 'image', //  我的头像3
+                imageResource: this.headImg3,
+                dx: 393,
+                dy: 850,
+                dWidth: 250,
+                dHeight: 250
+            });
+        }
         this.layers.push({
             type: 'image', //  小程序二维码
-            imageResource: this.headImg1,
+            imageResource: this.qrcode,
             dx: 527,
             dy: 1193,
             dWidth: 130,
             dHeight: 130
         });
+
         this.layers.push({
             type: 'image', //  黑色1
             imageResource: '../../../../images/my/myrank-black.png',

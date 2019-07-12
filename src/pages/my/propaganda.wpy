@@ -26,9 +26,7 @@
                 </view>
             </view>
         </view>
-        <navigator url="activityRule" open-type="navigate" hover-class="none">
-            <view class="rules">活动规则 ></view>
-        </navigator>
+        <view class="rules" @tap="showRule">活动规则 ></view>
         <view class="line"></view>
         <view class="invite-box">
             <view class="header">
@@ -92,6 +90,19 @@
                 </navigator>
             </view>
         </van-action-sheet>
+        <view class="rules-box" wx:if="{{rule}}">
+            <view class="content">
+                <view class="title">活动规则</view>
+                <view class="rule">活动时间：2019年7月15日-2019年12月31日</view>
+                <view class="rule">1、已注册并通过审核的用户，可以通过「推广有奖」和「我的排名」页面，邀请身边的朋友注册“颜狗”小程序。</view>
+                <view class="rule">2、被邀请用户需要通过邀请者分享的小程序链接或二维码进行注册并通过审核，才算一个成功邀请的用户，可以获得奖励。</view>
+                <view class="rule">3、每邀请成功一个人，邀请者可获得10元奖励，被邀请人也可获得10元奖励，红包奖励只有在50元或以上时才可以申请进行提现，奖励将于1-5个工作日内发放。</view>
+                <view class="rule">4、请在提现页面填写正确的微信号，并保证可以通过该微信号查找和添加邀请者，否则将可能出现无法发放红包奖励的情况。</view>
+                <view class="rule">5、如发现用户利用漏洞恶意注册或者非本人注册等情况，颜狗官方有权取消该用户的活动资格，并清空所有已获得的奖励。</view>
+                <view class="rule">6、本活动最终解释权归颜狗小程序所有者北京陌连科技有限公司所有。</view>
+                <view class="ok" @tap="closeRule">确定</view>
+            </view>
+        </view>
     </view>
 </template>
 
@@ -114,7 +125,8 @@ export default class Propaganda extends wepy.page {
         show: false,
         clickIndex: 0,
         balance: 0,
-        profile: wepy.getStorageSync('profile')
+        profile: wepy.getStorageSync('profile'),
+        rule: false
     };
 
     components = {};
@@ -139,6 +151,12 @@ export default class Propaganda extends wepy.page {
         },
         tab(index) {
             this.clickIndex = index;
+        },
+        showRule() {
+            this.rule = true;
+        },
+        closeRule() {
+            this.rule = false;
         }
     };
 
@@ -196,7 +214,7 @@ button {
         color: rgba(162, 162, 162, 1);
         text-align: center;
         z-index: 9999;
-        position:relative;
+        position: relative;
         margin-top: 79rpx;
         image {
             width: 123rpx;
@@ -420,6 +438,50 @@ button {
         font-size: 28rpx;
         text-align: center;
         color: rgba(252, 252, 252, 1);
+    }
+    .rules-box {
+        width: 100%;
+        height: 100%;
+        z-index: 999;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.71);
+        .content {
+            width: 627rpx;
+            margin: 100rpx auto;
+            box-sizing: border-box;
+            padding: 0 32rpx;
+            background: rgba(255, 255, 255, 1);
+            border: 1rpx solid rgba(112, 112, 112, 1);
+            opacity: 1;
+            border-radius: 20rpx;
+            text-align: left;
+            .title {
+                font-size: 32rpx;
+                font-weight: 600;
+                text-align: center;
+                margin: 47rpx 0;
+                color: rgba(0, 0, 0, 1);
+            }
+            .rule {
+                font-size: 20rpx;
+                margin-bottom: 34rpx;
+                font-weight: 400;
+                color: rgba(165, 165, 165, 1);
+            }
+            .ok {
+                width: calc(100%+64rpx);
+                height: 103rpx;
+                text-align: center;
+                margin:0 -32rpx;
+                border-top:1rpx solid rgba(220,218,218,1);
+                line-height: 103rpx;
+                font-size: 32rpx;
+                font-weight: 600;
+                color: rgba(0, 0, 0, 1);
+            }
+        }
     }
 }
 </style>
