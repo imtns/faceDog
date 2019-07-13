@@ -52,7 +52,8 @@ export default class fabu extends wepy.page {
         latitude: '',
         longitude: '',
         // tempFilePaths: [],
-        uploadedPics: []
+        uploadedPics: [],
+        isPublishing: false,
     };
 
     components = {};
@@ -141,6 +142,9 @@ export default class fabu extends wepy.page {
             this.$apply();
         },
         async publish() {
+            if (this.isPublishing) {
+                return;
+            }
             const subData = this.uploadedPics.reduce(
                 (sub, file) => {
                     sub.images.push(file.id);
@@ -154,11 +158,13 @@ export default class fabu extends wepy.page {
                     images: []
                 }
             );
+            this.isPublishing = true;
             const data = await post(FABU_FABU_MOMENT, subData);
             Event.trigger('refresh');
             toast('发布成功');
-
+            
             setTimeout(() => {
+                this.isPublishing = false;
                 wx.navigateBack({
                     delta: 1
                 });
