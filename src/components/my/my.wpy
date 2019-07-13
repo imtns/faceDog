@@ -11,7 +11,7 @@
                         <view class="name">{{profile.nick_name}}</view>
                         <view class="desc">{{profile.age}}岁 | {{profile.city}}</view>
                     </view>
-                    <view class="verify">
+                    <view class="verify" @tap="checkVerify({{profile.progress}})">
                         {{progress[profile.progress]}}
                     </view>
                 </view>
@@ -73,13 +73,20 @@ export default class My extends wepy.component {
             profile: '待完善资料',
             certify: '未验证',
             audit: '未审核',
-            finish: '通过审核'
+            finish: '通过审核',
+            refuse: '已拒绝'
         },
         profile: {}
     };
     components = {};
 
     methods = {
+        checkVerify(state) {
+            console.log(state);
+            if (state == 'refuse') {
+                wepy.redirectTo({ url: 'register?verify=true' });
+            }
+        },
         goProfile() {
             wx.navigateTo({
                 url: 'battle/profile?id=' + this.profile._id,
@@ -119,8 +126,7 @@ export default class My extends wepy.component {
 </script>
 
 <style lang='less' scoped>
-.wrapper {
-}
+
 .head {
     display: flex;
     justify-content: space-between;

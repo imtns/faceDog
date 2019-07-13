@@ -8,7 +8,7 @@
             <profile :userInfo.sync="userInfo"></profile>
         </block>
         <block wx:if="{{step===3}}">
-            <uploadPic></uploadPic>
+            <uploadPic :verify.sync="verify"></uploadPic>
         </block>
         <block wx:if="{{step===4}}">
             <chooseVerify :code.sync="code" :disabled.sync="disabled"></chooseVerify>
@@ -17,6 +17,7 @@
             <uploadVideo></uploadVideo>
         </block>
          <van-toast id="van-toast" />
+         <van-dialog id="van-dialog" />
     </view>
 
 </template>
@@ -42,7 +43,8 @@ export default class Register extends wepy.page {
             'van-datetime-picker': '../components/vant/datetime-picker/index',
             'van-action-sheet': '../components/vant/action-sheet/index',
             'van-toast': '../components/vant/toast/index',
-            'van-loading': '../components/vant/loading/index'
+            'van-loading': '../components/vant/loading/index',
+            'van-dialog': '../components/vant/dialog/index'
         }
     };
 
@@ -51,7 +53,8 @@ export default class Register extends wepy.page {
         scopeUser: false,
         userInfo: {},
         code: '',
-        disabled: false
+        disabled: false,
+        verify: false
     };
 
     components = {
@@ -97,8 +100,12 @@ export default class Register extends wepy.page {
         wepy.setStorageSync('token', result.access_token);
         wepy.setStorageSync('tencent_token', result.tencent_token);
         wepy.setStorageSync('identifier', result.identifier);
-        if (result.welcome) {
-            this.step = 2;
+        if (result.welcome && !this.verify) {
+            if (this.verify) {
+                this.step = 3;
+            } else {
+                this.step = 2;
+            }
             this.$apply();
         } else {
             wx.redirectTo({
@@ -115,6 +122,11 @@ export default class Register extends wepy.page {
             console.error(options.userid);
             this.code = options.userid;
             this.disabled = true;
+        }
+        if (options.verify) {
+            this.verify = options.verify;
+            this.step = 3;
+            return;
         }
         if (options.name == 'reg') {
             this.step = 2;

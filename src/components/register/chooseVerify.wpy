@@ -55,6 +55,10 @@ export default class ChooseVerify extends wepy.component {
     methods = {
         async verify() {
             try {
+                if (!this.code) {
+                    toast('请填写认证编号');
+                    return;
+                }
                 const data = await post(VERIFY, {
                     number: this.code
                 });

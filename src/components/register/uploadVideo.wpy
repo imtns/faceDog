@@ -16,6 +16,7 @@ import wepy from 'wepy';
 import { uploader } from '@/utils/uploader';
 import { toast, sleep } from '@/utils';
 import Toast from '@/components/vant/toast/toast';
+import Dialog from '@/components/vant/dialog/dialog';
 export default class Example extends wepy.component {
     props = {
         step: {
@@ -49,46 +50,63 @@ export default class Example extends wepy.component {
     methods = {
         async uploadVideo() {
             try {
-                const {
-                    tempFilePath,
-                    thumbTempFilePath
-                } = await wepy.chooseVideo({
-                    camera: 'front',
-                    sourceType: ['camera']
+                console.log('ssss');
+                const tempFilePath = await this.record();
+                Dialog.confirm({
+                    confirmButtonText: '确认',
+                    cancelButtonText: '重录',
+                    message: '录制完成,确认发送么?'
+                }).then(() => {
+                    this.goUpload(tempFilePath);
+                }).catch(() => {
+                    this.methods.uploadVideo.bind(this)();
                 });
-                uploader(
+            } catch (e) {
+
+            }
+        }
+    };
+    async record() {
+        return new Promise(async(resolve, reject) => {
+            const {
+                tempFilePath
+            } = await wepy.chooseVideo({
+                camera: 'front',
+                sourceType: ['camera']
+            });
+            resolve(tempFilePath);
+        });
+    }
+    goUpload(tempFilePath) {
+        try {
+            uploader(
                     tempFilePath,
-                    {
-                        isVideo: true,
-                        data: {
-                            code: this.number
-                        },
-                        name: 'files'
+                {
+                    isVideo: true,
+                    data: {
+                        code: this.number
                     },
+                    name: 'files'
+                },
                     async result => {
                         if (result == 'ok') {
-                            Toast.success('上传成功');
-                            // Object.assign(this.video, {
-                            //     src: result.content,
-                            //     cover: thumbTempFilePath
-                            // });
-                            this.$apply();
-                            await sleep(2);
-
-                            wx.redirectTo({
-                                url: 'index'
+                            Dialog.alert({
+                                message: '认证将于1个工作日内完成,你可以在我的页面查看进度',
+                                confirmButtonText: '返回首页'
+                            }).then(() => {
+                                wx.redirectTo({
+                                    url: 'index'
+                                });
                             });
                         } else {
                             Toast.fail(result);
                         }
                     }
                 );
-            } catch (e) {
-                toast('上传失败', 3000);
-            }
+        } catch (e) {
+            // toast('上传失败', 3000);
         }
     };
-
     events = {};
 
     watch = {};
