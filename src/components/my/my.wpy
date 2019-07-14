@@ -103,6 +103,7 @@ export default class My extends wepy.component {
                 wepy.navigateTo({
                     url: `/pages/my/mymoment?id=${this.profile._id}`
                 });
+                return;
             }
             wepy.navigateTo({ url: `my/${name}` });
         },

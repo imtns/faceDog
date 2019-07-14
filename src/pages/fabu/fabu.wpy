@@ -52,7 +52,8 @@ export default class fabu extends wepy.page {
         latitude: '',
         longitude: '',
         // tempFilePaths: [],
-        uploadedPics: []
+        uploadedPics: [],
+        isPublishing: false,
     };
 
     components = {};
@@ -141,28 +142,37 @@ export default class fabu extends wepy.page {
             this.$apply();
         },
         async publish() {
-            const subData = this.uploadedPics.reduce(
-                (sub, file) => {
-                    sub.images.push(file.id);
-                    return sub;
-                },
-                {
-                    content: this.content,
-                    region: this.region,
-                    latitude: this.latitude,
-                    longitude: this.longitude,
-                    images: []
+            try {
+                if (this.isPublishing) {
+                    return;
                 }
-            );
-            const data = await post(FABU_FABU_MOMENT, subData);
-            Event.trigger('refresh');
-            toast('发布成功');
-
-            setTimeout(() => {
-                wx.navigateBack({
-                    delta: 1
-                });
-            }, 1500);
+                const subData = this.uploadedPics.reduce(
+                    (sub, file) => {
+                        sub.images.push(file.id);
+                        return sub;
+                    },
+                    {
+                        content: this.content,
+                        region: this.region,
+                        latitude: this.latitude,
+                        longitude: this.longitude,
+                        images: []
+                    }
+                );
+                this.isPublishing = true;
+                const data = await post(FABU_FABU_MOMENT, subData);
+                Event.trigger('refresh');
+                toast('发布成功');
+                
+                setTimeout(() => {
+                    this.isPublishing = false;
+                    wx.navigateBack({
+                        delta: 1
+                    });
+                }, 1500);
+            } catch (error) {
+                this.isPublishing = false;
+            }
 
             console.log(data);
         }
