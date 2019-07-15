@@ -31,7 +31,15 @@
       </view>
       <view class="others">
           <repeat for="{{topOthers}}" key="index" index="index" item="item">
-             <view class="other-box" @tap="toProfile" data-id="{{item._id}}">
+             <view class="other-box margin" @tap="toProfile" data-id="{{item._id}}" wx:if="{{ index % 3 === 1 }}">
+                 <image  class="img" mode="aspectFill" src="{{item.avatar}}" ></image>
+                 <view class="rate otherrate">{{index + 4}}</view>
+                 <view class="name">{{item.nick_name}}</view>
+                 <view class="location" wx:if="{{by === ''}}">距离您 {{item.distance}}km</view>
+                 <view class="location" wx:if="{{by === 'all'}}">{{item.province}}</view>
+                 <view class="location" wx:if="{{by !== 'all' && by !== ''}}">{{item.birthday}}</view>
+             </view>
+             <view class="other-box" @tap="toProfile" data-id="{{item._id}}" wx:else>
                  <image  class="img" mode="aspectFill" src="{{item.avatar}}" ></image>
                  <view class="rate otherrate">{{index + 4}}</view>
                  <view class="name">{{item.nick_name}}</view>
@@ -176,8 +184,10 @@ export default class Discover extends wepy.component {
         width: 100%;
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
         margin-top: 9rpx;
+        .margin{
+            margin: 9rpx 2.5vw !important;
+        }
         .other-box{
             width: 29vw;
             height: 16.3vh;
