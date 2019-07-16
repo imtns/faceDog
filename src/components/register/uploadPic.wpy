@@ -4,7 +4,7 @@
         <view class="step-info">
             <view class="num">2.</view>上传照片
         </view>
-        <view class="desc">在颜狗里，颜值就是王道！请上传你本人最好看的一张 照片它将直接关系到你的各项权益（照片可以随时修改）</view>
+        <view class="desc">在颜狗里，颜值就是王道！请上传你本人最满意的一张照片，它将直接关系到你是否通过认证（认证失败可以再次尝试）</view>
         <image class="thumb" src="{{src}}" @tap="uploadPic" mode="aspectFill"></image>
         <!-- <button class="button" @tap="next">下一步</button> -->
     </view>
@@ -118,6 +118,7 @@ export default class uploadPic extends wepy.component {
                     } else {
                         data = wepy.getStorageSync('reg_profile');
                     }
+                    console.error(data);
                     uploader(
                         src,
                         {
@@ -133,15 +134,16 @@ export default class uploadPic extends wepy.component {
                                 this.uploaded = true;
                                 // Toast.success('上传成功');
                                 // await sleep(2);
+
                                 Dialog.confirm({
-                                    confirmButtonText: '先去逛逛',
-                                    cancelButtonText: '现在认证',
-                                    title: '需要现在去认证吗?限时免费',
+                                    confirmButtonText: '现在认证',
+                                    cancelButtonText: '先去逛逛',
+                                    title: '需要现在去认证吗？限时免费',
                                     message: '颜狗是高颜值用户交友平台,通过官方认证的用户才可以参与照片竞技并享受添加好友等权益'
                                 }).then(() => {
-                                    wepy.redirectTo({ url: 'index' });
-                                }).catch(() => {
                                     this.$emit('changeStep', 4);
+                                }).catch(() => {
+                                    wepy.redirectTo({ url: 'index' });
                                 });
                                 // this.$emit('changeStep', 4);
                             } else {

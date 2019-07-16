@@ -6,7 +6,7 @@
     <view class='wrapper' wx:else>
 
         <repeat for="{{list}}" key="index" index="index" item="item">
-            <van-swipe-cell class="swipe" right-width="{{ 70 }}" data-userid="{{item._id}}" data-index="{{index}}" async-close bind:close="onClose">
+            <van-swipe-cell class="swipe" right-width="{{ 80 }}" data-userid="{{item._id}}" data-index="{{index}}" async-close bind:close="onClose">
             <view class="friends-box" >
                 <image class="icon" @tap="goProfile({{item.dentifier}})" src="{{item.avatar}}" mode="aspectFill"></image>
                 <view class="msg" @tap="goChat({{item.dentifier}},{{item.nick_name}})">
@@ -14,7 +14,7 @@
                     <view class="distance">匹配于{{item.month}}/{{item.day}}</view>
                 </view>
             </view>
-            <view class="delete" slot="right">删除</view>
+            <view class="delete" slot="right">解除好友</view>
             </van-swipe-cell>
         </repeat>
     </view>
@@ -97,6 +97,7 @@ export default class Friends extends wepy.component {
         color: white;
         text-align: center;
         width: 142rpx;
+        font-size:28rpx;
     }
     .friends-box {
         padding: 0 30rpx;

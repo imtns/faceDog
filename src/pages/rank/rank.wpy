@@ -42,6 +42,7 @@
 <script>
 import wepy from 'wepy';
 import { get } from '@/utils/request';
+import { toast } from '@/utils';
 import { RANK_LIST } from '@/utils/url';
 import rankList from '@/components/rank/rankList';
 import Constellation from '@/components/rank/Constellation';
@@ -63,16 +64,18 @@ export default class fabu extends wepy.page {
         changeGenderPop: false,
         by: 'all',
         active: 0,
+        page: 1,
+        list: {}
     };
 
     components = {
         rankList,
         Constellation,
-        empty,
+        empty
     };
 
     myCatchTouch() {
-        return;
+
     }
 
     onClickTabs(event) {
@@ -94,6 +97,7 @@ export default class fabu extends wepy.page {
             // 点击同城
             this.showConstellation = false;
             this.by = '';
+            this.page = 1;
             this.getRankList({
                 by: '',
                 gender: this.gender
@@ -102,6 +106,7 @@ export default class fabu extends wepy.page {
             // 点击全国
             this.showConstellation = false;
             this.by = 'all';
+            this.page = 1;
             this.getRankList({
                 by: 'all',
                 gender: this.gender
@@ -112,11 +117,18 @@ export default class fabu extends wepy.page {
     getTabStyle() {
         return 'background:red';
     }
-
+    onReachBottom() {
+        this.page = this.page + 1;
+        this.getRankList({
+            by: this.by,
+            gender: this.gender
+        });
+    }
     methods = {
         async getRankListByXZ(obj) {
             this.showConstellation = false;
             this.by = obj.by || '';
+            this.page = 1;
             await this.getRankList(obj);
         },
         showchangeGenderPop() {
@@ -126,8 +138,9 @@ export default class fabu extends wepy.page {
             this.changeGenderPop = false;
         },
         changeGender() {
-            this.gender = this.gender === '1' ? '0'  : '1';
+            this.gender = this.gender === '1' ? '0' : '1';
             this.hidechangeGenderPop();
+            this.page = 1;
             this.getRankList({
                 by: this.by,
                 gender: this.gender
@@ -158,19 +171,28 @@ export default class fabu extends wepy.page {
 
     onShow() {}
 
-    async getRankList({ by = '', gender = '' }) {
+    async getRankList({ by = '', gender = ''}) {
         let data = await get(RANK_LIST, {
             by,
-            gender: gender || this.gender
+            gender: gender || this.gender,
+            page: this.page
         });
-        data = data.map((item) => {
+        data.map((item) => {
             if (item.distance) {
                 item.distance = (item.distance / 1000).toFixed(2);
             }
             return item;
         });
-        this.top3 = data.filter((x, index) => index <= 2);
-        this.topOthers = data.filter((x, index) => index > 2);
+        if (data.length && this.page === 1) {
+            this.top3 = data.filter((x, index) => index <= 2);
+            this.topOthers = data.filter((x, index) => index > 2);
+        } else if (this.page !== 1 && !data.length) {
+            toast('没有更多纪录');
+            return;
+        } else {
+            this.topOthers.push(...data.filter((x, index) => index > 2));
+        }
+
         this.$apply();
         console.log(data);
     }

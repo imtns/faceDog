@@ -64,8 +64,13 @@ export default class Chatlist extends wepy.component {
                 item.MsgShow = decodeURIComponent(item.MsgShow);
                 item.showTime = formatDateFromSeconds(item.MsgTimeStamp);
                 item.time = item.MsgTimeStamp;
+                if (item.To_Account === 'administrator') {
+                    item.C2cImage = '../images/chat/chatIcon.png';
+                    item.C2cNick = '颜狗客服';
+                }
             });
             this.list = data;
+            this.list.sort((x, y) => { return x.To_Account === 'administrator' ? -1 : y.To_Account === 'administrator' ? 1 : 0; });
             this.initLength = data.length;
             this.$apply();
         },
@@ -73,7 +78,7 @@ export default class Chatlist extends wepy.component {
         receivingMsg(sessMap, msg) {
             var sess = null;
             unread = 0;
-
+            wx.hideLoading();
             console.error('msg', msg);
             for (var i in sessMap) {
                 sess = sessMap[i];
@@ -119,6 +124,10 @@ export default class Chatlist extends wepy.component {
                     );
                 } else {
                     this.list.forEach(item => {
+                        if (item.To_Account === 'administrator') {
+                            item.C2cImage = '../images/chat/chatIcon.png';
+                            item.C2cNick = '颜狗客服';
+                        }
                         if (item.To_Account == sess.id()) {
                             item.UnreadMsgCount = sess.unread();
                         }
@@ -126,7 +135,6 @@ export default class Chatlist extends wepy.component {
                             item.To_Account == sess.id() &&
                             Object.keys(msg).length !== 0
                         ) {
-                            console.error('hahaha');
                             item.MsgShow = decodeURIComponent(
                                 msg.elems[0].content.text
                             );
@@ -137,9 +145,10 @@ export default class Chatlist extends wepy.component {
                         }
                     });
                 }
-                this.list.sort(function(a, b) {
+                this.list.sort((a, b) => {
                     return b.time - a.time;
                 });
+                this.list.sort((x, y) => { return x.To_Account == 'administrator' ? -1 : y.To_Account == 'administrator' ? 1 : 0; });
                 unread += sess.unread();
                 this.$apply();
                 console.log('unrenad:', unread);
@@ -184,7 +193,6 @@ export default class Chatlist extends wepy.component {
             }
         }
     };
-
     events = {};
 
     watch = {};

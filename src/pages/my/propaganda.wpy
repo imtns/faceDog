@@ -30,9 +30,9 @@
         <view class="line"></view>
         <view class="invite-box">
             <view class="header">
-                <view class="text {{clickIndex==0?'active':''}}" @tap="tab(0)">邀请记录 1</view>
+                <view class="text {{clickIndex==0?'active':''}}" @tap="tab(0)">邀请记录</view>
                 <view class="l">|</view>
-                <view class="text {{clickIndex==1?'active':''}}" @tap="tab(1)">红包 0元</view>
+                <view class="text {{clickIndex==1?'active':''}}" @tap="tab(1)">红包记录</view>
             </view>
             <view class="box-container">
                 <block wx:if="{{clickIndex == 0}}">
@@ -125,7 +125,7 @@ export default class Propaganda extends wepy.page {
         show: false,
         clickIndex: 0,
         balance: 0,
-        profile: wepy.getStorageSync('profile'),
+        profile: {},
         rule: false
     };
 
@@ -170,16 +170,19 @@ export default class Propaganda extends wepy.page {
         const data = await get(INVATATION);
         this.balance = data.balance;
         wepy.setStorageSync('balance', data.balance);
-
+        this.profile = wepy.getStorageSync('profile');
         this.inviteList = data.invitation;
         this.withdrawList = data.record;
         this.$apply();
     }
     onShareAppMessage() {
+        var ID = wepy.getStorageSync('profile').ID;
         return {
             title: '邀请好友获得10元现金红包',
-            path: '/pages/register?userid=' + this.profile.ID,
-            success: res => {},
+            path: '/pages/register?userid=' + ID,
+            success: res => {
+                console.error(this.profile.ID);
+            },
             fail(res) {
                 // 分享失败
                 console.log(res);
@@ -214,7 +217,6 @@ button {
         color: rgba(162, 162, 162, 1);
         text-align: center;
         z-index: 9999;
-        position: relative;
         margin-top: 79rpx;
         image {
             width: 123rpx;

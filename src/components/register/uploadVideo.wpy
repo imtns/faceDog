@@ -84,7 +84,8 @@ export default class Example extends wepy.component {
                 {
                     isVideo: true,
                     data: {
-                        code: this.number
+                        code: this.number,
+                        wechat: wepy.getStorageSync('wechat')
                     },
                     name: 'files'
                 },

@@ -1,6 +1,15 @@
 <!--  -->
 <template>
-    <view class='wrapper'>
+    <view class="loading" wx:if="{{loading}}">
+        <view class="content">
+            <view class="icon">
+                <van-loading color="#fff" />
+            </view>
+             <view class="word">正在保存...</view>
+        </view>
+
+    </view>
+    <view class='wrapper' >
         <view class="card">
             <view class="image">
                 <image mode="aspectFill" src="{{profile.icon}}"></image>
@@ -17,7 +26,7 @@
         </view>
         <view class="btn" @tap="save">保存图片</view>
         <view class="drawImage" wx:if="{{ready}}">
-            <drawimage id="drawimage" width="750" height="840" background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile" fileType="'jpg'" />
+            <drawimage id="drawimage" width="750" height="1334" background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile" fileType="'jpg'" />
         </view>
     </view>
 </template>
@@ -32,17 +41,20 @@ export default class MyCard extends wepy.page {
         navigationBarTitleText: '生成美图',
         disableScroll: true,
         usingComponents: {
-            drawimage: './miniprogram_npm/miniprogram-drawimage/index'
+            drawimage: './miniprogram_npm/miniprogram-drawimage/index',
+            'van-loading': '../../components/vant/loading/index'
         }
     };
 
     data = {
         profile: {},
         qrcode: 'https://www.facedog.cn/api/auth/qrcode?ID=10008',
+        downloadQRcode: 'https://www.facedog.cn/api/auth/qrcode?ID=10008',
         layers: [],
         ready: false,
         background: {},
-        sharePic: ''
+        sharePic: '',
+        loading: false
     };
 
     components = {};
@@ -50,15 +62,22 @@ export default class MyCard extends wepy.page {
     methods = {
         async save() {
             // if (!this.ready) return;
-            const path = this.sharePic;
-            console.error(path);
-            await this.savePhotosAlbum(path);
+            this.loading = true;
+            this.$apply();
+            await this.initStyleList();
+            this.ready = true;
+
+            this.$apply();
         },
 
-        toTempFile(res) {
+        async toTempFile(res) {
             console.error(res);
             const { tempFilePath } = res.detail;
             this.sharePic = tempFilePath;
+            const path = this.sharePic;
+            console.error(path);
+            await this.savePhotosAlbum(path);
+
             this.$apply();
         }
     };
@@ -71,7 +90,9 @@ export default class MyCard extends wepy.page {
         // 保存
     async savePhotosAlbum(path) {
         try {
-                // await wepy.saveImageToPhotosAlbum({ filePath: path });
+            this.loading = false;
+            this.$apply();
+            await wepy.saveImageToPhotosAlbum({ filePath: path });
             console.error(path);
             wx.previewImage({
                 current: path, // 当前显示图片的http链接
@@ -88,46 +109,42 @@ export default class MyCard extends wepy.page {
     }
     async onLoad() {
         this.profile = wepy.getStorageSync('profile');
-        wx.downloadFile({
-            url: 'https://www.facedog.cn/api/auth/qrcode?ID=10008',
-            success(res) {
-                console.log(1111);
-                console.log(res.tempFilePath);
-            },
-            fail(err) {
-                console.log(err);
-                // reject(err);
-            }
-        });
-        // this.qrcode = await get(QRCODE, {ID: this.profile.ID});
-        // await this.initStyleList();
-        // this.ready = true;
-        // this.$apply();
+        this.$apply();
     }
 
     onShow() {}
     async initStyleList() {
-        this.background.imageResource = '../../../../images/my/background.png';
+        this.background.imageResource = '../../../../images/my/background1.png';
         this.headImg = await getTmpFilePath(this.profile.icon);
-        this.qrcode = '';
+        let name = this.profile.nick_name;
+        let qrcode = await getTmpFilePath(this.qrcode);
         this.layers = [
             {
                 type: 'image', //  我的头像
                 imageResource: this.headImg,
-                dx: 60,
-                dy: 60,
+                dx: 90,
+                dy: 216,
                 dWidth: 570,
                 dHeight: 672
+            },
+            {
+                type: 'text', // 城市
+                fontSize: 28,
+                text: name,
+                textAlign: 'left',
+                x: 194,
+                y: 934,
+                color: '#000000'
             }
         ];
-        // this.layers.push({
-        //     type: 'image', //  小程序二维码
-        //     imageResource: this.qrcode,
-        //     dx: 527,
-        //     dy: 1193,
-        //     dWidth: 130,
-        //     dHeight: 130
-        // });
+        this.layers.push({
+            type: 'image', //  小程序二维码
+            imageResource: qrcode,
+            dx: 520,
+            dy: 900,
+            dWidth: 130,
+            dHeight: 130
+        });
         // this.layers.push({
         //     type: 'image', //  黑色1
         //     imageResource: '../../../../images/my/background.png',
@@ -142,6 +159,37 @@ export default class MyCard extends wepy.page {
 </script>
 
 <style lang='less'>
+.loading{
+    width:100%;
+    height:100vh;
+    background:rgba(0, 0, 0, 0.5);
+    position:absolute;
+    left:0;
+    z-index: 999;
+    top:0;
+    .content{
+        position:absolute;
+        left:50%;
+        top:50%;
+        width:180rpx;
+        display:flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        transform: translate(-50%,-50%);
+        .icon{
+            width:100rpx;
+            height:100rpx;
+        }
+        .word{
+            color:white;
+            font-size:28rpx;
+            text-align: center;
+            margin:10rpx aut0;
+            width:230rpx;
+        }
+    }
+
+}
 page {
     background: rgba(245, 245, 245, 1);
 }
@@ -201,7 +249,7 @@ page {
     }
     .btn {
         width: 638rpx;
-        z-index: 999;
+        z-index: 998;
         height: 92rpx;
         background: rgba(0, 0, 0, 1);
         position: fixed;

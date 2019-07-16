@@ -9,18 +9,22 @@
                 <view class="label">昵称:</view>
                 <input class="input" @change="onChangeName" label="用户名" placeholder="请输入昵称" />
             </view>
+            <view class="field" wx:if="{{code}}">
+                <view class="label">推荐人ID:</view>
+                <input class="input" value="{{ code }}" disabled label="推荐人ID"/>
+            </view>
             <view class="field">
                 <view class="label">性别:</view>
                 <view class="sex-container">
-                    <view class="male button" @tap="choose(1)">
-                        <image src="../../images/reg/male{{gender==1?'-active':''}}.png" mode="aspectFill"></image>
+                    <view class="male button" @tap="choose(2)">
+                        <image src="../../images/reg/male{{gender==2?'-active':''}}.png" mode="aspectFill"></image>
                     </view>
-                    <view class="female button" @tap="choose(2)">
-                        <image src="../../images/reg/female{{gender == 2?'-active':''}}.png" mode="aspectFill"></image>
+                    <view class="female button" @tap="choose(1)">
+                        <image src="../../images/reg/female1{{gender==1?'-active':''}}.png" mode="aspectFill"></image>
                     </view>
                 </view>
             </view>
-            <picker mode="date" value="{{currentDate}}" start="1970-01-01" end="{{ currentDate }}" bindchange="bindDateChange">
+            <picker mode="date" value="{{currentDate}}" start="1970-01-01" end="2019-01-01" bindchange="bindDateChange">
                 <view class="field">
                     <view class="label">生日:</view>
                     <view class="input">{{ currentDate }}</view>
@@ -34,20 +38,25 @@
 
 <script>
 import wepy from 'wepy';
-import { post } from '@/utils/request.js';
-import {toast} from '@/utils'
+// import { post } from '@/utils/request.js';
+import {toast} from '@/utils';
+import Dialog from '@/components/vant/dialog/dialog';
 export default class Profile extends wepy.component {
     props = {
         userInfo: {
             type: Object,
             default: {}
         },
+        code: {
+            type: String,
+            defalut: ''
+        }
     };
 
     data = {
         gender: 0,
         show: false,
-        currentDate: '',
+        currentDate: new Date().now,
         nickName: ''
     };
 
@@ -55,11 +64,9 @@ export default class Profile extends wepy.component {
 
     methods = {
         onChangeName(event) {
-            console.log(event.detail);
             this.nickName = event.detail.value;
         },
         choose(gender) {
-            console.log(gender);
             this.gender = gender;
             this.$apply();
         },
@@ -74,23 +81,21 @@ export default class Profile extends wepy.component {
             this.$apply();
         },
         bindDateChange(event) {
-            console.log(event);
             this.currentDate = event.detail.value;
         },
         next() {
-            if(!this.nickName || this.gender == 0 || !this.currentDate){
-                toast('请填写全部资料')
+            if (!this.nickName || this.gender === 0 || !this.currentDate) {
+                toast('请填写全部资料');
                 return;
             }
             const data = {
                 nick_name: this.nickName,
-                gender: this.gender == 1 ? 'male' : 'female',
-                birthday: this.currentDate
+                gender: this.gender == 2 ? 'male' : 'female',
+                birthday: this.currentDate,
+                number: this.code
             };
             wepy.setStorageSync('reg_profile', data);
-
-            console.log(data);
-            this.$emit('changeStep',3)
+            this.$emit('changeStep', 3);
         }
     };
 
@@ -102,7 +107,11 @@ export default class Profile extends wepy.component {
 }
 </script>
 
-<style lang='less' scoped>
+<style lang='less'>
+#van-dialog .van-dialog__confirm{
+    background:#07c160 !important;
+    color:white !important;
+}
 .wapper {
     width: 556rpx;
     margin: 60rpx auto 0;

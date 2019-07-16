@@ -71,10 +71,10 @@ export default class My extends wepy.component {
     data = {
         progress: {
             profile: '待完善资料',
-            certify: '未验证',
-            audit: '未审核',
+            certify: '未认证',
+            audit: '审核中',
             finish: '通过审核',
-            refuse: '已拒绝'
+            refuse: '认证失败'
         },
         profile: {}
     };
@@ -84,7 +84,10 @@ export default class My extends wepy.component {
         checkVerify(state) {
             console.log(state);
             if (state == 'refuse') {
-                wepy.redirectTo({ url: 'register?verify=true' });
+                wepy.navigateTo({ url: 'register?verify=true' });
+            }
+            if (state == 'certify') {
+                wepy.navigateTo({ url: 'register?certify=true' });
             }
         },
         goProfile() {

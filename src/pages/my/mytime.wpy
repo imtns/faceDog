@@ -85,6 +85,8 @@ export default class MyTime extends wepy.page {
                 font-size: 28rpx;
                 font-weight: 600;
                 color: rgba(6, 5, 5, 1);
+                width:100%;
+                text-align: center;
             }
             .word {
                 font-size: 24rpx;
