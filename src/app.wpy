@@ -44,7 +44,8 @@ export default class extends wepy.app {
             backgroundTextStyle: 'light',
             navigationBarBackgroundColor: '#fff',
             navigationBarTitleText: '颜狗',
-            navigationBarTextStyle: 'black'
+            navigationBarTextStyle: 'black',
+            onReachBottomDistance: 200,
         },
         permission: {
             'scope.userLocation': {

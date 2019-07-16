@@ -10,9 +10,9 @@
                     <view class="chat-avatars">
                         <image src="{{item.avatar}}" class="avatar" mode="aspectFill" bindtap="goProfile"></image>
                     </view>
-                    <view class="profile-image" wx:if="{{index==0}}" bindtap="goProfile">
+                    <view class="profile-image " wx:if="{{index==0}}" bindtap="goProfile">
                         <image class="thumb" src="{{item.avatar}}" mode="aspectFill"></image>
-                        <view class="profile-desc">
+                        <view class="profile-desc {{item.be}}">
                             <view class="left-container">
                                 <view class="top">{{item.nick_name}} {{item.age}}岁/{{item.constellation}}</view>
                                 <view class="bottom">在全国颜值排名前{{item.face*100}}%</view>
@@ -93,7 +93,7 @@ export default class Chat extends wepy.page {
         getMoreData() {
             if (loading || this.Complete) return;
             loading = true;
-            wx.showLoading();
+            // wx.showLoading();
             this.getLastC2CHistoryMsgs(
                 (list, err) => {
                     loading = false;
@@ -268,18 +268,20 @@ export default class Chat extends wepy.page {
             title: options.nick
         });
         this.nick = options.nick;
-        this.icon =
-            (options.icon && decodeURI(options.icon)) ||
-            wx.getStorageSync('chatIcon');
-        this.profile = wx.getStorageSync('profile');
-        this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
-        const result = await get(PROFILE, { dentifier: this.id });
-        this.user = result;
-        this.user.images.forEach(item => {
-            if (item.is_avatar) {
-                this.user.avatar = item.image;
-            }
-        });
+        this.icon = wx.getStorageSync('chatIcon');
+        if (this.nick !== '颜狗客服') {
+            this.profile = wx.getStorageSync('profile');
+            this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
+            const result = await get(PROFILE, { dentifier: this.id });
+            this.user = result;
+            this.user.images.forEach(item => {
+                if (item.is_avatar) {
+                    this.user.avatar = item.image;
+                }
+            });
+        } else {
+            this.icon = '../../images/chat/chatIcon.png';
+        }
         this.msgReaded();
         this.initChat();
         this.$apply();
@@ -398,7 +400,15 @@ page {
     .profile-desc {
         width: 370rpx;
         height: 79rpx;
-        background: rgba(237, 65, 81, 1);
+        &.lover{
+            background:#EE5361;
+        }
+        &.friend{
+            background:#5DCF8E;
+        }
+        &.close{
+            background:#D066EF;
+        }
         border-radius: 0 0 12rpx 12rpx;
         color: #070707;
         display: flex;

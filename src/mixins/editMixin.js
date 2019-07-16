@@ -55,17 +55,19 @@ export default class Mixin extends wepy.mixin {
     async getProfile(noLoading, fresh) {
         const data = await get(PROFILE, noLoading);
         data.images = this.switchOrder(data.images);
-        if (data.images.length === 1 || fresh) {
+        if ((data.images && data.images.length === 1) || fresh) {
             this.changeAvatar({
                 image_id: data.images[0]._id
             }, true);
         }
         this.profile = data;
         wepy.setStorageSync('profile', this.profile);
-        if (this.profile.images.length == 1) {
-            this.actions[1].disabled = true;
-        } else {
-            this.actions[1].disabled = false;
+        if (this.actions) {
+            if (this.profile.images.length == 1) {
+                this.actions[1].disabled = true;
+            } else {
+                this.actions[1].disabled = false;
+            }
         }
         this.$apply();
     }

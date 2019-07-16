@@ -5,13 +5,13 @@
             <getInfo></getInfo>
         </block>
         <block wx:if="{{step===2}}">
-            <profile :userInfo.sync="userInfo"></profile>
+            <profile :code.sync="code" :userInfo.sync="userInfo"></profile>
         </block>
         <block wx:if="{{step===3}}">
             <uploadPic :verify.sync="verify"></uploadPic>
         </block>
         <block wx:if="{{step===4}}">
-            <chooseVerify :code.sync="code" :disabled.sync="disabled"></chooseVerify>
+            <chooseVerify :disabled.sync="disabled"></chooseVerify>
         </block>
         <block wx:if="{{step===5}}">
             <uploadVideo></uploadVideo>
@@ -54,7 +54,8 @@ export default class Register extends wepy.page {
         userInfo: {},
         code: '',
         disabled: false,
-        verify: false
+        verify: false,
+        certify: false
     };
 
     components = {
@@ -103,6 +104,8 @@ export default class Register extends wepy.page {
         if (result.welcome && !this.verify) {
             if (this.verify) {
                 this.step = 3;
+            } else if (this.certify) {
+                this.step = 4;
             } else {
                 this.step = 2;
             }
@@ -121,11 +124,15 @@ export default class Register extends wepy.page {
         if (options.userid) {
             console.error(options.userid);
             this.code = options.userid;
-            this.disabled = true;
         }
         if (options.verify) {
-            this.verify = options.verify;
+            this.verify = true;
             this.step = 3;
+            return;
+        }
+        if (options.certify) {
+            this.certify = true;
+            this.step = 4;
             return;
         }
         if (options.name == 'reg') {
@@ -185,8 +192,12 @@ export default class Register extends wepy.page {
 }
 </script>
 
-<style lang='less' scoped>
+<style lang='less'>
 .main {
     padding: 0 30rpx;
+}
+.van-dialog__confirm{
+    background:#07c160 !important;
+    color:white !important;
 }
 </style>

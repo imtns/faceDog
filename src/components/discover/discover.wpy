@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-    <scroll-view scroll-y class='discover' bindscrolltolower="pageTuring"
+    <scroll-view scroll-y class='discover'  bindscrolltolower="pageTuring"
     bindscrolltoupper="refresh">
         <topBanner></topBanner>
         <view class="content-search">

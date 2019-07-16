@@ -14,7 +14,7 @@
                 </view>
                 <repeat for="{{item.users}}" key="index" index="index" item="user">
                     <view class="like-list">
-                        <view class="like">
+                        <view class="like" @tap="goProfile({{user.dentifier}})">
                             <image src="{{user.avatar}}" mode="aspectFill"></image>
                             <view class="desc">
                                 <view class="left">
@@ -71,6 +71,9 @@ export default class Like extends wepy.component {
             wx.navigateTo({
                 url: 'chat/like'
             });
+        },
+        goProfile(id) {
+            wepy.navigateTo({ url: `battle/profile?dentifier=${id}` });
         },
         async initData() {
             const result = await get(LIKE_ME);

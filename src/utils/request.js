@@ -11,7 +11,9 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
             resolve(data);
             data = {};
         }
-        wx.showLoading && wx.showLoading({ title: '加载中', mask: true });
+        if (data && data.loading) {
+            wx.showLoading && wx.showLoading({ title: '加载中', mask: true });
+        }
         let header = props[2] || {};
         if (wx.getStorageSync('token')) {
             Object.assign(header, {
@@ -39,7 +41,9 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
                 if (data.return_code === 0) {
                     resolve(data.data);
                 } else {
-                    toast(data.message || '服务器开小差了, 请稍后再试');
+                    if (data.message !== '用户未审核') {
+                        toast(data.message || '服务器开小差了, 请稍后再试');
+                    }
                     reject(data.message);
                 }
             },

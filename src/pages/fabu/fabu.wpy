@@ -36,7 +36,7 @@
 <script>
 import wepy from 'wepy';
 import { post, put } from '@/utils/request';
-import { toast } from '@/utils/index';
+import { sleep, toast } from '@/utils/index';
 import { FABU_FABU_MOMENT, FABU_UPLOAD_PIC } from '@/utils/url';
 import { Event } from '@/utils/event.js';
 export default class fabu extends wepy.page {
@@ -53,7 +53,7 @@ export default class fabu extends wepy.page {
         longitude: '',
         // tempFilePaths: [],
         uploadedPics: [],
-        isPublishing: false,
+        isPublishing: false
     };
 
     components = {};
@@ -163,13 +163,12 @@ export default class fabu extends wepy.page {
                 const data = await post(FABU_FABU_MOMENT, subData);
                 Event.trigger('refresh');
                 toast('发布成功');
-                
-                setTimeout(() => {
-                    this.isPublishing = false;
-                    wx.navigateBack({
-                        delta: 1
-                    });
-                }, 1500);
+                await sleep(2);
+                this.isPublishing = false;
+                wx.navigateBack({
+                    delta: 1
+                });
+                this.$apply();
             } catch (error) {
                 this.isPublishing = false;
             }

@@ -6,18 +6,20 @@
         </view>
         <view class="form">
             <view class="field">
-                <view class="label">填写推荐人编号</view>
-                <input class="input" type="text" disabled="{{disabled}}" value="{{ code }}"  placeholder="" />
+                <view class="label">请填写微信号</view>
+                <input class="input" type="text" @input="onChangeName"   placeholder="" />
             </view>
             <view class="verify-box">
                 <view class="box">
                     <view class="title">方式一</view>
-                    <view class="desc">必须填写推荐人需要跟推荐人沟通</view>
+                    <view class="desc">需要推荐人确认</view>
+                    <view class="desc" style="margin-top:0;"> 预计60分钟内审核完成</view>
                     <button @tap="verify">直接认证</button>
                 </view>
                 <view class="box">
-                    <view class="title">方式一</view>
-                    <view class="desc">必须填写推荐人需要跟推荐人沟通</view>
+                    <view class="title">方式二</view>
+                    <view class="desc">无需推荐人确认</view>
+                    <view class="desc" style="margin-top:0">预计30分钟内审核完成</view>
                     <button @tap="redirect">视频认证</button>
                 </view>
             </view>
@@ -37,10 +39,6 @@ export default class ChooseVerify extends wepy.component {
             default: 0,
             twoWay: true
         },
-        code: {
-            type: String,
-            defalut: ''
-        },
         disabled: {
             type: Boolean,
             default: false
@@ -48,22 +46,25 @@ export default class ChooseVerify extends wepy.component {
     };
 
     data = {
-        inviteCode: ''
+        wechat: ''
     };
     components = {};
 
     methods = {
+        onChangeName(event) {
+            this.wechat = event.detail.value;
+        },
         async verify() {
             try {
-                if (!this.code) {
-                    toast('请填写认证编号');
+                if (!this.wechat) {
+                    toast('请填写微信号');
                     return;
                 }
                 const data = await post(VERIFY, {
-                    number: this.code
+                    wechat: this.wechat
                 });
                 console.log(data);
-                toast('认证成功');
+                toast('已提交审核');
                 await sleep(2);
                 wx.redirectTo({
                     url: 'index'
@@ -74,6 +75,12 @@ export default class ChooseVerify extends wepy.component {
         },
         redirect() {
             // this.step = 5;
+            if (!this.wechat) {
+                toast('请填写微信号');
+                return;
+            }
+            wepy.setStorageSync('wechat', this.wechat);
+
             this.$emit('changeStep', 5);
         }
     };
