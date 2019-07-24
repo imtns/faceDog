@@ -2,9 +2,11 @@
 <template>
     <view class='wrapper'>
         <view class='item'>
-            <view class="title">只看异性</view>
-            <view class="detail2">
-                <van-switch checked="{{ opposite_sex }}" @change="onChange('opposite_sex')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+            <view class="title">只看</view>
+            <view class="detail3">
+                <view @tap="genderChange(1)" class="sex-btn {{gender==1?'active':''}}">异性</view>
+                <view @tap="genderChange(2)" class="sex-btn {{gender==2?'active':''}}">同性</view>
+                <!-- <van-switch checked="{{ opposite_sex }}" @change="onChange('opposite_sex')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" /> -->
             </view>
         </view>
         <view class="line"></view>
@@ -59,7 +61,8 @@ export default class Setting extends wepy.page {
     data = {
         opposite_sex: false,
         in_city: false,
-        no_battle: false
+        no_battle: false,
+        gender: 1
     };
 
     components = {};
@@ -70,12 +73,19 @@ export default class Setting extends wepy.page {
             console.log(name);
             // 需要手动对 checked 状态进行更新
             this[name] = detail;
+            this.opposite_sex = this.gender == 1;
             this.$apply();
             await put(USER_SETTING, this.data);
             Event.trigger('battleFresh');
         },
-        logout() {
-            console.log('out');
+        async genderChange(status) {
+            this.gender = status;
+            this.opposite_sex = status == 1;
+            this.$apply();
+            await put(USER_SETTING, this.data);
+            Event.trigger('battleFresh');
+            this.$apply();
+            console.log(status);
         }
     };
 
@@ -88,6 +98,7 @@ export default class Setting extends wepy.page {
     async onLoad() {
         const result = await get(USER_SETTING);
         Object.assign(this, result);
+        this.gender = result.opposite_sex ? 1 : 2;
         this.$apply();
     }
 
@@ -136,7 +147,28 @@ export default class Setting extends wepy.page {
     right: 60rpx;
     color: rgba(178, 178, 178, 1);
 }
-
+.detail3{
+    position:absolute;
+    right:60rpx;
+    width:300rpx;
+    display:flex;
+    justify-content: space-around;
+        .sex-btn{
+        width:105rpx;
+        height:56rpx;
+        background:#cecece;
+        color:#2a2a2a;
+        font-size:24rpx;
+        margin-left:35rpx;
+        text-align: center;
+        line-height: 56rpx;
+        font-weight:bold;
+        &.active {
+            color:white;
+            background:#000;
+        }
+    }
+}
 .line {
     width: 630rpx;
     margin: 0 auto;

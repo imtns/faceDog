@@ -6,7 +6,7 @@
                 <view class="author-name" wx:if="{{item.showtime}}">
                     <text class="chat-date">{{item.sendTime}}</text>
                 </view>
-                <view class="left" style="margin-bottom:40rpx;" wx:if="{{Complete && index == 0}}">
+                <view class="left" style="margin-bottom:40rpx;" wx:if="{{Complete && index == 0 && nick!='颜狗客服'}}">
                     <view class="chat-avatars">
                         <image src="{{item.avatar}}" class="avatar" mode="aspectFill" bindtap="goProfile"></image>
                     </view>
@@ -152,7 +152,7 @@ export default class Chat extends wepy.page {
                 var skey = that.id; // 拼装 skey
                 var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
                 var selSess = sessMap[skey]; // 获取 Session 的实例
-                console.log(sessMap);
+                console.error(111, sessMap);
                 webim.setAutoRead(selSess, true, true);
                 Event.trigger('send');
                 that.$apply();
@@ -200,7 +200,7 @@ export default class Chat extends wepy.page {
                 that.count = resp.MaxCnt;
                 that.$apply();
                 var temp = null;
-                if (complete === 1) {
+                if (complete === 1 && that.nick != '颜狗客服') {
                     wx.hideLoading();
                     webim.Log.error(
                         '没有历史消息了:data=' + JSON.stringify(options)
@@ -269,9 +269,12 @@ export default class Chat extends wepy.page {
         });
         this.nick = options.nick;
         this.icon = wx.getStorageSync('chatIcon');
-        if (this.nick !== '颜狗客服') {
-            this.profile = wx.getStorageSync('profile');
-            this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
+        this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
+        this.profile = wx.getStorageSync('profile');
+
+        if (this.nick == '颜狗客服') {
+            this.icon = '../../images/chat/chatIcon.png';
+        } else {
             const result = await get(PROFILE, { dentifier: this.id });
             this.user = result;
             this.user.images.forEach(item => {
@@ -279,8 +282,6 @@ export default class Chat extends wepy.page {
                     this.user.avatar = item.image;
                 }
             });
-        } else {
-            this.icon = '../../images/chat/chatIcon.png';
         }
         this.msgReaded();
         this.initChat();

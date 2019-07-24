@@ -35,6 +35,7 @@ import { formatDateFromSeconds } from '@/utils';
 import webimhandler from '@/utils/handler';
 import webim from '@/utils/webim.js'; // 腾讯云im包
 import empty from '@/components/empty';
+import { Event } from '@/utils/event.js';
 var unread = 0;
 export default class Chatlist extends wepy.component {
     props = {};
@@ -64,7 +65,7 @@ export default class Chatlist extends wepy.component {
                 item.MsgShow = decodeURIComponent(item.MsgShow);
                 item.showTime = formatDateFromSeconds(item.MsgTimeStamp);
                 item.time = item.MsgTimeStamp;
-                if (item.To_Account === 'administrator') {
+                if (item.To_Account == 'administrator') {
                     item.C2cImage = '../images/chat/chatIcon.png';
                     item.C2cNick = '颜狗客服';
                 }
@@ -200,7 +201,21 @@ export default class Chatlist extends wepy.component {
     computed = {};
 
     onLoad() {
-
+        Event.listen('chatDelete', (id) => {
+            var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
+            var skey = 'C2C' + id; // 拼装 skey
+            var selSess = sessMap[skey]; // 获取 Session 的实例
+            webim.setAutoRead(selSess, true, false);
+            setTimeout(() => {
+                webim.setAutoRead(selSess, false, false);
+            }, 2000);
+            webimhandler.delChat(id);
+            let index = this.findIndex(x => x.To_Account == 'id');
+            this.list.splice(index, 1);
+            unread = unread - this.list[index].UnreadMsgCount;
+            this.$emit('unreadSet', unread);
+            this.$apply();
+        });
     }
 
     onShow() {}

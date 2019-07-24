@@ -2,9 +2,9 @@
 <template>
     <view class='wrapper'>
         <view class="input">
-            <textarea type="text" value="{{profile.signature}}" @input="inputChange" maxlength="20" auto-focus></textarea>
+            <textarea type="text" value="{{profile.signature}}" @input="inputChange" maxlength="40" auto-focus></textarea>
         </view>
-        <view class="textleft">{{textleft}} / 20</view>
+        <view class="textleft">{{textleft}} / 40</view>
         <view class="btn" @tap="submit">
             确定
         </view>

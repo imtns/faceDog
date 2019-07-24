@@ -189,6 +189,11 @@ export default class fabu extends wepy.page {
         } else if (this.page !== 1 && !data.length) {
             toast('没有更多纪录');
             return;
+        } else if (this.page == 1 && !data.length) {
+            this.top3 = [];
+            this.topOthers = [];
+            this.$apply();
+            return;
         } else {
             this.topOthers.push(...data.filter((x, index) => index > 2));
         }

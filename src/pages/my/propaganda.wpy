@@ -225,6 +225,10 @@ button {
         }
     }
 }
+navigator{
+    position:relative;
+    z-index: 99999;
+}
 .wrapper {
     width: 100%;
     padding-bottom: 150rpx;

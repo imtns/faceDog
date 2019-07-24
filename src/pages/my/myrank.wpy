@@ -1,10 +1,19 @@
 <!--  -->
 <template>
+    <view class="loading" wx:if="{{loading}}">
+        <view class="content">
+            <view class="icon">
+                <van-loading color="#fff" />
+            </view>
+            <view class="word">正在保存...</view>
+        </view>
+
+    </view>
     <view class='wrapper'>
         <view class="header">
             <view class="title">你在全国颜值排名<text>{{face}}%</text></view>
             <view class="title">你在{{position}}颜值排名第<text>{{city}}名</text></view>
-            <view class="bar">“除了帅气，你一无所有”</view>
+            <view class="bar">“{{shareText}}”</view>
         </view>
         <view class="w">
             <view class="boxes">
@@ -53,16 +62,84 @@ export default class Example extends wepy.page {
         navigationBarBackgroundColor: '#000',
         navigationBarTextStyle: 'white',
         usingComponents: {
-            drawimage: './miniprogram_npm/miniprogram-drawimage/index'
+            drawimage: 'miniprogram_npm/miniprogram-drawimage/index',
+            'van-loading': '../../components/vant/loading/index'
         }
     };
 
     data = {
+        charData: {
+            male: {
+            },
+            female: {
+            }
+        },
+        loading: false,
+        charLabel: {
+            male: ['帅气', '阳光', '多金', '智慧', '性感'],
+            female: ['美丽', '可爱', '高贵', '智慧', '性感']
+        },
+        charTexts: {
+            male: {
+                sexy: [
+                    '想在哥哥的八块腹肌上蹦个迪',
+                    '放在心上的宝贝以后也要放在床上'
+                ],
+                cool: [
+                    '近朱者赤，近你者甜',
+                    '世间万物皆苦，你的偏爱是我的救赎'
+                ],
+                wisdom: [
+                    '始于颜值，陷于才华，忠于人品',
+                    '满地都是六便士，他却抬头看见了月亮'
+                ],
+                wealth: [
+                    '我一生中就喜欢两种花，有钱花和随便花',
+                    '男生其实很懂事，有钱了就想多照顾几个女生'
+                ],
+                other: [
+                    '什么都可以错，但是别再错过我',
+                    '以梦为马，不负韶华，无问西东',
+                    '两个人的无聊，好过一个人的发呆',
+                    '我百毒不侵，可偏偏你是第一百零一种',
+                    '好看的皮囊扫黄打非，有趣的灵魂账号违规',
+                    '遇见你的那天，我连我们孩子名字都想好了'
+                ]
+            },
+            female: {
+                sexy: [
+                    '做个万人迷，然后只喜欢你',
+                    '男人喜欢乖的又拒绝不了你',
+                    '不能同日生，但能一起祸害苍生'
+                ],
+                cool: [
+                    '可爱不是长久之计，可爱是我',
+                    '像我这样的小盆友是要随时被放在怀里的'
+                ],
+                wisdom: [
+                    '世上所有的惊喜与好运，都是你积累的温柔和善良',
+                    '徒手摘星，爱而不得，世人万千，再难遇我'
+                ],
+                wealth: [
+                    '人生苦短，喜欢就买',
+                    '我的心思很好猜，除了想你就是发财'
+                ],
+                other: [
+                    '我是一个没有感情的杀手',
+                    '一生温暖纯良，不舍爱与自由',
+                    '我可以亲口对你说晚安吗？先亲口再说',
+                    '我一般下午出现，不然你早晚会爱上我',
+                    '反正你也没有女朋友，叫我一声老婆怎么了',
+                    '酒那么苦你喜欢喝，我嘴那么甜你怎么不尝尝'
+                ]
+            }
+        },
         position: '', // 省份
         city: 0, // 城市名次
         images: [],
         face: 0, // 颜值排名
         ready: false,
+        qrcode: '',
         canvasImage: '',
         background: {
             imageResource: '',
@@ -74,7 +151,8 @@ export default class Example extends wepy.page {
         layers: [],
         headImg1: '',
         styleImage1: '',
-        qrcode: '',
+        gender: '',
+        shareText: '',
         blackbg: '' // 黑色的部分，胜率等
     };
 
@@ -82,14 +160,19 @@ export default class Example extends wepy.page {
 
     methods = {
         async share() {
-            if (!this.ready) return;
-            const path = this.styleImage1;
+            this.loading = true;
+            this.$apply();
+            await this.initStyleList();
+            this.ready = true;
+            this.$apply();
+        },
+        async toTempFile(res) {
+            console.error(res);
+            const { tempFilePath } = res.detail;
+            const path = tempFilePath;
             console.error(path);
             await this.savePhotosAlbum(path);
-        },
-        toTempFile(res) {
-            const { tempFilePath } = res.detail;
-            this.styleImage1 = tempFilePath;
+
             this.$apply();
         }
     };
@@ -97,12 +180,15 @@ export default class Example extends wepy.page {
     // 保存
     async savePhotosAlbum(path) {
         try {
-            // await wepy.saveImageToPhotosAlbum({ filePath: path });
-            console.error(path);
+            this.loading = false;
+            this.ready = false;
+            this.$apply();
+            await wepy.saveImageToPhotosAlbum({ filePath: path });
             wx.previewImage({
                 current: path, // 当前显示图片的http链接
                 urls: [path] // 需要预览的图片http链接列表
             });
+
             toast('保存成功！');
         } catch (e) {
             toast('由于您拒绝了相册授权，无法自动保存到本地相册，请截图保存');
@@ -116,37 +202,60 @@ export default class Example extends wepy.page {
     watch = {};
 
     computed = {};
-
+    getRanText() {
+        let text = '';
+        for (const [key, value] of Object.entries(this.charData[this.gender])) {
+            console.log(key, value);
+            if (value == 5) {
+                text = this.getRanValue(this.charTexts[this.gender][key]);
+            }
+        }
+        if (!text) {
+            text = this.getRanValue(this.charTexts[this.gender]['other']);
+        }
+        this.shareText = text;
+        this.$apply();
+        console.log('text:', text);
+    }
     async onLoad() {
+        let profile = wepy.getStorageSync('profile');
+        let gender = profile.gender;
+        this.qrcode = `https://www.facedog.cn/api/auth/qrcode?ID=${profile.ID}`;
         const info = await get(USER_RANK);
-        const { face, city, position } = info;
+        const { face, city, position, five } = info;
+        this.gender = gender;
+        this.charData[gender] = five;
         // 颜值排名
         this.face = face;
         // 城市排名
         this.city = city;
         // 省份
         this.position = position;
-        // info.images && info.images.forEach(item => {
-        //     item.image = item.image.replace('http', 'https');
-        // });
         // 图片1
         this.images = info.images;
         this.$apply();
+        this.getRanText();
         radarChart = new wxCharts({
             canvasId: 'radarCanvas',
             type: 'radar',
             background: 'red',
-            categories: ['帅气', '多金', '智慧', '阳光', '性感'],
+            categories: this.charLabel[this.gender],
             series: [
                 {
-                    data: [90, 50, 60, 95, 40]
+                    data: [
+                        this.charData[this.gender].character,
+                        this.charData[this.gender].cool,
+                        this.charData[this.gender].wealth,
+                        this.charData[this.gender].wisdom,
+                        this.charData[this.gender].sexy
+                    ]
                 }
             ],
             width: 158,
             height: 141,
             extra: {
                 radar: {
-                    max: 100
+                    max: 5
                 }
             }
         });
@@ -157,9 +266,6 @@ export default class Example extends wepy.page {
                     var tempFilePath = res.tempFilePath;
                     // console.error(tempFilePath);
                     that.canvasImage = tempFilePath;
-
-                    await that.initStyleList();
-                    that.ready = true;
                     that.$apply();
                 },
                 fail(res) {
@@ -171,14 +277,18 @@ export default class Example extends wepy.page {
 
         this.$apply();
     }
-
+    getRanValue(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
     async initStyleList() {
-        this.background.imageResource = '../../../../images/my/myrank-bg.png';
+        this.background.imageResource = '../../../../images/my/myrank-bg1.png';
         const bg = '../../../../images/my/myrank-bg.png';
         this.headImg1 = await getTmpFilePath(this.images[0].image);
-        this.headImg2 = this.images[1] && await getTmpFilePath(this.images[1].image);
-        this.headImg3 = this.images[2] && await getTmpFilePath(this.images[2].image);
-        this.qrcode = '';
+        this.headImg2 =
+            this.images[1] && (await getTmpFilePath(this.images[1].image));
+        this.headImg3 =
+            this.images[2] && (await getTmpFilePath(this.images[2].image));
+        let qrcode = await getTmpFilePath(this.qrcode);
         this.layers = [
             {
                 type: 'image', //  我的头像1
@@ -202,8 +312,8 @@ export default class Example extends wepy.page {
                 fontSize: 30,
                 text: `${this.city}`,
                 textAlign: 'center',
-                x: 370,
-                y: 299,
+                x: 357,
+                y: 298,
                 color: '#E11220'
             },
             {
@@ -211,27 +321,27 @@ export default class Example extends wepy.page {
                 fontSize: 30,
                 text: `${100 - this.face}%`,
                 textAlign: 'center',
-                x: 310,
-                y: 341,
+                x: 308,
+                y: 338,
                 color: '#E11220'
             },
             {
                 type: 'text', // 城市
-                fontSize: 35,
-                text: '一个集美貌和才华的萌妹子',
+                fontSize: 24,
+                text: this.shareText,
                 textAlign: 'center',
-                x: 350,
-                y: 415,
+                x: 357,
+                y: 426,
                 color: '#000000'
             }
         ];
         this.layers.push({
             type: 'image', //  我的头像1
             imageResource: this.canvasImage,
-            dx: 379,
-            dy: 513,
-            dWidth: 310,
-            dHeight: 310
+            dx: 400,
+            dy: 550,
+            dWidth: 330,
+            dHeight: 280
         });
         if (this.images[1]) {
             this.layers.push({
@@ -255,7 +365,7 @@ export default class Example extends wepy.page {
         }
         this.layers.push({
             type: 'image', //  小程序二维码
-            imageResource: this.qrcode,
+            imageResource: qrcode,
             dx: 527,
             dy: 1193,
             dWidth: 130,
@@ -265,18 +375,18 @@ export default class Example extends wepy.page {
         this.layers.push({
             type: 'image', //  黑色1
             imageResource: '../../../../images/my/myrank-black.png',
-            dx: 306,
+            dx: 326,
             dy: 773,
             dWidth: 120,
-            dHeight: 62
+            dHeight: 63
         });
         this.layers.push({
             type: 'text', // 黑色1 胜率
             fontSize: 18,
             text: `${this.images[0].win * 100}%`,
             textAlign: 'center',
-            x: 385,
-            y: 780,
+            x: 412,
+            y: 781,
             color: '#E1111F'
         });
         this.layers.push({
@@ -284,62 +394,69 @@ export default class Example extends wepy.page {
             fontSize: 18,
             text: `${this.images[0].play}`,
             textAlign: 'center',
-            x: 400,
-            y: 807,
+            x: 409,
+            y: 809,
             color: '#E1111F'
         });
-        this.layers.push({
-            type: 'image', //  黑色2
-            imageResource: '../../../../images/my/myrank-black.png',
-            dx: 258,
-            dy: 1047,
-            dWidth: 120,
-            dHeight: 62
-        });
-        this.layers.push({
-            type: 'text', // 黑色2 胜率
-            fontSize: 18,
-            text: `${this.images[1].win * 100}%`,
-            textAlign: 'center',
-            x: 343,
-            y: 1054,
-            color: '#E1111F'
-        });
-        this.layers.push({
-            type: 'text', // 黑色2 出场率
-            fontSize: 18,
-            text: `${this.images[0].play}`,
-            textAlign: 'center',
-            x: 350,
-            y: 1084,
-            color: '#E1111F'
-        });
-        this.layers.push({
-            type: 'image', //  黑色3
-            imageResource: '../../../../images/my/myrank-black.png',
-            dx: 548,
-            dy: 1047,
-            dWidth: 120,
-            dHeight: 62
-        });
-        this.layers.push({
-            type: 'text', // 黑色3 胜率
-            fontSize: 18,
-            text: `${this.images[2].win * 100}%`,
-            textAlign: 'center',
-            x: 632,
-            y: 1052,
-            color: '#E1111F'
-        });
-        this.layers.push({
-            type: 'text', // 黑色3 出场率
-            fontSize: 18,
-            text: `${this.images[0].play}`,
-            textAlign: 'center',
-            x: 639,
-            y: 1084,
-            color: '#E1111F'
-        });
+
+        if (this.images[1]) {
+            this.layers.push({
+                type: 'image', //  黑色2
+                imageResource: '../../../../images/my/myrank-black.png',
+                dx: 258,
+                dy: 1047,
+                dWidth: 120,
+                dHeight: 62
+            });
+            this.layers.push({
+                type: 'text', // 黑色2 胜率
+                fontSize: 18,
+                text: `${this.images[1].win * 100}%`,
+                textAlign: 'center',
+                x: 343,
+                y: 1054,
+                color: '#E1111F'
+            });
+            this.layers.push({
+                type: 'text', // 黑色2 出场率
+                fontSize: 18,
+                text: `${this.images[1].play}`,
+                textAlign: 'center',
+                x: 345,
+                y: 1083,
+                color: '#E1111F'
+            });
+        }
+
+        if (this.images[2]) {
+            this.layers.push({
+                type: 'image', //  黑色3
+                imageResource: '../../../../images/my/myrank-black.png',
+                dx: 548,
+                dy: 1047,
+                dWidth: 120,
+                dHeight: 62
+            });
+            this.layers.push({
+                type: 'text', // 黑色3 胜率
+                fontSize: 18,
+                text: `${this.images[2].win * 100}%`,
+                textAlign: 'center',
+                x: 632,
+                y: 1055,
+                color: '#E1111F'
+            });
+            this.layers.push({
+                type: 'text', // 黑色3 出场率
+                fontSize: 18,
+                text: `${this.images[2].play}`,
+                textAlign: 'center',
+                x: 634,
+                y: 1083,
+                color: '#E1111F'
+            });
+        }
+
         this.$apply();
     }
     onShow() {}
@@ -382,7 +499,7 @@ export default class Example extends wepy.page {
             height: 99rpx;
             background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAABjBAMAAADz3MACAAAAD1BMVEX///9wcHAAAAB/f3/V1dVOBKR1AAABNElEQVR42u3dOw6CUBCGUYwsQHdgYAMEN8D+VyWYeHlU3JlG4/kaE8uTv6K409yVqLk1CnfBhw/fD/O1z6WJxtkK2Jvv2s3189+dTjRDjcvvsOUbjOp81yNfz6Sm8cBnfNXz2/AZX/38NnzGVz+/lc/4AvNb+YwvML/CZ3yR+RU+44vM78PXsog0+WTgiws+fPgU5HuACPTAhw8fPnzChw8fPuHDhw+f8OHDh0/48OHDh48FPnz48AkfPnz4hA8fPnzChw8fPnz48OHDh0/48OHDJ3z48OETPnxfx6dg+PDhw/e3fJ4/DDV5fDPRoubp13Dr068eHg6Mz7PXqfF5dD01Pk/+p8bn4ERqfM6dpMbn2E5qfHs+86scX+Erd7NcwTp3KWt/aEy+uODDh081fC48Z3oB0talxn/B210AAAAASUVORK5CYII=');
             background-size: cover;
-            font-size: 35rpx;
+            font-size: 28rpx;
             font-weight: 600;
             color: #000;
             text-align: center;
@@ -470,15 +587,48 @@ export default class Example extends wepy.page {
             }
         }
         .shareButton {
-            margin-top: 100rpx;
-            width: 462rpx;
+            width: 638rpx;
+            z-index: 998;
             height: 92rpx;
             background: rgba(0, 0, 0, 1);
-            font-size: 28rpx;
+            position: fixed;
+            bottom: 22rpx;
+            left: 50%;
+            transform: translateX(-50%);
             line-height: 92rpx;
+            font-size: 28rpx;
             text-align: center;
-            font-weight: 500;
             color: rgba(252, 252, 252, 1);
+        }
+    }
+}
+.loading {
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    left: 0;
+    z-index: 999;
+    top: 0;
+    .content {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 180rpx;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        transform: translate(-50%, -50%);
+        .icon {
+            width: 100rpx;
+            height: 100rpx;
+        }
+        .word {
+            color: white;
+            font-size: 28rpx;
+            text-align: center;
+            margin: 10rpx aut0;
+            width: 230rpx;
         }
     }
 }

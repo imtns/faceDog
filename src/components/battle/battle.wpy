@@ -146,6 +146,7 @@ export default class Battle extends wepy.component {
                 }
                 self.bottomLikedImage = self.battle.b[index].image_id;
                 self.bottomLikedUser = self.battle.b[index]._id;
+                console.error(self.bottomLikeImage);
             } else {
                 if (self.bottomIndex == self.battle.b.length - 2) {
                     try {
@@ -255,7 +256,7 @@ export default class Battle extends wepy.component {
             this.heartTop = true;
             imageid = this.topLikedImage;
         }
-
+        console.error(imageid);
         if (!this.likeCount.count[imageid]) this.likeCount.count[imageid] = 0;
         this.likeCount.count[imageid] = this.likeCount.count[imageid] + 1;
         this.setHeart(type, this.likeCount.count[imageid]);
@@ -380,9 +381,9 @@ export default class Battle extends wepy.component {
             index = 3;
         }
         if (position === 'top') {
-            this.topHeart = `../../../images/battle/${index}.png`;
+            this.topHeart = `../../../images/battle/win${index}.png`;
         } else {
-            this.bottomHeart = `../../../images/battle/${index}.png`;
+            this.bottomHeart = `../../../images/battle/win${index}.png`;
         }
         this.$apply();
     }

@@ -31,6 +31,7 @@
                 <van-icon name="arrow" color="#B2B2B2"/>
             </view>
         </view>
+        <van-toast id="van-toast" />
     </view>
 </template>
 <script>
@@ -39,11 +40,15 @@ import { post, put } from '@/utils/request';
 import { sleep, toast } from '@/utils/index';
 import { FABU_FABU_MOMENT, FABU_UPLOAD_PIC } from '@/utils/url';
 import { Event } from '@/utils/event.js';
+import Toast from '@/components/vant/toast/toast';
+let auth = false;
 export default class fabu extends wepy.page {
     config = {
         navigationBarTitleText: '发布动态',
         usingComponents: {
-            'van-icon': '../../components/vant/icon/index'
+            'van-icon': '../../components/vant/icon/index',
+            'van-loading': '../components/vant/loading/index',
+            'van-toast': '../components/vant/toast/index'
         }
     };
     data = {
@@ -120,8 +125,14 @@ export default class fabu extends wepy.page {
                         'Content-Type': 'multipart/form-data'
                     },
                     success(res) {
-                        const data = JSON.parse(res.data).data;
-                        resolve(data);
+                        const data = JSON.parse(res.data);
+                        console.log(data);
+                        if (data.message == '用户未审核') {
+                            toast('认证审核中，加急审核请联系客服微信：yanzc1023');
+                            auth = true;
+                            return;
+                        }
+                        resolve(data.data);
                         // do something
                     },
                     fail(res) {
@@ -142,6 +153,10 @@ export default class fabu extends wepy.page {
             this.$apply();
         },
         async publish() {
+            if (auth) {
+                toast('认证审核中，加急审核请联系客服微信：yanzc1023');
+                return;
+            }
             try {
                 if (this.isPublishing) {
                     return;
@@ -159,10 +174,17 @@ export default class fabu extends wepy.page {
                         images: []
                     }
                 );
+                wx.showLoading({
+                    title: '正在发布',
+                    mask: true
+                });
+
                 this.isPublishing = true;
-                const data = await post(FABU_FABU_MOMENT, subData);
+                await post(FABU_FABU_MOMENT, subData);
+                wx.hideLoading();
                 Event.trigger('refresh');
-                toast('发布成功');
+                // toast('发布成功');
+                Toast.success('发布成功');
                 await sleep(2);
                 this.isPublishing = false;
                 wx.navigateBack({
@@ -172,8 +194,6 @@ export default class fabu extends wepy.page {
             } catch (error) {
                 this.isPublishing = false;
             }
-
-            console.log(data);
         }
     };
 
@@ -183,9 +203,11 @@ export default class fabu extends wepy.page {
 
     computed = {};
 
-    onLoad() {}
+    onLoad() {
 
-    onShow() {}
+    }
+
+    onShow() { auth = false; }
 }
 </script>
 

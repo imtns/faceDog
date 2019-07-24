@@ -1,24 +1,28 @@
 <!--  -->
 <template>
     <view class="top">
-        <image  class="banner" src="../../images/discover/discover-top2.png"></image>
+        <image  class="banner" src="../../images/discover/discover-top2.png" @tap="toActivity"></image>
         <image  class="banner" src="../../images/discover/discover-top1.png" @tap="toRank"></image>
     </view>
 </template>
 <script>
 import wepy from 'wepy';
 export default class topBanner extends wepy.component {
-
     data = {};
 
     components = {};
 
     methods = {
-        toRank() {
+        toActivity() {
             wepy.navigateTo({
-                url: 'rank/rank',
+                url: 'activity/activity'
             });
         },
+        toRank() {
+            wepy.navigateTo({
+                url: 'rank/rank'
+            });
+        }
     };
 
     events = {};

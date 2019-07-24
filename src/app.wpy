@@ -38,14 +38,15 @@ export default class extends wepy.app {
             'pages/my/withdraw', // 红包提现
             'pages/my/activityRule', // 活动规则
             'pages/my/contactService', // 联系客服
-            'pages/my/myCard' // 生成美图
+            'pages/my/myCard', // 生成美图
+            'pages/activity/activity'
         ],
         window: {
             backgroundTextStyle: 'light',
             navigationBarBackgroundColor: '#fff',
             navigationBarTitleText: '颜狗',
             navigationBarTextStyle: 'black',
-            onReachBottomDistance: 200,
+            onReachBottomDistance: 200
         },
         permission: {
             'scope.userLocation': {

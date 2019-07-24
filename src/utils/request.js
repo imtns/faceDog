@@ -41,7 +41,9 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
                 if (data.return_code === 0) {
                     resolve(data.data);
                 } else {
-                    if (data.message !== '用户未审核') {
+                    if (data.message == '用户未审核') {
+                        toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
+                    } else {
                         toast(data.message || '服务器开小差了, 请稍后再试');
                     }
                     reject(data.message);

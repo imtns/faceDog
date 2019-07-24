@@ -26,7 +26,7 @@
         </view>
         <view class="btn" @tap="save">保存图片</view>
         <view class="drawImage" wx:if="{{ready}}">
-            <drawimage id="drawimage" width="750" height="1334" background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile" fileType="'jpg'" />
+            <drawimage id="drawimage" width="570" height="738" background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile" fileType="'jpg'" />
         </view>
     </view>
 </template>
@@ -48,8 +48,7 @@ export default class MyCard extends wepy.page {
 
     data = {
         profile: {},
-        qrcode: 'https://www.facedog.cn/api/auth/qrcode?ID=10008',
-        downloadQRcode: 'https://www.facedog.cn/api/auth/qrcode?ID=10008',
+        qrcode: '',
         layers: [],
         ready: false,
         background: {},
@@ -91,6 +90,7 @@ export default class MyCard extends wepy.page {
     async savePhotosAlbum(path) {
         try {
             this.loading = false;
+            this.ready = false;
             this.$apply();
             await wepy.saveImageToPhotosAlbum({ filePath: path });
             console.error(path);
@@ -100,21 +100,20 @@ export default class MyCard extends wepy.page {
             });
             toast('保存成功！');
         } catch (e) {
-            toast(
-                    '由于您拒绝了相册授权，无法自动保存到本地相册，请截图保存'
-                );
+            toast('由于您拒绝了相册授权，无法自动保存到本地相册，请截图保存');
             console.log('savePhotosAlbum', e);
         }
         this.$apply();
     }
     async onLoad() {
         this.profile = wepy.getStorageSync('profile');
+        this.qrcode = `https://www.facedog.cn/api/auth/qrcode?ID=${this.profile.ID}`;
         this.$apply();
     }
 
     onShow() {}
     async initStyleList() {
-        this.background.imageResource = '../../../../images/my/background1.png';
+        this.background.imageResource = '../../../../images/my/background.png';
         this.headImg = await getTmpFilePath(this.profile.icon);
         let name = this.profile.nick_name;
         let qrcode = await getTmpFilePath(this.qrcode);
@@ -122,28 +121,28 @@ export default class MyCard extends wepy.page {
             {
                 type: 'image', //  我的头像
                 imageResource: this.headImg,
-                dx: 90,
-                dy: 216,
+                dx: 0,
+                dy: 0,
                 dWidth: 570,
-                dHeight: 672
+                dHeight: 570
             },
             {
                 type: 'text', // 城市
                 fontSize: 28,
                 text: name,
                 textAlign: 'left',
-                x: 194,
-                y: 934,
+                x: 94,
+                y: 622,
                 color: '#000000'
             }
         ];
         this.layers.push({
             type: 'image', //  小程序二维码
             imageResource: qrcode,
-            dx: 520,
-            dy: 900,
-            dWidth: 130,
-            dHeight: 130
+            dx: 430,
+            dy: 590,
+            dWidth: 120,
+            dHeight: 120
         });
         // this.layers.push({
         //     type: 'image', //  黑色1
@@ -199,12 +198,12 @@ page {
     .card {
         display: flex;
         justify-content: center;
-        margin-top: 61rpx;
+        margin-top: 121rpx;
         align-items: center;
         flex-wrap: wrap;
         .image {
             width: 570rpx;
-            height: 672rpx;
+            height: 570rpx;
             image {
                 width: 100%;
                 height: 100%;
@@ -253,7 +252,7 @@ page {
         height: 92rpx;
         background: rgba(0, 0, 0, 1);
         position: fixed;
-        bottom: 18rpx;
+        bottom: 22rpx;
         left: 50%;
         transform: translateX(-50%);
         line-height: 92rpx;

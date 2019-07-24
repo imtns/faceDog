@@ -14,7 +14,7 @@ module.exports.uploader = (tempFilePath, ...props) => {
     const formData = params && params.data || {};
     const name = params && params.name || '';
     !params.noLoading && wx.showLoading && wx.showLoading({ title: '上传中', mask: true });
-    console.log(name);
+    console.warn(formData);
     return wx.uploadFile({
         url: uploadUrl,
         name,

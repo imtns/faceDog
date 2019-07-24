@@ -43,8 +43,8 @@
         <view class="bottom-box" wx:if="{{!self}}">
             <block wx:if="{{!profile.is_friend}}">
                 <image class="close" mode="aspectFill" @tap="close" src="../../images/profile/close1.png"></image>
-                <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="../../images/profile/menu.png"></image>
-                <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="../../images/profile/icon-clock.png"></image>
+                <!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="../../images/profile/menu.png"></image>
+                <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="../../images/profile/icon-clock.png"></image> -->
             </block>
             <block wx:else>
                 <image class="close" mode="aspectFill" @tap="gochat" src="../../images/profile/icon-chat.png"></image>
@@ -133,13 +133,22 @@ export default class Profile extends wepy.page {
             }
         },
         async makeFriend(type) {
-            await post(MAKEFRIEND, {
+            const data = await post(MAKEFRIEND, {
                 to_be: type,
                 user_id: this.id
             });
-            this.profile.is_like = true;
+            if (data.friend) {
+                this.profile.is_friend = true;
+                wx.navigateTo({
+                    url: `../chat/becomeFriend?id=${this.profile.dentifier}&nick=${
+                    this.profile.nick_name
+                }&icon=${encodeURI(this.profile.avartar)}`
+                });
+            } else {
+                Toast(this.likeType[type] + '发送成功');
+                this.profile.is_like = true;
+            }
 
-            Toast(this.likeType[type] + '发送成功');
             this.$apply();
         },
         goDiscover() {
@@ -148,6 +157,7 @@ export default class Profile extends wepy.page {
             });
         },
         gochat() {
+            wx.setStorageSync('chatIcon', this.profile.avartar);
             wepy.navigateTo({
                 url: `/pages/chat/chat?id=${this.profile.dentifier}&nick=${this.profile.nick_name}`
             });
@@ -202,6 +212,11 @@ export default class Profile extends wepy.page {
         this.profile.face =
             result.face !== 0 ? (result.face * 100).toFixed(1) : 0;
         this.profile.distance = (this.profile.distance / 1000).toFixed(2);
+        this.profile.images.forEach(item => {
+            if (item.is_avatar) {
+                this.profile.avartar = item.image;
+            }
+        });
         wx.setNavigationBarTitle({
             title: result.nick_name,
             success: result => {},

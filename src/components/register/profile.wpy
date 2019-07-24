@@ -113,7 +113,7 @@ export default class Profile extends wepy.component {
     color:white !important;
 }
 .wapper {
-    width: 556rpx;
+    width: 600rpx;
     margin: 60rpx auto 0;
     text-align: center;
     .van-cell {
@@ -149,8 +149,10 @@ export default class Profile extends wepy.component {
             color: rgba(0, 0, 0, 1);
             text-align: left;
             .label {
-                width: 84rpx;
+                width: 120rpx;
                 font-weight: 600;
+                text-align: right;
+                margin-right:15rpx;
             }
             .icon {
                 width: 40rpx;
@@ -167,13 +169,13 @@ export default class Profile extends wepy.component {
                 padding-left: 24rpx;
             }
             .sex-container {
-                width: 479rpx;
+                width: 500rpx;
                 .button {
                     display: inline-block;
                     width: 211rpx;
                     height: 80rpx;
                     &:nth-child(1) {
-                        margin-right: 52rpx;
+                        margin-right: 30rpx;
                     }
                 }
             }

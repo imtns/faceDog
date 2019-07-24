@@ -301,6 +301,8 @@ Component({
                     dHeight = height,
                     sWidth,
                     sHeight,
+                    cutX = 0,
+                    cutY = 0,
                     cut,
                     border
                 } = layer;
@@ -308,7 +310,7 @@ Component({
                 const [pxdx, pxdy, pxdWidth, pxdHeight, pxdRadius] =
                     [px(dx), px(dy), px(dWidth), px(dHeight), px(radius)];
                 if (cut) {
-                    ctx.drawImage(imageResource, 0, 0, sWidth, sHeight, dx, dy, dWidth, dHeight);
+                    ctx.drawImage(imageResource, cutX, cutY, sWidth, sHeight, dx, dy, dWidth, dHeight);
                 } else if (radius) {
                     ctx.save();
                     ctx.setStrokeStyle(bc);

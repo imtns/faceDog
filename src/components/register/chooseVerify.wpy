@@ -6,7 +6,7 @@
         </view>
         <view class="form">
             <view class="field">
-                <view class="label">请填写微信号</view>
+                <view class="label">个人微信号（必填，号码保密，仅供审核使用）</view>
                 <input class="input" type="text" @input="onChangeName"   placeholder="" />
             </view>
             <view class="verify-box">

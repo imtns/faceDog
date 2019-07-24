@@ -34,6 +34,7 @@ export default class BecomeFriend extends wepy.page {
 
     methods = {
         redirect() {
+            wx.setStorageSync('chatIcon', this.friendIcon);
             wx.redirectTo({
                 url: `chat?id=${this.dentifier}&nick=${this.nick}&icon=${encodeURI(this.friendIcon)}`
             });

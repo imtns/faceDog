@@ -6,10 +6,10 @@
     <view class='wrapper' wx:else>
 
         <repeat for="{{list}}" key="index" index="index" item="item">
-            <van-swipe-cell class="swipe" right-width="{{ 80 }}" data-userid="{{item._id}}" data-index="{{index}}" async-close bind:close="onClose">
+            <van-swipe-cell class="swipe" right-width="{{ 80 }}" data-userid="{{item._id}}" data-dentifier="{{item.dentifier}}" data-index="{{index}}" async-close bind:close="onClose">
             <view class="friends-box" >
                 <image class="icon" @tap="goProfile({{item.dentifier}})" src="{{item.avatar}}" mode="aspectFill"></image>
-                <view class="msg" @tap="goChat({{item.dentifier}},{{item.nick_name}})">
+                <view class="msg" @tap="goChat({{item.dentifier}},{{item.nick_name}},{{item.avatar}})">
                     <view class="name">{{item.nick_name}}</view>
                     <view class="distance">匹配于{{item.month}}/{{item.day}}</view>
                 </view>
@@ -27,6 +27,7 @@ import { dialog } from '@/utils';
 import { get, deltemp } from '@/utils/request';
 import { FRIENDS_LIST } from '@/utils/url';
 import empty from '@/components/empty';
+import { Event } from '@/utils/event.js';
 export default class Friends extends wepy.component {
     props = {};
 
@@ -39,7 +40,8 @@ export default class Friends extends wepy.component {
     };
 
     methods = {
-        goChat(id, name) {
+        goChat(id, name, icon) {
+            wx.setStorageSync('chatIcon', icon);
             wepy.navigateTo({ url: `chat/chat?id=${id}&nick=${name}` });
         },
         goProfile(id) {
@@ -56,8 +58,8 @@ export default class Friends extends wepy.component {
                 await deltemp(FRIENDS_LIST, {
                     user_id: instance.dataset.userid
                 });
+                Event.trigger('deleteChat', instance.dataset.dentifier);
                 this.list.splice(instance.dataset.index, 1);
-                console.log(instance.dataset.userid);
                 this.$apply();
                 instance.close();
                 break;
