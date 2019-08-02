@@ -43,8 +43,8 @@
         <view class="bottom-box" wx:if="{{!self}}">
             <block wx:if="{{!profile.is_friend}}">
                 <image class="close" mode="aspectFill" @tap="close" src="../../images/profile/close1.png"></image>
-                <!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="../../images/profile/menu.png"></image>
-                <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="../../images/profile/icon-clock.png"></image> -->
+                <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="../../images/profile/menu.png"></image>
+                <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="../../images/profile/icon-clock.png"></image>
             </block>
             <block wx:else>
                 <image class="close" mode="aspectFill" @tap="gochat" src="../../images/profile/icon-chat.png"></image>

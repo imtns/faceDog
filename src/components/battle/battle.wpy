@@ -381,9 +381,9 @@ export default class Battle extends wepy.component {
             index = 3;
         }
         if (position === 'top') {
-            this.topHeart = `../../../images/battle/win${index}.png`;
+            this.topHeart = `../../../images/battle/${index}.png`;
         } else {
-            this.bottomHeart = `../../../images/battle/win${index}.png`;
+            this.bottomHeart = `../../../images/battle/${index}.png`;
         }
         this.$apply();
     }

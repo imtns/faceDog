@@ -11,8 +11,8 @@
     </view>
     <view class='wrapper'>
         <view class="header">
-            <view class="title">你在全国颜值排名<text>{{face}}%</text></view>
-            <view class="title">你在{{position}}颜值排名第<text>{{city}}名</text></view>
+            <view class="title">你在全国颜值排名前<text>{{face}}%</text></view>
+            <view class="title">你的颜值在{{position}}排名第<text>{{city}}名</text></view>
             <view class="bar">“{{shareText}}”</view>
         </view>
         <view class="w">
@@ -76,7 +76,7 @@ export default class Example extends wepy.page {
         },
         loading: false,
         charLabel: {
-            male: ['帅气', '阳光', '多金', '智慧', '性感'],
+            male: ['阳光', '帅气', '多金', '智慧', '性感'],
             female: ['美丽', '可爱', '高贵', '智慧', '性感']
         },
         charTexts: {
@@ -97,7 +97,7 @@ export default class Example extends wepy.page {
                     '我一生中就喜欢两种花，有钱花和随便花',
                     '男生其实很懂事，有钱了就想多照顾几个女生'
                 ],
-                other: [
+                character: [
                     '什么都可以错，但是别再错过我',
                     '以梦为马，不负韶华，无问西东',
                     '两个人的无聊，好过一个人的发呆',
@@ -124,7 +124,7 @@ export default class Example extends wepy.page {
                     '人生苦短，喜欢就买',
                     '我的心思很好猜，除了想你就是发财'
                 ],
-                other: [
+                character: [
                     '我是一个没有感情的杀手',
                     '一生温暖纯良，不舍爱与自由',
                     '我可以亲口对你说晚安吗？先亲口再说',
@@ -183,7 +183,7 @@ export default class Example extends wepy.page {
             this.loading = false;
             this.ready = false;
             this.$apply();
-            await wepy.saveImageToPhotosAlbum({ filePath: path });
+            // await wepy.saveImageToPhotosAlbum({ filePath: path });
             wx.previewImage({
                 current: path, // 当前显示图片的http链接
                 urls: [path] // 需要预览的图片http链接列表
@@ -211,7 +211,7 @@ export default class Example extends wepy.page {
             }
         }
         if (!text) {
-            text = this.getRanValue(this.charTexts[this.gender]['other']);
+            text = this.getRanValue(this.charTexts[this.gender]['character']);
         }
         this.shareText = text;
         this.$apply();
@@ -221,12 +221,18 @@ export default class Example extends wepy.page {
         let profile = wepy.getStorageSync('profile');
         let gender = profile.gender;
         this.qrcode = `https://www.facedog.cn/api/auth/qrcode?ID=${profile.ID}`;
-        const info = await get(USER_RANK);
+        let info = null;
+        try {
+            info = await get(USER_RANK);
+        } catch (e) {
+            wepy.redirectTo({ url: '/pages/register' });
+        }
+        console.log(info);
         const { face, city, position, five } = info;
         this.gender = gender;
         this.charData[gender] = five;
         // 颜值排名
-        this.face = face;
+        this.face = Number(face).toFixed(1);
         // 城市排名
         this.city = city;
         // 省份
@@ -281,7 +287,7 @@ export default class Example extends wepy.page {
         return arr[Math.floor(Math.random() * arr.length)];
     }
     async initStyleList() {
-        this.background.imageResource = '../../../../images/my/myrank-bg1.png';
+        this.background.imageResource = '../../../../images/my/shareBG.png';
         const bg = '../../../../images/my/myrank-bg.png';
         this.headImg1 = await getTmpFilePath(this.images[0].image);
         this.headImg2 =
@@ -300,11 +306,11 @@ export default class Example extends wepy.page {
             },
             {
                 type: 'text', // 城市
-                fontSize: 22,
+                fontSize: 24,
                 text: this.position,
                 textAlign: 'center',
-                x: 253,
-                y: 301,
+                x: 248,
+                y: 302,
                 color: '#000000'
             },
             {
@@ -312,7 +318,7 @@ export default class Example extends wepy.page {
                 fontSize: 30,
                 text: `${this.city}`,
                 textAlign: 'center',
-                x: 357,
+                x: 382,
                 y: 298,
                 color: '#E11220'
             },
@@ -321,7 +327,7 @@ export default class Example extends wepy.page {
                 fontSize: 30,
                 text: `${100 - this.face}%`,
                 textAlign: 'center',
-                x: 308,
+                x: 346,
                 y: 338,
                 color: '#E11220'
             },

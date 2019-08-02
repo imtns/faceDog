@@ -2,7 +2,7 @@
 <template>
     <view class='wrapper'>
         <view class="input">
-            <input type="text" value="{{profile.nick_name}}" maxlength="5" auto-focus @input="inputChange" />
+            <input type="text" value="{{profile.nick_name}}" maxlength="10" auto-focus @input="inputChange" />
         </view>
         <view class="btn" @tap="submit">
             确定
@@ -12,14 +12,14 @@
 
 <script>
 import wepy from 'wepy';
-import mixin from '@/mixins/editMixin'
+import mixin from '@/mixins/editMixin';
 export default class EditName extends wepy.page {
     config = {
         navigationBarTitleText: '编辑昵称'
     };
     mixins = [mixin];
     data = {
-        name:""
+        name: ''
     };
 
     components = {};
