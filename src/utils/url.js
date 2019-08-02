@@ -43,3 +43,5 @@ export const INVATATION = '/api/user/invitation';
 export const WITHDRAW = '/api/user/take_money';
 // 获取小程序二维码
 export const QRCODE = '/api/auth/qrcode';
+// 获取活动
+export const GET_ACTIVITY = '/api/activity/list';
