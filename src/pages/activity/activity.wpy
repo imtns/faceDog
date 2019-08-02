@@ -2,31 +2,42 @@
 <template>
     <view class='container'>
         <view class="image-list">
-            <view class="box">
-                <image class="image" src="../../images/activity/activity-1.jpg" mode="aspectFill">
-                </image>
-                <view class="text-container">
-                    <view class="text">颜狗俱乐部</view>
-                    <view class="text">首批会员免费招募中</view>
-                    <image class="logo" src="../../images/chat/chatIcon.png" mode="aspectFill" />
-                </view>
-            </view>
+            <repeat for="{{list.record}}" key="index" index="index" item="item">
+                    <view class="box" @tap="go({{item.link}})">
+                        <image class="image" src="{{item.image_url}}" mode="aspectFill">
+                        </image>
+                        <!-- <view class="text-container">
+                        <view class="text">颜狗俱乐部</view>
+                        <view class="text">首批会员免费招募中</view>
+                        <image class="logo" src="../../images/chat/chatIcon.png" mode="aspectFill" />
+                    </view> -->
+                    </view>
+            </repeat>
         </view>
     </view>
 </template>
 
 <script>
 import wepy from 'wepy';
+import { GET_ACTIVITY } from '@/utils/url';
+import { post } from '@/utils/request';
 export default class Activity extends wepy.page {
     config = {
         navigationBarTitleText: '热门活动'
     };
 
-    data = {};
+    data = {
+        list: {}
+    };
 
     components = {};
 
-    methods = {};
+    methods = {
+        go(link) {
+            wepy.setStorageSync('h5url', link);
+            wepy.navigateTo({ url: 'webview' });
+        }
+    };
 
     events = {};
 
@@ -34,7 +45,10 @@ export default class Activity extends wepy.page {
 
     computed = {};
 
-    onLoad() {}
+    async onLoad() {
+        this.list = await post(GET_ACTIVITY);
+        this.$apply();
+    }
 
     onShow() {}
 }
@@ -54,31 +68,31 @@ export default class Activity extends wepy.page {
                 height: 250rpx;
                 border-radius: 12rpx;
             }
-            .text-container{
-                position:absolute;
-                width:100%;
-                top:0;
-                .logo{
-                    position:absolute;
-                    top:80rpx;
-                    left:60rpx;
-                    width:100rpx;
-                    height:100rpx;
-                    border:1rpx solid #fbdd4a;
+            .text-container {
+                position: absolute;
+                width: 100%;
+                top: 0;
+                .logo {
+                    position: absolute;
+                    top: 80rpx;
+                    left: 60rpx;
+                    width: 100rpx;
+                    height: 100rpx;
+                    border: 1rpx solid #fbdd4a;
                     border-radius: 50%;
                 }
-                .text{
-                    color:#fbdd4a;
+                .text {
+                    color: #fbdd4a;
                     text-shadow: 2rpx 2rpx 2rpx #000;
                     position: absolute;
                     font-weight: bold;
-                    &:nth-child(1){
-                        top:80rpx;
-                        left:210rpx;
+                    &:nth-child(1) {
+                        top: 80rpx;
+                        left: 210rpx;
                     }
-                    &:nth-child(2){
-                        top:130rpx;
-                        left:210rpx;
+                    &:nth-child(2) {
+                        top: 130rpx;
+                        left: 210rpx;
                     }
                 }
             }
