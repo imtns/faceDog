@@ -160,10 +160,11 @@ export default class Register extends wepy.page {
                         }
                     });
                 } else {
-                    this.goLogin(
-                        wepy.getStorageSync('latitude'),
-                        wepy.getStorageSync('longitude')
-                    );
+                    this.events.getLocation(this);
+                    // this.goLogin(
+                    //     wepy.getStorageSync('latitude'),
+                    //     wepy.getStorageSync('longitude')
+                    // );
                 }
             }
         });

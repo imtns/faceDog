@@ -1,0 +1,39 @@
+<!--  -->
+<template>
+    <view class='container'>
+        <web-view src="{{src}}">
+        </web-view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Webview extends wepy.page {
+    config = {
+        navigationBarTitleText: ''
+    };
+
+    data = {
+        src: ''
+    };
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {
+        this.src = wepy.getStorageSync('h5url');
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='scss'>
+</style>

@@ -39,7 +39,8 @@ export default class extends wepy.app {
             'pages/my/activityRule', // 活动规则
             'pages/my/contactService', // 联系客服
             'pages/my/myCard', // 生成美图
-            'pages/activity/activity'
+            'pages/activity/activity',
+            'pages/activity/webview'
         ],
         window: {
             backgroundTextStyle: 'light',
