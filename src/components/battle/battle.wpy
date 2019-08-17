@@ -26,7 +26,7 @@
                 </view>
             </repeat>
             <repeat for="{{battle.b}}" key="index">
-                <view animation="{{item.animation}}" style="z-index:{{battle.b.length - index}};" id="{{item._id}}" class="battle-box bottom" @tap="fly('bottom',{{index}},{{item.image_id}},'')">
+                <view animation="{{item.animation}}"  id="{{item._id}}" class="battle-box bottom" @tap="fly('bottom',{{index}},{{item.image_id}},'')">
                     <image src="{{item.image}}" mode="aspectFill"></image>
                     <view class="info">
                         <view class="name">{{item.nick_name}}</view>
@@ -69,6 +69,7 @@ import wepy from 'wepy';
 import { BATTLE, BATTLE_COMMIT } from '@/utils/url';
 import { get, post } from '@/utils/request';
 import { Event } from '@/utils/event.js';
+import { sleep } from '@/utils';
 import empty from '@/components/empty';
 import tutorial from './tutorial';
 let emptyData = false;
@@ -158,8 +159,10 @@ export default class Battle extends wepy.component {
                 self.bottomIndex++;
                 self.animation.translateX('-150%').step();
                 self.battle.b[
-                    self.bottomIndex - 1
+                    self.battle.b.length - 1
                 ].animation = self.animation.export();
+                // await sleep(1);
+                // self.battle.b.splice(self.battle.b.length - self.bottomIndex - 1, 1);
                 if (that) {
                     self.$apply();
                     return;
@@ -193,9 +196,9 @@ export default class Battle extends wepy.component {
                     } else {
                         idx = self.topIndex;
                     }
-                    wepy.navigateTo({
-                        url: `battle/profile?id=${likedUserId}&index=${idx}&position=${position == 'bottom' ? 'top' : 'bottom'}`
-                    });
+                    // wepy.navigateTo({
+                    //     url: `battle/profile?id=${likedUserId}&index=${idx}&position=${position == 'bottom' ? 'top' : 'bottom'}`
+                    // });
                 }, 1000);
             }
             self.handleEmpty();
@@ -294,7 +297,6 @@ export default class Battle extends wepy.component {
                     item.distance = (item.distance / 1000).toFixed(2);
                     item.animation = {};
                 });
-
                 this.battle.a.push(...result.a);
             }
             if (!position || position === 'b') {

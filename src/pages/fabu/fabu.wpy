@@ -117,7 +117,7 @@ export default class fabu extends wepy.page {
         wxUploade(tempFilePath) {
             return new Promise((resolve, reject) => {
                 wx.uploadFile({
-                    url: 'https://www.molineapp.cn/api/discover/moment/images',
+                    url: 'https://www.facedog.cn/api/discover/moment/images',
                     filePath: tempFilePath,
                     name: 'image',
                     header: {
@@ -127,7 +127,7 @@ export default class fabu extends wepy.page {
                     success(res) {
                         const data = JSON.parse(res.data);
                         console.log(data);
-                        if (data.message == '用户未审核') {
+                        if (data.message === '用户未审核') {
                             toast('认证审核中，加急审核请联系客服微信：yanzc1023');
                             auth = true;
                             return;
@@ -149,7 +149,8 @@ export default class fabu extends wepy.page {
                 address = ''
             } = await wepy.chooseLocation();
             this.region = name;
-            (this.longitude = longitude), (this.latitude = latitude);
+            this.longitude = longitude;
+            this.latitude = latitude;
             this.$apply();
         },
         async publish() {

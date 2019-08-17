@@ -24,13 +24,13 @@
             </view>
         </view>
         <view class="hr"></view>
-        <view class='item' @tap="redirect('mytime')">
+        <!-- <view class='item' @tap="redirect('mytime')">
             <view class="title" >我的次数</view>
             <view class="detail2">
                 <van-icon name="arrow" />
             </view>
         </view>
-        <view class="line"></view>
+        <view class="line"></view> -->
         <view class='item' @tap="redirect('myrank')">
             <view class="title">我的排名</view>
             <view class="detail2">

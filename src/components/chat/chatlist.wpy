@@ -50,6 +50,7 @@ export default class Chatlist extends wepy.component {
     };
     methods = {
         goProfile(id) {
+            if (id === 'administrator') return;
             wx.navigateTo({
                 url: 'battle/profile?dentifier=' + id,
                 success: (result) => {
