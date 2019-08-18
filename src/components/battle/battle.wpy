@@ -16,7 +16,7 @@
         </view>
         <view class="battle-container ">
             <repeat key="index" for="{{battle.a}}">
-                <view animation="{{item.animation}}" style="z-index:{{battle.a.length - index}};" id="{{item._id}}" class="battle-box top" @tap="fly('top',{{index}},{{item.image_id}},'')">
+                <view animation="{{item.animation}}"  id="{{item._id}}" class="battle-box top" @tap="fly('top',{{index}},{{item.image_id}},'')">
                     <image src="{{item.image}}" mode="aspectFill"></image>
                     <view class="info">
                         <view class="name">{{item.nick_name}}</view>
@@ -69,7 +69,7 @@ import wepy from 'wepy';
 import { BATTLE, BATTLE_COMMIT } from '@/utils/url';
 import { get, post } from '@/utils/request';
 import { Event } from '@/utils/event.js';
-import { sleep } from '@/utils';
+// import { sleep } from '@/utils';
 import empty from '@/components/empty';
 import tutorial from './tutorial';
 let emptyData = false;
@@ -128,77 +128,89 @@ export default class Battle extends wepy.component {
                 self = that;
             }
             console.error(position);
-            if (position == 'bottom') {
-                if (self.topIndex == self.battle.a.length - 2) {
-                    try {
-                        await self.getBattle('a');
-                    } catch (e) {
-                        emptyData = true;
-                    }
-                }
+            // eslint-disable-next-line one-var
+            var notLikeImageId = '', likedImageId = '', likedUserId = '';
+            if (position === 'bottom') {
                 self.topIndex++;
                 self.animation.translateX('-150%').step();
+                // eslint-disable-next-line standard/computed-property-even-spacing
                 self.battle.a[
-                    self.topIndex - 1
+                    self.battle.a.length - 1
                 ].animation = self.animation.export();
+                setTimeout(async () => {
+                    self.battle.a.splice(self.battle.a.length - 1, 1);
+                    if (self.battle.a.length < 2) {
+                        try {
+                            await self.getBattle('a');
+                        } catch (e) {
+                            emptyData = true;
+                        }
+                    }
+                    if (self.battle.b.length < 2) {
+                        try {
+                            await self.getBattle('b');
+                        } catch (e) {
+                            emptyData = true;
+                        }
+                    }
+                }, 600);
                 if (that) {
                     self.$apply();
                     return;
                 }
                 self.bottomLikedImage = self.battle.b[index].image_id;
                 self.bottomLikedUser = self.battle.b[index]._id;
-                console.error(self.bottomLikeImage);
+                likedImageId = self.bottomLikedImage;
+                likedUserId = self.bottomLikedUser;
+                notLikeImageId = self.battle.a[self.battle.a.length - 1].image_id;
             } else {
-                if (self.bottomIndex == self.battle.b.length - 2) {
-                    try {
-                        await self.getBattle('b');
-                    } catch (e) {
-                        emptyData = true;
-                    }
-                }
                 self.bottomIndex++;
                 self.animation.translateX('-150%').step();
+                // eslint-disable-next-line standard/computed-property-even-spacing
                 self.battle.b[
                     self.battle.b.length - 1
                 ].animation = self.animation.export();
-                // await sleep(1);
-                // self.battle.b.splice(self.battle.b.length - self.bottomIndex - 1, 1);
+                setTimeout(async () => {
+                    self.battle.b.splice(self.battle.b.length - 1, 1);
+                    if (self.battle.b.length < 2) {
+                        try {
+                            await self.getBattle('b');
+                        } catch (e) {
+                            emptyData = true;
+                        }
+                    }
+                    if (self.battle.a.length < 2) {
+                        try {
+                            await self.getBattle('a');
+                        } catch (e) {
+                            emptyData = true;
+                        }
+                    }
+                }, 600);
+
                 if (that) {
                     self.$apply();
                     return;
                 }
                 self.topLikedImage = self.battle.a[index].image_id;
                 self.topLikedUser = self.battle.a[index]._id;
+                likedImageId = self.topLikedImage;
+                likedUserId = self.topLikedUser;
+                notLikeImageId = self.battle.b[self.battle.b.length - 1].image_id;
             }
 
-            let likedImageId =
-                position == 'bottom'
-                    ? self.bottomLikedImage
-                    : self.topLikedImage;
-            let likedUserId =
-                position == 'bottom' ? self.bottomLikedUser : self.topLikedUser;
             self.flyHeart(position, imageid);
-            var notLikeImageId = '';
-            if (position == 'bottom') {
-                notLikeImageId = self.battle.a[self.topIndex - 1].image_id;
-            } else {
-                notLikeImageId = self.battle.b[self.bottomIndex - 1].image_id;
-            }
+
             this.battleCommit(likedImageId, notLikeImageId);
-            if (self.likeCount.count[likedImageId] == 2) {
+            console.log(self.likeCount.count[likedImageId]);
+            if (self.likeCount.count[likedImageId] === 2) {
                 setTimeout(() => {
                     self.likeCount.count = {};
                     self.setHeart('top', 1);
                     self.setHeart('bottom', 1);
-                    var idx = '';
-                    if (position == 'bottom') {
-                        idx = self.bottomIndex;
-                    } else {
-                        idx = self.topIndex;
-                    }
-                    // wepy.navigateTo({
-                    //     url: `battle/profile?id=${likedUserId}&index=${idx}&position=${position == 'bottom' ? 'top' : 'bottom'}`
-                    // });
+                    wepy.navigateTo({
+                        url: `battle/profile?id=${likedUserId}&index=${index}&position=${position === 'bottom' ? 'top' : 'bottom'}`
+                    });
                 }, 1000);
             }
             self.handleEmpty();
@@ -252,7 +264,7 @@ export default class Battle extends wepy.component {
     flyHeart(type) {
         this.heartShow = true;
         var imageid = '';
-        if (type == 'bottom') {
+        if (type === 'bottom') {
             this.heartBottom = true;
             imageid = this.bottomLikedImage;
         } else {
@@ -289,6 +301,7 @@ export default class Battle extends wepy.component {
                 (position === 'a' && !result.a.length) ||
                 (position === 'b' && !result.b.length)
             ) {
+                // eslint-disable-next-line prefer-promise-reject-errors
                 reject('empty');
                 return;
             }
@@ -323,27 +336,15 @@ export default class Battle extends wepy.component {
             this.getBattle();
         });
         Event.listen('changeBattle', async (index, position) => {
-            var imgId = '';
-            console.error(position);
-            console.error(index);
-
-            var indexNext = index - 0 + 1;
-
-            console.error(this.battle.a[indexNext].image_id);
-            if (position == 'top') {
-                if (!this.battle.a[indexNext].image_id) {
-                    await this.getBattle('a');
-                }
-                imgId = this.battle.a[indexNext].image_id;
-            } else {
-                if (!this.battle.b[indexNext].image_id) {
-                    await this.getBattle('b');
-                }
-                imgId = this.battle.b[indexNext].image_id;
-            }
+            let o = position === 'top' ? this.battle.b : this.battle.a;
             setTimeout(() => {
-                this.methods.fly(position, indexNext, imgId, this);
-            }, 300);
+                this.animation.translateX('-150%').step();
+                o[o.length - 1].animation = this.animation.export();
+                setTimeout(() => {
+                    o.splice(o.length - 1, 1);
+                }, 600);
+                this.$apply();
+            }, 600);
         });
         this.animation = wx.createAnimation({
             duration: 300,
@@ -353,6 +354,7 @@ export default class Battle extends wepy.component {
         this.loaded = true;
         this.topLikedImage = this.battle.a[this.battle.a.length - 1].image_id;
         this.topLikedUser = this.battle.a[this.battle.a.length - 1]._id;
+        // eslint-disable-next-line standard/computed-property-even-spacing
         this.bottomLikedImage = this.battle.b[
             this.battle.b.length - 1
         ].image_id;
