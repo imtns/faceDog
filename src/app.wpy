@@ -60,7 +60,8 @@ export default class extends wepy.app {
         userInfo: {},
         location: {},
         welcome: false,
-        inviteCode: ''
+        inviteCode: '',
+        isphoneX: false
     };
 
     constructor() {
@@ -69,7 +70,17 @@ export default class extends wepy.app {
         this.use('promisify');
     }
 
-    onLaunch() {}
+    onLaunch() {
+        var that = this;
+        wx.getSystemInfo({
+            success(res) {
+                var name = 'iPhone X';
+                if (res.model.indexOf(name) > -1) {
+                    that.globalData.isphoneX = true;
+                }
+            }
+        });
+    }
 
     async testAsync() {
         const data = await this.sleep(3);

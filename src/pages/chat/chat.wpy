@@ -15,7 +15,7 @@
                         <view class="profile-desc {{item.be}}">
                             <view class="left-container">
                                 <view class="top">{{item.nick_name}} {{item.age}}岁/{{item.constellation}}</view>
-                                <view class="bottom">在全国颜值排名前{{item.face*100}}%</view>
+                                <view class="bottom">在全国颜值排名前{{item.face}}%</view>
                             </view>
                             <view class="right-container">
                                 <image class="like-icon" src="../../images/profile/{{item.be}}.png" mode="aspectFill"></image>
@@ -211,7 +211,7 @@ export default class Chat extends wepy.page {
                         nick_name: that.user.nick_name,
                         constellation: that.user.constellation,
                         age: getAge(that.user.birthday),
-                        face: that.user.face,
+                        face: Math.floor(that.user.face * 100),
                         isSend: false,
                         be: that.user.be,
                         sendTime: formatDateFromSeconds(

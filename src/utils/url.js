@@ -45,3 +45,5 @@ export const WITHDRAW = '/api/user/take_money';
 export const QRCODE = '/api/auth/qrcode';
 // 获取活动
 export const GET_ACTIVITY = '/api/activity/list';
+// 每日日报
+export const DAILY_REPORT = '/api/face/daily_news';
