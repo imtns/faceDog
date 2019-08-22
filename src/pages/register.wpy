@@ -1,9 +1,9 @@
 <!-- 注册 -->
 <template>
     <view class='main'>
-        <block wx:if="{{step===1}}">
+        <!-- <block wx:if="{{step===1}}">
             <getInfo></getInfo>
-        </block>
+        </block> -->
         <block wx:if="{{step===2}}">
             <profile :code.sync="code" :userInfo.sync="userInfo"></profile>
         </block>
@@ -16,15 +16,16 @@
         <block wx:if="{{step===5}}">
             <uploadVideo></uploadVideo>
         </block>
-         <van-toast id="van-toast" />
-         <van-dialog id="van-dialog" />
+        <view @tap="back" wx:if="{{step != 2 && step!= 1 && step != 4}}"  class="back">返回</view>
+        <van-toast id="van-toast" />
+        <van-dialog id="van-dialog" />
     </view>
 
 </template>
 
 <script>
 import wepy from 'wepy';
-import getInfo from '@/components/register/getInfo';
+// import getInfo from '@/components/register/getInfo';
 import profile from '@/components/register/profile';
 import uploadPic from '@/components/register/uploadPic';
 import chooseVerify from '@/components/register/chooseVerify';
@@ -60,31 +61,21 @@ export default class Register extends wepy.page {
 
     components = {
         profile,
-        getInfo,
+        // getInfo,
         uploadPic,
         chooseVerify,
         uploadVideo
     };
 
-    methods = {};
+    methods = {
+        back() {
+            this.step = this.step - 1;
+        }
+    };
 
     events = {
         changeStep(step) {
             this.step = step;
-        },
-        getLocation(t) {
-            wx.getLocation({
-                type: 'wgs84',
-                success: res => {
-                    wepy.setStorageSync('latitude', res.latitude);
-                    wepy.setStorageSync('longitude', res.longitude);
-                    t.goLogin(res.latitude, res.longitude);
-                },
-                fail: err => {
-                    console.log(err);
-                    t.authorizeLocation();
-                }
-            });
         }
     };
     async goLogin(latitude, longitude) {
@@ -101,11 +92,11 @@ export default class Register extends wepy.page {
         wepy.setStorageSync('token', result.access_token);
         wepy.setStorageSync('tencent_token', result.tencent_token);
         wepy.setStorageSync('identifier', result.identifier);
-        if (result.welcome && !this.verify) {
-            if (this.verify) {
-                this.step = 3;
-            } else if (this.certify) {
+        if (result.welcome) {
+            if (this.certify) {
                 this.step = 4;
+            } else if (this.verify) {
+                this.step = 3;
             } else {
                 this.step = 2;
             }
@@ -125,12 +116,12 @@ export default class Register extends wepy.page {
             console.error(options.userid);
             this.code = options.userid;
         }
-        if (options.verify) {
+        if (options.verify && options.verify != 'false') {
             this.verify = true;
             this.step = 3;
             return;
         }
-        if (options.certify) {
+        if (options.certify && options.certify != 'false') {
             this.certify = true;
             this.step = 4;
             return;
@@ -143,29 +134,20 @@ export default class Register extends wepy.page {
             success: res => {
                 console.log(res);
                 wepy.setStorageSync('code', res.code);
-                if (!wepy.getStorageSync('latitude')) {
-                    this.$invoke('getInfo', 'display');
-                    wx.getSetting({
-                        success: res => {
-                            console.log(res.authSetting['scope.userLocation']);
-                            if (
-                                res.authSetting['scope.userLocation'] !==
-                                    undefined &&
-                                res.authSetting['scope.userLocation'] !== true
-                            ) {
-                                this.authorizeLocation();
-                            } else {
-                                this.events.getLocation(this);
-                            }
-                        }
-                    });
-                } else {
-                    this.events.getLocation(this);
-                    // this.goLogin(
-                    //     wepy.getStorageSync('latitude'),
-                    //     wepy.getStorageSync('longitude')
-                    // );
-                }
+                this.goLogin(
+                    wepy.getStorageSync('latitude'),
+                    wepy.getStorageSync('longitude')
+                );
+                // this.goLogin();
+                // if (!wepy.getStorageSync('latitude')) {
+                //     this.$invoke('getInfo', 'display');
+                // } else {
+                //     this.events.getLocation(this);
+                //     // this.goLogin(
+                //     //     wepy.getStorageSync('latitude'),
+                //     //     wepy.getStorageSync('longitude')
+                //     // );
+                // }
             }
         });
     }
@@ -194,11 +176,20 @@ export default class Register extends wepy.page {
 </script>
 
 <style lang='less'>
+.back{
+    width:394rpx;
+    height:88rpx;
+    color:#040404;
+    margin:10rpx auto;
+    text-align: center;
+    line-height: 88rpx;
+    font-size:28rpx;
+}
 .main {
     padding: 0 30rpx;
 }
-.van-dialog__confirm{
-    background:#07c160 !important;
-    color:white !important;
+.van-dialog__confirm {
+    background: #07c160 !important;
+    color: white !important;
 }
 </style>

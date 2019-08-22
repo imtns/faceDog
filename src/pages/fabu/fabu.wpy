@@ -24,7 +24,7 @@
         </view>
         <view class="location" @tap="choseLocation">
             <view class="flex">
-                <image class="location-icon" src="../../images/fabu/fabu-location.png" ></image>
+                <image class="location-icon" src="https://images.facedog.cn/public/fabu/fabu-location.png" ></image>
                 <view class="location-address">{{ region || '您的位置' }}</view>
             </view>
             <view class="icon">

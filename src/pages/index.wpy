@@ -63,7 +63,9 @@ export default class Index extends wepy.page {
             nickName: '加载中...'
         },
         selectedTab: 0,
-        tabbarshow: true
+        tabbarshow: true,
+        hide: false,
+        user: {}
     };
     computed = {
         now() {
@@ -88,7 +90,7 @@ export default class Index extends wepy.page {
     }
     async setProfile() {
         try {
-            const data = await get(PROFILE, {loading: false});
+            const data = await get(PROFILE, { loading: false });
             console.error(data);
             data.age = getAge(data.birthday);
             this.profile = data;
@@ -122,6 +124,11 @@ export default class Index extends wepy.page {
         tabSelect: (...args) => {
             let $event = args[args.length - 1];
             this.selectedTab = $event.source.tabIndex;
+            if (this.selectedTab == 0) {
+                // this.$invoke('chat', 'initChat');
+                this.$invoke('battle', 'displayPage', this.hide);
+                if (this.hide) this.hide = false;
+            }
             if (this.selectedTab == 2) {
                 // this.$invoke('chat', 'initChat');
             }
@@ -148,9 +155,22 @@ export default class Index extends wepy.page {
         Event.listen('refresh', () => {
             this.$invoke('discover', 'initList', { page: 1 });
         });
+        this.user = wx.getStorageSync('profile');
         this.setProfile();
     }
-
+    onShareAppMessage() {
+        return {
+            title: '好看的人才能加入的高颜值社交圈',
+            path: `/pages/home?userid=${this.user.ID}`,
+            imageUrl: 'https://images.facedog.cn/public/index/54.png',
+            success: (res) => {
+                console.log('转发成功', res);
+            },
+            fail: (res) => {
+                console.log('转发失败', res);
+            }
+        };
+    }
     onShow() {
         // this.$invoke('chat', 'initChat');
         if (this.selectedTab === 2) {
@@ -159,6 +179,9 @@ export default class Index extends wepy.page {
             this.setProfile();
             // this.$invoke('my', 'setProfile', this.profile);
         }
+    }
+    onHide() {
+        this.hide = true;
     }
 }
 </script>

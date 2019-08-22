@@ -7,9 +7,9 @@
                 <van-tab title="同城"></van-tab>
                 <van-tab title="星座"></van-tab>
             </van-tabs>
-            <image wx:if="{{!showConstellation && active !== 2}}" src="../../images/rank/down-pic.png" mode="aspectFill" class="rank-down-pic"></image>
-            <image wx:if="{{!showConstellation && active === 2}}" src="../../images/rank/down-pic.png" mode="aspectFill" class="rank-down-pic spe"></image>
-            <image wx:if="{{showConstellation && active === 2}}" src="../../images/rank/down-pic.png" mode="aspectFill" class="rank-down-pic roate"></image>
+            <image wx:if="{{!showConstellation && active !== 2}}" src="https://images.facedog.cn/public/rank/down-pic.png" mode="aspectFill" class="rank-down-pic"></image>
+            <image wx:if="{{!showConstellation && active === 2}}" src="https://images.facedog.cn/public/rank/down-pic.png" mode="aspectFill" class="rank-down-pic spe"></image>
+            <image wx:if="{{showConstellation && active === 2}}" src="https://images.facedog.cn/public/rank/down-pic.png" mode="aspectFill" class="rank-down-pic roate"></image>
             <block wx:if="{{showConstellation}}">
                 <Constellation @getRankListByXZ.user="getRankListByXZ"></Constellation>
             </block>
@@ -21,21 +21,21 @@
         <block wx:else>
             <empty></empty>
         </block>
-        <image class="menu" mode="aspectFill" src="../../images/profile/menu.png" @tap="showchangeGenderPop"></image>
+        <image class="menu" mode="aspectFill" src="https://images.facedog.cn/public/profile/menu.png" @tap="showchangeGenderPop"></image>
         <view class="drawer_screen" catchtouchmove="myCatchTouch" wx:if="{{changeGenderPop}}">
             <view class="drawer-btn" @tap="changeGender">
-                <image src="../../images/rank/rank-change-gender.png" mode="aspectFill" class="btn"></image>
+                <image src="https://images.facedog.cn/public/rank/rank-change-gender.png" mode="aspectFill" class="btn"></image>
                 <view class="textWrap">
                     <view>切换性别</view>
                 </view>
             </view>
             <view class="drawer-btn" @tap="toMyRank">
-                <image src="../../images/rank/rank-my-rank.png" mode="aspectFill" class="btn"></image>
+                <image src="https://images.facedog.cn/public/rank/rank-my-rank.png" mode="aspectFill" class="btn"></image>
                 <view class="textWrap">
                     <view>我的排名</view>
                 </view>
             </view>
-            <image src="../../images/profile/close1.png" mode="aspectFill" class="layer-close" @tap="hidechangeGenderPop"></image>
+            <image src="https://images.facedog.cn/public/profile/close1.png" mode="aspectFill" class="layer-close" @tap="hidechangeGenderPop"></image>
         </view>
     </view>
 </template>

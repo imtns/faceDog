@@ -47,3 +47,4 @@ export const QRCODE = '/api/auth/qrcode';
 export const GET_ACTIVITY = '/api/activity/list';
 // 每日日报
 export const DAILY_REPORT = '/api/face/daily_news';
+// 获取二维码

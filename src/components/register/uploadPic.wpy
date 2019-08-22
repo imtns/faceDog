@@ -45,7 +45,7 @@ export default class uploadPic extends wepy.component {
     };
 
     data = {
-        src: '../images/reg/upload.png',
+        src: 'https://images.facedog.cn/public/reg/upload.png',
         show: false,
         loading: false,
         uploaded: false,

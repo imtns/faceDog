@@ -28,31 +28,31 @@
                     </view>
                     <view class="actions">
                         <view  class="box  {{item.liked?'red':''}}" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
-                            <image class="icon" src="../../images/discover/discover-zaned.png" wx:if="{{item.liked}}"></image>
-                            <image class="icon" src="../../images/discover/discover-zan.png" wx:else></image>
+                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-zaned.png" wx:if="{{item.liked}}"></image>
+                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png" wx:else></image>
                             <view wx:if="{{item.liked}}" class="text">{{item.likes.length || 0}}</view>
                             <view wx:else class="text">{{item.likes.length || 0}}</view>
                         </view>
                         <view class="box" @tap="comment" data-id="{{item._id}}" data-index="{{index}}" data-userid="{{item.user_id}}">
-                            <image class="icon" src="../../images/discover/discover-commen.png"></image>
+                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-commen.png"></image>
                             <view class="text">私密评论</view>
                         </view>
                         <view class="last">
                             <view class="lastbox" @tap="warn" data-userid="{{item.user_id}}" data-index="{{index}}" data-momentid="{{item._id}}">
-                                <image class="action-icon" src="../../images/discover/discover-actions.png"></image>
+                                <image class="action-icon" src="https://images.facedog.cn/public/discover/discover-actions.png"></image>
                             </view>
                         </view>
                     </view>
                 </view>
                 <view class="comment-box">
                     <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length <= 6 && item.likes.length}}">
-                        <image class="icon" src="../../images/discover/discover-zan.png"></image>
+                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
                     </view>
                     <view class="comment-who expand {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && !item.expanded}}">
-                        <image class="icon" src="../../images/discover/discover-zan.png"></image>
+                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar && indexlikes !== 5 }}" @tap="toProfile({{pic.user_id}})"></image>
                             <view class="expand-btn" wx:if="{{ indexlikes === 5 && !item.expanded}}" @tap="expandNow({{index}})">展开</view>
@@ -60,7 +60,7 @@
                         </repeat>
                     </view>
                     <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && item.expanded}}">
-                        <image class="icon" src="../../images/discover/discover-zan.png"></image>
+                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>

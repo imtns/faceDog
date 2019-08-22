@@ -12,7 +12,8 @@
             <view class="battle-profile-left flex">
                 <view class="name">{{profile.nick_name}}</view>
                 <view class="info">{{profile.gender =='female'?'女':'男'}} / {{profile.age}} / {{profile.constellation}}</view>
-                <view class="distance"><text>{{profile.distance}}km</text> {{profile.city}}</view>
+                <view class="distance"><text>{{profile.distance}}km</text> </view>
+                <view class="area">{{profile.province}} {{profile.city}}</view>
             </view>
             <view class="battle-profile-right flex">
                 <view class="face-rank">{{profile.gender=='female'?'她':'他'}}的颜值在全国排名前 <text> {{profile.face}}%</text></view>
@@ -42,17 +43,18 @@
         </view>
         <view class="bottom-box" wx:if="{{!self}}">
             <block wx:if="{{!profile.is_friend}}">
-                <image class="close" mode="aspectFill" @tap="close" src="../../images/profile/close1.png"></image>
-                <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="../../images/profile/menu.png"></image>
-                <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="../../images/profile/icon-clock.png"></image>
+                <image class="close" mode="aspectFill" @tap="close" src="https://images.facedog.cn/public/profile/close1.png"></image>
+                <!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="https://images.facedog.cn/public/profile/menu.png"></image> -->
+                <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="makeFriend('friend')" src="https://images.facedog.cn/public/profile/friend.png"></image>
+                <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="https://images.facedog.cn/public/profile/icon-clock.png"></image>
             </block>
             <block wx:else>
-                <image class="close" mode="aspectFill" @tap="gochat" src="../../images/profile/icon-chat.png"></image>
+                <image class="close" mode="aspectFill" @tap="gochat" src="https://images.facedog.cn/public/profile/icon-chat.png"></image>
             </block>
         </view>
         <view class="drawer_screen" bindtap="showOrHide" wx:if="{{isShow}}" catchtouchmove="myCatchTouch">
             <view class="drawer-btn" @tap="makeFriend('close')">
-                <image src="../../images/profile/close.png" mode="aspectFill" class="btn"></image>
+                <image src="https://images.facedog.cn/public/profile/close.png" mode="aspectFill" class="btn"></image>
                 <view class="textWrap">
                     <view class="lip">真爱降临</view>
                     <view>剩余{{timeLeft.close}}次</view>
@@ -60,20 +62,20 @@
 
             </view>
             <view class="drawer-btn" @tap="makeFriend('lover')">
-                <image src="../../images/profile/lover.png" mode="aspectFill" class="btn"></image>
+                <image src="https://images.facedog.cn/public/profile/lover.png" mode="aspectFill" class="btn"></image>
                 <view class="textWrap">
                     <view class="lover">一见钟情</view>
                     <view>剩余{{timeLeft.lover}}次</view>
                 </view>
             </view>
             <view class="drawer-btn" @tap="makeFriend('friend')">
-                <image src="../../images/profile/friend.png" mode="aspectFill" class="btn"></image>
+                <image src="https://images.facedog.cn/public/profile/friend.png" mode="aspectFill" class="btn"></image>
                 <view class="textWrap">
                     <view class="friend">有好感</view>
                     <view>剩余{{timeLeft.friend}}次</view>
                 </view>
             </view>
-            <image src="../../images/profile/close1.png" mode="aspectFill" class="layer-close" @tap.stop="showOrHide"></image>
+            <image src="https://images.facedog.cn/public/profile/close1.png" mode="aspectFill" class="layer-close" @tap.stop="showOrHide"></image>
         </view>
     </view>
     <van-toast id="van-toast" />
@@ -342,6 +344,11 @@ swiper {
                 text {
                     color: #ffc125;
                 }
+            }
+            .area{
+                color: #000;
+                margin-top: 13rpx;
+                font-size: 24rpx;
             }
         }
         .battle-profile-right {

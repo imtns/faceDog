@@ -1,0 +1,240 @@
+<!--  -->
+<template>
+    <view class="wrapper" wx:if="{{show}}" style="padding-top:{{isphoneX?'100rpx':'0'}};height:{{isphoneX?'93vh':'100vh'}}">
+        <view class="wrap">
+            <image class="top" src="https://images.facedog.cn/public/index/top.png" mode="aspectFill"></image>
+            <image class="middle" src="https://images.facedog.cn/public/index/middle.png" mode="aspectFit"></image>
+            <view class="bottom">
+                <image class="btn try" src="https://images.facedog.cn/public/index/try.png" @tap="onGotUserInfo" mode="scaleToFill"></image>
+                <image class="btn deny" src="https://images.facedog.cn/public/index/deny.png" @tap="go" mode="scaleToFill"></image>
+            </view>
+            <!-- <button size="large" @tap="onGotUserInfo">进入颜狗</button> -->
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class Home extends wepy.page {
+    config = {
+        navigationBarTitleText: '颜狗',
+        navigationBarBackgroundColor: '#000',
+        navigationBarTextStyle: 'white'
+    };
+    data = {
+        show: false,
+        code: '',
+        disabled: false,
+        verify: false,
+        certify: false,
+        name: '',
+        isphoneX: false
+    };
+
+    components = {};
+
+    methods = {
+        async onGotUserInfo(e) {
+            // var that = this;
+            this.getLocationAuth();
+            // console.log(res.authSetting['scope.userLocation']);
+            // if (
+            //     res.authSetting['scope.userLocation'] != undefined &&
+            //     res.authSetting['scope.userLocation'] != true
+            // ) {
+            // that.$emit('getLocationAuth', this.$parent);
+            // } else {
+            //     //初始化进入
+            //     that.$emit('changeStep', 2);
+            //     that.$apply();
+            // }
+            // }
+            // });
+        },
+        go(link) {
+            wepy.setStorageSync(
+                'h5url',
+                'https://mp.weixin.qq.com/s/6IdzS5m2oPTOozZ11uzwfQ'
+            );
+            wepy.navigateTo({ url: 'activity/webview' });
+        }
+    };
+    authorizeLocation() {
+        wx.showModal({
+            title: '是否授权当前位置',
+            content: '需要获取您的地理位置，请确认授权，否则无法使用',
+            success: res => {
+                if (res.cancel) {
+                } else if (res.confirm) {
+                    wx.openSetting({
+                        success: data => {
+                            console.log(data);
+                            if (data.authSetting['scope.userLocation']) {
+                                this.events.getLocation(this);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+    onShareAppMessage() {
+        return {
+            title: '好看的人才能加入的高颜值社交圈',
+            path: '/pages/home',
+            imageUrl: 'https://images.facedog.cn/public/index/54.png',
+            success: res => {
+                console.log('转发成功', res);
+            },
+            fail: res => {
+                console.log('转发失败', res);
+            }
+        };
+    }
+    getLocationAuth() {
+        wx.getSetting({
+            success: res => {
+                console.log(res.authSetting['scope.userLocation']);
+                if (
+                    res.authSetting['scope.userLocation'] !== undefined &&
+                    res.authSetting['scope.userLocation'] !== true
+                ) {
+                    this.authorizeLocation();
+                } else {
+                    this.events.getLocation(this);
+                }
+            }
+        });
+    }
+    events = {
+        changeStep(step) {
+            this.step = step;
+        },
+
+        getLocation(t) {
+            wx.getLocation({
+                type: 'wgs84',
+                success: res => {
+                    wepy.setStorageSync('latitude', res.latitude);
+                    wepy.setStorageSync('longitude', res.longitude);
+                    wepy.redirectTo({
+                        url: `register?verify=${t.verify}&certify=${t.certify}&name=${t.name}&userid=${t.code}`
+                    });
+                },
+                fail: err => {
+                    console.log(err);
+                    t.authorizeLocation();
+                }
+            });
+        }
+    };
+
+    watch = {};
+    computed = {};
+
+    onLoad(options) {
+        console.log(options);
+        if (options.scene) {
+            this.code = options.scene;
+        }
+        if (options.userid) {
+            this.code = options.userid;
+        }
+        if (options.verify) {
+            this.verify = true;
+            return;
+        }
+        if (options.certify) {
+            this.certify = true;
+            return;
+        }
+        if (options.name === 'reg') {
+            this.name = 'reg';
+        }
+        // wx.login({
+        //     success: res => {
+        //         console.log(res);
+        //         wepy.setStorageSync('code', res.code);
+        //     }
+        // });
+        var that = this;
+        wx.getSystemInfo({
+            success(res) {
+                var name = 'iPhone X';
+                if (res.model.indexOf(name) > -1) {
+                    that.isphoneX = true;
+                }
+            }
+        });
+        // if (wepy.getStorageSync('latitude')) {
+        //     wepy.redirectTo({
+        //         url: `register?verify=${this.verify}&certify=${this.certify}&name=${this.name}&userid=${this.code}`
+        //     });
+        // } else {
+        this.show = true;
+        // }
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+.wrapper {
+    background: #000;
+    width: 100%;
+    height: 100vh;
+    .wrap {
+        width: 692rpx;
+        margin: 0rpx auto 0;
+        .logo {
+            width: 272rpx;
+            height: 557rpx;
+            margin: 0 auto;
+            display: block;
+        }
+        image {
+            width: 100%;
+        }
+        .top {
+            height: 213rpx;
+        }
+        .middle {
+            width: 692rpx;
+            height: 678rpx;
+            margin: 17rpx auto;
+        }
+        .bottom {
+            width: 692rpx;
+            height: 227rpx;
+            background: url('https://images.facedog.cn/public/index/bottom.png');
+            background-size: cover;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .btn {
+                margin: 25rpx;
+                width: 292rpx;
+                height: 85rpx;
+                margin-top: 90rpx;
+            }
+        }
+        button {
+            width: 394rpx;
+            height: 92rpx;
+            background: rgba(0, 0, 0, 1);
+            opacity: 1;
+            color: #fcfcfc;
+            font-size: 28rpx;
+            text-align: center;
+            line-height: 92rpx;
+            position: absolute;
+            left: 50%;
+            bottom: 164rpx;
+            transform: translateX(-50%);
+        }
+    }
+}
+</style>

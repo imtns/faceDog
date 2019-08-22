@@ -1,7 +1,7 @@
 <!--  -->
 <template>
     <view class="wrapper" wx:if="{{show}}">
-        <image class="logo" src="../../images/reg/logo.png" mode="aspectFill"></image>
+        <image class="logo" src="https://images.facedog.cn/public/reg/logo.png" mode="aspectFill"></image>
         <button size="large" @tap="onGotUserInfo">进入颜狗</button>
     </view>
 </template>
@@ -23,17 +23,17 @@ export default class getInfo extends wepy.component {
             var that = this;
             wx.getSetting({
                 success: res => {
-                    console.log(res.authSetting['scope.userLocation']);
-                    if (
-                        res.authSetting['scope.userLocation'] != undefined &&
-                        res.authSetting['scope.userLocation'] != true
-                    ) {
-                        that.$emit('getLocation', this.$parent);
-                    } else {
-                        //初始化进入
-                        that.$emit('changeStep', 2);
-                        that.$apply();
-                    }
+                    // console.log(res.authSetting['scope.userLocation']);
+                    // if (
+                    //     res.authSetting['scope.userLocation'] != undefined &&
+                    //     res.authSetting['scope.userLocation'] != true
+                    // ) {
+                    that.$emit('getLocationAuth', this.$parent);
+                    // } else {
+                    //     //初始化进入
+                    //     that.$emit('changeStep', 2);
+                    //     that.$apply();
+                    // }
                 }
             });
         }

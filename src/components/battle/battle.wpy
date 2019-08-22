@@ -1,7 +1,7 @@
 <!--  -->
 <template>
     <block wx:if="{{tutorialShow}}">
-        <tutorial  @closeTutorial.user="closeTutorial"/>
+        <tutorial @closeTutorial.user="closeTutorial" />
     </block>
     <view class='container'>
         <view wx:if="{{removeOutter}}" bindanimationend='animationEnd' class="battle-container {{!loading?'fadeout':''}}" style="z-index:9999;position:absolute;top:{{isphoneX?'100rpx':'0'}}">
@@ -16,22 +16,22 @@
         </view>
         <view class="battle-container " style="top:{{isphoneX?'100rpx':'0'}};">
             <repeat key="index" for="{{battle.a}}">
-                <view animation="{{item.animation}}"  id="{{item._id}}" class="battle-box top" @tap="fly('top',{{index}},{{item.image_id}},'')">
+                <view animation="{{item.animation}}" id="{{item._id}}" class="battle-box top" @tap="fly('top',{{index}},{{item.image_id}},'')">
                     <image src="{{item.image}}" mode="aspectFill"></image>
                     <view class="info">
                         <view class="name">{{item.nick_name}}</view>
                         <view class="desc">{{item.gender=='male'?'男':'女'}} / {{item.age}} / {{item.constellation}}</view>
-                        <view class="distance"><text>{{item.distance}}km</text>  {{item.city}}</view>
+                        <view class="distance"><text>{{item.distance}}km</text> {{item.city}}</view>
                     </view>
                 </view>
             </repeat>
             <repeat for="{{battle.b}}" key="index">
-                <view animation="{{item.animation}}"  id="{{item._id}}" class="battle-box bottom" @tap="fly('bottom',{{index}},{{item.image_id}},'')">
+                <view animation="{{item.animation}}" id="{{item._id}}" class="battle-box bottom" @tap="fly('bottom',{{index}},{{item.image_id}},'')">
                     <image src="{{item.image}}" mode="aspectFill"></image>
                     <view class="info">
                         <view class="name">{{item.nick_name}}</view>
                         <view class="desc">{{item.gender=='male'?'男':'女'}} / {{item.age}} / {{item.constellation}}</view>
-                        <view class="distance"><text>{{item.distance}}km</text>  {{item.city}}</view>
+                        <view class="distance"><text>{{item.distance}}km</text> {{item.city}}</view>
                     </view>
                 </view>
             </repeat>
@@ -45,7 +45,7 @@
                 <image src="{{bottomHeart}}" mode="aspectFill"></image>
             </view>
         </view>
-    </view> 
+    </view>
     <view class="box-layer" wx:if="{{layer}}">
         <view class="pop-box" style="margin-top:{{isphoneX?'214rpx':'114rpx'}}">
             <image class="image" src="https://images.facedog.cn/public/daily_report.png" mode="aspectFill"></image>
@@ -57,7 +57,7 @@
         </view>
     </view>
     <view class="divider" style="top:{{isphoneX?'632rpx':'532rpx'}}">
-        <image src="../../images/battle/devider.png" mode="aspectFill"></image>
+        <image src="https://images.facedog.cn/public/battle/devider.png" mode="aspectFill"></image>
     </view>
     <van-dialog id="van-dialog" />
 
@@ -112,6 +112,17 @@ export default class Battle extends wepy.component {
     };
 
     methods = {
+        displayPage(hide) {
+            console.log(hide);
+            if (hide) {
+                this.loading = true;
+                this.removeOutter = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.$apply();
+                }, 1000);
+            }
+        },
         closeTutorial() {
             this.tutorialShow = false;
             wepy.setStorageSync('tutorial', true);
@@ -119,7 +130,6 @@ export default class Battle extends wepy.component {
         },
         closeLayer() {
             this.layer = false;
-            console.log(111);
             this.$apply();
         },
         animationEnd() {
@@ -129,9 +139,11 @@ export default class Battle extends wepy.component {
         async fly(position, index, imageid, that, event) {
             console.error(position);
             // eslint-disable-next-line one-var
-            var notLikeImageId = '', likedImageId = '', likedUserId = '';
+            var notLikeImageId = '',
+                likedImageId = '',
+                likedUserId = '';
             let o = position === 'bottom' ? this.battle.a : this.battle.b;
-            this.animation.translateX('-150%').step();
+            this.animation.translateX('-110%').step();
             o[o.length - 1].animation = this.animation.export();
             setTimeout(async () => {
                 o.splice(o.length - 1, 1);
@@ -151,13 +163,17 @@ export default class Battle extends wepy.component {
                 }
             }, 600);
             if (position === 'bottom') {
-                this.bottomLikedImage = likedImageId = this.battle.b[index].image_id;
+                this.bottomLikedImage = likedImageId = this.battle.b[index]
+                    .image_id;
                 this.bottomLikedUser = likedUserId = this.battle.b[index]._id;
-                notLikeImageId = this.battle.a[this.battle.a.length - 1].image_id;
+                notLikeImageId = this.battle.a[this.battle.a.length - 1]
+                    .image_id;
             } else {
-                this.topLikedImage = likedImageId = this.battle.a[index].image_id;
+                this.topLikedImage = likedImageId = this.battle.a[index]
+                    .image_id;
                 this.topLikedUser = likedUserId = this.battle.a[index]._id;
-                notLikeImageId = this.battle.b[this.battle.b.length - 1].image_id;
+                notLikeImageId = this.battle.b[this.battle.b.length - 1]
+                    .image_id;
             }
             this.flyHeart(position, imageid);
             this.battleCommit(likedImageId, notLikeImageId);
@@ -167,9 +183,11 @@ export default class Battle extends wepy.component {
                     this.setHeart('top', 1);
                     this.setHeart('bottom', 1);
                     wepy.navigateTo({
-                        url: `battle/profile?id=${likedUserId}&index=${index}&position=${position === 'bottom' ? 'top' : 'bottom'}`
+                        url: `battle/profile?id=${likedUserId}&index=${index}&position=${
+                            position === 'bottom' ? 'top' : 'bottom'
+                        }`
                     });
-                }, 1000);
+                }, 600);
             }
             this.handleEmpty();
         }
@@ -298,7 +316,7 @@ export default class Battle extends wepy.component {
         Event.listen('changeBattle', async (index, position) => {
             let o = position === 'top' ? this.battle.b : this.battle.a;
             setTimeout(() => {
-                this.animation.translateX('-150%').step();
+                this.animation.translateX('-110%').step();
                 o[o.length - 1].animation = this.animation.export();
                 setTimeout(() => {
                     o.splice(o.length - 1, 1);
@@ -308,14 +326,16 @@ export default class Battle extends wepy.component {
         });
         this.animation = wx.createAnimation({
             duration: 300,
-            timingFunction: 'ease-in'
+            timingFunction: 'ease-in-out'
         });
         await this.getBattle();
         this.loaded = true;
         this.topLikedImage = this.battle.a[this.battle.a.length - 1].image_id;
         this.topLikedUser = this.battle.a[this.battle.a.length - 1]._id;
 
-        this.bottomLikedImage = this.battle.b[this.battle.b.length - 1].image_id;
+        this.bottomLikedImage = this.battle.b[
+            this.battle.b.length - 1
+        ].image_id;
         this.bottomLikedUser = this.battle.b[this.battle.b.length - 1]._id;
         this.$apply();
         // if (!wepy.getStorageSync('isNew')) {
@@ -335,22 +355,28 @@ export default class Battle extends wepy.component {
         if (!wepy.getStorageSync('tutorial')) {
             this.tutorialShow = true;
         }
-        const { windowWidth } = await wepy.getSystemInfo();
-        console.log(windowWidth);
         const report = await get(DAILY_REPORT);
         this.daily = report;
-        this.daily.up = Math.floor(report.up * 100);
-        this.layer = true;
-        this.$apply();
+        this.daily.up = this.toFixed(report.up, 3) * 100;
+        setTimeout(() => {
+            if (this.daily.up) {
+                this.layer = true;
+                this.$apply();
+            }
+        }, 1000);
+    }
+    toFixed(num, fixed) {
+        var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+        return num.toString().match(re)[0];
     }
     setHeart(position, index) {
         if (index === 2) {
             index = 3;
         }
         if (position === 'top') {
-            this.topHeart = `../../../images/battle/${index}.png`;
+            this.topHeart = `https://images.facedog.cn/public/battle/${index}.png`;
         } else {
-            this.bottomHeart = `../../../images/battle/${index}.png`;
+            this.bottomHeart = `https://images.facedog.cn/public/battle/${index}.png`;
         }
         this.$apply();
     }
@@ -366,6 +392,7 @@ export default class Battle extends wepy.component {
     width: 100%;
     height: 100%;
     z-index: 99999;
+    transition: all 0.3s;
     background: rgba(0, 0, 0, 0.55);
     .pop-box {
         margin: 114rpx auto;
@@ -373,7 +400,7 @@ export default class Battle extends wepy.component {
         height: 810rpx;
         display: flex;
         justify-content: center;
-        position:relative;
+        position: relative;
         flex-wrap: wrap;
         background: rgba(255, 255, 255, 1);
         .image {
@@ -384,38 +411,38 @@ export default class Battle extends wepy.component {
         .text {
             font-size: 28rpx;
             color: #030303;
-            position:absolute;
-            left:164rpx;
-            .red{
+            position: absolute;
+            left: 164rpx;
+            .red {
                 font-weight: bold;
                 font-size: 34rpx;
-                color:#df062e;
+                color: #df062e;
             }
         }
-        .rankText{
-            position:absolute;
-            top:557rpx;
-            left:305rpx;
+        .rankText {
+            position: absolute;
+            top: 557rpx;
+            left: 305rpx;
             font-weight: bold;
             font-size: 24rpx;
-            color:#030303;
-            &.red{
-                color:#df062e;
+            color: #030303;
+            &.red {
+                color: #df062e;
             }
         }
-        .display-time{
-            top:292rpx;
+        .display-time {
+            top: 292rpx;
         }
-        .win-time{
-            top:442rpx;
+        .win-time {
+            top: 442rpx;
         }
-        .face{
-            top:592rpx;
+        .face {
+            top: 592rpx;
         }
         .pop-btn {
             width: 420rpx;
             height: 78rpx;
-            bottom:20rpx;
+            bottom: 20rpx;
             line-height: 78rpx;
             text-align: center;
             font-weight: 500;
@@ -480,7 +507,7 @@ export default class Battle extends wepy.component {
         }
         .bottom-heart.active,
         .top-heart.active {
-            animation: flashHeart .6s ease-in-out 1;
+            animation: flashHeart 0.6s ease-in-out 1;
             animation-fill-mode: both;
         }
         @keyframes flashHeart {
@@ -650,7 +677,7 @@ export default class Battle extends wepy.component {
                 }
                 .distance {
                     text {
-                        color: #FFC125;
+                        color: #ffc125;
                         text-shadow: 0px 1rpx 3rpx rgba(0, 0, 0, 0.47);
                     }
                 }

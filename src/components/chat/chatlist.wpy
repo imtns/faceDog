@@ -67,7 +67,7 @@ export default class Chatlist extends wepy.component {
                 item.showTime = formatDateFromSeconds(item.MsgTimeStamp);
                 item.time = item.MsgTimeStamp;
                 if (item.To_Account == 'administrator') {
-                    item.C2cImage = '../images/chat/chatIcon.png';
+                    item.C2cImage = 'https://images.facedog.cn/public/chat/chatIcon.png';
                     item.C2cNick = '颜狗客服';
                 }
             });
@@ -127,7 +127,7 @@ export default class Chatlist extends wepy.component {
                 } else {
                     this.list.forEach(item => {
                         if (item.To_Account === 'administrator') {
-                            item.C2cImage = '../images/chat/chatIcon.png';
+                            item.C2cImage = 'https://images.facedog.cn/public/chat/chatIcon.png';
                             item.C2cNick = '颜狗客服';
                         }
                         if (item.To_Account == sess.id()) {

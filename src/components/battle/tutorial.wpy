@@ -1,9 +1,9 @@
 <!--  -->
 <template>
   <view class='wrapper'>
-      <image class="tutorial1" @tap="show(1)" wx:if="{{step1}}" src="../../images/battle/tutorial-1.png" mode="aspectFill">
+      <image class="tutorial1" @tap="show(1)" wx:if="{{step1}}" src="https://images.facedog.cn/public/battle/tutorial-1.png" mode="aspectFill">
       </image>
-      <image class="tutorial2" @tap="show(2)" wx:if="{{step2}}" src="../../images/battle/tutorial-2.png" mode="aspectFill">
+      <image class="tutorial2" @tap="show(2)" wx:if="{{step2}}" src="https://images.facedog.cn/public/battle/tutorial-2.png" mode="aspectFill">
       </image>
   </view>
 </template>

@@ -17,10 +17,10 @@
                 <view class="label">性别:</view>
                 <view class="sex-container">
                     <view class="male button" @tap="choose(2)">
-                        <image src="../../images/reg/male{{gender==2?'-active':''}}.png" mode="aspectFill"></image>
+                        <image src="https://images.facedog.cn/public/reg/male{{gender==2?'-active':''}}.png" mode="aspectFill"></image>
                     </view>
                     <view class="female button" @tap="choose(1)">
-                        <image src="../../images/reg/female1{{gender==1?'-active':''}}.png" mode="aspectFill"></image>
+                        <image src="https://images.facedog.cn/public/reg/female1{{gender==1?'-active':''}}.png" mode="aspectFill"></image>
                     </view>
                 </view>
             </view>
@@ -28,7 +28,7 @@
                 <view class="field">
                     <view class="label">生日:</view>
                     <view class="input">{{ currentDate }}</view>
-                    <image class="icon" src="../../images/reg/birth-icon.png" mode="aspectFill"></image>
+                    <image class="icon" src="https://images.facedog.cn/public/reg/birth-icon.png" mode="aspectFill"></image>
                 </view>
             </picker>
         </view>

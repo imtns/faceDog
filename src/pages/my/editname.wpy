@@ -2,7 +2,7 @@
 <template>
     <view class='wrapper'>
         <view class="input">
-            <input type="text" value="{{profile.nick_name}}" maxlength="10" auto-focus @input="inputChange" />
+            <input type="text" value="{{profile.nick_name}}" maxlength="6" placeholder="最多6个字符" auto-focus @input="inputChange" />
         </view>
         <view class="btn" @tap="submit">
             确定

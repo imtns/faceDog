@@ -9,7 +9,7 @@
                         <!-- <view class="text-container">
                         <view class="text">颜狗俱乐部</view>
                         <view class="text">首批会员免费招募中</view>
-                        <image class="logo" src="../../images/chat/chatIcon.png" mode="aspectFill" />
+                        <image class="logo" src="https://images.facedog.cn/public/chat/chatIcon.png" mode="aspectFill" />
                     </view> -->
                     </view>
             </repeat>

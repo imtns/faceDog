@@ -5,11 +5,11 @@
             <view class="icon">
                 <van-loading color="#fff" />
             </view>
-             <view class="word">正在保存...</view>
+            <view class="word">正在保存...</view>
         </view>
 
     </view>
-    <view class='wrapper' >
+    <view class='wrapper'>
         <view class="card">
             <view class="image">
                 <image mode="aspectFill" src="{{profile.icon}}"></image>
@@ -33,9 +33,10 @@
 
 <script>
 import wepy from 'wepy';
-import { get } from '@/utils/request';
+import { get, post } from '@/utils/request';
 import { QRCODE } from '@/utils/url';
 import { getTmpFilePath, toast } from '@/utils/index';
+import { base64src } from '@/utils/base64src';
 export default class MyCard extends wepy.page {
     config = {
         navigationBarTitleText: '生成美图',
@@ -86,7 +87,7 @@ export default class MyCard extends wepy.page {
     watch = {};
 
     computed = {};
-        // 保存
+    // 保存
     async savePhotosAlbum(path) {
         try {
             this.loading = false;
@@ -107,8 +108,23 @@ export default class MyCard extends wepy.page {
     }
     async onLoad() {
         this.profile = wepy.getStorageSync('profile');
-        this.qrcode = `https://www.facedog.cn/api/auth/qrcode?ID=${this.profile.ID}`;
-        this.$apply();
+        let that = this;
+        wx.request({
+            url: 'https://www.facedog.cn' + QRCODE,
+            data: {
+                page: 'pages/home',
+                scene: that.profile.ID,
+                width: 300
+            },
+            responseType: 'arraybuffer',
+            method: 'POST',
+            success(res) {
+                const base64 = wx.arrayBufferToBase64(res.data);
+                that.qrcode = 'data:image/jpg;base64,' + base64.replace(/[\r\n]/g, '');
+                that.$apply();
+            },
+            fail() {}
+        });
     }
 
     onShow() {}
@@ -116,7 +132,9 @@ export default class MyCard extends wepy.page {
         this.background.imageResource = '../../../../images/my/background.png';
         this.headImg = await getTmpFilePath(this.profile.icon);
         let name = this.profile.nick_name;
-        let qrcode = await getTmpFilePath(this.qrcode);
+        const path = await base64src(this.qrcode);
+        console.log(path);
+        let qrcode = await getTmpFilePath(path);
         this.layers = [
             {
                 type: 'image', //  我的头像
@@ -131,7 +149,20 @@ export default class MyCard extends wepy.page {
                 fontSize: 28,
                 text: name,
                 textAlign: 'left',
-                x: 94,
+                x:
+                    name.length == 1
+                        ? 140
+                        : name.length == 2
+                        ? 114
+                        : name.length == 3
+                        ? 86
+                        : name.length == 4
+                        ? 64
+                        : name.length == 5
+                        ? 36
+                        : name.length == 6
+                        ? 10
+                        : 80,
                 y: 622,
                 color: '#000000'
             }
@@ -146,7 +177,7 @@ export default class MyCard extends wepy.page {
         });
         // this.layers.push({
         //     type: 'image', //  黑色1
-        //     imageResource: '../../../../images/my/background.png',
+        //     imageResource: 'https://images.facedog.cn/public/my/background.png',
         //     dx: 79,
         //     dy: 79,
         //     dWidth: 570,
@@ -158,36 +189,35 @@ export default class MyCard extends wepy.page {
 </script>
 
 <style lang='less'>
-.loading{
-    width:100%;
-    height:100vh;
-    background:rgba(0, 0, 0, 0.5);
-    position:absolute;
-    left:0;
+.loading {
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    left: 0;
     z-index: 999;
-    top:0;
-    .content{
-        position:absolute;
-        left:50%;
-        top:50%;
-        width:180rpx;
-        display:flex;
+    top: 0;
+    .content {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 180rpx;
+        display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        transform: translate(-50%,-50%);
-        .icon{
-            width:100rpx;
-            height:100rpx;
+        transform: translate(-50%, -50%);
+        .icon {
+            width: 100rpx;
+            height: 100rpx;
         }
-        .word{
-            color:white;
-            font-size:28rpx;
+        .word {
+            color: white;
+            font-size: 28rpx;
             text-align: center;
-            margin:10rpx aut0;
-            width:230rpx;
+            margin: 10rpx aut0;
+            width: 230rpx;
         }
     }
-
 }
 page {
     background: rgba(245, 245, 245, 1);

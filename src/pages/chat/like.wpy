@@ -15,7 +15,7 @@
                                 <view class="info">{{item.age}}岁 / {{item.constellation}}</view>
                             </view>
                             <view class="right">
-                               <image src="../../images/chat/icon-{{item.be}}.png" mode="aspectFill"></image>
+                               <image src="https://images.facedog.cn/public/chat/icon-{{item.be}}.png" mode="aspectFill"></image>
                             </view>
                         </view>
                     </view>

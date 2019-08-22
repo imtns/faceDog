@@ -8,7 +8,7 @@
         </view>
         <view class="bigText"><text class="black">现金</text><text class="red">红包无上限</text></view>
         <view class="image">
-            <image src="../../images/my/invite.png" mode="aspectFill"></image>
+            <image src="https://images.facedog.cn/public/my/invite.png" mode="aspectFill"></image>
         </view>
         <view class="steps">
             <view class="step">
@@ -72,19 +72,19 @@
             <view class="popBox">
                 <view class="little-box">
                     <button open-type="share">
-                        <image src="../../images/my/wechat.png" mode="aspectFill"></image>
+                        <image src="https://images.facedog.cn/public/my/wechat.png" mode="aspectFill"></image>
                         <view>微信好友</view>
                     </button>
                 </view>
                 <navigator url="myCard" open-type="navigate" hover-class="none">
                     <view class="little-box">
-                        <image src="../../images/my/moment.png" mode="aspectFill"></image>
+                        <image src="https://images.facedog.cn/public/my/moment.png" mode="aspectFill"></image>
                         <view>朋友圈</view>
                     </view>
                 </navigator>
                 <navigator url="myCard" open-type="navigate" hover-class="none">
                     <view class="little-box">
-                        <image src="../../images/my/picture.png" mode="aspectFill"></image>
+                        <image src="https://images.facedog.cn/public/my/picture.png" mode="aspectFill"></image>
                         <view>生成美图</view>
                     </view>
                 </navigator>
@@ -178,8 +178,9 @@ export default class Propaganda extends wepy.page {
     onShareAppMessage() {
         var ID = wepy.getStorageSync('profile').ID;
         return {
-            title: '邀请好友获得10元现金红包',
-            path: '/pages/register?userid=' + ID,
+            title: '好看的人才能加入的高颜值社交圈',
+            path: `/pages/home?userid=${ID}`,
+            imageUrl: 'https://images.facedog.cn/public/index/54.png',
             success: res => {
                 console.error(this.profile.ID);
             },

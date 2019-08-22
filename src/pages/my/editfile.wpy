@@ -3,25 +3,25 @@
     <view class='wrapper'>
         <view class="avatar-box">
             <view class="avatar big">
-                <image @tap.stop="upload(0)" src="{{profile.images[0].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
+                <image @tap.stop="upload(0)" src="{{profile.images[0].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
             </view>
             <view class="inner-flex-container">
                 <view class="avatar">
-                    <image @tap.stop="upload(1)" src="{{profile.images[1].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
+                    <image @tap.stop="upload(1)" src="{{profile.images[1].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
                 </view>
                 <view class="avatar">
-                    <image @tap.stop="upload(2)" src="{{profile.images[2].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
+                    <image @tap.stop="upload(2)" src="{{profile.images[2].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
                 </view>
             </view>
 
             <view class="avatar">
-                <image @tap.stop="upload(3)" src="{{profile.images[3].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
+                <image @tap.stop="upload(3)" src="{{profile.images[3].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
             </view>
             <view class="avatar">
-                <image @tap.stop="upload(4)" src="{{profile.images[4].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
+                <image @tap.stop="upload(4)" src="{{profile.images[4].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
             </view>
             <view class="avatar">
-                <image @tap.stop="upload(5)" src="{{profile.images[5].image || '../../images/my/empty.png'}}" mode="aspectFill"></image>
+                <image @tap.stop="upload(5)" src="{{profile.images[5].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
             </view>
         </view>
         <view class="item">

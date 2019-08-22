@@ -3,17 +3,17 @@
     <view class='wrapper'>
         <view class="top">
             <view class="sec">
-                <image class="icon" src="../../images/my/friend.png" mode="aspectFill"></image>
+                <image class="icon" src="https://images.facedog.cn/public/my/friend.png" mode="aspectFill"></image>
                 <view class="title">有好感</view>
                 <view class="word">剩余 {{time.friend}} 次</view>
             </view>
             <view class="sec">
-                <image class="icon" src="../../images/my/lover.png" mode="aspectFill"></image>
+                <image class="icon" src="https://images.facedog.cn/public/my/lover.png" mode="aspectFill"></image>
                 <view class="title">一见钟情</view>
                 <view class="word">剩余 {{time.lover}} 次</view>
             </view>
             <view class="sec">
-                <image class="icon" src="../../images/my/close.png" mode="aspectFill"></image>
+                <image class="icon" src="https://images.facedog.cn/public/my/close.png" mode="aspectFill"></image>
                 <view class="title">真爱降临</view>
                 <view class="word">剩余 {{time.close}} 次</view>
             </view>

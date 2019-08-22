@@ -2,10 +2,10 @@
 <template>
     <view class="container">
         <view class="tabs">
-            <image class="tab" @tap="tabClick(1)" src="{{tabIndex == 1?'../../../images/chat/chat-active.png':'../../../images/chat/chat.png'}}" mode="aspectFill"></image>
-            <image class="tab" @tap="tabClick(2)" src="{{tabIndex == 2?'../../../images/chat/like-active.png':'../../../images/chat/like.png'}}" mode="aspectFill"></image>
-            <image class="tab" @tap="tabClick(3)" src="{{tabIndex == 3?'../../../images/chat/friends-active.png':'../../../images/chat/friends.png'}}" mode="aspectFill"></image>
-            <image class="tab" @tap="tabClick(4)" src="{{tabIndex == 4?'../../../images/chat/notify-active.png':'../../../images/chat/notify.png'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(1)" src="{{tabIndex == 1?'https://images.facedog.cn/public/chat/chat-active.png':'https://images.facedog.cn/public/chat/chat.png'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(2)" src="{{tabIndex == 2?'https://images.facedog.cn/public/chat/like-active.png':'https://images.facedog.cn/public/chat/like.png'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(3)" src="{{tabIndex == 3?'https://images.facedog.cn/public/chat/friends-active.png':'https://images.facedog.cn/public/chat/friends.png'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(4)" src="{{tabIndex == 4?'https://images.facedog.cn/public/chat/notify-active.png':'https://images.facedog.cn/public/chat/notify.png'}}" mode="aspectFill"></image>
         </view>
         <scroll-view scroll-y style="height:{{scrollHeight}}px" class="scroll" wx:if="{{tabIndex == 1}}">
             <chatList />

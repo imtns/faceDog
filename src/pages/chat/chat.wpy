@@ -18,7 +18,7 @@
                                 <view class="bottom">在全国颜值排名前{{item.face}}%</view>
                             </view>
                             <view class="right-container">
-                                <image class="like-icon" src="../../images/profile/{{item.be}}.png" mode="aspectFill"></image>
+                                <image class="like-icon" src="https://images.facedog.cn/public/profile/{{item.be}}.png" mode="aspectFill"></image>
                             </view>
                         </view>
                     </view>
@@ -28,7 +28,7 @@
                         <image src="{{item.icon}}" class="avatar" mode="aspectFill" bindtap="goProfile"></image>
                     </view>
                     <view class="chat-message">
-                        <!-- <image src="../../images/profile/model.jpg" mode="aspectFill"></image> -->
+                        <!-- <image src="https://images.facedog.cn/public/profile/model.jpg" mode="aspectFill"></image> -->
                          <text selectable="true">{{item.msg}}</text>
                     </view>
                 </view>
@@ -273,7 +273,7 @@ export default class Chat extends wepy.page {
         this.profile = wx.getStorageSync('profile');
 
         if (this.nick == '颜狗客服') {
-            this.icon = '../../images/chat/chatIcon.png';
+            this.icon = 'https://images.facedog.cn/public/chat/chatIcon.png';
         } else {
             const result = await get(PROFILE, { dentifier: this.id });
             this.user = result;

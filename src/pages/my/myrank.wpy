@@ -51,8 +51,9 @@
 <script>
 import wepy from 'wepy';
 import wxCharts from '@/utils/wxcharts';
-import { get } from '@/utils/request';
-import { USER_RANK } from '@/utils/url';
+import { get, post } from '@/utils/request';
+import { USER_RANK, QRCODE } from '@/utils/url';
+import { base64src } from '@/utils/base64src';
 import { getTmpFilePath, toast } from '@/utils/index';
 
 var radarChart = null;
@@ -77,7 +78,7 @@ export default class Example extends wepy.page {
         loading: false,
         charLabel: {
             male: ['阳光', '帅气', '多金', '智慧', '性感'],
-            female: ['美丽', '可爱', '高贵', '智慧', '性感']
+            female: ['可爱', '美丽', '高贵', '智慧', '性感']
         },
         charTexts: {
             male: {
@@ -217,10 +218,40 @@ export default class Example extends wepy.page {
         this.$apply();
         console.log('text:', text);
     }
+    onShareAppMessage() {
+        return {
+            title: '好看的人才能加入的高颜值社交圈',
+            path: '/pages/home',
+            imageUrl: 'https://images.facedog.cn/public/index/54.png',
+            success: (res) => {
+                console.log('转发成功', res);
+            },
+            fail: (res) => {
+                console.log('转发失败', res);
+            }
+        };
+    }
     async onLoad() {
         let profile = wepy.getStorageSync('profile');
         let gender = profile.gender;
-        this.qrcode = `https://www.facedog.cn/api/auth/qrcode?ID=${profile.ID}`;
+        let that = this;
+        // this.qrcode = `https://www.facedog.cn/api/auth/qrcode?ID=${profile.ID}`;
+        wx.request({
+            url: 'https://www.facedog.cn' + QRCODE,
+            data: {
+                page: 'pages/home',
+                scene: profile.ID,
+                width: 300
+            },
+            responseType: 'arraybuffer',
+            method: 'POST',
+            success(res) {
+                const base64 = wx.arrayBufferToBase64(res.data);
+                that.qrcode = 'data:image/jpg;base64,' + base64.replace(/[\r\n]/g, '');
+                that.$apply();
+            },
+            fail() {}
+        });
         let info = null;
         try {
             info = await get(USER_RANK);
@@ -282,8 +313,6 @@ export default class Example extends wepy.page {
                 }
             });
         }, 1000);
-        var that = this;
-
         this.$apply();
     }
     getRanValue(arr) {
@@ -297,7 +326,9 @@ export default class Example extends wepy.page {
             this.images[1] && (await getTmpFilePath(this.images[1].image));
         this.headImg3 =
             this.images[2] && (await getTmpFilePath(this.images[2].image));
-        let qrcode = await getTmpFilePath(this.qrcode);
+        const path = await base64src(this.qrcode);
+        let qrcode = await getTmpFilePath(path);
+        // let qrcode = await getTmpFilePath(this.qrcode);
         this.layers = [
             {
                 type: 'image', //  我的头像1

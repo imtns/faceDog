@@ -18,7 +18,7 @@
                 <empty></empty>
             </block>
         </view>
-        <image class="make-photo" src="../../images/discover/discover-add.png" @tap="mkPhoto"></image>
+        <image class="make-photo" src="https://images.facedog.cn/public/discover/discover-add.png" @tap="mkPhoto"></image>
     </scroll-view>
     <!--筛选的弹窗-->
     <van-popup class="warn-pop" show="{{ showGender }}" position="bottom" close-on-click-overlay="{{ true }}">

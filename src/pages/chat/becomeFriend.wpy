@@ -2,7 +2,7 @@
 <template>
     <view class='wrapper'>
         <view class="matched">
-            <image src="../../images/profile/matched.png" mode="aspectFill"></image>
+            <image src="https://images.facedog.cn/public/profile/matched.png" mode="aspectFill"></image>
         </view>
         <view class="avatars">
             <image class="avatar" src="{{me.icon}}" mode="aspectFill"></image>

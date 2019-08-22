@@ -31,20 +31,20 @@ export default class tabbar extends wepy.component {
         unread: '',
         icon: {
             home: {
-                normal: '../images/tabbar/home.png',
-                active: '../images/tabbar/home-active.png'
+                normal: 'https://images.facedog.cn/public/tabbar/home.png',
+                active: 'https://images.facedog.cn/public/tabbar/home-active.png'
             },
             discover: {
-                normal: '../images/tabbar/discover.png',
-                active: '../images/tabbar/discover-active.png'
+                normal: 'https://images.facedog.cn/public/tabbar/discover.png',
+                active: 'https://images.facedog.cn/public/tabbar/discover-active.png'
             },
             message: {
-                normal: '../images/tabbar/message.png',
-                active: '../images/tabbar/message-active.png'
+                normal: 'https://images.facedog.cn/public/tabbar/message.png',
+                active: 'https://images.facedog.cn/public/tabbar/message-active.png'
             },
             my: {
-                normal: '../images/tabbar/my.png',
-                active: '../images/tabbar/my-active.png'
+                normal: 'https://images.facedog.cn/public/tabbar/my.png',
+                active: 'https://images.facedog.cn/public/tabbar/my-active.png'
             }
         }
     };

@@ -18,7 +18,7 @@
                 <view class="bottom-part">
                     <view class="edit-profile" @tap="redirect('editfile')">编辑资料</view>
                     <view class="setting" @tap="redirect('setting')">
-                        <image class="i" src="../../images/my/setting.png" mode="aspectFill"></image>
+                        <image class="i" src="https://images.facedog.cn/public/my/setting.png" mode="aspectFill"></image>
                     </view>
                 </view>
             </view>

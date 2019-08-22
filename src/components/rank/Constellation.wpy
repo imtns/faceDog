@@ -16,55 +16,55 @@ export default class Constellation extends wepy.component {
         constellationData: [{
             value: 1,
             text: '白羊座',
-            icon: '../../images/rank/a1-ari.png',
+            icon: 'https://images.facedog.cn/public/rank/a1-ari.png',
         }, {
             value: 2,
             text: '金牛座',
-            icon: '../../images/rank/a2-tau.png',
+            icon: 'https://images.facedog.cn/public/rank/a2-tau.png',
         }, {
             value: 3,
             text: '双子座',
-            icon: '../../images/rank/a3-gem.png',
+            icon: 'https://images.facedog.cn/public/rank/a3-gem.png',
         }, {
             value: 4,
             text: '巨蟹座',
-            icon: '../../images/rank/a4-cnc.png',
+            icon: 'https://images.facedog.cn/public/rank/a4-cnc.png',
         }, {
             value: 5,
             text: '狮子座',
-            icon: '../../images/rank/a5-leo.png',
+            icon: 'https://images.facedog.cn/public/rank/a5-leo.png',
         }, {
             value: 6,
             text: '处女座',
-            icon: '../../images/rank/a6-vir.png',
+            icon: 'https://images.facedog.cn/public/rank/a6-vir.png',
         }, {
             value: 7,
             text: '天平座',
-            icon: '../../images/rank/a7-lib.png',
+            icon: 'https://images.facedog.cn/public/rank/a7-lib.png',
         }, {
             value: 8,
             text: '天蝎座',
-            icon: '../../images/rank/a8-sco.png',
+            icon: 'https://images.facedog.cn/public/rank/a8-sco.png',
         }, {
             value: 9,
             text: '射手座',
-            icon: '../../images/rank/a9-sgr.png',
+            icon: 'https://images.facedog.cn/public/rank/a9-sgr.png',
         }, {
             value: 10,
             text: '摩羯座',
-            icon: '../../images/rank/a10-cap.png',
+            icon: 'https://images.facedog.cn/public/rank/a10-cap.png',
         }, {
             value: 11,
             text: '水瓶座',
-            icon: '../../images/rank/a11-agr.png',
+            icon: 'https://images.facedog.cn/public/rank/a11-agr.png',
         }, {
             value: 12,
             text: '双鱼座',
-            icon: '../../images/rank/a12--psc.png',
+            icon: 'https://images.facedog.cn/public/rank/a12--psc.png',
         }],
     };
     props = {
-        
+
     };
     components = {};
 
@@ -82,7 +82,7 @@ export default class Constellation extends wepy.component {
         },
     }
     onLoad() {
-       
+
     };
 
     onShow() {};

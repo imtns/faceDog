@@ -22,7 +22,7 @@
                                     <view class="info">{{user.age}}岁 / {{user.constellation}}</view>
                                 </view>
                                 <view class="right">
-                                    <image @tap="agree({{user}})" src="../../images/chat/icon-{{user.be}}.png" mode="aspectFill"></image>
+                                    <image @tap="agree({{user}})" src="https://images.facedog.cn/public/chat/icon-{{user.be}}.png" mode="aspectFill"></image>
                                 </view>
                             </view>
                         </view>
