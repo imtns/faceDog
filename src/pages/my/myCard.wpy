@@ -93,6 +93,7 @@ export default class MyCard extends wepy.page {
             this.loading = false;
             this.ready = false;
             this.$apply();
+
             await wepy.saveImageToPhotosAlbum({ filePath: path });
             console.error(path);
             wx.previewImage({
@@ -134,7 +135,13 @@ export default class MyCard extends wepy.page {
         let name = this.profile.nick_name;
         const path = await base64src(this.qrcode);
         console.log(path);
-        let qrcode = await getTmpFilePath(path);
+        let qrcode = '';
+        if (path.indexOf('http') > -1) {
+            qrcode = await getTmpFilePath(path);
+        } else {
+            qrcode = path;
+        }
+
         this.layers = [
             {
                 type: 'image', //  我的头像

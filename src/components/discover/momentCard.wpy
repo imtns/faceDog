@@ -69,7 +69,7 @@
                     <view class="comment-info-box" wx:if="{{item.comments.length}}">
                         <repeat for="{{item.comments}}" key="indexcomments" index="indexcomments" item="comments">
                             <view class="comment-info" @tap="handleCommentAction" data-index="{{index}}" data-commentindex="{{indexcomments}}" data-username="{{comments.user_nick_name}}">
-                                <view class="from">{{comments.user_nick_name}}</view>
+                                <view class="from" @tap.stop="toProfile({{comments.user_id}})">{{comments.user_nick_name}}</view>
                                 <view class="reply" wx:if="{{comments.replay_user_nick_name}}">回复</view>
                                 <view class="to" wx:if="{{comments.replay_user_nick_name}}">{{comments.replay_user_nick_name}}</view>
                                 <view>:</view>

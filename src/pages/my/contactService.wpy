@@ -12,8 +12,8 @@
             </view>
             <view class="d">
                 <view class="contact">
-                    <view>静妮(小姐姐)</view>
-                    <view>微信号：P526034465</view>
+                    <view>静香(小姐姐)</view>
+                    <view>微信号：facedog001</view>
                 </view>
                 <view class="copy"  @tap="copy('P526034465')">复制</view>
             </view>
@@ -30,7 +30,7 @@
                     <view>商务、推广、合作</view>
                     <view>微信号：15810233527</view>
                 </view>
-                <view class="copy" @tap="copy('15810233527')">复制</view>
+                <view class="copy" @tap="copy('356402220')">复制</view>
             </view>
         </view>
     </view>

@@ -105,11 +105,9 @@ export default class Index extends wepy.page {
             this.$invoke('my', 'setProfile', this.profile);
         } catch (e) {
             console.error(e);
-            if (e == '未完善资料') {
-                setTimeout(() => {
-                    wepy.redirectTo({ url: 'register?name=reg' });
-                }, 1500);
-            }
+            setTimeout(() => {
+                wepy.redirectTo({ url: 'home' });
+            }, 1500);
         }
     }
     switchOrder(d) {

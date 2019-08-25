@@ -118,8 +118,13 @@ export default class Home extends wepy.page {
                 success: res => {
                     wepy.setStorageSync('latitude', res.latitude);
                     wepy.setStorageSync('longitude', res.longitude);
-                    wepy.redirectTo({
-                        url: `register?verify=${t.verify}&certify=${t.certify}&name=${t.name}&userid=${t.code}`
+                    wx.login({
+                        success: res => {
+                            wepy.setStorageSync('code', res.code);
+                            wepy.redirectTo({
+                                url: `register?verify=${t.verify}&certify=${t.certify}&name=${t.name}&userid=${t.code}`
+                            });
+                        }
                     });
                 },
                 fail: err => {

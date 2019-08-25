@@ -13,7 +13,8 @@
 <script>
 import wepy from 'wepy';
 import 'wepy-async-function';
-
+import { post } from '@/utils/request';
+import { LOGIN } from '@/utils/url';
 export default class extends wepy.app {
     config = {
         pages: [
@@ -82,7 +83,31 @@ export default class extends wepy.app {
             }
         });
     }
+    onShow() {
+        if (wepy.getStorageSync('latitude')) {
+            wx.login({
+                success: res => {
+                    this.goLogin(res.code);
+                }
+            });
+        }
+    }
+    onHide() {
 
+    }
+    async goLogin(code) {
+        const result = await post(
+            LOGIN,
+            { code },
+            {
+                latitude: wepy.getStorageSync('latitude'),
+                longitude: wepy.getStorageSync('longitude')
+            }
+        );
+        console.warn('token:' + result.access_token);
+        wepy.setStorageSync('token', result.access_token);
+        wepy.setStorageSync('loginResult', result);
+    }
     async testAsync() {
         const data = await this.sleep(3);
         console.log(data);

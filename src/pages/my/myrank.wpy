@@ -184,7 +184,7 @@ export default class Example extends wepy.page {
             this.loading = false;
             this.ready = false;
             this.$apply();
-            // await wepy.saveImageToPhotosAlbum({ filePath: path });
+            await wepy.saveImageToPhotosAlbum({ filePath: path });
             wx.previewImage({
                 current: path, // 当前显示图片的http链接
                 urls: [path] // 需要预览的图片http链接列表
@@ -327,7 +327,13 @@ export default class Example extends wepy.page {
         this.headImg3 =
             this.images[2] && (await getTmpFilePath(this.images[2].image));
         const path = await base64src(this.qrcode);
-        let qrcode = await getTmpFilePath(path);
+        let qrcode = '';
+        // let qrcode = await getTmpFilePath(path);
+        if (path.indexOf('http') > -1) {
+            qrcode = await getTmpFilePath(path);
+        } else {
+            qrcode = path;
+        }
         // let qrcode = await getTmpFilePath(this.qrcode);
         this.layers = [
             {

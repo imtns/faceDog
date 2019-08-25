@@ -83,11 +83,12 @@ export default class My extends wepy.component {
     methods = {
         checkVerify(state) {
             console.log(state);
+            let userid = wepy.getStorageSync('inviteCode');
             if (state == 'refuse') {
-                wepy.navigateTo({ url: 'register?verify=true' });
+                wepy.navigateTo({ url: `register?verify=true&userid=${userid}` });
             }
             if (state == 'certify') {
-                wepy.navigateTo({ url: 'register?certify=true' });
+                wepy.navigateTo({ url: `register?certify=true&userid=${userid}` });
             }
         },
         goProfile() {
