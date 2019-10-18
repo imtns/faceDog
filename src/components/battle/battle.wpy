@@ -3,6 +3,7 @@
     <block wx:if="{{tutorialShow}}">
         <tutorial @closeTutorial.user="closeTutorial" />
     </block>
+
     <view class='container'>
         <view wx:if="{{removeOutter}}" bindanimationend='animationEnd' class="battle-container {{!loading?'fadeout':''}}" style="z-index:9999;position:absolute;top:{{isphoneX?'100rpx':'0'}}">
             <view class="battle-box top">
@@ -16,8 +17,8 @@
         </view>
         <view class="battle-container " style="top:{{isphoneX?'100rpx':'0'}};">
             <repeat key="index" for="{{loadedBattle.a}}">
-                <view wx:if="{{item.loaded}}" animation="{{item.animation}}"  id="{{item._id}}" class="battle-box top fade_in" @tap="fly('top',{{index}},{{item.image_id}},'')">
-                    <image src="{{item.image}}"  mode="aspectFill"></image>
+                <view wx:if="{{item.loaded}}" animation="{{item.animation}}" id="{{item._id}}" class="battle-box top fade_in" @tap="fly('top',{{index}},{{item.image_id}},'')">
+                    <image src="{{item.image}}" mode="aspectFill"></image>
                     <view class="info">
                         <view class="name">{{item.nick_name}}</view>
                         <view class="desc">{{item.gender=='male'?'男':'女'}} / {{item.age}} / {{item.constellation}}</view>
@@ -26,7 +27,7 @@
                 </view>
             </repeat>
             <repeat for="{{loadedBattle.b}}" key="index">
-                <view wx:if="{{item.loaded}}"  animation="{{item.animation}}" id="{{item._id}}" class="battle-box bottom fade_in" @tap="fly('bottom',{{index}},{{item.image_id}},'')">
+                <view wx:if="{{item.loaded}}" animation="{{item.animation}}" id="{{item._id}}" class="battle-box bottom fade_in" @tap="fly('bottom',{{index}},{{item.image_id}},'')">
                     <image src="{{item.image}}" mode="aspectFill"></image>
                     <view class="info">
                         <view class="name">{{item.nick_name}}</view>
@@ -38,10 +39,10 @@
         </view>
 
         <view class="heart" wx:if="{{heartShow}}">
-            <view class="top-heart {{heartTop?'active':''}}" wx:if="{{heartTop}}">
+            <view class="top-heart {{heartTop?'active':''}}" style="top:{{isphoneX?'300rpx':'200rpx'}};" wx:if="{{heartTop}}">
                 <image src="{{topHeart}}" mode="aspectFill"></image>
             </view>
-            <view class="bottom-heart {{heartBottom?'active':''}}" wx:if="{{heartBottom}}">
+            <view class="bottom-heart {{heartBottom?'active':''}}" style="top:{{isphoneX?'800rpx':'700rpx'}};" wx:if="{{heartBottom}}">
                 <image src="{{bottomHeart}}" mode="aspectFill"></image>
             </view>
         </view>
@@ -57,10 +58,10 @@
         </view>
     </view>
     <view class="divider" style="top:{{isphoneX?'632rpx':'532rpx'}}">
-        <image src="https://images.facedog.cn/public/battle/devider.png" mode="aspectFill"></image>
+        <image src="https://images.facedog.cn/public/battle/devider.png?7" mode="scaleToFill"></image>
     </view>
     <van-dialog id="van-dialog" />
-   <imageLoader @getLoadedImage.user="getLoadedImage"/>
+    <imageLoader @getLoadedImage.user="getLoadedImage" />
 </template>
 
 <script>
@@ -68,10 +69,12 @@ import wepy from 'wepy';
 import { BATTLE, BATTLE_COMMIT, DAILY_REPORT } from '@/utils/url';
 import { get, post } from '@/utils/request';
 import { Event } from '@/utils/event.js';
-// import { sleep } from '@/utils';
+import { removeDuplicates } from '@/utils';
 import empty from '@/components/empty';
 import imageLoader from './imageLoader';
 import tutorial from './tutorial';
+let unVerify = false;
+let battleClick = 0;
 let emptyData = false;
 export default class Battle extends wepy.component {
     data = {
@@ -108,7 +111,9 @@ export default class Battle extends wepy.component {
         gift: false,
         layer: false,
         isphoneX: false,
-        daily: {}
+        daily: {},
+        fromOtherPage: false,
+        switchGender: false
     };
 
     components = {
@@ -118,33 +123,59 @@ export default class Battle extends wepy.component {
     };
 
     methods = {
-        getLoadedImage(data) {
-            if (data.from === 'a') {
-                this.loadedBattle.a.push(data);
+        getLoadedImage(data, loadPart) {
+            if (this.fromOtherPage && !this.switchGender) return;
+            data.forEach(item => {
+                if (item.from === 'a') {
+                    this.loadedBattle.a.push(item);
+                } else {
+                    this.loadedBattle.b.push(item);
+                }
+            });
+            this.$apply();
+            // if (
+            //     (!loadPart &&
+            //         this.loadedBattle.a.length === this.battle.a.length &&
+            //         this.loadedBattle.b.length === this.battle.b.length) ||
+            //     (loadPart === 'a' && this.loadedBattle.a.length === this.battle.a.length) ||
+            //     (loadPart === 'b' && this.loadedBattle.b.length === this.battle.b.length)
+            // ) {
+            this.loadingFinish();
+            // }
+            console.error('fuck');
+            if (loadPart === 'a') {
+                this.battle.a = [];
+            } else if (loadPart === 'b') {
+                this.battle.b = [];
             } else {
-                this.loadedBattle.b.push(data);
-            }
-            if (this.loadedBattle.a.length > this.battle.a.length - 3 && this.loadedBattle.b.length > this.battle.b.length - 3) {
-                this.loadingFinish();
+                this.battle.a = [];
+                this.battle.b = [];
             }
             this.$apply();
         },
-        displayPage(hide) {
-            console.log(hide);
-            if (hide) {
-                this.loading = true;
-                this.removeOutter = true;
-                setTimeout(() => {
-                    this.loading = false;
-                    this.$apply();
-                }, 1000);
+        displayPage() {
+            if (this.switchGender) {
+                this.loadedBattle.a = [];
+                this.loadedBattle.b = [];
+                this.$apply();
+                this.getBattle();
+                return;
             }
+            this.fromOtherPage = true;
+            this.loading = true;
+            this.removeOutter = true;
+            setTimeout(() => {
+                this.loading = false;
+                this.fromOtherPage = false;
+                this.$apply();
+            }, 1000);
         },
         closeTutorial() {
             this.tutorialShow = false;
             wepy.setStorageSync('tutorial', true);
             this.$apply();
         },
+
         closeLayer() {
             this.layer = false;
             this.$apply();
@@ -154,45 +185,58 @@ export default class Battle extends wepy.component {
             this.$apply();
         },
         async fly(position, index, imageid, that, event) {
-            console.error(position);
+            if (unVerify && battleClick == 5) {
+                Event.trigger('showVerify', true,2);
+                return;
+            }
+            console.warn(position);
             // eslint-disable-next-line one-var
             var notLikeImageId = '',
                 likedImageId = '',
                 likedUserId = '';
-            let o = position === 'bottom' ? this.loadedBattle.a : this.loadedBattle.b;
+            battleClick++;
+            let o =
+                position === 'bottom'
+                    ? this.loadedBattle.a
+                    : this.loadedBattle.b;
             let k = position === 'bottom' ? this.battle.a : this.battle.b;
             this.animation.translateX('-110%').step();
             o[o.length - 1].animation = this.animation.export();
             setTimeout(async () => {
                 o.splice(o.length - 1, 1);
-                k.splice(k.length - 1, 1);
-                if (this.loadedBattle.a.length <= 1) {
-                    try {
-                        await this.getBattle('a');
-                    } catch (e) {
-                        emptyData = true;
-                    }
+                // k.splice(k.length - 1, 1);
+                if (this.loadedBattle.a.length == 0) {
+                    // try {
+                    await this.getBattle('a');
+                    // } catch (e) {
+                    //     emptyData = true;
+                    //     await this.getBattle();
+                    // }
                 }
-                if (this.loadedBattle.b.length <= 1) {
-                    try {
-                        await this.getBattle('b');
-                    } catch (e) {
-                        emptyData = true;
-                    }
+                if (this.loadedBattle.b.length == 0) {
+                    await this.getBattle('b');
                 }
-            }, 600);
+                console.log('a', this.loadedBattle.a.length);
+                console.log('b', this.loadedBattle.b.length);
+                this.$apply();
+            }, 450);
             if (position === 'bottom') {
-                this.bottomLikedImage = likedImageId = this.loadedBattle.b[index]
-                    .image_id;
-                this.bottomLikedUser = likedUserId = this.loadedBattle.b[index]._id;
-                notLikeImageId = this.loadedBattle.a[this.loadedBattle.a.length - 1]
-                    .image_id;
+                this.bottomLikedImage = likedImageId = this.loadedBattle.b[
+                    index
+                ].image_id;
+                this.bottomLikedUser = likedUserId = this.loadedBattle.b[index]
+                    ._id;
+                notLikeImageId = this.loadedBattle.a[
+                    this.loadedBattle.a.length - 1
+                ].image_id;
             } else {
                 this.topLikedImage = likedImageId = this.loadedBattle.a[index]
                     .image_id;
-                this.topLikedUser = likedUserId = this.loadedBattle.a[index]._id;
-                notLikeImageId = this.loadedBattle.b[this.loadedBattle.b.length - 1]
-                    .image_id;
+                this.topLikedUser = likedUserId = this.loadedBattle.a[index]
+                    ._id;
+                notLikeImageId = this.loadedBattle.b[
+                    this.loadedBattle.b.length - 1
+                ].image_id;
             }
             this.flyHeart(position, imageid);
             this.battleCommit(likedImageId, notLikeImageId);
@@ -206,25 +250,25 @@ export default class Battle extends wepy.component {
                             position === 'bottom' ? 'top' : 'bottom'
                         }`
                     });
-                }, 600);
+                }, 500);
             }
-            this.handleEmpty();
+            // this.handleEmpty();
         }
     };
     handleEmpty() {
         // console.error(empty);
-        if (emptyData) {
-            setTimeout(async () => {
-                emptyData = false;
-                this.loadedBattle.a = [];
-                this.loadedBattle.b = [];
-                this.$apply();
-                await this.getBattle();
-                this.topIndex = 0;
-                this.bottomIndex = 0;
-                this.$apply();
-            }, 200);
-        }
+        // if (emptyData) {
+        setTimeout(async () => {
+            // emptyData = false;
+            this.loadedBattle.a = [];
+            this.loadedBattle.b = [];
+            this.$apply();
+            await this.getBattle();
+            this.topIndex = 0;
+            this.bottomIndex = 0;
+            this.$apply();
+        }, 200);
+        // }
     }
     async battleCommit(likedImageId, notLikeImageId) {
         try {
@@ -256,7 +300,7 @@ export default class Battle extends wepy.component {
             this.heartTop = true;
             imageid = this.topLikedImage;
         }
-        console.error(imageid);
+        // console.error(imageid);
         if (!this.likeCount.count[imageid]) this.likeCount.count[imageid] = 0;
         this.likeCount.count[imageid] = this.likeCount.count[imageid] + 1;
         this.setHeart(type, this.likeCount.count[imageid]);
@@ -290,13 +334,17 @@ export default class Battle extends wepy.component {
                 (position === 'b' && !result.b.length)
             ) {
                 // eslint-disable-next-line prefer-promise-reject-errors
-                reject('empty');
+                // reject('empty');
+                this.handleEmpty();
                 return;
             }
             if (!position || position === 'a') {
                 result.a.forEach(item => {
                     item.distance = (item.distance / 1000).toFixed(2);
                     item.animation = {};
+                    item.image =
+                        item.image +
+                        '?x-oss-process=image/resize,w_400,h_400/format,jpg';
                 });
                 this.battle.a.push(...result.a);
             }
@@ -304,10 +352,16 @@ export default class Battle extends wepy.component {
                 result.b.forEach(item => {
                     item.distance = (item.distance / 1000).toFixed(2);
                     item.animation = {};
+                    item.image =
+                        item.image +
+                        '?x-oss-process=image/resize,w_400,h_400/format,jpg';
                 });
                 this.battle.b.push(...result.b);
             }
-            Event.trigger('imageLoader', this.battle);
+            this.switchGender = false;
+            this.$apply();
+            Event.trigger('imageLoader', this.battle, position);
+
             resolve();
         });
     }
@@ -321,6 +375,13 @@ export default class Battle extends wepy.component {
     async onLoad() {
         var that = this;
         console.log(this.$parent.globalData);
+        let profile = wepy.getStorageSync('profile');
+        console.warn(profile);
+        if (profile.progress == 'profile') {
+            unVerify = true;
+        }
+        console.error(111111);
+        console.error(profile);
         wx.getSystemInfo({
             success(res) {
                 var name = 'iPhone X';
@@ -333,21 +394,28 @@ export default class Battle extends wepy.component {
             this.loadedBattle.a = [];
             this.battle.a = [];
             this.loadedBattle.b = [];
-            this.babble.b = [];
-            this.$apply();
-            this.getBattle();
+            this.battle.b = [];
+            this.switchGender = true;
+            // this.getBattle();
             this.$apply();
         });
         Event.listen('changeBattle', async (index, position) => {
-            let o = position === 'top' ? this.loadedBattle.b : this.loadedBattle.a;
+            let o =
+                position === 'top' ? this.loadedBattle.b : this.loadedBattle.a;
             let k = position === 'top' ? this.battle.b : this.battle.a;
-            setTimeout(() => {
+            setTimeout(async() => {
                 this.animation.translateX('-110%').step();
                 o[o.length - 1].animation = this.animation.export();
                 setTimeout(() => {
                     o.splice(o.length - 1, 1);
                     k.splice(k.length - 1, 1);
                 }, 600);
+                console.log('this.loadedBattle', this.loadedBattle);
+                if (this.loadedBattle.b.length === 1) {
+                    await this.getBattle('b');
+                } else if (this.loadedBattle.a.length === 1) {
+                    await this.getBattle('a');
+                }
                 this.$apply();
             }, 600);
         });
@@ -357,13 +425,13 @@ export default class Battle extends wepy.component {
         });
         await this.getBattle();
         this.loaded = true;
-        this.topLikedImage = this.loadedBattle.a[this.loadedBattle.a.length - 1].image_id;
-        this.topLikedUser = this.loadedBattle.a[this.loadedBattle.a.length - 1]._id;
+        this.topLikedImage = this.battle.a[this.battle.a.length - 1].image_id;
+        this.topLikedUser = this.battle.a[this.battle.a.length - 1]._id;
 
-        this.bottomLikedImage = this.loadedBattle.b[
-            this.loadedBattle.b.length - 1
+        this.bottomLikedImage = this.battle.b[
+            this.battle.b.length - 1
         ].image_id;
-        this.bottomLikedUser = this.loadedBattle.b[this.loadedBattle.b.length - 1]._id;
+        this.bottomLikedUser = this.battle.b[this.battle.b.length - 1]._id;
 
         this.$apply();
         // if (!wepy.getStorageSync('isNew')) {
@@ -385,7 +453,7 @@ export default class Battle extends wepy.component {
         }
         const report = await get(DAILY_REPORT);
         this.daily = report;
-        this.daily.up = this.toFixed(report.up, 3) * 100;
+        this.daily.up = this.daily.up && this.toFixed(report.up, 3) * 100;
         setTimeout(() => {
             if (this.daily.up) {
                 this.layer = true;
@@ -394,7 +462,7 @@ export default class Battle extends wepy.component {
         }, 1000);
     }
     toFixed(num, fixed) {
-        var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+        var re = new RegExp('^-?\\d+(?:.\\d{0,' + (fixed || -1) + '})?');
         return num.toString().match(re)[0];
     }
     setHeart(position, index) {
@@ -402,9 +470,9 @@ export default class Battle extends wepy.component {
             index = 3;
         }
         if (position === 'top') {
-            this.topHeart = `https://images.facedog.cn/public/battle/${index}.png`;
+            this.topHeart = `https://images.facedog.cn/public/battle/${index}.png?43`;
         } else {
-            this.bottomHeart = `https://images.facedog.cn/public/battle/${index}.png`;
+            this.bottomHeart = `https://images.facedog.cn/public/battle/${index}.png?33`;
         }
         this.$apply();
     }
@@ -414,11 +482,15 @@ export default class Battle extends wepy.component {
 
 <style lang='less' scoped>
 @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 .fade_in {
-    animation: fadeIn .5s both;
+    animation: fadeIn 0.5s both;
 }
 .box-layer {
     position: absolute;
@@ -504,7 +576,7 @@ export default class Battle extends wepy.component {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 690rpx;
-    height: 100rpx;
+    height: 70rpx;
     z-index: 99998;
     image {
         width: 100%;

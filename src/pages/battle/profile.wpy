@@ -1,6 +1,9 @@
 <!-- 详情资料页 -->
 <template>
     <view class='container'>
+            <block wx:if="{{verify}}">
+        <verify  />
+    </block>
         <swiper indicator-dots="{{true}}" autoplay="{{false}}" indicator-color="{{indicatorcolor}}" indicator-active-color="{{indicatoractivecolor}}" duration="300">
             <repeat for="{{profile.images}}" key="index">
                 <swiper-item>
@@ -45,7 +48,11 @@
             <block wx:if="{{!profile.is_friend}}">
                 <image class="close" mode="aspectFill" @tap="close" src="https://images.facedog.cn/public/profile/close1.png"></image>
                 <!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="https://images.facedog.cn/public/profile/menu.png"></image> -->
-                <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="makeFriend('friend')" src="https://images.facedog.cn/public/profile/friend.png"></image>
+                <image wx:if="{{!profile.is_like}}" src="https://images.facedog.cn/public/profile/apply-tip.png" mode="aspectFill" class="apply-tip"></image>
+                <form report-submit='true'  bindsubmit='applyFriend'>
+                    <button  wx:if="{{!profile.is_like}}" style="background:url('https://images.facedog.cn/public/profile/friend.png?44');background-size:cover;border:0;" form-type='submit' class="menu apply-button"></button>
+                </form>
+                <!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="makeFriend('friend')" src="https://images.facedog.cn/public/profile/friend.png?44"></image> -->
                 <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="https://images.facedog.cn/public/profile/icon-clock.png"></image>
             </block>
             <block wx:else>
@@ -83,15 +90,12 @@
 
 <script>
 import wepy from 'wepy';
-import {
-    PROFILE,
-    MAKEFRIEND,
-    USER_LIKE_TIME
-} from '@/utils/url';
+import { PROFILE, MAKEFRIEND, USER_LIKE_TIME } from '@/utils/url';
 import Toast from '@/components/vant/toast/toast';
 import { get, post } from '@/utils/request';
 import { getAge, toast } from '@/utils';
 import { Event } from '@/utils/event.js';
+import verify from '@/components/battle/verify';
 var index = 0;
 var position = '';
 var systemInfo = wx.getSystemInfoSync();
@@ -115,16 +119,19 @@ export default class Profile extends wepy.page {
         dentifier: '',
         profile: {},
         timeLeft: {},
+        status:1,
         likeType: {
             friend: '有好感',
             close: '真爱降临',
             lover: '一见钟情'
         },
-        self: false
-
+        self: false,
+        verify: false
     };
 
-    components = {};
+    components = {
+        verify
+    };
 
     methods = {
         showOrHide() {
@@ -134,24 +141,58 @@ export default class Profile extends wepy.page {
                 this.isShow = true;
             }
         },
-        async makeFriend(type) {
-            const data = await post(MAKEFRIEND, {
-                to_be: type,
-                user_id: this.id
-            });
+        async applyFriend(e) {
+            console.log(e);
+            let data = null;
+            try {
+                data = await post(MAKEFRIEND, {
+                    to_be: 'friend',
+                    user_id: this.id,
+                    formId: e.detail.formId
+                });
+            } catch (e) {
+                if (e == '用户未完善资料') {
+                    this.verify = true;
+                    this.$apply();
+                }
+                return;
+            }
             if (data.friend) {
                 this.profile.is_friend = true;
                 wx.navigateTo({
-                    url: `../chat/becomeFriend?id=${this.profile.dentifier}&nick=${
-                    this.profile.nick_name
-                }&icon=${encodeURI(this.profile.avartar)}`
+                    url: `../chat/becomeFriend?id=${
+                        this.profile.dentifier
+                    }&nick=${this.profile.nick_name}&icon=${encodeURI(
+                        this.profile.avartar
+                    )}`
                 });
             } else {
-                Toast(this.likeType[type] + '发送成功');
+                Toast('已发送好友申请');
                 this.profile.is_like = true;
             }
 
             this.$apply();
+        },
+        async makeFriend(type) {
+            // const data = await post(MAKEFRIEND, {
+            //     to_be: type,
+            //     user_id: this.id
+            // });
+            // if (data.friend) {
+            //     this.profile.is_friend = true;
+            //     wx.navigateTo({
+            //         url: `../chat/becomeFriend?id=${
+            //             this.profile.dentifier
+            //         }&nick=${this.profile.nick_name}&icon=${encodeURI(
+            //             this.profile.avartar
+            //         )}`
+            //     });
+            // } else {
+            //     Toast(this.likeType[type] + '发送成功');
+            //     this.profile.is_like = true;
+            // }
+
+            // this.$apply();
         },
         goDiscover() {
             wepy.navigateTo({
@@ -177,7 +218,6 @@ export default class Profile extends wepy.page {
             //     delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
             // });
         }
-
     };
     myCatchTouch() {}
     events = {};
@@ -194,12 +234,15 @@ export default class Profile extends wepy.page {
         this.id = options.id;
         index = options.index;
         position = options.position;
+        Event.listen('showVerify', (status,step) => {
+            this.verify = status;
+            this.status = step;
+            this.$apply();
+        });
         try {
             this.timeLeft = await get(MAKEFRIEND);
             this.dentifier = options.dentifier;
-        } catch (e) {
-
-        }
+        } catch (e) {}
         var data = this.id
             ? { user_id: this.id }
             : { dentifier: this.dentifier };
@@ -215,6 +258,7 @@ export default class Profile extends wepy.page {
             result.face !== 0 ? (result.face * 100).toFixed(1) : 0;
         this.profile.distance = (this.profile.distance / 1000).toFixed(2);
         this.profile.images.forEach(item => {
+            item.image = item.image + '?x-oss-process=image/resize,w_400,h_400/format,jpg';
             if (item.is_avatar) {
                 this.profile.avartar = item.image;
             }
@@ -234,7 +278,6 @@ export default class Profile extends wepy.page {
 </script>
 
 <style lang='less' scoped>
-
 #van-toast {
     font-size: 24rpx;
 }
@@ -315,6 +358,9 @@ swiper {
     position: fixed;
     z-index: 1001;
 }
+.apply-button::after{
+    border:0;
+}
 .container {
     width: 100%;
     .battle-profile-wrapper {
@@ -345,7 +391,7 @@ swiper {
                     color: #ffc125;
                 }
             }
-            .area{
+            .area {
                 color: #000;
                 margin-top: 13rpx;
                 font-size: 24rpx;
@@ -410,6 +456,16 @@ swiper {
         .menu {
             width: 174rpx;
             height: 174rpx;
+            &.apply-button::after{
+                border:0;
+            }
+        }
+        .apply-tip {
+            position: absolute;
+            width: 237rpx;
+            height: 69rpx;
+            right:78rpx;
+            top:-53rpx;
         }
     }
     .battle-profile-moments {

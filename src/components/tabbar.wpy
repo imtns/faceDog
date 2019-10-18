@@ -3,22 +3,22 @@
         <van-tabbar-item>
             <image slot="icon" src="{{ icon.home.normal }}" mode="aspectFit"></image>
             <image slot="icon-active" src="{{ icon.home.active }}" mode="aspectFit"></image>
-            颜值
+            <!-- 颜值 -->
         </van-tabbar-item>
         <van-tabbar-item>
             <image slot="icon" src="{{ icon.discover.normal }}" mode="aspectFit"></image>
             <image slot="icon-active" src="{{ icon.discover.active }}" mode="aspectFit"></image>
-            发现
+            <!-- 发现 -->
         </van-tabbar-item>
         <van-tabbar-item info="{{unread}}">
             <image slot="icon" src="{{ icon.message.normal }}" mode="aspectFit"></image>
             <image slot="icon-active" src="{{ icon.message.active }}" mode="aspectFit"></image>
-            消息
+            <!-- 消息 -->
         </van-tabbar-item>
         <van-tabbar-item>
             <image slot="icon" src="{{ icon.my.normal }}" mode="aspectFit"></image>
             <image slot="icon-active" src="{{ icon.my.active }}" mode="aspectFit"></image>
-            我的
+            <!-- 我的 -->
         </van-tabbar-item>
     </van-tabbar>
 </template>
@@ -31,20 +31,20 @@ export default class tabbar extends wepy.component {
         unread: '',
         icon: {
             home: {
-                normal: 'https://images.facedog.cn/public/tabbar/home.png',
-                active: 'https://images.facedog.cn/public/tabbar/home-active.png'
+                normal: 'https://images.facedog.cn/public/tabbar/tab1.png',
+                active: 'https://images.facedog.cn/public/tabbar/tab1-active.png'
             },
             discover: {
-                normal: 'https://images.facedog.cn/public/tabbar/discover.png',
-                active: 'https://images.facedog.cn/public/tabbar/discover-active.png'
+                normal: 'https://images.facedog.cn/public/tabbar/tab2.png',
+                active: 'https://images.facedog.cn/public/tabbar/tab2-active.png'
             },
             message: {
-                normal: 'https://images.facedog.cn/public/tabbar/message.png',
-                active: 'https://images.facedog.cn/public/tabbar/message-active.png'
+                normal: 'https://images.facedog.cn/public/tabbar/tab3.png',
+                active: 'https://images.facedog.cn/public/tabbar/tab3-active.png'
             },
             my: {
-                normal: 'https://images.facedog.cn/public/tabbar/my.png',
-                active: 'https://images.facedog.cn/public/tabbar/my-active.png'
+                normal: 'https://images.facedog.cn/public/tabbar/tab4.png',
+                active: 'https://images.facedog.cn/public/tabbar/tab4-active.png'
             }
         }
     };
@@ -74,7 +74,7 @@ export default class tabbar extends wepy.component {
 }
 .van-tabbar-item__icon image {
     width:136rpx !important;
-    height:48rpx !important;
+    height:81rpx !important;
 
 }
 .van-tabbar-item__text{

@@ -12,13 +12,13 @@
                     </view>
                     <view class="profile-image " wx:if="{{index==0}}" bindtap="goProfile">
                         <image class="thumb" src="{{item.avatar}}" mode="aspectFill"></image>
-                        <view class="profile-desc {{item.be}}">
+                        <view class="profile-desc {{item.be || 'friend'}}">
                             <view class="left-container">
                                 <view class="top">{{item.nick_name}} {{item.age}}岁/{{item.constellation}}</view>
                                 <view class="bottom">在全国颜值排名前{{item.face}}%</view>
                             </view>
                             <view class="right-container">
-                                <image class="like-icon" src="https://images.facedog.cn/public/profile/{{item.be}}.png" mode="aspectFill"></image>
+                                <image class="like-icon" src="https://images.facedog.cn/public/profile/{{item.be || 'friend'}}.png?v2" mode="aspectFill"></image>
                             </view>
                         </view>
                     </view>
@@ -51,7 +51,7 @@
         <!-- </view> -->
     </scroll-view>
     <view class="chatInput" style="height:82rpx">
-        <input type="text" adjust-position="true" confirm-type="send" placeholder="请输入消息~" bindconfirm="bindConfirm" value="{{msgContent}}" class="input_text"></input>
+        <input type="text" adjust-position="true" confirm-hold="true" confirm-type="send" placeholder="请输入消息~" bindconfirm="bindConfirm" value="{{msgContent}}" class="input_text"></input>
     </view>
 
 </template>
@@ -143,16 +143,15 @@ export default class Chat extends wepy.page {
             });
             that.toview = `chat${that.msgList.length - 1}`;
             webimhandler.onSendMsg(encodeURIComponent(content), function(e) {
-                if (e) {
-                    toast('发送失败');
-                    that.msgList.pop();
-                    return;
-                }
+                // if (e) {
+                //     toast('发送失败');
+                //     that.msgList.pop();
+                //     return;
+                // }
 
                 var skey = that.id; // 拼装 skey
                 var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
                 var selSess = sessMap[skey]; // 获取 Session 的实例
-                console.error(111, sessMap);
                 webim.setAutoRead(selSess, true, true);
                 Event.trigger('send');
                 that.$apply();
@@ -178,7 +177,6 @@ export default class Chat extends wepy.page {
             this.getLastC2CHistoryMsgs((list, err) => {
                 this.msgList = list;
                 this.toview = `chat${list.length - 1}`;
-                console.log(list);
                 this.$apply();
             });
         }
@@ -223,7 +221,6 @@ export default class Chat extends wepy.page {
                     that.$apply();
                 }
                 const list = resp.MsgList.map((item, index) => {
-                    console.log(item);
                     return {
                         fromAccount: item.fromAccount,
                         fromNickName: item.fromAccountNick,
@@ -317,6 +314,7 @@ export default class Chat extends wepy.page {
         var selSess = sessMap[skey]; // 获取 Session 的实例
         webim.setAutoRead(selSess, false, false);
         Event.remove('msgDetectChat');
+        Event.trigger('send');
         loading = false;
         this.MsgKey = '';
         this.toview = '';
@@ -405,7 +403,7 @@ page {
             background:#EE5361;
         }
         &.friend{
-            background:#5DCF8E;
+            background:#dc4f56;
         }
         &.close{
             background:#D066EF;

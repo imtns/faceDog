@@ -13,8 +13,7 @@
 <script>
 import wepy from 'wepy';
 import 'wepy-async-function';
-import { post } from '@/utils/request';
-import { LOGIN } from '@/utils/url';
+
 export default class extends wepy.app {
     config = {
         pages: [
@@ -42,7 +41,13 @@ export default class extends wepy.app {
             'pages/my/contactService', // 联系客服
             'pages/my/myCard', // 生成美图
             'pages/activity/activity',
-            'pages/activity/webview'
+            'pages/activity/webview',
+            'pages/register/chooseName',
+            'pages/register/chooseGender',
+            'pages/register/chooseBirth',
+            'pages/register/uploadAvatar',
+            'pages/register/verify',
+            'pages/register/uploadVideo'
         ],
         window: {
             backgroundTextStyle: 'light',
@@ -83,30 +88,11 @@ export default class extends wepy.app {
             }
         });
     }
-    onShow() {
-        if (wepy.getStorageSync('latitude')) {
-            wx.login({
-                success: res => {
-                    this.goLogin(res.code);
-                }
-            });
-        }
-    }
     onHide() {
-
+        console.log(5);
     }
-    async goLogin(code) {
-        const result = await post(
-            LOGIN,
-            { code },
-            {
-                latitude: wepy.getStorageSync('latitude'),
-                longitude: wepy.getStorageSync('longitude')
-            }
-        );
-        console.warn('token:' + result.access_token);
-        wepy.setStorageSync('token', result.access_token);
-        wepy.setStorageSync('loginResult', result);
+    onShow() {
+        console.log(77);
     }
     async testAsync() {
         const data = await this.sleep(3);

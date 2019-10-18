@@ -1,7 +1,6 @@
 <!--  -->
 <template>
-    <scroll-view scroll-y class='discover'  bindscrolltolower="pageTuring"
-    bindscrolltoupper="refresh">
+    <scroll-view scroll-y class='discover' bindscrolltolower="pageTuring" bindscrolltoupper="refresh">
         <topBanner></topBanner>
         <view class="content-search">
             <van-tabs class="tabs" bind:change="onChange" v-model="activeIndex">
@@ -30,130 +29,137 @@
 </template>
 
 <script>
-import { get } from '@/utils/request';
-import { DISCOVER_MOMENT_LIST } from '@/utils/url.js';
-import wepy from 'wepy';
-import { toast } from '@/utils';
-import topBanner from '@/components/discover/topBanner';
-import momentCard from '@/components/discover/momentCard';
-import empty from '@/components/empty';
+    import { get } from '@/utils/request';
+    import { DISCOVER_MOMENT_LIST } from '@/utils/url.js';
+    import wepy from 'wepy';
+    import { toast } from '@/utils';
+    import { Event } from '@/utils/event.js';
+    import topBanner from '@/components/discover/topBanner';
+    import momentCard from '@/components/discover/momentCard';
+    import empty from '@/components/empty';
 
-let nomore = false;
-export default class Discover extends wepy.component {
-    data = {
+    let nomore = false;
+    export default class Discover extends wepy.component {
+      data = {
         showGender: false,
         momentList: [],
         page: 1,
         same_city: 0,
         opposite: '',
         loading: false
-    };
+      };
 
-    components = {
+      components = {
         topBanner,
         momentCard,
         empty
-    };
-    onClose() {
+      };
+      onClose() {
         this.show = false;
-    }
+      }
 
-    watch = {};
+      watch = {};
 
-    computed = {};
+      computed = {};
 
-    methods = {
+      methods = {
         genderBy(opposite) {
-            const same_city = this.same_city;
-            this.opposite = opposite;
-            this.methods.initList.call(this, {
-                page: 1,
-                same_city,
-                opposite
-            });
-            this.showGender = false;
+          const same_city = this.same_city;
+          this.opposite = opposite;
+          this.methods.initList.call(this, {
+            page: 1,
+            same_city,
+            opposite
+          });
+          this.showGender = false;
         },
         onChange(event) {
-            nomore = false;
-            console.log('event.detail.index', event.detail.index);
-            const { index } = event.detail;
-            if (+index === 0) {
-                this.same_city = 0;
-                this.methods.initList.call(this, {
-                    page: 1,
-                    same_city: 0
-                });
-            } else if (+index === 1) {
-                this.same_city = 1;
-                this.methods.initList.call(this, {
-                    page: 1,
-                    same_city: 1
-                });
-            }
+          nomore = false;
+          console.log('event.detail.index', event.detail.index);
+          const { index } = event.detail;
+          if (+index === 0) {
+            this.same_city = 0;
+            this.methods.initList.call(this, {
+              page: 1,
+              same_city: 0
+            });
+          } else if (+index === 1) {
+            this.same_city = 1;
+            this.methods.initList.call(this, {
+              page: 1,
+              same_city: 1
+            });
+          }
         },
         closeshowGender() {
-            this.showGender = false;
+          this.showGender = false;
         },
         sbowshowGender() {
-            this.showGender = true;
+          this.showGender = true;
         },
         mkPhoto() {
-            wepy.navigateTo({
-                url: 'fabu/fabu'
-            });
+          let profile = wepy.getStorageSync('profile');
+          if (!profile || profile.progress == 'profile') {
+            Event.trigger('showVerify', true, 2);
+            return;
+          } else if (profile.progress !== 'finish') {
+           toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
+            return;
+          }
+          wepy.navigateTo({
+            url: 'fabu/fabu'
+          });
         },
         async initList({ page = 1, same_city = 0, opposite = '' }) {
-            this.loading = true;
-            if (nomore) return;
-            // 请求动态列表
-            console.log('动态列表', this.momentList);
-            if (page == 1) {
-                this.momentList = [];
-                this.$apply();
-            }
-            const List = await get(DISCOVER_MOMENT_LIST, {
-                page,
-                same_city,
-                opposite
-            });
-            this.loading = false;
-            if (!List.length) {
-                nomore = true;
-                toast('已经没有更多了~');
-            }
-            this.momentList = this.momentList.concat(List);
-            console.log('动态列表', this.momentList);
-            this.$invoke('momentCard', 'setMomentList', this.momentList);
+          this.loading = true;
+          if (nomore) return;
+          // 请求动态列表
+          console.log('动态列表', this.momentList);
+          if (page == 1) {
+            this.momentList = [];
             this.$apply();
+          }
+          const List = await get(DISCOVER_MOMENT_LIST, {
+            page,
+            same_city,
+            opposite
+          });
+          this.loading = false;
+          if (!List.length) {
+            nomore = true;
+            toast('已经没有更多了~');
+          }
+          this.momentList = this.momentList.concat(List);
+          console.log('动态列表', this.momentList);
+          this.$invoke('momentCard', 'setMomentList', this.momentList);
+          this.$apply();
         },
         pageTuring() {
-            this.methods.initList.call(this, {
-                page: (this.page += 1)
-            });
-            console.log(this.methods.initList);
+          this.methods.initList.call(this, {
+            page: (this.page += 1)
+          });
+          console.log(this.methods.initList);
         },
         refresh() {
-            // nomore = false;
-            // setTimeout(() => {
-            //     this.methods.initList.call(this, {
-            //         page: 1,
-            //         same_city: this.same_city,
-            //         opposite: this.opposite,
-            //     });
-            // }, 500);
+          // nomore = false;
+          // setTimeout(() => {
+          //     this.methods.initList.call(this, {
+          //         page: 1,
+          //         same_city: this.same_city,
+          //         opposite: this.opposite,
+          //     });
+          // }, 500);
         }
-    };
-    onLoad() {
+      };
+      onLoad() {}
 
+      onShow() {}
     }
-
-    onShow() {}
-}
 </script>
 
 <style lang='less'>
-.warn-pop {
-    .warn {
+    .warn-pop {
+      .warn {
         height: 120rpx;
         text-align: center;
         font-size: 32rpx;
@@ -161,44 +167,44 @@ export default class Discover extends wepy.component {
         line-height: 120rpx;
         color: rgba(0, 0, 0, 1);
         border-bottom: 1px solid rgba(226, 225, 225, 1);
+      }
     }
-}
-.discover {
-    height: 100vh;
-    .make-photo {
+    .discover {
+      height: 100vh;
+      .make-photo {
         display: block;
         position: fixed;
         width: 110rpx;
         height: 110rpx;
         bottom: 145rpx;
         right: 22rpx;
-    }
-    .card {
+      }
+      .card {
         padding-bottom: 20vh;
-    }
-    .content-search {
+      }
+      .content-search {
         display: flex;
         justify-content: space-between;
         padding: 0 30rpx;
         .tabs {
-            width: 230rpx;
-            .van-tab--active {
-                font-size: 42rpx !important;
-                font-weight: 600 !important;
-                z-index: 1;
-            }
-            .van-tabs__line {
-                width: 77rpx !important;
-                height: 10rpx !important;
-                bottom: 28% !important;
-                left:-4% !important;
-            }
+          width: 230rpx;
+          .van-tab--active {
+            font-size: 42rpx !important;
+            font-weight: 600 !important;
+            z-index: 1;
+          }
+          .van-tabs__line {
+            width: 77rpx !important;
+            height: 10rpx !important;
+            bottom: 28% !important;
+            left: -4% !important;
+          }
         }
         .change {
-            line-height: 44px;
-            color: rgba(158, 157, 157, 1);
-            font-size: 14px;
+          line-height: 44px;
+          color: rgba(158, 157, 157, 1);
+          font-size: 14px;
         }
+      }
     }
-}
 </style>

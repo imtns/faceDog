@@ -117,6 +117,7 @@ export default class uploadPic extends wepy.component {
                         data.birthday = wepy.getStorageSync('profile').birthday;
                     } else {
                         data = wepy.getStorageSync('reg_profile');
+                        data.formId = wepy.getStorageSync('formId');
                     }
                     console.error(data);
                     uploader(

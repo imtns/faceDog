@@ -28,13 +28,13 @@
                     </view>
                     <view class="actions">
                         <view  class="box  {{item.liked?'red':''}}" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
-                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-zaned.png" wx:if="{{item.liked}}"></image>
-                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png" wx:else></image>
-                            <view wx:if="{{item.liked}}" class="text">{{item.likes.length || 0}}</view>
+                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-zaned.png?c2" wx:if="{{item.liked}}"></image>
+                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c3" wx:else></image>
+                            <view wx:if="{{item.liked}}" class="text liked">{{item.likes.length || 0}}</view>
                             <view wx:else class="text">{{item.likes.length || 0}}</view>
                         </view>
                         <view class="box" @tap="comment" data-id="{{item._id}}" data-index="{{index}}" data-userid="{{item.user_id}}">
-                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-commen.png"></image>
+                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-commen.png?c3"></image>
                             <view class="text">私密评论</view>
                         </view>
                         <view class="last">
@@ -46,13 +46,13 @@
                 </view>
                 <view class="comment-box">
                     <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length <= 6 && item.likes.length}}">
-                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png"></image>
+                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c2"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
                     </view>
                     <view class="comment-who expand {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && !item.expanded}}">
-                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png"></image>
+                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c2"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar && indexlikes !== 5 }}" @tap="toProfile({{pic.user_id}})"></image>
                             <view class="expand-btn" wx:if="{{ indexlikes === 5 && !item.expanded}}" @tap="expandNow({{index}})">展开</view>
@@ -60,7 +60,7 @@
                         </repeat>
                     </view>
                     <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && item.expanded}}">
-                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png"></image>
+                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c2"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
@@ -119,6 +119,7 @@ import { get, post, del } from '../../utils/request';
 import { formatDateFromSeconds } from '../../utils/index';
 import { DELETE_MOMENT } from '@/utils/url';
 import { toast } from '@/utils';
+import { Event } from '@/utils/event.js';
 
 export default class momentCard extends wepy.component {
     data = {
@@ -248,10 +249,18 @@ export default class momentCard extends wepy.component {
                 this.$apply();
             } else {
                 // 点赞
-                const data = await get(`/api/discover/moment/${id}/like`);
+                let data = null;
+                try {
+                    data = await get(`/api/discover/moment/${id}/like`);
+                } catch (e) {
+                    if (e == '用户未完善资料') {
+                        Event.trigger('showVerify', true,2);
+                    }
+                    return;
+                }
                 // this.momentList[index].likes.length += 1;
                 this.momentList[index].likes.push({
-                    avatar: me.icon,
+                    avatar: me.icon + '?x-oss-process=image/resize,w_100,h_100/format,jpg',
                     user_id: me._id
                 });
                 this.momentList[index].liked = true;
@@ -278,13 +287,21 @@ export default class momentCard extends wepy.component {
         // 发送评论
         async sendComment(e) {
             const { value } = e.detail;
-            const data = await post(
+            let data = null;
+            try {
+                data = await post(
                 `/api/discover/comment/${this.componentId}`,
-                {
-                    moment_id: this.componentId,
-                    content: value
-                }
+                    {
+                        moment_id: this.componentId,
+                        content: value
+                    }
             );
+            } catch (e) {
+                if (e == '用户未完善资料') {
+                    Event.trigger('showVerify', true,2);
+                }
+                return;
+            }
             const me = wepy.getStorageSync('profile');
             this.momentList[this.componentIndex].comments.push({
                 _id: data,
@@ -391,6 +408,17 @@ export default class momentCard extends wepy.component {
             if (item.distance || +item.distance === 0) {
                 item.distance = (item.distance / 1000).toFixed(2);
             }
+            item.images && item.images.forEach(c => {
+                if (c.thumbnail_url.indexOf('x-oss') == -1) {
+                    c.thumbnail_url = c.thumbnail_url + '?x-oss-process=image/resize,w_400,h_400/format,jpg';
+                }
+            });
+            item.likes && item.likes.forEach(d => {
+                d.avatar = d.avatar + '?x-oss-process=image/resize,w_100,h_100/format,jpg';
+            });
+            if (item.avatar.indexOf('x-oss') == -1) {
+                item.avatar = item.avatar + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
+            }
             if (item.birthday) {
                 item.age = this.methods.handleAge(item.birthday);
             }
@@ -490,7 +518,7 @@ export default class momentCard extends wepy.component {
                 width: 100%;
                 line-height: 55rpx;
                 .name {
-                    font-size: 32rpx;
+                    font-size: 28rpx;
                     font-weight: 600;
                     color: rgba(0, 0, 0, 1);
                 }
@@ -545,17 +573,32 @@ export default class momentCard extends wepy.component {
                     border-radius:10rpx;
                     height: 45rpx;
                     .icon {
-                        width: 24rpx;
-                        height: 22rpx;
+                        width: 32rpx;
+                        height: 32rpx;
+                        position: relative;
+                        top:9rpx;
                     }
                     .text {
-                        font-size: 24rpx;
+                        font-size: 20rpx;
                         height: 45rpx;
                         line-height: 45rpx;
+                        color:#C1BFBF;
                         // color: rgba(158, 157, 157, 1);
                         display: inline-block;
                         margin-left: 5rpx;
+                        &.liked{
+                            color:white;
+                        }
                     }
+                    &:nth-of-type(1){
+                        .text{
+                            font-size:24rpx;
+                        }
+                        .icon{
+                            top:7rpx;
+                        }
+                    }
+
                     &.red {
                         color: white !important;
                         background:#e60011;
@@ -596,9 +639,9 @@ export default class momentCard extends wepy.component {
             }
             padding-bottom: 23rpx;
             .icon {
-                width: 24rpx;
-                height: 21rpx;
-                margin: 44rpx 11rpx 21rpx 30rpx;
+                width: 32rpx;
+                height: 32rpx;
+                margin: 40rpx 11rpx 21rpx 30rpx;
             }
             .img {
                 width: 60rpx;

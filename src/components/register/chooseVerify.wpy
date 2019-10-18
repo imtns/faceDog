@@ -30,7 +30,7 @@
 <script>
 import wepy from 'wepy';
 import { post } from '@/utils/request';
-import { toast, sleep } from '@/utils';
+    import { toast, sleep } from '@/utils';
 import { VERIFY } from '../../utils/url.js';
 export default class ChooseVerify extends wepy.component {
     props = {

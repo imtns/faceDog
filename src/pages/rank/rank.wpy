@@ -181,6 +181,7 @@ export default class fabu extends wepy.page {
             if (item.distance) {
                 item.distance = (item.distance / 1000).toFixed(2);
             }
+            item.avatar = item.avatar + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
             return item;
         });
         if (data.length && this.page === 1) {
@@ -195,7 +196,8 @@ export default class fabu extends wepy.page {
             this.$apply();
             return;
         } else {
-            this.topOthers.push(...data.filter((x, index) => index > 2));
+            // this.topOthers.push(...data.filter((x, index) => index > 2));
+            this.topOthers.push(...data);
         }
 
         this.$apply();

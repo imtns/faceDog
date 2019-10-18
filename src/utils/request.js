@@ -1,6 +1,7 @@
 import { toast } from './index';
 
 const domain = 'https://www.facedog.cn';
+// const domain = 'http://39.97.187.201:8082';
 
 const http = (method, ...props) => new Promise((resolve, reject) => {
     try {
@@ -26,7 +27,7 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
                 });
             }
         }
-        console.log('请求参数-》', data);
+        // console.log('请求参数-》', data);
         wx.request({
             url: domain + url,
             data,
@@ -44,7 +45,7 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
                     if (data.message == '用户未审核') {
                         toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
                     } else {
-                        toast(data.message || '服务器开小差了, 请稍后再试');
+                        if (data.message !== '用户未完善资料' && data.message !== '未完善资料') { toast(data.message || '服务器开小差了, 请稍后再试'); }
                     }
                     reject(data.message);
                 }

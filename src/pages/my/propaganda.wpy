@@ -180,7 +180,7 @@ export default class Propaganda extends wepy.page {
         return {
             title: '好看的人才能加入的高颜值社交圈',
             path: `/pages/home?userid=${ID}`,
-            imageUrl: 'https://images.facedog.cn/public/index/54.png',
+            imageUrl: 'https://images.facedog.cn/discover/share.jpeg',
             success: res => {
                 console.error(this.profile.ID);
             },

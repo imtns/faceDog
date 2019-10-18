@@ -1,0 +1,165 @@
+<!--  -->
+<template>
+    <view class='container'>
+        <view class="title">请选择您的生日</view>
+        <view class="wrap">
+            <picker mode="date" value="{{currentDate}}" start="1970-01-01" end="2019-01-01" bindchange="bindDateChange">
+                <view class="field">
+                    <text class="year">{{year}}年</text>
+                    <text class="month">{{month}}月</text>
+                    <text class="day">{{day}}日</text>
+                     <view class="line"></view>
+                    <view class="line line1"></view>
+                </view>
+
+            </picker>
+        </view>
+        <form report-submit='true' bindsubmit='submitForm'>
+            <button size="large" form-type='submit' >下一步</button>
+        </form>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { post } from '@/utils/request';
+import { SUBMIT_FORMID } from '@/utils/url';
+export default class ChooseBirth extends wepy.page {
+    config = {
+        navigationBarTitleText: '2/4'
+    };
+
+    data = {
+        currentDate: '',
+        year: '',
+        month: '',
+        day: ''
+    };
+
+    components = {};
+
+    methods = {
+        async submitForm(e) {
+            console.warn(this.currentDate);
+            wepy.setStorageSync('birthday', this.currentDate);
+            await post(SUBMIT_FORMID, {
+                formId: e.detail.formId
+            });
+            wepy.navigateTo({ url: 'uploadAvatar' });
+        },
+
+        bindDateChange(event) {
+            console.log(event.detail.value);
+            this.currentDate = event.detail.value;
+
+            var date = new Date(this.currentDate);
+            this.month = date.getUTCMonth() + 1; // months from 1-12
+            this.day = date.getUTCDate();
+            this.year = date.getUTCFullYear();
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {
+        this.currentDate = '1995-01-01';
+        var dateObj = new Date('1995-01-01');
+        this.month = dateObj.getUTCMonth() + 1; // months from 1-12
+        this.day = dateObj.getUTCDate();
+        this.year = dateObj.getUTCFullYear();
+    }
+
+    onShow() {}
+}
+// function getNowFormatDate() {
+//     var date = new Date('1995-01-01');
+//     var seperator1 = '-';
+//     var year = date.getFullYear();
+//     var month = date.getMonth() + 1;
+//     var strDate = date.getDate();
+//     if (month >= 1 && month <= 9) {
+//         month = '0' + month;
+//     }
+//     if (strDate >= 0 && strDate <= 9) {
+//         strDate = '0' + strDate;
+//     }
+//     var currentdate = year + seperator1 + month + seperator1 + strDate;
+//     return currentdate;
+// }
+</script>
+
+<style lang='scss'>
+.container {
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin: 0 auto;
+    .title {
+        margin-top: 152rpx;
+        text-align: center;
+        color: #302f2f;
+        font-size: 42rpx;
+    }
+    .wrap {
+        margin: 206rpx auto;
+        display: flex;
+        justify-content: center;
+        .field {
+            width: 630rpx;
+            height: 96rpx;
+            margin: 0 auto;
+            background: rgba(242, 244, 245, 1);
+            position: relative;
+            opacity: 1;
+            border-radius: 10px;
+            .line {
+                height: 54rpx;
+                width: 3rpx;
+                position: absolute;
+                top: 50%;
+                left: 210rpx;
+                transform: translateY(-50%);
+                background: rgba(226, 223, 223, 1);
+                &.line1 {
+                    left: 420rpx;
+                }
+            }
+            text{
+                position: absolute;
+                top:50%;
+                transform: translateY(-50%);
+                font-size:32rpx;
+                color:#302F2F;
+            }
+            .year{
+                left:66rpx;
+            }
+            .month{
+                left:294rpx;
+            }
+            .day{
+                left:495rpx;
+            }
+        }
+    }
+    button {
+        width: 420rpx;
+        height: 100rpx;
+        background: rgba(0, 0, 0, 1);
+        opacity: 1;
+        color: #fcfcfc;
+        font-size: 28rpx;
+        text-align: center;
+        line-height: 92rpx;
+        position: absolute;
+        left: 50%;
+        bottom: 156rpx;
+        transform: translateX(-50%);
+    }
+}
+</style>

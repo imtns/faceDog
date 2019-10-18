@@ -61,6 +61,7 @@ export default class Chatlist extends wepy.component {
             });
         },
         async getChatList(data) {
+            console.log('data', data);
             data.forEach(item => {
                 item.C2cNick = decodeURIComponent(item.C2cNick);
                 item.MsgShow = decodeURIComponent(item.MsgShow);
@@ -77,21 +78,21 @@ export default class Chatlist extends wepy.component {
             this.$apply();
         },
 
-        receivingMsg(sessMap, msg) {
+        receivingMsg(sessMap, msg, init) {
             var sess = null;
             unread = 0;
             wx.hideLoading();
-            console.error('msg', msg);
+            console.warn('msg', msg);
             for (var i in sessMap) {
                 sess = sessMap[i];
-                console.error('sess', sess);
+                console.warn('sess', sess);
                 var isnew = true;
-                this.list.forEach(item => {
+                this.list && this.list.forEach(item => {
                     if (item.To_Account == sess.id()) {
                         isnew = false;
                     }
                 });
-                console.error('isnew', isnew);
+                console.warn('isnew', isnew);
                 if (isnew && Object.keys(msg).length !== 0) {
                     console.log('no!!!!!!');
                     webim.getProfilePortrait(
@@ -103,15 +104,20 @@ export default class Chatlist extends wepy.component {
                             ]
                         },
                         response => {
+                            let nick = '';
+                            let image = '';
+                            response.UserProfileItem[0].ProfileItem.forEach(item => {
+                                if (item.Tag == 'Tag_Profile_IM_Nick') {
+                                    nick = item.Value;
+                                } else {
+                                    image = item.Value;
+                                }
+                            });
                             this.list.unshift({
                                 To_Account: msg.sess.id(),
                                 UnreadMsgCount: msg.sess.unread(),
-                                C2cNick:
-                                    response.UserProfileItem[0].ProfileItem[1]
-                                        .Value,
-                                C2cImage:
-                                    response.UserProfileItem[0].ProfileItem[0]
-                                        .Value,
+                                C2cNick: nick,
+                                C2cImage: image,
                                 MsgShow: decodeURIComponent(
                                     msg.sess.msgs()[msg.sess.msgs().length - 1]
                                         .elems[0].content.text
@@ -125,25 +131,22 @@ export default class Chatlist extends wepy.component {
                         }
                     );
                 } else {
-                    this.list.forEach(item => {
+                    this.list && this.list.forEach(item => {
                         if (item.To_Account === 'administrator') {
                             item.C2cImage = 'https://images.facedog.cn/public/chat/chatIcon.png';
                             item.C2cNick = '颜狗客服';
                         }
                         if (item.To_Account == sess.id()) {
                             item.UnreadMsgCount = sess.unread();
-                        }
-                        if (
-                            item.To_Account == sess.id() &&
-                            Object.keys(msg).length !== 0
-                        ) {
-                            item.MsgShow = decodeURIComponent(
+                            if (!init && Object.keys(msg).length !== 0 && item.To_Account == msg.fromAccount) {
+                                item.MsgShow = decodeURIComponent(
                                 msg.elems[0].content.text
                             );
-                            item.showTime = formatDateFromSeconds(
+                                item.showTime = formatDateFromSeconds(
                                 msg.sess.time()
                             );
-                            item.time = msg.sess.time();
+                                item.time = msg.sess.time();
+                            }
                         }
                     });
                 }

@@ -16,7 +16,7 @@
         <block wx:if="{{step===5}}">
             <uploadVideo></uploadVideo>
         </block>
-        <view @tap="back" wx:if="{{step != 2 && step!= 1 && step != 4}}"  class="back">返回</view>
+        <view @tap="back" wx:if="{{step != 2 && step!= 1 && step != 4}}" class="back">返回</view>
         <van-toast id="van-toast" />
         <van-dialog id="van-dialog" />
     </view>
@@ -79,16 +79,15 @@ export default class Register extends wepy.page {
         }
     };
     async goLogin(latitude, longitude) {
-        let result = {};
-        if (!wepy.getStorageSync('token')) {
-            result = await post(
+        const result = await post(
             LOGIN,
             { code: wepy.getStorageSync('code') },
-            { latitude, longitude }
+            // { code: 'ygtest0003' || wepy.getStorageSync('code') },
+            {
+                latitude,
+                longitude
+            }
         );
-        } else {
-            result = wepy.getStorageSync('loginResult');
-        }
         wepy.setStorageSync('welcome', result.welcome);
         wepy.setStorageSync('token', result.access_token);
         wepy.setStorageSync('tencent_token', result.tencent_token);
@@ -118,25 +117,25 @@ export default class Register extends wepy.page {
             this.code = options.userid;
             wepy.setStorageSync('inviteCode', this.code);
         }
-        if (options.verify && options.verify != 'false') {
+        if (options.verify && options.verify !== 'false') {
             this.verify = true;
             this.step = 3;
             return;
         }
-        if (options.certify && options.certify != 'false') {
+        if (options.certify && options.certify !== 'false') {
             this.certify = true;
             this.step = 4;
             return;
         }
-        if (options.name == 'reg') {
+        if (options.name === 'reg') {
             this.step = 2;
             return;
         }
-        // wx.login({
-        //     success: res => {
-        //         console.log(res);
-        //         wepy.setStorageSync('code', res.code);
-        this.goLogin(
+        wx.login({
+            success: res => {
+                console.log(res);
+                wepy.setStorageSync('code', res.code);
+                this.goLogin(
                     wepy.getStorageSync('latitude'),
                     wepy.getStorageSync('longitude')
                 );
@@ -145,13 +144,13 @@ export default class Register extends wepy.page {
                 //     this.$invoke('getInfo', 'display');
                 // } else {
                 //     this.events.getLocation(this);
-                //     this.goLogin(
-                //         wepy.getStorageSync('latitude'),
-                //         wepy.getStorageSync('longitude')
-                //     );
+                //     // this.goLogin(
+                //     //     wepy.getStorageSync('latitude'),
+                //     //     wepy.getStorageSync('longitude')
+                //     // );
                 // }
-        //     }
-        // });
+            }
+        });
     }
 
     authorizeLocation() {
@@ -178,14 +177,14 @@ export default class Register extends wepy.page {
 </script>
 
 <style lang='less'>
-.back{
-    width:394rpx;
-    height:88rpx;
-    color:#040404;
-    margin:10rpx auto;
+.back {
+    width: 394rpx;
+    height: 88rpx;
+    color: #040404;
+    margin: 10rpx auto;
     text-align: center;
     line-height: 88rpx;
-    font-size:28rpx;
+    font-size: 28rpx;
 }
 .main {
     padding: 0 30rpx;

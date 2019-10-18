@@ -1,10 +1,11 @@
 /*eslint-disable */
 let uploadUrl = 'https://www.facedog.cn/api/user/profile';
-// uploadUrl = 'https://yaofa.58.com/fileUpload'
+// let uploadUrl =  'http://39.97.187.201:8082/api/user/profile';
 import { toast } from './index';
 module.exports.uploader = (tempFilePath, ...props) => {
     let [params, callback] = props;
     if (params && params.isVideo) uploadUrl = 'https://www.facedog.cn/api/user/certify/video';
+    // if (params && params.isVideo) uploadUrl = 'http://39.97.187.201:8082/api/user/certify/video';
     if (params && params.profile) uploadUrl = 'https://www.facedog.cn/api/user/image';
     if (typeof params === 'function') {
         callback = params;
@@ -12,6 +13,7 @@ module.exports.uploader = (tempFilePath, ...props) => {
     }
 
     const formData = params && params.data || {};
+    console.log(formData);
     const name = params && params.name || '';
     !params.noLoading && wx.showLoading && wx.showLoading({ title: '上传中', mask: true });
     console.warn(formData);

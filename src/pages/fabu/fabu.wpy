@@ -3,8 +3,11 @@
     <view class="fabu-page">
         <view class="actions">
             <view class="btn" @tap="prepareToCancle">取消</view>
-            <view class="btn" @tap="publish">发布</view>
+            <form report-submit='true' bindsubmit='publish'>
+                <button form-type='submit' class="btn">发布</button>
+            </form>
         </view>
+
         <view class="inputArea">
             <textarea class="desc" placeholder="请输入内容..." placeholder-style="color:#cccccc;" maxlength="1000" data-type="content" @input="inputDesc" value="{{content}}" />
             <view class="len">{{ content.length + '/1000'}}</view>
@@ -42,6 +45,14 @@ import { FABU_FABU_MOMENT, FABU_UPLOAD_PIC } from '@/utils/url';
 import { Event } from '@/utils/event.js';
 import Toast from '@/components/vant/toast/toast';
 let auth = false;
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
 export default class fabu extends wepy.page {
     config = {
         navigationBarTitleText: '发布动态',
@@ -76,7 +87,7 @@ export default class fabu extends wepy.page {
             wx.showModal({
                 title: '提示',
                 content: '确认退出吗',
-                success (res) {
+                success(res) {
                     if (res.confirm) {
                         wx.navigateBack({
                             delta: 1
@@ -125,10 +136,17 @@ export default class fabu extends wepy.page {
                         'Content-Type': 'multipart/form-data'
                     },
                     success(res) {
+                        console.warn(res);
+                        if (!IsJsonString(res.data)) {
+                            toast('服务器开小差了，请稍后重试');
+                            return;
+                        }
                         const data = JSON.parse(res.data);
                         console.log(data);
                         if (data.message === '用户未审核') {
-                            toast('认证审核中，加急审核请联系客服微信：yanzc1023');
+                            toast(
+                                '认证审核中，加急审核请联系客服微信：yanzc1023'
+                            );
                             auth = true;
                             return;
                         }
@@ -136,6 +154,7 @@ export default class fabu extends wepy.page {
                         // do something
                     },
                     fail(res) {
+                        toast(res.message);
                         reject(res);
                     }
                 });
@@ -153,7 +172,7 @@ export default class fabu extends wepy.page {
             this.latitude = latitude;
             this.$apply();
         },
-        async publish() {
+        async publish(e) {
             if (auth) {
                 toast('认证审核中，加急审核请联系客服微信：yanzc1023');
                 return;
@@ -172,6 +191,7 @@ export default class fabu extends wepy.page {
                         region: this.region,
                         latitude: this.latitude,
                         longitude: this.longitude,
+                        formId: e.detail.formId,
                         images: []
                     }
                 );
@@ -204,11 +224,11 @@ export default class fabu extends wepy.page {
 
     computed = {};
 
-    onLoad() {
+    onLoad() {}
 
+    onShow() {
+        auth = false;
     }
-
-    onShow() { auth = false; }
 }
 </script>
 
@@ -225,6 +245,10 @@ export default class fabu extends wepy.page {
             font-weight: 600;
             line-height: 60rpx;
             color: rgba(7, 7, 7, 1);
+            background:transparent;
+            &::after{
+                border:0;
+            }
         }
     }
     .inputArea {

@@ -1,8 +1,8 @@
 <!--  -->
 <template>
     <view class="top">
-        <image  class="banner" src="https://images.facedog.cn/public/discover/discover-top2.png" @tap="toActivity"></image>
-        <image  class="banner" src="https://images.facedog.cn/public/discover/discover-top1.png" @tap="toRank"></image>
+        <image  class="banner" src="https://images.facedog.cn/public/discover/my-rank.png" @tap="toMyRank"></image>
+        <image  class="banner" src="https://images.facedog.cn/public/discover/rank-list.png" @tap="toRank"></image>
     </view>
 </template>
 <script>
@@ -13,9 +13,9 @@ export default class topBanner extends wepy.component {
     components = {};
 
     methods = {
-        toActivity() {
+        toMyRank() {
             wepy.navigateTo({
-                url: 'activity/activity'
+                url: 'my/myrank'
             });
         },
         toRank() {

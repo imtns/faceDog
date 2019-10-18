@@ -28,7 +28,8 @@ export default class Webview extends wepy.page {
     computed = {};
 
     onLoad() {
-        this.src = wepy.getStorageSync('h5url');
+        // this.src = wepy.getStorageSync('h5url');
+        this.src= 'https://mp.weixin.qq.com/s/5EAKmIVJZYGDSbylRSBc7w';
     }
 
     onShow() {}

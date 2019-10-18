@@ -1254,7 +1254,7 @@ module.exports = function () {
             };
             this.info = function (logStr) {
                 try {
-                    on && console.info(logStr);
+                    // on && console.info(logStr);
                 } catch (e) { }
             };
             this.debug = function (logStr) {

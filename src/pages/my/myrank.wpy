@@ -70,10 +70,8 @@ export default class Example extends wepy.page {
 
     data = {
         charData: {
-            male: {
-            },
-            female: {
-            }
+            male: {},
+            female: {}
         },
         loading: false,
         charLabel: {
@@ -154,6 +152,7 @@ export default class Example extends wepy.page {
         styleImage1: '',
         gender: '',
         shareText: '',
+        noData: false,
         blackbg: '' // 黑色的部分，胜率等
     };
 
@@ -161,6 +160,10 @@ export default class Example extends wepy.page {
 
     methods = {
         async share() {
+            if (this.noData) {
+                toast('数据正在生成中，暂时不能分享');
+                return;
+            }
             this.loading = true;
             this.$apply();
             await this.initStyleList();
@@ -184,13 +187,13 @@ export default class Example extends wepy.page {
             this.loading = false;
             this.ready = false;
             this.$apply();
-            await wepy.saveImageToPhotosAlbum({ filePath: path });
+            // await wepy.saveImageToPhotosAlbum({ filePath: path });
             wx.previewImage({
                 current: path, // 当前显示图片的http链接
                 urls: [path] // 需要预览的图片http链接列表
             });
 
-            toast('保存成功！');
+            toast('截屏分享给其他人吧~');
         } catch (e) {
             toast('由于您拒绝了相册授权，无法自动保存到本地相册，请截图保存');
             console.log('savePhotosAlbum', e);
@@ -205,6 +208,15 @@ export default class Example extends wepy.page {
     computed = {};
     getRanText() {
         let text = '';
+        if (
+            !this.charData[this.gender] ||
+            Object.keys(this.charData[this.gender]).length === 0
+        ) {
+            this.shareText = '数据生成中，请等待1-2天';
+            this.noData = true;
+            this.$apply();
+            return;
+        }
         for (const [key, value] of Object.entries(this.charData[this.gender])) {
             console.log(key, value);
             if (value == 5) {
@@ -222,11 +234,11 @@ export default class Example extends wepy.page {
         return {
             title: '好看的人才能加入的高颜值社交圈',
             path: '/pages/home',
-            imageUrl: 'https://images.facedog.cn/public/index/54.png',
-            success: (res) => {
+            imageUrl: 'https://images.facedog.cn/discover/share.jpeg',
+            success: res => {
                 console.log('转发成功', res);
             },
-            fail: (res) => {
+            fail: res => {
                 console.log('转发失败', res);
             }
         };
@@ -247,7 +259,8 @@ export default class Example extends wepy.page {
             method: 'POST',
             success(res) {
                 const base64 = wx.arrayBufferToBase64(res.data);
-                that.qrcode = 'data:image/jpg;base64,' + base64.replace(/[\r\n]/g, '');
+                that.qrcode =
+                    'data:image/jpg;base64,' + base64.replace(/[\r\n]/g, '');
                 that.$apply();
             },
             fail() {}
@@ -271,48 +284,51 @@ export default class Example extends wepy.page {
         // 图片1
         this.images = info.images;
         this.images.forEach(item => {
+            // item.image = item.image + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
             item.win = Math.floor(item.win * 100);
         });
         this.$apply();
         this.getRanText();
-        radarChart = new wxCharts({
-            canvasId: 'radarCanvas',
-            type: 'radar',
-            background: 'red',
-            categories: this.charLabel[this.gender],
-            series: [
-                {
-                    data: [
-                        this.charData[this.gender].character,
-                        this.charData[this.gender].cool,
-                        this.charData[this.gender].wealth,
-                        this.charData[this.gender].wisdom,
-                        this.charData[this.gender].sexy
-                    ]
-                }
-            ],
-            width: 158,
-            height: 141,
-            extra: {
-                radar: {
-                    max: 5
-                }
-            }
-        });
-        setTimeout(() => {
-            wx.canvasToTempFilePath({
+        if (this.charData[this.gender]) {
+            radarChart = new wxCharts({
                 canvasId: 'radarCanvas',
-                async success(res) {
-                    var tempFilePath = res.tempFilePath;
-                    // console.error(tempFilePath);
-                    that.canvasImage = tempFilePath;
-                    that.$apply();
-                },
-                fail(res) {
-                    console.log(res);
+                type: 'radar',
+                background: 'red',
+                categories: this.charLabel[this.gender],
+                series: [
+                    {
+                        data: [
+                            this.charData[this.gender].character,
+                            this.charData[this.gender].cool,
+                            this.charData[this.gender].wealth,
+                            this.charData[this.gender].wisdom,
+                            this.charData[this.gender].sexy
+                        ]
+                    }
+                ],
+                width: 158,
+                height: 141,
+                extra: {
+                    radar: {
+                        max: 5
+                    }
                 }
             });
-        }, 1000);
+            setTimeout(() => {
+                wx.canvasToTempFilePath({
+                    canvasId: 'radarCanvas',
+                    async success(res) {
+                        var tempFilePath = res.tempFilePath;
+                        // console.error(tempFilePath);
+                        that.canvasImage = tempFilePath;
+                        that.$apply();
+                    },
+                    fail(res) {
+                        console.log(res);
+                    }
+                });
+            }, 1000);
+        }
         this.$apply();
     }
     getRanValue(arr) {

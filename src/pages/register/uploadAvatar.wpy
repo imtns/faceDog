@@ -1,0 +1,220 @@
+<!--  -->
+<template>
+    <view class='container'>
+        <view class='title'>请上传你最满意的照片</view>
+        <view class='desc'>好看的照片会收获更多关注，你可以随时修改</view>
+        <view class='wrap'>
+            <image class='thumb' src='{{src}}' @tap='uploadPic' mode='aspectFill' />
+        </view>
+        <form report-submit='true' bindsubmit='submitForm'>
+            <button size='large' @tap='next' form-type='submit'>下一步</button>
+        </form>
+        <view wx:if='{{show}}'>
+            <cropper :options='cropperOpt' @beforeImageLoad='bl'></cropper>
+        </view>
+        <block wx:if='{{loading}}'>
+            <loading></loading>
+        </block>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import { post } from '@/utils/request';
+    import { SUBMIT_FORMID } from '@/utils/url';
+    import { uploader } from '@/utils/uploader';
+    import { toast } from '@/utils';
+    import cropper from '@/components/cropper';
+    import Toast from '@/components/vant/toast/toast';
+    import loading from '@/components/loading';
+
+    const device = wx.getSystemInfoSync();
+    const width = device.windowWidth;
+    const height = device.windowHeight - 50;
+
+    export default class ChooseGender extends wepy.page {
+      config = {
+        navigationBarTitleText: '3/4',
+        usingComponents: {
+          'van-loading': '../../components/vant/loading/index',
+          'van-dialog': '../../components/vant/dialog/index'
+        }
+      };
+
+      data = {
+        src: 'https://images.facedog.cn/public/reg/upload.png',
+        show: false,
+        loading: false,
+        uploaded: false,
+        cropperOpt: {
+          width,
+          height,
+          scale: 2.5,
+          zoom: 8,
+          cut: {
+            x: (width - 300) / 2,
+            y: (height - 300) / 2,
+            width: 300,
+            height: 300
+          }
+        }
+      };
+
+      components = {
+        cropper,
+        loading
+      };
+
+      methods = {
+        async submitForm(e) {
+          await post(SUBMIT_FORMID, {
+            formId: e.detail.formId
+          });
+          // wepy.navigateTo({ url: 'verify' });
+        },
+        async uploadPic() {
+          try {
+            const { tempFilePaths } = await wepy.chooseImage({ count: 1 });
+            this.$invoke('cropper', 'pushOrigin', tempFilePaths[0]);
+            this.show = true;
+          } catch (e) {
+            console.log(e);
+          }
+        },
+        next() {
+          if (!this.uploaded) {
+            toast('请上传头像');
+            return;
+          }
+          wepy.navigateTo({ url: 'verify' });
+        }
+      };
+
+      events = {
+        ready() {
+          // console.log('we-cropper ready');
+        },
+        beforeImageLoad() {
+          // console.log('we-cropper beforeImageLoad');
+        },
+        imageLoad() {
+          // console.log('we-cropper imageLoad');
+        },
+        beforeDraw() {
+          // console.log('we-cropper beforeDraw');
+        },
+        cancel() {
+          this.show = false;
+        },
+        getCropImage: () => {
+          this.$invoke('cropper', 'getCropperImage')
+            .then(src => {
+              console.log(src);
+              this.loading = true;
+              this.show = false;
+              this.$apply();
+              const data = {
+                birthday: wepy.getStorageSync('birthday'),
+                nick_name:wepy.getStorageSync('name')
+              };
+              console.log(data);
+              uploader(
+                src,
+                {
+                  data,
+                  name: 'avatar',
+                  noLoading: true
+                },
+                async result => {
+                  this.show = false;
+                  this.loading = false;
+                  this.src = src;
+                  if (result === 'ok') {
+                    this.uploaded = true;
+                    this.$apply();
+                    // Toast.success('上传成功');
+                    // await sleep(2);
+
+                    // Dialog.confirm({
+                    //     confirmButtonText: '现在认证',
+                    //     cancelButtonText: '先去逛逛',
+                    //     title: '需要现在去认证吗？限时免费',
+                    //     message:
+                    //         '颜狗是高颜值用户交友平台,通过官方认证的用户才可以参与照片竞技并享受添加好友等权益'
+                    // })
+                    //     .then(() => {
+                    //         this.$emit('changeStep', 4);
+                    //     })
+                    //     .catch(() => {
+                    //         wepy.redirectTo({ url: 'index' });
+                    //     });
+                    // this.$emit('changeStep', 4);
+                  } else {
+                    Toast.fail(result);
+                  }
+                  this.$apply();
+                }
+              );
+            })
+            .catch(async err => {
+              // toast('error');
+              this.show = false;
+              console.log(err + '获取图片地址失败，请稍后重试');
+            });
+        }
+      };
+
+      watch = {};
+
+      computed = {};
+
+      onLoad() {}
+
+      onShow() {}
+    }
+</script>
+
+<style lang='scss'>
+    .container {
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      margin: 0 auto;
+      .title {
+        margin-top: 152rpx;
+        text-align: center;
+        color: #302f2f;
+        font-size: 42rpx;
+      }
+      .desc {
+        color: #a6aaa8;
+        font-size: 24rpx;
+        margin-top: 10rpx;
+        text-align: center;
+      }
+      .wrap {
+        margin: 90rpx 132rpx 0;
+        display: flex;
+        justify-content: center;
+      }
+      .thumb {
+        width: 470rpx;
+        height: 470rpx;
+      }
+      button {
+        width: 420rpx;
+        height: 100rpx;
+        background: rgba(0, 0, 0, 1);
+        opacity: 1;
+        color: #fcfcfc;
+        font-size: 28rpx;
+        text-align: center;
+        line-height: 92rpx;
+        position: absolute;
+        left: 50%;
+        bottom: 156rpx;
+        transform: translateX(-50%);
+      }
+    }
+</style>

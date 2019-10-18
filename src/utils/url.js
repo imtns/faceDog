@@ -48,3 +48,9 @@ export const GET_ACTIVITY = '/api/activity/list';
 // 每日日报
 export const DAILY_REPORT = '/api/face/daily_news';
 // 获取二维码
+export const SUBMIT_FORMID = '/api/user/tmp_submit';
+// 提交formid
+export const USER_REGISTER = '/api/user/register';
+// 提交formid
+export const USER_VERIFY = '/api/user/justify';
+// 认证

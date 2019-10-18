@@ -11,7 +11,7 @@
             </view>
             <view class="field" wx:if="{{code}}">
                 <view class="label">推荐人ID:</view>
-                <input class="input" value="{{ code }}" disabled label="推荐人ID"/>
+                <input class="input" value="{{ code }}" disabled label="推荐人ID" />
             </view>
             <view class="field">
                 <view class="label">性别:</view>
@@ -32,14 +32,16 @@
                 </view>
             </picker>
         </view>
-        <button size="large" class="btn" @tap="next">下一步</button>
+        <form report-submit='true' bindsubmit='next'>
+            <button form-type='submit' class="btn">下一步</button>
+        </form>
     </view>
 </template>
 
 <script>
 import wepy from 'wepy';
 // import { post } from '@/utils/request.js';
-import {toast} from '@/utils';
+import { toast } from '@/utils';
 import Dialog from '@/components/vant/dialog/dialog';
 export default class Profile extends wepy.component {
     props = {
@@ -57,7 +59,8 @@ export default class Profile extends wepy.component {
         gender: 0,
         show: false,
         currentDate: new Date().now,
-        nickName: ''
+        nickName: '',
+        formId: ''
     };
 
     components = {};
@@ -83,7 +86,8 @@ export default class Profile extends wepy.component {
         bindDateChange(event) {
             this.currentDate = event.detail.value;
         },
-        next() {
+        next(e) {
+            console.log(e.detail.formId);
             if (!this.nickName || this.gender === 0 || !this.currentDate) {
                 toast('请填写全部资料');
                 return;
@@ -94,6 +98,7 @@ export default class Profile extends wepy.component {
                 birthday: this.currentDate,
                 number: this.code
             };
+            wepy.setStorageSync('formId', e.detail.formId);
             wepy.setStorageSync('reg_profile', data);
             this.$emit('changeStep', 3);
         }
@@ -108,9 +113,9 @@ export default class Profile extends wepy.component {
 </script>
 
 <style lang='less'>
-#van-dialog .van-dialog__confirm{
-    background:#07c160 !important;
-    color:white !important;
+#van-dialog .van-dialog__confirm {
+    background: #07c160 !important;
+    color: white !important;
 }
 .wapper {
     width: 600rpx;
@@ -152,7 +157,7 @@ export default class Profile extends wepy.component {
                 width: 120rpx;
                 font-weight: 600;
                 text-align: right;
-                margin-right:15rpx;
+                margin-right: 15rpx;
             }
             .icon {
                 width: 40rpx;

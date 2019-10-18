@@ -12,7 +12,7 @@
         <view class="goChat" @tap="redirect">
             发送消息
         </view>
-        <view class="back">返回</view>
+        <view class="back" @tap="back">返回</view>
     </view>
 </template>
 
@@ -37,6 +37,11 @@ export default class BecomeFriend extends wepy.page {
             wx.setStorageSync('chatIcon', this.friendIcon);
             wx.redirectTo({
                 url: `chat?id=${this.dentifier}&nick=${this.nick}&icon=${encodeURI(this.friendIcon)}`
+            });
+        },
+        back() {
+            wx.navigateBack({
+                delta: -1
             });
         }
     };

@@ -3,16 +3,18 @@
     <view class="wrapper">
         <view class="head">
             <view class="headIcon" @tap="goProfile">
-                <image src="{{profile.icon}}" style="width:172rpx;height:172rpx;"></image>
+                <image src="{{profile.icon || 'https://images.facedog.cn/public/discover/default-avatar.png'}}" style="width:172rpx;height:172rpx;"></image>
             </view>
             <view class="box">
                 <view class="top-part">
                     <view class="info">
-                        <view class="name">{{profile.nick_name}}</view>
-                        <view class="desc">{{profile.age}}岁 | {{profile.city}}</view>
+                        <view class="name">{{profile.nick_name || tempName}}</view>
+                        <view class="desc">{{profile.age || '未知'}}岁 | {{profile.city || ''}}</view>
                     </view>
                     <view class="verify" @tap="checkVerify({{profile.progress}})">
-                        {{progress[profile.progress]}}
+                        <image class="icon" style="{{profile.progress == 'finish'?'width:33rpx;height:21rpx':'width:28rpx;height:28rpx;position:relative;top:4.5rpx;'}}" src="../../images/my/icon/{{profile.progress || 'refuse'}}.png" mode="aspectFill" lazy-load="false">
+                        </image>
+                        {{profile.progress?progress[profile.progress]:'未认证'}}
                     </view>
                 </view>
                 <view class="bottom-part">
@@ -60,23 +62,24 @@
                 </view>
             </view>
             <view class="line"></view>
-         </navigator>
+        </navigator>
     </view>
 </template>
 
 <script>
 import wepy from 'wepy';
-
+import { Event } from '@/utils/event.js';
 export default class My extends wepy.component {
     data = {
         progress: {
-            profile: '待完善资料',
+            profile: '未认证',
             certify: '未认证',
             audit: '审核中',
-            finish: '通过审核',
+            finish: '已通过',
             refuse: '认证失败'
         },
-        profile: {}
+        profile: {},
+        tempName:''
     };
     components = {};
 
@@ -92,6 +95,10 @@ export default class My extends wepy.component {
             }
         },
         goProfile() {
+            if (!wepy.getStorageSync('hasProfile')) {
+                Event.trigger('showVerify', true);
+                return;
+            }
             wx.navigateTo({
                 url: 'battle/profile?id=' + this.profile._id,
                 success: (result) => {
@@ -102,6 +109,10 @@ export default class My extends wepy.component {
             });
         },
         redirect(name) {
+            if (!wepy.getStorageSync('hasProfile')) {
+                Event.trigger('showVerify', true);
+                return;
+            }
             // 跳转到我的动态页面需要带参数
             if (name === 'mymoment') {
                 wepy.navigateTo({
@@ -112,6 +123,8 @@ export default class My extends wepy.component {
             wepy.navigateTo({ url: `my/${name}` });
         },
         setProfile(profile) {
+            console.error(profile);
+            this.tempName = wepy.getStorageSync('tempName');
             this.profile = profile;
             this.$apply();
         }
@@ -131,7 +144,6 @@ export default class My extends wepy.component {
 </script>
 
 <style lang='less' scoped>
-
 .head {
     display: flex;
     justify-content: space-between;
@@ -185,9 +197,13 @@ export default class My extends wepy.component {
             border-radius: 30rpx;
             line-height: 60rpx;
             text-align: center;
-            font-size: 28rpx;
+            font-size: 24rpx;
             font-weight: 600;
             color: rgba(0, 0, 0, 1);
+            .icon {
+                width: 28rpx;
+                height: 28rpx;
+            }
         }
     }
     .bottom-part {

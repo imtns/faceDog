@@ -2,10 +2,10 @@
 <template>
     <view class="container">
         <view class="tabs">
-            <image class="tab" @tap="tabClick(1)" src="{{tabIndex == 1?'https://images.facedog.cn/public/chat/chat-active.png':'https://images.facedog.cn/public/chat/chat.png'}}" mode="aspectFill"></image>
-            <image class="tab" @tap="tabClick(2)" src="{{tabIndex == 2?'https://images.facedog.cn/public/chat/like-active.png':'https://images.facedog.cn/public/chat/like.png'}}" mode="aspectFill"></image>
-            <image class="tab" @tap="tabClick(3)" src="{{tabIndex == 3?'https://images.facedog.cn/public/chat/friends-active.png':'https://images.facedog.cn/public/chat/friends.png'}}" mode="aspectFill"></image>
-            <image class="tab" @tap="tabClick(4)" src="{{tabIndex == 4?'https://images.facedog.cn/public/chat/notify-active.png':'https://images.facedog.cn/public/chat/notify.png'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(1)" src="{{tabIndex == 1?'https://images.facedog.cn/public/chat/chat-active.png?3':'https://images.facedog.cn/public/chat/chat.png?3'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(2)" src="{{tabIndex == 2?'https://images.facedog.cn/public/chat/like-active.png?3':'https://images.facedog.cn/public/chat/like.png?3'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(3)" src="{{tabIndex == 3?'https://images.facedog.cn/public/chat/friends-active.png?3':'https://images.facedog.cn/public/chat/friends.png?3'}}" mode="aspectFill"></image>
+            <image class="tab" @tap="tabClick(4)" src="{{tabIndex == 4?'https://images.facedog.cn/public/chat/notify-active.png?3':'https://images.facedog.cn/public/chat/notify.png?3'}}" mode="aspectFill"></image>
         </view>
         <scroll-view scroll-y style="height:{{scrollHeight}}px" class="scroll" wx:if="{{tabIndex == 1}}">
             <chatList />
@@ -47,7 +47,6 @@ export default class Chat extends wepy.component {
         tabIndex: 1,
         scrollHeight: 0
     };
-
     components = {
         like,
         chatList,
@@ -141,11 +140,15 @@ export default class Chat extends wepy.component {
         Event.listen('send', () => {
             this.initRecentContactList();
         });
+        Event.listen('tab', (tab) => {
+            this.tabIndex = tab;
+            console.log('tab', tab);
+            if (tab == 2) {
+                this.$invoke('like', 'initData');
+            }
+            this.$apply();
+        });
         this.$apply();
-    }
-
-    onShow() {
-        initChat();
     }
     // 初始化聊天界面最近会话列表
     initRecentContactList() {
@@ -154,7 +157,7 @@ export default class Chat extends wepy.component {
         webim.getRecentContactList(
             {
                 // 获取会话列表的方法
-                Count: 20 // 最近的会话数 ,最大为 100
+                Count: 100 // 最近的会话数 ,最大为 100
             },
             function(resp) {
                 wx.hideLoading();
@@ -170,7 +173,7 @@ export default class Chat extends wepy.component {
                             'getChatList',
                             resp.SessionItem
                         );
-                        that.initUnreadMsgCount(that);
+                        that.initUnreadMsgCount(that, null, true);
                     }
                 }
             },
@@ -180,12 +183,12 @@ export default class Chat extends wepy.component {
         );
     }
     // 初始化最近会话的消息未读数（这个方法用不到，多余，这是个坑，登录之后仍然返回空对象）
-    initUnreadMsgCount(that, msg) {
+    initUnreadMsgCount(that, msg, init = false) {
         console.warn('这是未读信息的位置!!!!!!');
         var sessMap = webim.MsgStore.sessMap();
-        var sess = null;
         console.log(sessMap);
-        that.$invoke('chatList', 'receivingMsg', sessMap, msg || {});
+        var sess = null;
+        that.$invoke('chatList', 'receivingMsg', sessMap, msg || {}, init);
     }
 }
 </script>

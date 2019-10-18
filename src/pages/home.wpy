@@ -2,26 +2,40 @@
 <template>
     <view class="wrapper" wx:if="{{show}}" style="padding-top:{{isphoneX?'100rpx':'0'}};height:{{isphoneX?'93vh':'100vh'}}">
         <view class="wrap">
-            <image class="top" src="https://images.facedog.cn/public/index/top.png" mode="aspectFill"></image>
-            <image class="middle" src="https://images.facedog.cn/public/index/middle.png" mode="aspectFit"></image>
+            <image class="logo" src="https://images.facedog.cn/public/discover/welcome.png?1" mode="aspectFill"></image>
             <view class="bottom">
-                <image class="btn try" src="https://images.facedog.cn/public/index/try.png" @tap="onGotUserInfo" mode="scaleToFill"></image>
-                <image class="btn deny" src="https://images.facedog.cn/public/index/deny.png" @tap="go" mode="scaleToFill"></image>
+                <form report-submit='true' bindsubmit='submitForm'>
+                    <!-- <image class="btn try" src="https://images.facedog.cn/public/index/try.png" @tap="onGotUserInfo" mode="scaleToFill"></image>          </view> -->
+                    <button size="large" wx:if="{{showPositionButton}}" form-type='submit' @tap="onGetPosition">进入颜狗</button>
+                    <!-- <button size="large" wx:if="{{showUserInfoButton}}" from-type='submit' open-type="getUserInfo" bindgetuserinfo="onGetUserInfo">微信授权登录</button> -->
+                </form>
             </view>
-            <!-- <button size="large" @tap="onGotUserInfo">进入颜狗</button> -->
+            <!-- <view class="tag" @tap="redirect">什么是颜狗？</view> -->
+        </view>
+        <view class="loadingLayer" wx:if="{{loading}}">
+            <view class="loading">
+                <view class="icon">
+                    <van-loading type="spinner" color="#ccc" />
+                </view>
+                <view class="text">请稍后...</view>
+            </view>
         </view>
     </view>
 </template>
 
 <script>
 import wepy from 'wepy';
-
+import { post } from '@/utils/request';
+import { LOGIN, SUBMIT_FORMID } from '@/utils/url';
+let inviteUserId = '';
 export default class Home extends wepy.page {
     config = {
         navigationBarTitleText: '颜狗',
-        navigationBarBackgroundColor: '#000',
-        navigationBarTextStyle: 'white'
+        usingComponents: {
+            'van-loading': '../../components/vant/loading/index'
+        }
     };
+
     data = {
         show: false,
         code: '',
@@ -29,35 +43,61 @@ export default class Home extends wepy.page {
         verify: false,
         certify: false,
         name: '',
-        isphoneX: false
+        isphoneX: false,
+        showPositionButton: true,
+        // showUserInfoButton: false,
+        loading: false
     };
 
     components = {};
 
     methods = {
-        async onGotUserInfo(e) {
-            // var that = this;
-            this.getLocationAuth();
-            // console.log(res.authSetting['scope.userLocation']);
-            // if (
-            //     res.authSetting['scope.userLocation'] != undefined &&
-            //     res.authSetting['scope.userLocation'] != true
-            // ) {
-            // that.$emit('getLocationAuth', this.$parent);
-            // } else {
-            //     //初始化进入
-            //     that.$emit('changeStep', 2);
-            //     that.$apply();
-            // }
-            // }
-            // });
+        async submitForm(e) {
+            await post(SUBMIT_FORMID, {
+                formId: e.detail.formId
+            });
         },
-        go(link) {
-            wepy.setStorageSync(
-                'h5url',
-                'https://mp.weixin.qq.com/s/6IdzS5m2oPTOozZ11uzwfQ'
+        redirect(){
+            wepy.navigateTo({ url: `activity/webview` });
+        },
+        async goLogin(latitude, longitude, t) {
+            t.loading = true;
+            t.$apply();
+            const result = await post(
+                LOGIN,
+                { code: wepy.getStorageSync('code') },
+                {
+                    latitude,
+                    longitude
+                }
             );
-            wepy.navigateTo({ url: 'activity/webview' });
+            wepy.setStorageSync('welcome', result.welcome);
+            wepy.setStorageSync('token', result.access_token);
+            wepy.setStorageSync('tencent_token', result.tencent_token);
+            wepy.setStorageSync('identifier', result.identifier);
+            if (result.welcome) {
+                wx.redirectTo({
+                    url: `register/chooseGender?userid=${inviteUserId}`
+                });
+            } else {
+                wx.redirectTo({
+                    url: 'index'
+                });
+            }
+        },
+        async onGetPosition(e) {
+            this.getLocationAuth();
+        },
+        onGetUserInfo(e) {
+            console.log(e.detail.userInfo);
+            if (e.detail.errMsg != 'getUserInfo:ok') {
+                return;
+            }
+            wepy.setStorageSync('wx_profile', e.detail.userInfo);
+
+            this.showPositionButton = true;
+            this.showUserInfoButton = false;
+            // this.getUserInfoAuth();
         }
     };
     authorizeLocation() {
@@ -80,10 +120,11 @@ export default class Home extends wepy.page {
         });
     }
     onShareAppMessage() {
+        let user = wx.getStorageSync('profile') || '';
         return {
             title: '好看的人才能加入的高颜值社交圈',
-            path: '/pages/home',
-            imageUrl: 'https://images.facedog.cn/public/index/54.png',
+            path: `/pages/home?userid=${user ? user.ID : ''}`,
+            imageUrl: 'https://images.facedog.cn/public/discover/share.jpeg',
             success: res => {
                 console.log('转发成功', res);
             },
@@ -111,19 +152,20 @@ export default class Home extends wepy.page {
         changeStep(step) {
             this.step = step;
         },
-
         getLocation(t) {
             wx.getLocation({
                 type: 'wgs84',
                 success: res => {
                     wepy.setStorageSync('latitude', res.latitude);
                     wepy.setStorageSync('longitude', res.longitude);
+                    // wepy.redirectTo({
+                    //     url: `register?verify=${t.verify}&certify=${t.certify}&name=${t.name}&userid=${t.code}`
+                    // });
+                    // console.log(t);
                     wx.login({
-                        success: res => {
-                            wepy.setStorageSync('code', res.code);
-                            wepy.redirectTo({
-                                url: `register?verify=${t.verify}&certify=${t.certify}&name=${t.name}&userid=${t.code}`
-                            });
+                        success: ress => {
+                            wepy.setStorageSync('code', ress.code);
+                            t.methods.goLogin(res.latitude, res.longitude, t);
                         }
                     });
                 },
@@ -140,11 +182,34 @@ export default class Home extends wepy.page {
 
     onLoad(options) {
         console.log(options);
+        var that = this;
+        // wx.getSetting({
+        //     success(res) {
+        //         if (res.authSetting['scope.userInfo']) {
+        //             // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+        //             wx.getUserInfo({
+        //                 success(res) {
+        //                     console.log(res.userInfo);
+        //                     wepy.setStorageSync(
+        //                         'nickName',
+        //                         res.userInfo.nickName
+        //                     );
+        //                     that.showPositionButton = true;
+        //                     that.showUserInfoButton = false;
+        //                     that.$apply();
+        //                 }
+        //             });
+        //         } else {
+        //             that.showUserInfoButton = true;
+        //             that.$apply();
+        //         }
+        //     }
+        // });
         if (options.scene) {
-            this.code = options.scene;
+            inviteUserId = options.scene;
         }
         if (options.userid) {
-            this.code = options.userid;
+            inviteUserId = options.userid;
         }
         if (options.verify) {
             this.verify = true;
@@ -181,54 +246,43 @@ export default class Home extends wepy.page {
         // }
     }
 
-    onShow() {}
+    onShow() {
+        console.log(1);
+    }
 }
 </script>
 
 <style lang='less' scoped>
+.tag{
+    text-align: center;
+    color:#b9b9b9;
+    font-size:26rpx;
+    text-decoration: underline;
+    position:absolute;
+    left:50%;
+    bottom:70rpx;
+    transform: translateX(-50%);
+}
 .wrapper {
-    background: #000;
+    background: white;
     width: 100%;
     height: 100vh;
+    overflow: hidden;
     .wrap {
         width: 692rpx;
         margin: 0rpx auto 0;
         .logo {
-            width: 272rpx;
-            height: 557rpx;
-            margin: 0 auto;
+            width: 328rpx;
+            height: 413rpx;
+            margin: 175rpx auto;
             display: block;
         }
         image {
             width: 100%;
         }
-        .top {
-            height: 213rpx;
-        }
-        .middle {
-            width: 692rpx;
-            height: 678rpx;
-            margin: 17rpx auto;
-        }
-        .bottom {
-            width: 692rpx;
-            height: 227rpx;
-            background: url('https://images.facedog.cn/public/index/bottom.png');
-            background-size: cover;
-            position: relative;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            .btn {
-                margin: 25rpx;
-                width: 292rpx;
-                height: 85rpx;
-                margin-top: 90rpx;
-            }
-        }
         button {
-            width: 394rpx;
-            height: 92rpx;
+            width: 420rpx;
+            height: 100rpx;
             background: rgba(0, 0, 0, 1);
             opacity: 1;
             color: #fcfcfc;
@@ -237,8 +291,42 @@ export default class Home extends wepy.page {
             line-height: 92rpx;
             position: absolute;
             left: 50%;
-            bottom: 164rpx;
+            bottom: 156rpx;
             transform: translateX(-50%);
+        }
+    }
+}
+.loadingLayer {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.1);
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200rpx;
+        height: 200rpx;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 10rpx;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        .icon {
+            width: 100%;
+            margin-top: 40rpx;
+            text-align: center;
+            height: 50rpx;
+        }
+        .text {
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 28rpx;
         }
     }
 }

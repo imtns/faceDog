@@ -1,71 +1,98 @@
 <!--  -->
 <template>
-  <view class='wrapper'>
-      <image class="tutorial1" @tap="show(1)" wx:if="{{step1}}" src="https://images.facedog.cn/public/battle/tutorial-1.png" mode="aspectFill">
-      </image>
-      <image class="tutorial2" @tap="show(2)" wx:if="{{step2}}" src="https://images.facedog.cn/public/battle/tutorial-2.png" mode="aspectFill">
-      </image>
-  </view>
+    <view class='wrapper'>
+        <image style="top:{{isphoneX?'106rpx':'0'}}" class="tutorial1" @tap="show(1)" wx:if="{{step1}}" src="https://images.facedog.cn/public/battle/tutorial-1.png?v7" mode="aspectFill">
+        </image>
+        <image style="top:{{isphoneX?'300rpx':'200rpx'}}" class="tutorial2" @tap="show(2)" wx:if="{{step2}}" src="https://images.facedog.cn/public/battle/tutorial-2.png?v7" mode="aspectFill">
+        </image>
+        <image style="top:{{isphoneX?'300rpx':'0'}}" class="tutorial3" @tap="show(3)" wx:if="{{step3}}" src="https://images.facedog.cn/public/battle/tutorial-3.png?v7" mode="aspectFill">
+        </image>
+    </view>
 </template>
 
 <script>
-  import wepy from 'wepy';
-  export default class Turorial extends wepy.component {
-      props = {};
+import wepy from 'wepy';
+export default class Turorial extends wepy.component {
+    props = {};
 
-      data = {
-          step1: true,
-          step2: false
-      };
+    data = {
+        step1: true,
+        step2: false,
+        step3: false,
+        isphoneX: false
+    };
 
-      components = {};
+    components = {};
 
-      methods = {
-          show(num) {
-              if (num == 1) {
-                  this.step2 = true;
-                  this.step1 = false;
-              } else {
-                  this.$emit('closeTutorial');
-              }
-          }
-      };
+    methods = {
+        show(num) {
+            if (num == 1) {
+                this.step2 = true;
+                this.step1 = false;
+            } else if (num == 2) {
+                this.step3 = true;
+                this.step2 = false;
+            } else {
+                this.$emit('closeTutorial');
+            }
+        }
+    };
 
-      events = {};
+    events = {};
 
-      watch = {};
+    watch = {};
 
-      computed = {};
+    computed = {};
 
-      onLoad() { };
+    onLoad() {
+        var that = this;
+        wx.getSystemInfo({
+            success(res) {
+                console.warn(222222222);
+                var name = 'iPhone X';
+                if (res.model.indexOf(name) > -1) {
+                    that.isphoneX = true;
+                    that.$apply();
+                }
+            }
+        });
+    }
 
-      onShow() { };
-  }
+    onShow() {}
+}
 </script>
 
 <style lang='less' scoped>
-.wrapper{
-    width:100%;
+.wrapper {
+    width: 100%;
     height: 100%;
-    position: absolute;;
-    top:0;
-    left:0;
-    background:rgba(0,0,0,0.75);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.75);
     z-index: 99999;
-    .tutorial1{
-        position:absolute;
-        width:690rpx;
-        height:1068rpx;
-        top:0rpx;
-        left:50%;
+    .tutorial1 {
+        position: absolute;
+        width: 690rpx;
+        height: 1068rpx;
+        top: 0rpx;
+        left: 50%;
         transform: translateX(-50%);
     }
-    .tutorial2{
-        position:absolute;
-        width:438rpx;
-        height:660rpx;
-        top:130rpx;
-        left:50%;
+    .tutorial2 {
+        position: absolute;
+        width: 438rpx;
+        height: 660rpx;
+        top: 130rpx;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .tutorial3 {
+        position: absolute;
+        width: 648rpx;
+        height: 465rpx;
+        top: 0rpx;
+        left: 50%;
         transform: translateX(-50%);
     }
 }
