@@ -18,6 +18,7 @@ export default class extends wepy.app {
     config = {
         pages: [
             'pages/home',
+            'pages/test',  // 切换
             'pages/register',
             'pages/index',
             'pages/battle/profile',
@@ -85,6 +86,7 @@ export default class extends wepy.app {
                 if (res.model.indexOf(name) > -1) {
                     that.globalData.isphoneX = true;
                 }
+                console.warn(res);
             }
         });
     }

@@ -72,7 +72,8 @@ export default class Home extends wepy.page {
                 }
             );
             wepy.setStorageSync('welcome', result.welcome);
-            wepy.setStorageSync('token', result.access_token);
+            // wepy.setStorageSync('token', result.access_token);
+           wepy.setStorageSync('token', 'eyJhbGciOiJIUzI1NiJ9.WyJib3RmbTE3NCIsIjA5MTU3MSJd.NiUVCVyhv9yj_H_Q12WVSnYiQ8NgsPeXwoPk33QSSGo');
             wepy.setStorageSync('tencent_token', result.tencent_token);
             wepy.setStorageSync('identifier', result.identifier);
             if (result.welcome) {

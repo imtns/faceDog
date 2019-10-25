@@ -63,6 +63,15 @@
             </view>
             <view class="line"></view>
         </navigator>
+        <navigator url="test" open-type="navigate" hover-class="none">
+            <view class="item">
+                <view class="title">切换</view>
+                <view class="detail2">
+                    <van-icon name="arrow" />
+                </view>
+            </view>
+            <view class="line"></view>
+        </navigator>
     </view>
 </template>
 
