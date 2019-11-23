@@ -24,19 +24,19 @@
 </template>
 
 <script>
-import wepy from 'wepy';
-import { post } from '@/utils/request';
-import { LOGIN, SUBMIT_FORMID } from '@/utils/url';
-let inviteUserId = '';
-export default class Home extends wepy.page {
-    config = {
+    import wepy from 'wepy';
+    import { post } from '@/utils/request';
+    import { LOGIN, SUBMIT_FORMID } from '@/utils/url';
+    let inviteUserId = '';
+    export default class Home extends wepy.page {
+      config = {
         navigationBarTitleText: '颜狗',
         usingComponents: {
-            'van-loading': '../../components/vant/loading/index'
+          'van-loading': '../../components/vant/loading/index'
         }
-    };
+      };
 
-    data = {
+      data = {
         show: false,
         code: '',
         disabled: false,
@@ -47,141 +47,141 @@ export default class Home extends wepy.page {
         showPositionButton: true,
         // showUserInfoButton: false,
         loading: false
-    };
+      };
 
-    components = {};
+      components = {};
 
-    methods = {
+      methods = {
         async submitForm(e) {
-            await post(SUBMIT_FORMID, {
-                formId: e.detail.formId
-            });
+          await post(SUBMIT_FORMID, {
+            formId: e.detail.formId
+          });
         },
-        redirect(){
-            wepy.navigateTo({ url: `activity/webview` });
+        redirect() {
+          wepy.navigateTo({ url: `activity/webview` });
         },
         async goLogin(latitude, longitude, t) {
-            t.loading = true;
-            t.$apply();
-            const result = await post(
-                LOGIN,
-                { code: wepy.getStorageSync('code') },
-                {
-                    latitude,
-                    longitude
-                }
-            );
-            wepy.setStorageSync('welcome', result.welcome);
-            // wepy.setStorageSync('token', result.access_token);
-           wepy.setStorageSync('token', 'eyJhbGciOiJIUzI1NiJ9.WyJib3RmbTE3NCIsIjA5MTU3MSJd.NiUVCVyhv9yj_H_Q12WVSnYiQ8NgsPeXwoPk33QSSGo');
-            wepy.setStorageSync('tencent_token', result.tencent_token);
-            wepy.setStorageSync('identifier', result.identifier);
-            if (result.welcome) {
-                wx.redirectTo({
-                    url: `register/chooseGender?userid=${inviteUserId}`
-                });
-            } else {
-                wx.redirectTo({
-                    url: 'index'
-                });
+          t.loading = true;
+          t.$apply();
+          const result = await post(
+            LOGIN,
+            { code: wepy.getStorageSync('code') },
+            {
+              latitude,
+              longitude
             }
+          );
+          wepy.setStorageSync('welcome', result.welcome);
+          wepy.setStorageSync('token', result.access_token);
+          //    wepy.setStorageSync('token', 'eyJhbGciOiJIUzI1NiJ9.WyJib3RmbTE3NCIsIjA5MTU3MSJd.NiUVCVyhv9yj_H_Q12WVSnYiQ8NgsPeXwoPk33QSSGo');
+          wepy.setStorageSync('tencent_token', result.tencent_token);
+          wepy.setStorageSync('identifier', result.identifier);
+          if (result.welcome) {
+            wx.redirectTo({
+              url: `register/chooseGender?userid=${inviteUserId}`
+            });
+          } else {
+            wx.redirectTo({
+              url: 'index'
+            });
+          }
         },
         async onGetPosition(e) {
-            this.getLocationAuth();
+          this.getLocationAuth();
         },
         onGetUserInfo(e) {
-            console.log(e.detail.userInfo);
-            if (e.detail.errMsg != 'getUserInfo:ok') {
-                return;
-            }
-            wepy.setStorageSync('wx_profile', e.detail.userInfo);
+          console.log(e.detail.userInfo);
+          if (e.detail.errMsg != 'getUserInfo:ok') {
+            return;
+          }
+          wepy.setStorageSync('wx_profile', e.detail.userInfo);
 
-            this.showPositionButton = true;
-            this.showUserInfoButton = false;
-            // this.getUserInfoAuth();
+          this.showPositionButton = true;
+          this.showUserInfoButton = false;
+          // this.getUserInfoAuth();
         }
-    };
-    authorizeLocation() {
+      };
+      authorizeLocation() {
         wx.showModal({
-            title: '是否授权当前位置',
-            content: '需要获取您的地理位置，请确认授权，否则无法使用',
-            success: res => {
-                if (res.cancel) {
-                } else if (res.confirm) {
-                    wx.openSetting({
-                        success: data => {
-                            console.log(data);
-                            if (data.authSetting['scope.userLocation']) {
-                                this.events.getLocation(this);
-                            }
-                        }
-                    });
+          title: '是否授权当前位置',
+          content: '需要获取您的地理位置，请确认授权，否则无法使用',
+          success: res => {
+            if (res.cancel) {
+            } else if (res.confirm) {
+              wx.openSetting({
+                success: data => {
+                  console.log(data);
+                  if (data.authSetting['scope.userLocation']) {
+                    this.events.getLocation(this);
+                  }
                 }
+              });
             }
+          }
         });
-    }
-    onShareAppMessage() {
+      }
+      onShareAppMessage() {
         let user = wx.getStorageSync('profile') || '';
         return {
-            title: '好看的人才能加入的高颜值社交圈',
-            path: `/pages/home?userid=${user ? user.ID : ''}`,
-            imageUrl: 'https://images.facedog.cn/public/discover/share.jpeg',
-            success: res => {
-                console.log('转发成功', res);
-            },
-            fail: res => {
-                console.log('转发失败', res);
-            }
+          title: '好看的人才能加入的高颜值社交圈',
+          path: `/pages/home?userid=${user ? user.ID : ''}`,
+          imageUrl: 'https://images.facedog.cn/public/discover/share.jpeg',
+          success: res => {
+            console.log('转发成功', res);
+          },
+          fail: res => {
+            console.log('转发失败', res);
+          }
         };
-    }
-    getLocationAuth() {
+      }
+      getLocationAuth() {
         wx.getSetting({
-            success: res => {
-                console.log(res.authSetting['scope.userLocation']);
-                if (
-                    res.authSetting['scope.userLocation'] !== undefined &&
-                    res.authSetting['scope.userLocation'] !== true
-                ) {
-                    this.authorizeLocation();
-                } else {
-                    this.events.getLocation(this);
-                }
+          success: res => {
+            console.log(res.authSetting['scope.userLocation']);
+            if (
+              res.authSetting['scope.userLocation'] !== undefined &&
+              res.authSetting['scope.userLocation'] !== true
+            ) {
+              this.authorizeLocation();
+            } else {
+              this.events.getLocation(this);
             }
+          }
         });
-    }
-    events = {
+      }
+      events = {
         changeStep(step) {
-            this.step = step;
+          this.step = step;
         },
         getLocation(t) {
-            wx.getLocation({
-                type: 'wgs84',
-                success: res => {
-                    wepy.setStorageSync('latitude', res.latitude);
-                    wepy.setStorageSync('longitude', res.longitude);
-                    // wepy.redirectTo({
-                    //     url: `register?verify=${t.verify}&certify=${t.certify}&name=${t.name}&userid=${t.code}`
-                    // });
-                    // console.log(t);
-                    wx.login({
-                        success: ress => {
-                            wepy.setStorageSync('code', ress.code);
-                            t.methods.goLogin(res.latitude, res.longitude, t);
-                        }
-                    });
-                },
-                fail: err => {
-                    console.log(err);
-                    t.authorizeLocation();
+          wx.getLocation({
+            type: 'wgs84',
+            success: res => {
+              wepy.setStorageSync('latitude', res.latitude);
+              wepy.setStorageSync('longitude', res.longitude);
+              // wepy.redirectTo({
+              //     url: `register?verify=${t.verify}&certify=${t.certify}&name=${t.name}&userid=${t.code}`
+              // });
+              // console.log(t);
+              wx.login({
+                success: ress => {
+                  wepy.setStorageSync('code', ress.code);
+                  t.methods.goLogin(res.latitude, res.longitude, t);
                 }
-            });
+              });
+            },
+            fail: err => {
+              console.log(err);
+              t.authorizeLocation();
+            }
+          });
         }
-    };
+      };
 
-    watch = {};
-    computed = {};
+      watch = {};
+      computed = {};
 
-    onLoad(options) {
+      onLoad(options) {
         console.log(options);
         var that = this;
         // wx.getSetting({
@@ -207,21 +207,21 @@ export default class Home extends wepy.page {
         //     }
         // });
         if (options.scene) {
-            inviteUserId = options.scene;
+          inviteUserId = options.scene;
         }
         if (options.userid) {
-            inviteUserId = options.userid;
+          inviteUserId = options.userid;
         }
         if (options.verify) {
-            this.verify = true;
-            return;
+          this.verify = true;
+          return;
         }
         if (options.certify) {
-            this.certify = true;
-            return;
+          this.certify = true;
+          return;
         }
         if (options.name === 'reg') {
-            this.name = 'reg';
+          this.name = 'reg';
         }
         // wx.login({
         //     success: res => {
@@ -231,12 +231,12 @@ export default class Home extends wepy.page {
         // });
         var that = this;
         wx.getSystemInfo({
-            success(res) {
-                var name = 'iPhone X';
-                if (res.model.indexOf(name) > -1) {
-                    that.isphoneX = true;
-                }
+          success(res) {
+            var name = 'iPhone X';
+            if (res.model.indexOf(name) > -1) {
+              that.isphoneX = true;
             }
+          }
         });
         // if (wepy.getStorageSync('latitude')) {
         //     wepy.redirectTo({
@@ -245,67 +245,67 @@ export default class Home extends wepy.page {
         // } else {
         this.show = true;
         // }
-    }
+      }
 
-    onShow() {
+      onShow() {
         console.log(1);
+      }
     }
-}
 </script>
 
 <style lang='less' scoped>
-.tag{
-    text-align: center;
-    color:#b9b9b9;
-    font-size:26rpx;
-    text-decoration: underline;
-    position:absolute;
-    left:50%;
-    bottom:70rpx;
-    transform: translateX(-50%);
-}
-.wrapper {
-    background: white;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    .wrap {
+    .tag {
+      text-align: center;
+      color: #b9b9b9;
+      font-size: 26rpx;
+      text-decoration: underline;
+      position: absolute;
+      left: 50%;
+      bottom: 70rpx;
+      transform: translateX(-50%);
+    }
+    .wrapper {
+      background: white;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      .wrap {
         width: 692rpx;
         margin: 0rpx auto 0;
         .logo {
-            width: 328rpx;
-            height: 413rpx;
-            margin: 175rpx auto;
-            display: block;
+          width: 328rpx;
+          height: 413rpx;
+          margin: 175rpx auto;
+          display: block;
         }
         image {
-            width: 100%;
+          width: 100%;
         }
         button {
-            width: 420rpx;
-            height: 100rpx;
-            background: rgba(0, 0, 0, 1);
-            opacity: 1;
-            color: #fcfcfc;
-            font-size: 28rpx;
-            text-align: center;
-            line-height: 92rpx;
-            position: absolute;
-            left: 50%;
-            bottom: 156rpx;
-            transform: translateX(-50%);
+          width: 420rpx;
+          height: 100rpx;
+          background: rgba(0, 0, 0, 1);
+          opacity: 1;
+          color: #fcfcfc;
+          font-size: 28rpx;
+          text-align: center;
+          line-height: 92rpx;
+          position: absolute;
+          left: 50%;
+          bottom: 156rpx;
+          transform: translateX(-50%);
         }
+      }
     }
-}
-.loadingLayer {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    background: rgba(0, 0, 0, 0.1);
-    top: 0;
-    left: 0;
-    z-index: 9999;
-    .loading {
+    .loadingLayer {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      background: rgba(0, 0, 0, 0.1);
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      .loading {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -318,17 +318,17 @@ export default class Home extends wepy.page {
         flex-wrap: wrap;
         justify-content: center;
         .icon {
-            width: 100%;
-            margin-top: 40rpx;
-            text-align: center;
-            height: 50rpx;
+          width: 100%;
+          margin-top: 40rpx;
+          text-align: center;
+          height: 50rpx;
         }
         .text {
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-size: 28rpx;
+          width: 100%;
+          text-align: center;
+          color: white;
+          font-size: 28rpx;
         }
+      }
     }
-}
 </style>

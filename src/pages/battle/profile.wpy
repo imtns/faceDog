@@ -258,7 +258,7 @@ export default class Profile extends wepy.page {
             result.face !== 0 ? (result.face * 100).toFixed(1) : 0;
         this.profile.distance = (this.profile.distance / 1000).toFixed(2);
         this.profile.images.forEach(item => {
-            item.image = item.image + '?x-oss-process=image/resize,w_400,h_400/format,jpg';
+            item.image = item.image + '?x-oss-process=image/resize,w_900,h_900/format,jpg';
             if (item.is_avatar) {
                 this.profile.avartar = item.image;
             }

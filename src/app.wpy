@@ -42,13 +42,15 @@ export default class extends wepy.app {
             'pages/my/contactService', // 联系客服
             'pages/my/myCard', // 生成美图
             'pages/activity/activity',
-            'pages/activity/webview',
+            'pages/activity/webview', // webview页面
             'pages/register/chooseName',
             'pages/register/chooseGender',
             'pages/register/chooseBirth',
-            'pages/register/uploadAvatar',
+            'pages/register/uploadAvatar', // 上传头像
             'pages/register/verify',
-            'pages/register/uploadVideo'
+			'pages/register/uploadVideo',
+			'pages/discover/likeList', // 点赞列表
+			'pages/discover/commentList' // 评论列表
         ],
         window: {
             backgroundTextStyle: 'light',

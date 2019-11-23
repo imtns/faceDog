@@ -1,230 +1,260 @@
 <template>
-    <block wx:if="{{verify}}">
-        <verify />
-    </block>
-    <view wx:if="{{selectedTab == 0}}">
-        <battle />
-    </view>
-    <view wx:if="{{selectedTab == 1}}">
-        <discover />
-    </view>
-    <view wx:if="{{selectedTab == 2}}">
-        <chat />
-    </view>
-    <view wx:if="{{selectedTab == 3}}">
-        <my />
-    </view>
-    <block wx:if="{{tabbarshow}}">
-        <tabbar :tabIndex.sync="selectedTab" />
-    </block>
-    <van-toast id="van-toast" />
+	<block wx:if="{{verify}}">
+		<verify />
+	</block>
+	<!-- <view hidden="{{selectedTab != 0 && test}}">
+		<battle />
+	</view> -->
+	<view wx:if="{{selectedTab == 0}}">
+		<battle1 />
+	</view>
+	<view wx:if="{{selectedTab == 1}}">
+		<discover />
+	</view>
+	<view wx:if="{{selectedTab == 2}}">
+		<chat />
+	</view>
+	<view wx:if="{{selectedTab == 3}}">
+		<my />
+	</view>
+	<block wx:if="{{tabbarshow}}">
+		<tabbar :tabIndex.sync="selectedTab" />
+	</block>
+	<van-toast id="van-toast" />
+	<van-dialog id="van-dialog" />
 </template>
 
 <script>
-    import wepy from 'wepy';
-    import tabbar from '@/components/tabbar';
-    import battle from '@/components/battle/battle';
-    import discover from '@/components/discover/discover';
-    import my from '@/components/my/my';
-    import chat from '@/components/chat/chat';
-    import { sleep } from '@/utils';
-    import testMixin from '@/mixins/test';
-    import { get } from '@/utils/request';
-    import { PROFILE } from '@/utils/url';
-    import { getAge } from '@/utils';
-    import { Event } from '@/utils/event.js';
-    import verify from '@/components/battle/verify';
-    let tabClicked = false;
-    let optionFrom = false;
-    // import { toast } from '@/utils';
-    export default class Index extends wepy.page {
-      config = {
-        navigationBarTitleText: '颜狗FaceDog',
-        // disableScroll: true,
-        usingComponents: {
-          'van-button': '../components/vant/button/index',
-          'van-tabbar': '../components/vant/tabbar/index',
-          'van-tabbar-item': '../components/vant/tabbar-item/index',
-          'van-dialog': '../components/vant/dialog/index',
-          'van-icon': '../components/vant/icon/index',
-          'van-tabs': '../components/vant/tabs/index',
-          'van-tab': '../components/vant/tab/index',
-          'van-popup': '../components/vant/popup/index',
-          'van-overlay': '../components/vant/overlay/index',
-          'van-swipe-cell': '../components/vant/swipe-cell/index',
-          'van-toast': '../components/vant/toast/index'
-        }
-      };
-      components = {
-        tabbar,
-        battle,
-        discover,
-        chat,
-        my,
-        verify
-      };
+	import wepy from 'wepy';
+	import tabbar from '@/components/tabbar';
+	// import battle from '@/components/battle/battle';
+	import battle1 from '@/components/battle/battle1';
+	import discover from '@/components/discover/discover';
+	import my from '@/components/my/my';
+	import chat from '@/components/chat/chat';
+	import { sleep } from '@/utils';
+	import testMixin from '@/mixins/test';
+	import { get } from '@/utils/request';
+	import { PROFILE } from '@/utils/url';
+	import { getAge } from '@/utils';
+	import { Event } from '@/utils/event.js';
+	import verify from '@/components/battle/verify';
+	let tabClicked = false;
+	let optionFrom = false;
+	// import { toast } from '@/utils';
+	export default class Index extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '谁的颜值更高？',
+	    // disableScroll: true,
+	    usingComponents: {
+	      'van-button': '../components/vant/button/index',
+	      'van-tabbar': '../components/vant/tabbar/index',
+	      'van-tabbar-item': '../components/vant/tabbar-item/index',
+	      'van-dialog': '../components/vant/dialog/index',
+	      'van-icon': '../components/vant/icon/index',
+	      'van-tabs': '../components/vant/tabs/index',
+	      'van-tab': '../components/vant/tab/index',
+	      'van-popup': '../components/vant/popup/index',
+	      'van-overlay': '../components/vant/overlay/index',
+	      'van-swipe-cell': '../components/vant/swipe-cell/index',
+	      'van-toast': '../components/vant/toast/index',
+	      'van-progress': '../components/vant/progress/index'
+	    }
+	  };
+	  components = {
+	    tabbar,
+	    battle1,
+	    discover,
+	    chat,
+	    my,
+	    verify
+	  };
 
-      data = {
-        mynum: 20,
-        userInfo: {
-          nickName: '加载中...'
-        },
-        selectedTab: -1,
-        tabbarshow: true,
-        hide: false,
-        user: {},
-        verify: false,
-        hasProfile: false
-      };
-      computed = {
-        now() {
-          return +new Date();
-        }
-      };
-      methods = {
-        onGotUserInfo(e) {
-          console.log(e.detail.errMsg);
-          console.log(e.detail.userInfo);
-          console.log(e.detail.rawData);
-        },
-        counterEmit(...args) {
-          let $event = args[args.length - 1];
-          console.log(
-            `${this.$name} receive ${$event.name} from ${$event.source.$name}`
-          );
-        }
-      };
-      onPullDownRefresh() {
-        console.error('ssss');
-      }
-      async setProfile() {
-        try {
-          const data = await get(PROFILE, { loading: false });
-          console.warn(data);
-          data.age = (data.birthday && getAge(data.birthday)) || 18;
-          if (data.progress == 'profile') {
-            this.hasProfile = false;
-            this.$apply();
-          } else {
-            this.hasProfile = true;
-          }
-          this.$apply();
-          this.profile = data;
-          this.profile.images &&
-            this.profile.images.forEach(item => {
-              if (item.is_avatar) {
-                this.profile.icon = item.image;
-              }
-            });
-          wepy.setStorageSync('hasProfile', this.hasProfile);
-          this.profile.images = this.switchOrder(this.profile.images);
-          wepy.setStorageSync('profile', this.profile);
-          this.$invoke('my', 'setProfile', this.profile);
-        } catch (e) {
-          console.error(e);
-          this.hasProfile = false;
-          wepy.setStorageSync('hasProfile', false);
-          this.$apply();
-          let profile = wepy.getStorageSync('wx_profile');
-          this.$invoke('my', 'setProfile', profile);
-          // setTimeout(() => {
-          //     wepy.redirectTo({ url: 'home' });
-          // }, 1000);
-        }
-      }
-      switchOrder(d) {
-        var r = [];
-        d.forEach(e => {
-          if (e['is_avatar']) r.unshift(e);
-          else r.push(e);
-        });
-        return r;
-      }
-      events = {
-        tabSelect: (...args) => {
-          let $event = args[args.length - 1];
-          this.selectedTab = $event.source.tabIndex;
-          if (this.selectedTab == 0 && optionFrom) {
-            if (!tabClicked) {
-              tabClicked = true;
-              return;
-            }
-            this.$invoke('battle', 'displayPage');
-          }
-          if (this.selectedTab == 2) {
-            // this.$invoke('chat', 'initChat');
-          }
-          if (this.selectedTab == 3) {
-            // this.$invoke('my', 'setProfile');
-          } else if (this.selectedTab == 1) {
-            // this.$invoke('discover', 'initList');
-            this.$invoke('discover', 'initList');
-          }
-        },
-        unreadSet(num) {
-          this.$invoke('tabbar', 'unreadSet', num);
-        },
-        showtab(status) {
-          this.tabbarshow = status;
-          this.$apply();
-        },
-        getProfile() {
-          this.setProfile();
-        }
-      };
-      onLoad(options) {
-        if (options.select) {
-          optionFrom = true;
-          this.selectedTab = options.select;
-          setTimeout(() => {
-            if (options.select == 2) {
-              Event.trigger('tab', options.tab);
-            }
-          }, 500);
-          console.log(options.select);
-          this.$apply();
-          // return;
-        } else {
-          this.selectedTab = 0;
-        }
-
-        this.$invoke('discover', 'initList');
-        this.$invoke('chat', 'initChat');
-        Event.listen('refresh', () => {
-          this.$invoke('discover', 'initList', { page: 1 });
-        });
-        this.user = wx.getStorageSync('profile');
-        this.setProfile();
-        Event.listen('showVerify', status => {
-          this.verify = status;
-          this.$apply();
-        });
-      }
-      onShareAppMessage() {
-        return {
-          title: '好看的人才能加入的高颜值社交圈',
-          path: `/pages/home?userid=${this.user.ID}`,
-          imageUrl: 'https://images.facedog.cn/public/discover/share.jpeg',
-          success: res => {
-            console.log('转发成功', res);
-          },
-          fail: res => {
-            console.log('转发失败', res);
-          }
-        };
-      }
-      onShow() {
-        this.setProfile();
-        // this.$invoke('chat', 'initChat');
-        if (this.selectedTab === 2) {
-          // this.$invoke('chat', 'initChat');
-        } else if (this.selectedTab === 3) {
-          // this.setProfile();
-          // this.$invoke('my', 'setProfile', this.profile);
-        }
-      }
-      onHide() {
-        this.hide = true;
-      }
-    }
+	  data = {
+	    mynum: 20,
+	    userInfo: {
+	      nickName: '加载中...'
+	    },
+	    test: false,
+	    selectedTab: -1,
+	    tabbarshow: true,
+	    hide: false,
+	    user: {},
+	    verify: false,
+	    hasProfile: false
+	  };
+	  computed = {
+	    now() {
+	      return +new Date();
+	    }
+	  };
+	  methods = {
+	    onGotUserInfo(e) {
+	      console.log(e.detail.errMsg);
+	      console.log(e.detail.userInfo);
+	      console.log(e.detail.rawData);
+	    },
+	    counterEmit(...args) {
+	      let $event = args[args.length - 1];
+	      console.log(
+	        `${this.$name} receive ${$event.name} from ${$event.source.$name}`
+	      );
+	    }
+	  };
+	  onPullDownRefresh() {
+	    console.error('ssss');
+	  }
+	  async setProfile() {
+	    try {
+	      const data = await get(PROFILE, { loading: false });
+	      console.warn(data);
+	      data.age = (data.birthday && getAge(data.birthday)) || 18;
+	      if (data.progress == 'profile') {
+	        this.hasProfile = false;
+	        this.$apply();
+	      } else {
+	        this.hasProfile = true;
+	      }
+	      this.$apply();
+	      this.profile = data;
+	      this.profile.images &&
+	        this.profile.images.forEach(item => {
+	          if (item.is_avatar) {
+	            this.profile.icon = item.image;
+	          }
+	        });
+	      wepy.setStorageSync('hasProfile', this.hasProfile);
+	      this.profile.images = this.switchOrder(this.profile.images);
+	      wepy.setStorageSync('profile', this.profile);
+	      this.$invoke('my', 'setProfile', this.profile);
+	    } catch (e) {
+	      console.error(e);
+	      this.hasProfile = false;
+	      wepy.setStorageSync('hasProfile', false);
+	      this.$apply();
+	      let profile = wepy.getStorageSync('wx_profile');
+	      this.$invoke('my', 'setProfile', profile);
+	      // setTimeout(() => {
+	      //     wepy.redirectTo({ url: 'home' });
+	      // }, 1000);
+	    }
+	  }
+	  switchOrder(d) {
+	    var r = [];
+	    d.forEach(e => {
+	      if (e['is_avatar']) r.unshift(e);
+	      else r.push(e);
+	    });
+	    return r;
+	  }
+	  events = {
+	    tabSelect: (...args) => {
+	      let $event = args[args.length - 1];
+	      this.selectedTab = $event.source.tabIndex;
+	      if (this.selectedTab == 0) {
+	        wx.setNavigationBarTitle({
+	          title: '谁的颜值更高？'
+	        });
+	        if (optionFrom) {
+	          if (!tabClicked) {
+	            tabClicked = true;
+	            return;
+	          }
+	        //   this.$invoke('battle', 'displayPage');
+	        }
+	        this.$invoke('battle1', 'init');
+	      }
+	      if (this.selectedTab == 2) {
+	        wx.setNavigationBarTitle({
+	          title: ''
+	        });
+	        this.$invoke('chat', 'initLike');
+	      }
+	      if (this.selectedTab == 3) {
+	        wx.setNavigationBarTitle({
+	          title: ''
+	        });
+	        // this.$invoke('my', 'setProfile');
+	      } else if (this.selectedTab == 1) {
+	        wx.setNavigationBarTitle({
+	          title: '发现'
+	        });
+	        this.$invoke('discover', 'initList');
+	      }
+	    },
+	    unreadSet(num) {
+	      this.$invoke('tabbar', 'unreadSet', num);
+	    },
+	    showtab(status) {
+	      this.tabbarshow = status;
+	      this.$apply();
+	    },
+	    getProfile() {
+	      this.setProfile();
+	    }
+	  };
+	  onLoad(options) {
+	    if (options.test) {
+	      this.test = true;
+	    }
+	    if (options.select) {
+	      optionFrom = true;
+	      this.selectedTab = options.select;
+	      setTimeout(() => {
+	        if (options.select == 2) {
+	          Event.trigger('tab', options.tab);
+	          wx.setNavigationBarTitle({
+	            title: ''
+	          });
+	        }
+	      }, 500);
+	      console.log(options.select);
+	      this.$apply();
+	      // return;
+	    } else {
+	      this.selectedTab = 0;
+	    }
+	    this.$invoke('battle1', 'init');
+	    this.$invoke('discover', 'initList');
+	    this.$invoke('chat', 'initChat');
+	    Event.listen('refresh', () => {
+	      this.$invoke('discover', 'initList', { page: 1 });
+	    });
+	    this.user = wx.getStorageSync('profile');
+	    this.setProfile();
+	    Event.listen('showVerify', status => {
+	      this.verify = status;
+	      this.$apply();
+	    });
+	  }
+	  onShareAppMessage() {
+	    return {
+	      title: '好看的人才能加入的高颜值社交圈',
+	      path: `/pages/home?userid=${this.user.ID}`,
+	      imageUrl: 'https://images.facedog.cn/public/discover/share.jpeg',
+	      success: res => {
+	        console.log('转发成功', res);
+	      },
+	      fail: res => {
+	        console.log('转发失败', res);
+	      }
+	    };
+	  }
+	  onShow() {
+	    this.setProfile();
+	    // this.$invoke('chat', 'initChat');
+	    if (this.selectedTab === 0) {
+	      //   this.$invoke('battle', 'init');
+	    }
+	    if (this.selectedTab === 2) {
+	      // this.$invoke('chat', 'initChat');
+	    } else if (this.selectedTab === 3) {
+	      // this.setProfile();
+	      // this.$invoke('my', 'setProfile', this.profile);
+	    }
+	  }
+	  onHide() {
+	    this.hide = true;
+	  }
+	}
 </script>

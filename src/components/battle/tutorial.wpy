@@ -1,11 +1,11 @@
 <!--  -->
 <template>
     <view class='wrapper'>
-        <image style="top:{{isphoneX?'106rpx':'0'}}" class="tutorial1" @tap="show(1)" wx:if="{{step1}}" src="https://images.facedog.cn/public/battle/tutorial-1.png?v7" mode="aspectFill">
+        <image style="top:{{isphoneX?'106rpx':'0'}}" class="tutorial1" @tap="show(1)" wx:if="{{step1}}" src="https://images.facedog.cn/public/battle/tutorial/guide1.png?v2" mode="aspectFill">
         </image>
-        <image style="top:{{isphoneX?'300rpx':'200rpx'}}" class="tutorial2" @tap="show(2)" wx:if="{{step2}}" src="https://images.facedog.cn/public/battle/tutorial-2.png?v7" mode="aspectFill">
+        <image style="bottom:5rpx" class="tutorial2" @tap="show(2)" wx:if="{{step2}}" src="https://images.facedog.cn/public/battle/tutorial/guide2.png?v7" mode="aspectFill">
         </image>
-        <image style="top:{{isphoneX?'300rpx':'0'}}" class="tutorial3" @tap="show(3)" wx:if="{{step3}}" src="https://images.facedog.cn/public/battle/tutorial-3.png?v7" mode="aspectFill">
+        <image style="top:{{isphoneX?'300rpx':'0'}}" class="tutorial3" @tap="show(3)" wx:if="{{step3}}" src="https://images.facedog.cn/public/battle/tutorial/guide3.png" mode="aspectFill">
         </image>
     </view>
 </template>
@@ -48,7 +48,6 @@ export default class Turorial extends wepy.component {
         var that = this;
         wx.getSystemInfo({
             success(res) {
-                console.warn(222222222);
                 var name = 'iPhone X';
                 if (res.model.indexOf(name) > -1) {
                     that.isphoneX = true;
@@ -73,7 +72,7 @@ export default class Turorial extends wepy.component {
     z-index: 99999;
     .tutorial1 {
         position: absolute;
-        width: 690rpx;
+        width: 750rpx;
         height: 1068rpx;
         top: 0rpx;
         left: 50%;
@@ -81,18 +80,17 @@ export default class Turorial extends wepy.component {
     }
     .tutorial2 {
         position: absolute;
-        width: 438rpx;
-        height: 660rpx;
-        top: 130rpx;
-        left: 50%;
+		width: 547rpx;
+		height:490rpx;
+        left: 51%;
         transform: translateX(-50%);
     }
     .tutorial3 {
         position: absolute;
         width: 648rpx;
-        height: 465rpx;
         top: 0rpx;
-        left: 50%;
+		left: 50%;
+		height: 600rpx;
         transform: translateX(-50%);
     }
 }

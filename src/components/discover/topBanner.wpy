@@ -1,8 +1,8 @@
 <!--  -->
 <template>
     <view class="top">
-        <image  class="banner" src="https://images.facedog.cn/public/discover/my-rank.png" @tap="toMyRank"></image>
-        <image  class="banner" src="https://images.facedog.cn/public/discover/rank-list.png" @tap="toRank"></image>
+        <image  class="banner" src="https://images.facedog.cn/public/discover/my-rank.png?1" @tap="toMyRank"></image>
+        <image  class="banner" src="https://images.facedog.cn/public/discover/rank-list.png?1" @tap="toRank"></image>
     </view>
 </template>
 <script>
@@ -40,13 +40,19 @@ export default class topBanner extends wepy.component {
 <style lang='less' scoped>
 .top{
     display: flex;
-    padding: 47rpx 17rpx;
+    padding: 47rpx 0rpx 24rpx;
     justify-content: space-between;
     border-bottom:1rpx solid rgba(226,225,225,1);
     margin: 0 30rpx;
     .banner{
-      width: 304rpx;
+      width: 335rpx;
       height: 130rpx;
+      &:first-child{
+          margin-right: 10rpx;
+      }
+      &:last-child{
+          margin-left:10rpx;
+      }
     }
 }
 </style>

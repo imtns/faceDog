@@ -2,7 +2,7 @@
 // 获取token
 export const LOGIN = '/api/auth/access_token';
 // 提交用户信息
-export const PROFILE = '/api/user/profile';
+export const PROFILE = '/api/v1.5/user/profile';
 // 根据用户邀请码直接认证
 export const VERIFY = '/api/user/certify/code';
 // 资料删除照片
@@ -54,3 +54,4 @@ export const USER_REGISTER = '/api/user/register';
 // 提交formid
 export const USER_VERIFY = '/api/user/justify';
 // 认证
+export const MY_FAVORITE = '/api/v1.5/face/favorites' // 收藏夹

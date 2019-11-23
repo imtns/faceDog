@@ -2,70 +2,89 @@
 <template>
     <repeat for="{{momentList}}" key="index" index="index" item="item">
         <view class="momentCard">
-            <image class="header" src="{{item.avatar}}" mode="aspectFill" @tap="toProfile({{item.user_id}})"></image>
+            <view class="top-part">
+                <image class="header" src="{{item.avatar}}" mode="aspectFill" @tap="toProfile({{item.user_id}})"></image>
+                <view class="first">
+                    <view class="name">{{item.nickname || item.nick_name}}</view>
+                    <view class="other">
+                        <!-- <text class="location">距您 {{item.distance}}km</text> -->
+                        {{item.juli}}
+
+                    </view>
+                </view>
+                <view class="second">
+                    <!-- <text class="margin-right" wx:if="{{item.gender === 'male'}}">{{item.age}}岁</text>
+                        <text class="margin-right" wx:else>{{item.age}}岁</text> -->
+                    <!-- <text class="margin-right">
+
+                    </text> -->
+                    <image src="https://images.facedog.cn/public/discover/icon-location.png" mode="aspectFill">
+                    </image> <text class="online-time">{{item.province}}</text>
+                    <!-- {{item.age}}岁 | {{item.constellation}} | {{item.province}} {{item.city}} {{item.distance ? ' | ' + item.distance + 'km' : ''}} -->
+                </view>
+            </view>
             <view class="content">
                 <view class="info">
-                    <view class="first">
-                        <view class="name">{{item.nickname || item.nick_name}}</view>
-                        <view class="other">
-                            <!-- <text class="location">距您 {{item.distance}}km</text> -->
-                            <text class="online-time">{{item.juli}}</text>
-                        </view>
-                    </view>
-                    <view class="second">
-                        <!-- <text class="margin-right" wx:if="{{item.gender === 'male'}}">{{item.age}}岁</text>
-                        <text class="margin-right" wx:else>{{item.age}}岁</text> -->
-                        <text class="margin-right">{{item.age}}岁 | {{item.constellation}} | {{item.province}} {{item.city}} {{item.distance ? ' | ' + item.distance + 'km' : ''}}</text>
-                    </view>
-                    <view class="moment" @tap="toMomentDetail({{item._id}})">
-                        <text  selectable='true'>{{item.content}}</text>
-                    </view>
                     <view class="imgs">
-                        <repeat for="{{item.images}}" key="indeximages" index="indeximages" item="pic" wx:if="{{item.images.length > 1}}">
-                            <image class="img" src="{{pic.thumbnail_url}}" data-index="{{index}}" data-picIndex="{{indeximages}}" @tap="preview" mode="aspectFill"></image>
-                        </repeat>
-                        <image class="imgOne" src="{{item.images[0].thumbnail_url}}" data-index="{{index}}" data-picIndex="{{0}}" @tap="preview" mode="aspectFill" wx:if="{{item.images.length == 1}}"></image>
+                        <swiper indicator-dots="{{item.images.length>1}}" indicator-color="rgba(255,255,255,.3)" indicator-active-color="#fff" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
+                            <repeat for="{{item.images}}" key="indeximages" index="indeximages" item="pic">
+                                <swiper-item>
+                                    <image class="img" src="{{pic.thumbnail_url}}" data-index="{{index}}" data-picIndex="{{indeximages}}" @tap="preview" mode="aspectFill"></image>
+                                </swiper-item>
+                            </repeat>
+                        </swiper>
                     </view>
                     <view class="actions">
-                        <view  class="box  {{item.liked?'red':''}}" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
-                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-zaned.png?c2" wx:if="{{item.liked}}"></image>
-                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c3" wx:else></image>
-                            <view wx:if="{{item.liked}}" class="text liked">{{item.likes.length || 0}}</view>
-                            <view wx:else class="text">{{item.likes.length || 0}}</view>
+                        <view class="post-info">
+                            <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
+                                <view class="like-box" wx:if="{{indexlikes<3}}">
+                                    <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" mode="aspectFill"></image>
+                                </view>
+                            </repeat>
+                            <view class="like-num"><text wx:if="{{item.likes.length>3}}">等</text>{{item.likes.length}}次赞</view>
                         </view>
-                        <view class="box" @tap="comment" data-id="{{item._id}}" data-index="{{index}}" data-userid="{{item.user_id}}">
-                            <image class="icon" src="https://images.facedog.cn/public/discover/discover-commen.png?c3"></image>
-                            <view class="text">私密评论</view>
-                        </view>
-                        <view class="last">
-                            <view class="lastbox" @tap="warn" data-userid="{{item.user_id}}" data-index="{{index}}" data-momentid="{{item._id}}">
-                                <image class="action-icon" src="https://images.facedog.cn/public/discover/discover-actions.png"></image>
+                        <view class="action">
+                            <view class="box  {{item.liked?'red':''}}" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
+                                <image class="icon" src="https://images.facedog.cn/public/discover/icon-like.png" wx:if="{{item.liked}}"></image>
+                                <image class="icon" src="https://images.facedog.cn/public/discover/icon-unlike.png" wx:else></image>
+                                <!-- <view wx:if="{{item.liked}}" class="text liked">{{item.likes.length || 0}}</view>
+                                <view wx:else class="text">{{item.likes.length || 0}}</view> -->
+                            </view>
+                            <view class="box" @tap="comment" data-id="{{item._id}}" data-index="{{index}}" data-userid="{{item.user_id}}">
+                                <image class="icon" src="https://images.facedog.cn/public/discover/icon-comment.png"></image>
+                            </view>
+                            <view class="box" @tap="warn" data-userid="{{item.user_id}}" data-index="{{index}}" data-momentid="{{item._id}}">
+                                <image class="action-icon" src="https://images.facedog.cn/public/discover/icon-more.png"></image>
                             </view>
                         </view>
                     </view>
                 </view>
+                <view class="moment" @tap="toMomentDetail({{item._id}})">
+                    <text selectable='true'>{{item.content}}</text>
+                </view>
                 <view class="comment-box">
-                    <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length <= 6 && item.likes.length}}">
+                    <!-- <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length <= 6 && item.likes.length}}">
                         <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c2"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
-                    </view>
-                    <view class="comment-who expand {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && !item.expanded}}">
+                    </view> -->
+                    <view class="comment-total" wx:if="{{item.comments.length}}">共{{item.comments.length}}条评论</view>
+                    <!-- <view class="comment-who expand {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && !item.expanded}}">
                         <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c2"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar && indexlikes !== 5 }}" @tap="toProfile({{pic.user_id}})"></image>
                             <view class="expand-btn" wx:if="{{ indexlikes === 5 && !item.expanded}}" @tap="expandNow({{index}})">展开</view>
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{ indexlikes === 5 && item.expanded}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
-                    </view>
-                    <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && item.expanded}}">
-                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c2"></image>
+                    </view> -->
+                    <!-- <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length > 6 && item.expanded}}">
+                        <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c5"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                             <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" @tap="toProfile({{pic.user_id}})"></image>
                         </repeat>
                         <view class="expand-btn" @tap="expandFasle({{index}})">收起</view>
-                    </view>
+                    </view> -->
                     <view class="comment-info-box" wx:if="{{item.comments.length}}">
                         <repeat for="{{item.comments}}" key="indexcomments" index="indexcomments" item="comments">
                             <view class="comment-info" @tap="handleCommentAction" data-index="{{index}}" data-commentindex="{{indexcomments}}" data-username="{{comments.user_nick_name}}">
@@ -84,7 +103,7 @@
     <!--点击私密评论的input-->
     <view class="moment-mask" wx:if="{{isShowComment}}" @tap="closeComment">
         <view class="inputbox">
-            <input placeholder="发送私密评论，只有她能看到哦~" focus="{{isShowComment}}" class="inputview" confirm-type="send" bindblur="closeComment" bindconfirm="sendComment" data-componentId="{{componentId}}" data-componentIndex="{{componentIndex}}" data-commentUser="{{commentUser}}" />
+            <input placeholder="发送私密评论，只有Ta能看到哦~" focus="{{isShowComment}}" class="inputview" confirm-type="send" bindblur="closeComment" bindconfirm="sendComment" data-componentId="{{componentId}}" data-componentIndex="{{componentIndex}}" data-commentUser="{{commentUser}}" />
         </view>
     </view>
     <!--回复某个评论的input-->
@@ -108,21 +127,21 @@
     </van-popup>
 
     <!--自己点击三个点 删除动态和取消-->
-    <van-popup class="warn-pop" zIndex="999999" show="{{ showPointsByme }}" position="bottom" bind:close="onClose" >
+    <van-popup class="warn-pop" zIndex="999999" show="{{ showPointsByme }}" position="bottom" bind:close="onClose">
         <view class="warn" @tap="deleteMoment">删除动态</view>
         <view class="warn last" @tap="closeshowPointsByme">取消</view>
     </van-popup>
 </template>
 <script>
-import wepy from 'wepy';
-import { get, post, del } from '../../utils/request';
-import { formatDateFromSeconds } from '../../utils/index';
-import { DELETE_MOMENT } from '@/utils/url';
-import { toast } from '@/utils';
-import { Event } from '@/utils/event.js';
+    import wepy from 'wepy';
+    import { get, post, del } from '../../utils/request';
+    import { formatDateFromSeconds } from '../../utils/index';
+    import { DELETE_MOMENT } from '@/utils/url';
+    import { toast } from '@/utils';
+    import { Event } from '@/utils/event.js';
 
-export default class momentCard extends wepy.component {
-    data = {
+    export default class momentCard extends wepy.component {
+      data = {
         momentList: [],
         isShowComment: false, // 回复评论pop
         componentId: '', // 私密回复的动态id
@@ -136,547 +155,603 @@ export default class momentCard extends wepy.component {
         show: false, // 别人举报的pop
         showPointsByme: false, // 自己点击三个点，是删除动态
         clickMomentId: '',
-        clickIndex: 0
-    };
-    components = {};
+        clickIndex: 0,
+        indicatorDots: true,
+        autoplay: false,
+        interval: 2000,
+        duration: 500
+      };
+      components = {};
 
-    methods = {
+      methods = {
         // 收起
         expandFasle(index) {
-            this.momentList[index].expanded = false;
-            this.$apply();
+          this.momentList[index].expanded = false;
+          this.$apply();
         },
         // 展开
         expandNow(index) {
-            this.momentList[index].expanded = true;
-            this.$apply();
+          this.momentList[index].expanded = true;
+          this.$apply();
         },
         // 匿名举报
         async reporting() {
-            await post(`/api/discover/report_moment/${this.clickMomentId}`, {
-                moment_id: this.clickMomentId
-            });
-            toast('匿名举报成功！');
-            this.show = false;
-            this.$apply();
+          await post(`/api/discover/report_moment/${this.clickMomentId}`, {
+            moment_id: this.clickMomentId
+          });
+          toast('匿名举报成功！');
+          this.show = false;
+          this.$apply();
         },
         // 加入黑名单
         async addBlackList() {
-            await post(`/api/discover/shielding/${this.clickMomentId}`, {
-                moment_id: this.clickMomentId
-            });
-            toast('加入黑名单成功！');
-            this.show = false;
-            this.$apply();
+          await post(`/api/discover/shielding/${this.clickMomentId}`, {
+            moment_id: this.clickMomentId
+          });
+          toast('加入黑名单成功！');
+          this.show = false;
+          this.$apply();
         },
         onClose() {
-            this.show = false;
-            this.showPointsByme = false;
-            this.showDelete = false;
-            this.$emit('showtab', true);
+          this.show = false;
+          this.showPointsByme = false;
+          this.showDelete = false;
+          this.$emit('showtab', true);
         },
         async deleteMoment() {
-            await del(DELETE_MOMENT, this.clickMomentId);
-            this.momentList.splice(this.clickIndex, 1);
-            toast('删除成功');
-            this.show = false;
-            this.showPointsByme = false;
-            this.$emit('showtab', true);
-            this.$apply();
+          await del(DELETE_MOMENT, this.clickMomentId);
+          this.momentList.splice(this.clickIndex, 1);
+          toast('删除成功');
+          this.show = false;
+          this.showPointsByme = false;
+          this.$emit('showtab', true);
+          this.$apply();
         },
         warn(e) {
-            const me = wepy.getStorageSync('profile');
-            const ownerId = me._id;
-            const { userid, momentid, index } = e.currentTarget.dataset;
-            if (ownerId == userid) {
-                this.showPointsByme = true;
-            } else {
-                this.show = true;
-            }
-            this.$emit('showtab', false);
-            this.clickMomentId = momentid;
-            this.clickIndex = index;
-            console.log('2222');
+          const me = wepy.getStorageSync('profile');
+          const ownerId = me._id;
+          const { userid, momentid, index } = e.currentTarget.dataset;
+          if (ownerId == userid) {
+            this.showPointsByme = true;
+          } else {
+            this.show = true;
+          }
+          this.$emit('showtab', false);
+          this.clickMomentId = momentid;
+          this.clickIndex = index;
+          console.log('2222');
         },
         // 点击图片预览
         preview(e) {
-            const { index, picindex } = e.currentTarget.dataset;
-            const urls = this.momentList.reduce((res, item, i) => {
-                if (+index === +i) {
-                    res = item.images.map(x => x.image_url);
-                }
-                return res;
-            }, []);
-            const current = urls[picindex];
-            console.log(urls, current);
-            wepy.previewImage({
-                current, // 当前显示图片的http链接
-                urls // 需要预览的图片http链接列表
-            });
+          const { index, picindex } = e.currentTarget.dataset;
+          const urls = this.momentList.reduce((res, item, i) => {
+            if (+index === +i) {
+              res = item.images.map(x => x.image_url);
+            }
+            return res;
+          }, []);
+          const current = urls[picindex];
+          console.log(urls, current);
+          wepy.previewImage({
+            current, // 当前显示图片的http链接
+            urls // 需要预览的图片http链接列表
+          });
         },
         // 处理接口的年龄字段
         handleAge(birthday) {
-            const arr = birthday.split('-');
-            const time = new Date();
-            const cur_year = time.getFullYear();
-            const cur_month = time.getMonth();
-            const cur_day = time.getDate();
-            const baseAge = +cur_year - +arr[0] - 1;
-            console.log(baseAge);
-            if (+arr[1] > cur_month) {
-                return baseAge;
-            } else if (+arr[1] < cur_month) {
-                return baseAge + 1;
+          const arr = birthday.split('-');
+          const time = new Date();
+          const cur_year = time.getFullYear();
+          const cur_month = time.getMonth();
+          const cur_day = time.getDate();
+          const baseAge = +cur_year - +arr[0] - 1;
+          console.log(baseAge);
+          if (+arr[1] > cur_month) {
+            return baseAge;
+          } else if (+arr[1] < cur_month) {
+            return baseAge + 1;
+          } else {
+            if (+arr[2] > cur_day) {
+              return baseAge;
             } else {
-                if (+arr[2] > cur_day) {
-                    return baseAge;
-                } else {
-                    return baseAge + 1;
-                }
+              return baseAge + 1;
             }
+          }
         },
         // 点赞
         async zan(e) {
-            const { id, index } = e.currentTarget.dataset;
-            const me = wepy.getStorageSync('profile');
-            if (this.momentList[index].liked) {
-                // 取消点赞
-                await get(`/api/discover/moment/${id}/unlike`);
-                this.momentList[index].likes = this.momentList[
-                    index
-                ].likes.filter(x => x.user_id !== me._id);
-                this.momentList[index].liked = false;
-                this.$apply();
-            } else {
-                // 点赞
-                let data = null;
-                try {
-                    data = await get(`/api/discover/moment/${id}/like`);
-                } catch (e) {
-                    if (e == '用户未完善资料') {
-                        Event.trigger('showVerify', true,2);
-                    }
-                    return;
-                }
-                // this.momentList[index].likes.length += 1;
-                this.momentList[index].likes.push({
-                    avatar: me.icon + '?x-oss-process=image/resize,w_100,h_100/format,jpg',
-                    user_id: me._id
-                });
-                this.momentList[index].liked = true;
-                this.$apply();
-            }
+          const { id, index } = e.currentTarget.dataset;
+          const me = wepy.getStorageSync('profile');
+          if (this.momentList[index].liked) {
+            // 取消点赞
+            await get(`/api/discover/moment/${id}/unlike`);
+            this.momentList[index].likes = this.momentList[index].likes.filter(
+              x => x.user_id !== me._id
+            );
+            this.momentList[index].liked = false;
             this.$apply();
+          } else {
+            // 点赞
+            let data = null;
+            try {
+              data = await get(`/api/discover/moment/${id}/like`);
+            } catch (e) {
+              if (e == '用户未完善资料') {
+                Event.trigger('showVerify', true, 2);
+              }
+              return;
+            }
+            // this.momentList[index].likes.length += 1;
+            this.momentList[index].likes.push({
+              avatar:
+                me.icon + '?x-oss-process=image/resize,w_100,h_100/format,jpg',
+              user_id: me._id
+            });
+            this.momentList[index].liked = true;
+            this.$apply();
+          }
+          this.$apply();
         },
         // 私密评论
         comment(e) {
-            this.isShowComment = true;
-            const { id, index, userid } = e.currentTarget.dataset;
-            this.componentId = id; // 动态id
-            this.componentIndex = index;
-            this.commentUser = userid;
+          this.isShowComment = true;
+          const { id, index, userid } = e.currentTarget.dataset;
+          this.componentId = id; // 动态id
+          this.componentIndex = index;
+          this.commentUser = userid;
         },
         // 关闭评论
         closeComment() {
-            this.isShowComment = false;
+          this.isShowComment = false;
         },
         // 关闭回复某条评论
         closeCommentCommentReply() {
-            this.isShowCommentReply = false;
+          this.isShowCommentReply = false;
         },
         // 发送评论
         async sendComment(e) {
-            const { value } = e.detail;
-            let data = null;
-            try {
-                data = await post(
-                `/api/discover/comment/${this.componentId}`,
-                    {
-                        moment_id: this.componentId,
-                        content: value
-                    }
-            );
-            } catch (e) {
-                if (e == '用户未完善资料') {
-                    Event.trigger('showVerify', true,2);
-                }
-                return;
-            }
-            const me = wepy.getStorageSync('profile');
-            this.momentList[this.componentIndex].comments.push({
-                _id: data,
-                user_nick_name: me.nick_name,
-                user_id: me._id,
-                replay_user_id: '',
-                replay_user_nick_name: '',
-                content: value
+          const { value } = e.detail;
+          let data = null;
+          try {
+            data = await post(`/api/discover/comment/${this.componentId}`, {
+              moment_id: this.componentId,
+              content: value
             });
-            this.$apply();
-            console.log(data);
+          } catch (e) {
+            if (e == '用户未完善资料') {
+              Event.trigger('showVerify', true, 2);
+            }
+            return;
+          }
+          const me = wepy.getStorageSync('profile');
+          this.momentList[this.componentIndex].comments.push({
+            _id: data,
+            user_nick_name: me.nick_name,
+            user_id: me._id,
+            replay_user_id: '',
+            replay_user_nick_name: '',
+            content: value
+          });
+          this.$apply();
+          console.log(data);
         },
         // 发表回复某一条评论
         async sendReply(e) {
-            const me = wepy.getStorageSync('profile');
-            const { value } = e.detail;
-            const commentId = this.momentList[this.actionItemIndex].comments[
-                this.actionCommentIndex
-            ]._id;
-            const { user_id, user_nick_name } = this.momentList[
-                this.actionItemIndex
-            ].comments[this.actionCommentIndex];
-            const data = await post(
-                `/api/discover/comment/${commentId}/reply`,
-                {
-                    content: value
-                }
-            );
-            this.momentList[this.actionItemIndex].comments.push({
-                content: value,
-                replay_user_id: user_id,
-                replay_user_nick_name: user_nick_name,
-                user_id: me._id,
-                user_nick_name: me.nick_name,
-                _id: data._id
-            });
-            this.$apply();
+          const me = wepy.getStorageSync('profile');
+          const { value } = e.detail;
+          const commentId = this.momentList[this.actionItemIndex].comments[
+            this.actionCommentIndex
+          ]._id;
+          const { user_id, user_nick_name } = this.momentList[
+            this.actionItemIndex
+          ].comments[this.actionCommentIndex];
+          const data = await post(`/api/discover/comment/${commentId}/reply`, {
+            content: value
+          });
+          this.momentList[this.actionItemIndex].comments.push({
+            content: value,
+            replay_user_id: user_id,
+            replay_user_nick_name: user_nick_name,
+            user_id: me._id,
+            user_nick_name: me.nick_name,
+            _id: data._id
+          });
+          this.$apply();
         },
         // 跳转到他的资料页面
         toProfile(id) {
-            wepy.navigateTo({
-                url: `/pages/battle/profile?id=${id}`
-            });
+          wepy.navigateTo({
+            url: `/pages/battle/profile?id=${id}`
+          });
         },
         // 跳转到动态详情页面
         toMomentDetail(id) {
-            if (getCurrentPages()[getCurrentPages().length - 1].route == 'pages/ta/momentDetail') { return; };
-            wepy.navigateTo({
-                url: `/pages/ta/momentDetail?momentId=${id}`
-            });
+          if (
+            getCurrentPages()[getCurrentPages().length - 1].route ==
+            'pages/ta/momentDetail'
+          ) {
+            return;
+          }
+          wepy.navigateTo({
+            url: `/pages/ta/momentDetail?momentId=${id}`
+          });
         },
         // 点击某一条评论
         handleCommentAction(e) {
-            const { index, commentindex, username } = e.currentTarget.dataset;
-            const comment = this.momentList[index].comments[commentindex];
-            console.log('点击某一个评论', comment);
-            const me = wepy.getStorageSync('profile');
-            const ownerId = me._id;
-            if (ownerId == comment.user_id) {
-                this.actionCommentIndex = commentindex;
-                this.actionItemIndex = index;
-                this.showDelete = true;
-                this.$emit('showtab', false);
-                console.log('点击某一个评论', '应该是删除评论');
-            } else {
-                console.log('点击某一个评论', '应该是回复评论');
-                this.actionCommentIndex = commentindex;
-                this.actionItemIndex = index;
-                this.replyUserName = username;
-                this.isShowCommentReply = true;
-            }
+          const { index, commentindex, username } = e.currentTarget.dataset;
+          const comment = this.momentList[index].comments[commentindex];
+          console.log('点击某一个评论', comment);
+          const me = wepy.getStorageSync('profile');
+          const ownerId = me._id;
+          if (ownerId == comment.user_id) {
+            this.actionCommentIndex = commentindex;
+            this.actionItemIndex = index;
+            this.showDelete = true;
+            this.$emit('showtab', false);
+            console.log('点击某一个评论', '应该是删除评论');
+          } else {
+            console.log('点击某一个评论', '应该是回复评论');
+            this.actionCommentIndex = commentindex;
+            this.actionItemIndex = index;
+            this.replyUserName = username;
+            this.isShowCommentReply = true;
+          }
         },
         // 确认删除评论
         async deleteComment() {
-            const comment = this.momentList[this.actionItemIndex].comments[
-                this.actionCommentIndex
-            ];
-            await del(`/api/discover/comment`, comment._id);
-            this.momentList[this.actionItemIndex].comments.splice(this.actionCommentIndex, 1);
-            this.$emit('showtab', true);
-            this.showDelete = false;
-            this.$apply();
+          const comment = this.momentList[this.actionItemIndex].comments[
+            this.actionCommentIndex
+          ];
+          await del(`/api/discover/comment`, comment._id);
+          this.momentList[this.actionItemIndex].comments.splice(
+            this.actionCommentIndex,
+            1
+          );
+          this.$emit('showtab', true);
+          this.showDelete = false;
+          this.$apply();
         },
         // 取消删除弹窗
         cancaleComment() {
-            this.$emit('showtab', true);
-            this.showDelete = false;
+          this.$emit('showtab', true);
+          this.showDelete = false;
         },
         // 关闭举报等的pop
         closewarn() {
-            this.show = false;
-            this.$emit('showtab', true);
+          this.show = false;
+          this.$emit('showtab', true);
         },
         // 关闭自己点击三个点的pop
         closeshowPointsByme() {
-            this.showPointsByme = false;
-            this.$emit('showtab', true);
+          this.showPointsByme = false;
+          this.$emit('showtab', true);
         }
-    };
-    setMomentList(list) {
+      };
+      setMomentList(list) {
         console.log(list);
         this.momentList = list.reduce((res, item) => {
-            // 处理距离
-            if (item.distance || +item.distance === 0) {
-                item.distance = (item.distance / 1000).toFixed(2);
-            }
-            item.images && item.images.forEach(c => {
-                if (c.thumbnail_url.indexOf('x-oss') == -1) {
-                    c.thumbnail_url = c.thumbnail_url + '?x-oss-process=image/resize,w_400,h_400/format,jpg';
-                }
+          // 处理距离
+          if (item.distance || +item.distance === 0) {
+            item.distance = (item.distance / 1000).toFixed(2);
+          }
+          item.images &&
+            item.images.forEach(c => {
+              if (c.thumbnail_url.indexOf('x-oss') == -1) {
+                c.thumbnail_url =
+                  c.image_url +
+                  '?x-oss-process=image/resize,w_900,h_900/format,jpg';
+              }
             });
-            item.likes && item.likes.forEach(d => {
-                d.avatar = d.avatar + '?x-oss-process=image/resize,w_100,h_100/format,jpg';
+          item.likes &&
+            item.likes.forEach(d => {
+              if (d.avatar.indexOf('x-oss') == -1) {
+                d.avatar =
+                  d.avatar + '?x-oss-process=image/resize,w_100,h_100/format,jpg';
+              }
             });
-            if (item.avatar.indexOf('x-oss') == -1) {
-                item.avatar = item.avatar + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
+          if (item.avatar.indexOf('x-oss') == -1) {
+            item.avatar =
+              item.avatar + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
+          }
+          if (item.birthday) {
+            item.age = this.methods.handleAge(item.birthday);
+          }
+          item.juli = formatDateFromSeconds(item.create_time);
+          // // 这里是测试的假数据，记得删除
+          const MOOK_LIKES = [
+            {
+              avatar:
+                'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+              user_id: '5d0de34a563b8b10021cce32'
+            },
+            {
+              avatar:
+                'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+              user_id: '5d0de34a563b8b10021cce32'
+            },
+            {
+              avatar:
+                'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+              user_id: '5d0de34a563b8b10021cce32'
+            },
+            {
+              avatar:
+                'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+              user_id: '5d0de34a563b8b10021cce32'
+            },
+            {
+              avatar:
+                'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+              user_id: '5d0de34a563b8b10021cce32'
+            },
+            {
+              avatar:
+                'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+              user_id: '5d0de34a563b8b10021cce32'
+            },
+            {
+              avatar:
+                'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+              user_id: '5d0de34a563b8b10021cce32'
+            },
+            {
+              avatar:
+                'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
+              user_id: '5d0de34a563b8b10021cce32'
             }
-            if (item.birthday) {
-                item.age = this.methods.handleAge(item.birthday);
-            }
-            item.juli = formatDateFromSeconds(item.create_time);
-            // // 这里是测试的假数据，记得删除
-            const MOOK_LIKES = [{
-                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32'
-            }, {
-                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32'
-            }, {
-                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32'
-            }, {
-                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32'
-            }, {
-                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32'
-            }, {
-                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32'
-            }, {
-                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32'
-            }, {
-                avatar: 'http://ygo.oss-cn-beijing.aliyuncs.com/avatar%2F5d0f22b6540444d6e6cec570-d41d8cd98f00b204e9800998ecf8427e-1562168025.458319.png',
-                user_id: '5d0de34a563b8b10021cce32'
-            }];
-            // item.likes =  item.likes.concat(MOOK_LIKES);
-            // 以上内容记得删除，调试展开功能用的
-            item.expanded = false;
-            res.push(item);
-            return res;
+          ];
+          // item.likes =  item.likes.concat(MOOK_LIKES);
+          // 以上内容记得删除，调试展开功能用的
+          item.expanded = false;
+          res.push(item);
+          return res;
         }, []);
         this.$apply();
+      }
+      events = {};
+
+      watch = {};
+
+      computed = {};
+
+      onLoad() {}
+
+      onShow() {}
     }
-    events = {};
-
-    watch = {};
-
-    computed = {};
-
-    onLoad() {}
-
-    onShow() {}
-}
 </script>
 
 <style lang='less' scoped>
-.moment-mask {
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.7);
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    .inputbox {
+    .moment-mask {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      .inputbox {
         position: absolute;
         bottom: 15vh;
         height: 147rpx;
         width: 100%;
         background: white;
         .inputview {
-            width: 92%;
-            margin: 32rpx auto;
-            background: rgba(230, 229, 232, 1);
-            height: 82rpx;
-            line-height: 82rpx;
-            font-size: 24rpx;
-            color: rgba(158, 157, 157, 1);
-            padding-left: 22rpx;
+          width: 92%;
+          margin: 32rpx auto;
+          background: rgba(230, 229, 232, 1);
+          height: 82rpx;
+          line-height: 82rpx;
+          font-size: 24rpx;
+          color: rgba(158, 157, 157, 1);
+          padding-left: 22rpx;
         }
+      }
     }
-}
-.momentCard {
-    display: flex;
-    padding: 0 26rpx;
-    margin-top: 47rpx;
-    .header {
-        width: 80rpx;
-        height: 80rpx;
-        border-radius: 100%;
-        display: block;
-        margin-right: 16rpx;
-    }
-    .content {
-        flex: 1;
-        .info {
-            .first {
-                display: flex;
-                justify-content: space-between;
-                width: 100%;
-                line-height: 55rpx;
-                .name {
-                    font-size: 28rpx;
-                    font-weight: 600;
-                    color: rgba(0, 0, 0, 1);
-                }
-                .other {
-                    font-size: 20rpx;
-                    font-weight: 400;
-                    color: rgba(158, 157, 157, 1);
-                    .location {
-                        margin-right: 18rpx;
-                    }
-                }
-            }
-            .second {
-                font-size: 20rpx;
-                font-weight: 400;
-                line-height: 28rpx;
-                color: rgba(158, 157, 157, 1);
-                .margin-right {
-                    margin-right: 20rpx;
-                }
-            }
-            .moment {
-                margin-top: 20rpx;
-                font-size: 24rpx;
-                line-height: 36rpx;
-                color: rgba(0, 0, 0, 1);
-            }
-            .imgs {
-                display: flex;
-                flex-wrap: wrap;
-                align-content: flex-start;
-                margin-top: 17rpx;
-                .img {
-                    width: 182rpx;
-                    height: 182rpx;
-                    margin:0rpx 10rpx 10rpx 0;
-                }
-                .imgOne{
-                    width: 364rpx;
-                    height: 364rpx;
-                    margin: 10rpx 10rpx 0 0;
-                }
-            }
-            .actions {
-                display: flex;
-                margin-top: 30rpx;
-                font-size: 0;
-                .box {
-                    background: rgba(245, 245, 245, 1);
-                    padding: 0 20rpx;
-                    margin-right: 40rpx;
-                    border-radius:10rpx;
-                    height: 45rpx;
-                    .icon {
-                        width: 32rpx;
-                        height: 32rpx;
-                        position: relative;
-                        top:9rpx;
-                    }
-                    .text {
-                        font-size: 20rpx;
-                        height: 45rpx;
-                        line-height: 45rpx;
-                        color:#C1BFBF;
-                        // color: rgba(158, 157, 157, 1);
-                        display: inline-block;
-                        margin-left: 5rpx;
-                        &.liked{
-                            color:white;
-                        }
-                    }
-                    &:nth-of-type(1){
-                        .text{
-                            font-size:24rpx;
-                        }
-                        .icon{
-                            top:7rpx;
-                        }
-                    }
-
-                    &.red {
-                        color: white !important;
-                        background:#e60011;
-                    }
-                }
-                .last {
-                    flex: 1;
-                    text-align: right;
-                    display: flex;
-                    flex-direction: column;
-                    .lastbox {
-                        width: 66rpx;
-                        height: 45rpx;
-                        align-self: flex-end;
-                        .action-icon {
-                            width: 37rpx;
-                            height: 9rpx;
-                            margin: 18rpx 0;
-                        }
-                    }
-                }
-            }
+    .momentCard {
+      margin-top: 47rpx;
+      .top-part {
+        display: flex;
+        padding: 0 30rpx;
+        justify-content: space-between;
+        .header {
+          width: 100rpx;
+          height: 100rpx;
+          border-radius: 100%;
+          display: block;
+          margin-right: 18rpx;
         }
-    }
-    .comment-box {
-        background:rgba(250,251,252,1);
-        margin-top: 30rpx;
-        border-radius:10px;
-        .expand{
-            height: 80rpx;
-            overflow: hidden;
-        }
-        .comment-who {
+        .first {
+          margin-right: auto;
+          margin-top: 15rpx;
+          .name {
+            font-size: 32rpx;
+            font-weight: 600;
+            margin-bottom: 10rpx;
+            color: rgba(0, 0, 0, 1);
+          }
+          .other {
+            font-size: 20rpx;
+            font-weight: 400;
+            color: #9e9d9d;
             display: flex;
-            flex-wrap: wrap;
-            &.border{
-                border-bottom: 1px solid rgba(212, 212, 213, 1);
-            }
-            padding-bottom: 23rpx;
-            .icon {
-                width: 32rpx;
-                height: 32rpx;
-                margin: 40rpx 11rpx 21rpx 30rpx;
+            align-items: center;
+          }
+        }
+        .second {
+          font-size: 20rpx;
+          font-weight: 400;
+          display: flex;
+          align-items: center;
+          color: rgba(158, 157, 157, 1);
+          .margin-right {
+            margin-right: 20rpx;
+          }
+          image {
+            width: 40rpx;
+            height: 40rpx;
+            margin-right: 8rpx; ///
+          }
+          .location {
+            margin-right: 18rpx;
+          }
+        }
+      }
+      .content {
+        // flex: 1;
+        width: 100%;
+        .moment {
+          padding: 0 30rpx;
+          margin-top: 33rpx;
+          font-size: 30rpx;
+          font-weight: bold;
+          color: rgba(0, 0, 0, 1);
+          position: relative;
+          padding-bottom: 12rpx;
+          &::after {
+            content: '';
+            position: absolute;
+            width: 690rpx;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 1rpx;
+            bottom: -5rpx;
+            background: rgba(185, 185, 185, 1);
+          }
+        }
+        .info {
+          .imgs {
+            width: 100%;
+
+            margin-top: 17rpx;
+            swiper {
+              width: 100%;
+              height: 750rpx;
             }
             .img {
-                width: 60rpx;
-                height: 60rpx;
-                border-radius: 100%;
-                margin: 23rpx 10rpx 0 10rpx;
+              width: 750rpx;
+              height: 750rpx;
             }
-            .expand-btn{
-                width: 80rpx;
-                height: 60rpx;
-                margin: 23rpx 10rpx 0 10rpx;
-                color:rgba(230,0,17,1);
+            // .imgOne {
+            //   width: 364rpx;
+            //   height: 364rpx;
+            //   margin: 10rpx 10rpx 0 0;
+            // }
+          }
+          .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 17rpx;
+            font-size: 0;
+            padding: 0 30rpx;
+            .post-info {
+              position: relative;
+              display: flex;
+              align-items: center;
+              .like-box {
+                position: relative;
+                float: left;
+                width: 40rpx;
+                height: 40rpx;
+                margin-right: -5rpx;
+                image {
+                  border: 2rpx solid white;
+                  width: 100%;
+                  height: 100%;
+                  border-radius: 50%;
+                }
+              }
+              .like-num {
+                float: left;
+                width: 100rpx;
+                margin-left: 20rpx;
                 font-size: 24rpx;
-                line-height: 60rpx;
-                text-align: center;
+                color: #000;
+                line-height: 24rpx;
+              }
             }
+            .action {
+              display: flex;
+              align-items: center;
+              .box {
+                width: 33rpx;
+                height: 33rpx;
+                display: inline-block;
+                margin-left: 30rpx;
+                image {
+                  width: 100%;
+                  height: 100%;
+                }
+                &:last-child {
+                  width: 36rpx;
+                  height: 10rpx;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .comment-box {
+        padding: 0 30rpx;
+        // background: rgba(250, 251, 252, 1);
+        margin-top: 20rpx;
+        border-radius: 10px;
+        .comment-total {
+          color: #a2a2a2;
+          font-size: 24rpx;
+        }
+        .expand {
+          height: 80rpx;
+          overflow: hidden;
+        }
+        .comment-who {
+          display: flex;
+          flex-wrap: wrap;
+          &.border {
+            border-bottom: 1px solid rgba(212, 212, 213, 1);
+          }
+          padding-bottom: 23rpx;
+          .icon {
+            width: 32rpx;
+            height: 32rpx;
+            margin: 40rpx 11rpx 21rpx 30rpx;
+          }
+          .img {
+            width: 60rpx;
+            height: 60rpx;
+            border-radius: 100%;
+            margin: 23rpx 10rpx 0 10rpx;
+          }
+          .expand-btn {
+            width: 80rpx;
+            height: 60rpx;
+            margin: 23rpx 10rpx 0 10rpx;
+            color: #000;
+            font-size: 24rpx;
+            line-height: 60rpx;
+            text-align: center;
+          }
         }
         .comment-info-box {
-            padding: 19rpx 0;
-            .comment-info {
-                margin: 5rpx 30rpx;
-                font-size: 24rpx;
-                view {
-                    display: inline-block;
-                }
-                .from,
-                .to {
-                    color: rgba(230, 0, 17, 1);
-                    font-weight: 600;
-                }
-                .reply {
-                    margin: 0 5rpx;
-                }
+          padding: 14rpx 0;
+          .comment-info {
+            margin: 5rpx 0rpx;
+            font-size: 24rpx;
+            view {
+              display: inline-block;
             }
+            .from,
+            .to {
+              color: #000;
+              font-weight: 600;
+            }
+            .reply {
+              margin: 0 5rpx;
+            }
+          }
         }
+      }
     }
-}
 </style>

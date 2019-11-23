@@ -7,7 +7,15 @@
                 <van-tab title="全部"></van-tab>
                 <van-tab title="同城"></van-tab>
             </van-tabs>
-            <view class="change" @tap="sbowshowGender">筛选</view>
+            <view class="right-part">
+                <view class="btn" @tap="mkPhoto"><image src="https://images.facedog.cn/public/discover/publish.png" mode="scaleToFill"
+                  lazy-load="false">
+                </image> 发布</view>
+                <view class="btn" @tap="sbowshowGender"><image src="https://images.facedog.cn/public/discover/filter.png" mode="scaleToFill"
+                  lazy-load="false">
+                </image> 筛选</view>
+            </view>
+
         </view>
         <view class="card">
             <block wx:if="{{momentList.length}}">
@@ -17,10 +25,10 @@
                 <empty></empty>
             </block>
         </view>
-        <image class="make-photo" src="https://images.facedog.cn/public/discover/discover-add.png" @tap="mkPhoto"></image>
+        <!-- <image class="make-photo" src="https://images.facedog.cn/public/discover/discover-add.png" @tap="mkPhoto"></image> -->
     </scroll-view>
     <!--筛选的弹窗-->
-    <van-popup class="warn-pop" show="{{ showGender }}" position="bottom" close-on-click-overlay="{{ true }}">
+    <van-popup class="warn-pop" show="{{ showGender }}" position="bottom" bind:click-overlay="closeshowGender">
         <view class="warn" @tap="genderBy('')">全部</view>
         <view class="warn" @tap="genderBy('same')">只看同性</view>
         <view class="warn" @tap="genderBy('not')">只看异性</view>
@@ -184,6 +192,7 @@
       }
       .content-search {
         display: flex;
+        position: relative;
         justify-content: space-between;
         padding: 0 30rpx;
         .tabs {
@@ -200,11 +209,30 @@
             left: -4% !important;
           }
         }
-        .change {
-          line-height: 44px;
-          color: rgba(158, 157, 157, 1);
-          font-size: 14px;
+        .right-part{
+            position:absolute;
+            right:30rpx;
+            top:28rpx;
+            display:flex;
+            .btn{
+                font-size:30rpx;
+                color:#000;
+                display:flex;
+                align-items: center;
+                font-weight: bold;
+                margin-left:25rpx;
+                image{
+                    width:37rpx;
+                    height:37rpx;
+                    margin-right:5rpx;
+                }
+            }
         }
+        // .change {
+        //   line-height: 44px;
+        //   color: rgba(158, 157, 157, 1);
+        //   font-size: 14px;
+        // }
       }
     }
 </style>
