@@ -11,7 +11,7 @@
 		<repeat for="{{list}}" key="index" index="index" item="item">
 			<view class="like-box">
 				<view class="like-list">
-					<image class="avatar" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
+					<image class="avatar" @tap="goProfile({{item.user_id}},{{item.dentifier}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
 					<view class="desc">
 						<view class="left">
 							<view class="name">{{item.nick_name}}</view>
@@ -38,9 +38,9 @@
 <script>
 	import wepy from 'wepy';
 	import { getAge } from '@/utils';
-	import { get, post, del } from '@/utils/request';
+	import { get, post } from '@/utils/request';
 	import empty from '@/components/empty';
-	import { MAKEFRIEND, MY_FAVORITE } from '@/utils/url';
+	import { MAKEFRIEND, MY_FAVORITE,DELETE_FAVORITE } from '@/utils/url';
 	import Dialog from '@/components/vant/dialog/dialog';
 	import Toast from '@/components/vant/toast/toast';
 	export default class Like extends wepy.component {
@@ -64,9 +64,9 @@
 	    toastTip() {
 	      Toast('已发送过好友申请');
 	    },
-	    goProfile(id) {
+	    goProfile(id,dentifier) {
 	      wx.navigateTo({
-	        url: 'battle/profile?dentifier=' + id,
+	        url: `battle/profile?id=${id}&dentifier=${dentifier}`,
 	        success: result => {},
 	        fail: () => {},
 	        complete: () => {}
@@ -100,6 +100,7 @@
 	        user_id: id
 		  });
 		  wx.hideLoading();
+		  Toast('申请成功');
 	      this.initList();
 	      this.$apply();
 	    },
@@ -116,7 +117,7 @@
 	          id.push(item._id);
 	        });
 	      }
-	      await del(MY_FAVORITE, { _id: id });
+	      await post(DELETE_FAVORITE, { id });
 	      Toast('删除成功');
 	      wepy.hideLoading();
 	      this.initList();

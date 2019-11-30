@@ -1,0 +1,73 @@
+<!--  -->
+<template>
+	<view class='wrapper'>
+		<view class="block">
+			<view class="title">数值说明：</view>
+			<view class="content">累计点选次数为用户在首页进行“颜值PK”玩法的次数，该
+				数值及对应等级仅自己可见。</view>
+		</view>
+		<view class="block">
+			<view class="title">用途介绍：</view>
+			<view class="content">累积点选次数会不断累积，在之后版本中的颜币提现、会员
+				特权等功能中会起到重要作用。</view>
+		</view>
+		<view class="block">
+			<view class="title">等级规则：</view>
+			<view class="content">
+				<view class="rules">① 0-9次——默默无闻</view>
+				<view class="rules">② 10-29次——上下其手</view>
+				<view class="rules">③ 30-99次——发报专员</view>
+				<view class="rules">④ 100-999次——审美大师</view>
+				<view class="rules">⑤ 1000次以上——寂寞至尊</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	import { MAKEFRIEND } from '@/utils/url';
+	import { get } from '@/utils/request';
+	export default class LikeHelp extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '累计点击次数'
+	  };
+
+	  data = {
+	    time: {}
+	  };
+
+	  components = {};
+
+	  methods = {};
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  async onLoad() {
+	    this.time = await get(MAKEFRIEND);
+	    this.$apply();
+	  }
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='less'>
+	.wrapper {
+	  width: 100%;
+	  padding-top: 100rpx;
+	  .block {
+	    .title {
+	      margin-bottom: 10rpx;
+	    }
+	    margin: 0 50rpx;
+	    color: #5a5a5a;
+	    font-size: 24rpx;
+	    margin-bottom: 78rpx;
+	  }
+	}
+</style>

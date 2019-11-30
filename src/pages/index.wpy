@@ -35,7 +35,7 @@
 	import { sleep } from '@/utils';
 	import testMixin from '@/mixins/test';
 	import { get } from '@/utils/request';
-	import { PROFILE } from '@/utils/url';
+	import { NEW_PROFILE } from '@/utils/url';
 	import { getAge } from '@/utils';
 	import { Event } from '@/utils/event.js';
 	import verify from '@/components/battle/verify';
@@ -106,7 +106,7 @@
 	  }
 	  async setProfile() {
 	    try {
-	      const data = await get(PROFILE, { loading: false });
+	      const data = await get(NEW_PROFILE, { loading: false });
 	      console.warn(data);
 	      data.age = (data.birthday && getAge(data.birthday)) || 18;
 	      if (data.progress == 'profile') {

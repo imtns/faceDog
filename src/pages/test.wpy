@@ -1,7 +1,7 @@
 <!--  -->
 <template>
     <view class="wrapper">
-        <repeat for="{{11}}" key="index" index="index" item="item">
+        <repeat for="{{40}}" key="index" index="index" item="item">
             <view class="bot" data-code="botfm{{170+index}}" @tap="click">botfm{{index+170}}</view>
         </repeat>
 

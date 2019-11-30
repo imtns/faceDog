@@ -50,7 +50,8 @@ export default class extends wepy.app {
             'pages/register/verify',
 			'pages/register/uploadVideo',
 			'pages/discover/likeList', // 点赞列表
-			'pages/discover/commentList' // 评论列表
+			'pages/discover/commentList', // 评论列表
+			'pages/my/likeHelp' // 评论列表
         ],
         window: {
             backgroundTextStyle: 'light',

@@ -8,7 +8,7 @@
 		<repeat for="{{list}}" key="index" index="index" item="item">
 			<van-swipe-cell class="swipe" right-width="{{ 80 }}" data-userid="{{item._id}}" data-dentifier="{{item.dentifier}}" data-index="{{index}}" async-close bind:close="onClose">
 				<view class="friends-box">
-					<image class="icon" @tap="goProfile({{item.dentifier}})" src="{{item.avatar}}" mode="aspectFill"></image>
+					<image class="icon" @tap="goProfile({{item.dentifier}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
 					<view class="msg" @tap="goChat({{item.dentifier}},{{item.nick_name}},{{item.avatar}})">
 						<view class="name">{{item.nick_name}}</view>
 						<view class="distance">匹配于{{item.month}}/{{item.day}}</view>

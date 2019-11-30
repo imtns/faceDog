@@ -14,14 +14,17 @@
                 <Constellation @getRankListByXZ.user="getRankListByXZ"></Constellation>
             </block>
         </view>
-        <view class="tips">排行榜每天下午5:00更新</view>
+        <!-- <view class="tips">排行榜每天下午5:00更新</view> -->
+		<view class="tips" @tap="changeGender"><image src="https://images.facedog.cn/public/rank/switch-gender.png" mode="scaleToFill"
+		  lazy-load="false">
+		</image></view>
         <block wx:if="{{top3.length}}">
             <rankList :top3.sync="top3" :topOthers.sync="topOthers" :by.sync="by"></rankList>
         </block>
         <block wx:else>
             <empty></empty>
         </block>
-        <image class="menu" mode="aspectFill" src="https://images.facedog.cn/public/profile/menu.png" @tap="showchangeGenderPop"></image>
+        <!-- <image class="menu" mode="aspectFill" src="https://images.facedog.cn/public/profile/menu.png" @tap="showchangeGenderPop"></image> -->
         <view class="drawer_screen" catchtouchmove="myCatchTouch" wx:if="{{changeGenderPop}}">
             <view class="drawer-btn" @tap="changeGender">
                 <image src="https://images.facedog.cn/public/rank/rank-change-gender.png" mode="aspectFill" class="btn"></image>
@@ -245,15 +248,15 @@ export default class fabu extends wepy.page {
         }
     }
     .tips{
-        display: inline-block;
-        font-size: 20rpx;
-        color: darkgrey;
-        width: 40vw;
-        height:44px;
-        line-height: 44px;
-        text-align: right;
-        vertical-align: top;
-        padding-right: 30rpx;
+		position: absolute;
+		right:30rpx;
+		top:20rpx;
+        width: 101rpx;
+        height:40rpx;
+		image{
+			width: 100%;
+			height: 100%;
+		}
     }
     .menu {
         width: 120rpx;

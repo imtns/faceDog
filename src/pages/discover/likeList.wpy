@@ -2,39 +2,32 @@
 <template>
 	<view class='container'>
 		<view class="list">
-			<view class="box">
-				<image src="https://images.facedog.cn/discover/thumbnail-discover-5d3ee3f1630746f89f09437e-d41d8cd98f00b204e9800998ecf8427e-1573124769.711497.jpg?x-oss-process=image/resize,w_900,h_900/format,jpg" mode="aspectFill"></image>
-				<view class="name">
-					王妮尔
+			<repeat for="{{list}}" key="index" index="index" item="item">
+				<view class="box">
+					<image src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
+					<view class="name">
+						{{item.nick_name}}
+					</view>
+					<view class="time">{{item.create_time}}</view>
 				</view>
-				<view class="time">3小时前</view>
-			</view>
-			<view class="box">
-				<image src="https://images.facedog.cn/discover/thumbnail-discover-5d3ee3f1630746f89f09437e-d41d8cd98f00b204e9800998ecf8427e-1573124769.711497.jpg?x-oss-process=image/resize,w_900,h_900/format,jpg" mode="aspectFill"></image>
-				<view class="name">
-					王妮尔
-				</view>
-				<view class="time">3小时前</view>
-			</view>
-			<view class="box">
-				<image src="https://images.facedog.cn/discover/thumbnail-discover-5d3ee3f1630746f89f09437e-d41d8cd98f00b204e9800998ecf8427e-1573124769.711497.jpg?x-oss-process=image/resize,w_900,h_900/format,jpg" mode="aspectFill"></image>
-				<view class="name">
-					王妮尔
-				</view>
-				<view class="time">3小时前</view>
-			</view>
+			</repeat>
 		</view>
 	</view>
 </template>
 
 <script>
 	import wepy from 'wepy';
+
+    import { GET_MOMENT_DETAIL } from '@/utils/url';
+	import { get } from '@/utils/request';
 	export default class LikeList extends wepy.page {
 	  config = {
 	    navigationBarTitleText: '点赞'
 	  };
 
-	  data = {};
+	  data = {
+	    list: []
+	  };
 
 	  components = {};
 
@@ -46,7 +39,11 @@
 
 	  computed = {};
 
-	  onLoad() {}
+	  async onLoad(options) {
+	    let { likes } = await get(`${GET_MOMENT_DETAIL}/${options.id}/comments`);
+	    this.list = likes;
+	    this.$apply();
+	  }
 
 	  onShow() {}
 	}

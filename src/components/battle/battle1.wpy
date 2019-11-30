@@ -9,28 +9,41 @@
 			<repeat key="index" for="{{battleList}}">
 				<swiper-item catchtouchmove="stopTouchMove">
 					<view class="battle-container " style="top:{{isphoneX?'100rpx':'0'}};">
-						<view class="gift-box gift-box-top {{topWave?'wave':''}} {{topDragDistance || bothLikeMove ?'open':''}} "></view>
-						<view class="gift-box gift-box-bottom {{bottomWave?'wave':''}} {{bottomDragDistance || bothLikeMove ?'open':''}} "></view>
+						<view class="cubit-box cubit-box-top">
+							<view class="cubit-heart {{topWave?'wave':''}}" wx:if="{{topDragDistance}}">
+								<image class="{{topWave?'wave':''}}" src="https://images.facedog.cn/public/battle/cubit-star.png" mode="scaleToFill">
+								</image>
+							</view>
+						</view>
+						<view class="cubit-box cubit-box-bottom">
+							<view class="cubit-heart {{bottomWave?'wave':''}}"  wx:if="{{bottomDragDistance}}">
+								<image class="{{bottomWave?'wave':''}}" src="https://images.facedog.cn/public/battle/cubit-star.png" mode="scaleToFill">
+								</image>
+							</view>
+						</view>
 						<view @tap="boxClick({{item.a.originalImages}})" class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[currentMovingID]?'flyTop':''}}" style="transform: translate3d(0px, {{tranTopY[currentMovingID]}}px, 0px)!important;" catch:touchmove="touchTopMove('1')" catch:touchend="touchEnd">
+							<!-- <view @tap="boxClick({{item.a.originalImages}})" class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[currentMovingID]?'flyTop':''}}" style="transform: translate3d(0px, 90px, 0px)!important;" catch:touchmove="touchTopMove('1')" catch:touchend="touchEnd"> -->
 							<image src="{{item.a.images[0]}}" class="{{blurTop?'blur':''}}" mode="aspectFill"></image>
 							<image src="https://images.facedog.cn/public/battle/pick.png" style="opacity:{{opacityTopPick}}" class="pick" mode="aspectFill" />
 							<view class="info" wx:if="{{draggingTop}}">
-								<view class="name">{{item.a.nick_name}}</view>
-								<view class="distance"><text class="number ">{{item.a.distance}}KM</text> <text class="city"> {{item.a.city}}</text></view>
-								<view class="desc">{{item.a.gender}}/{{item.a.age}}/{{item.a.constellation}}</view>
+								<image src="https://images.facedog.cn/public/battle/ssr.png" class="ssr" mode="scaleToFill" />
+								<view class="name">{{item.a.nick_name}}<view class="xingzuo">{{item.a.constellation}}</view>
+								</view>
+								<view class="signature"></text></view>
+								<!-- <view class="desc">{{item.a.gender}}/{{item.a.age}}/{{item.a.constellation}}</view> -->
 							</view>
 							<view class="info" wx:else>
 								<view class="name {{blurTop?'blur':''}}">{{item.a.nick_name}}<text> {{item.a.age}}</text></view>
 								<!-- <view class="desc {{draggingBottom?'blur':''}}">{{item.a.gender}} / {{item.a.age}} / {{item.a.constellation}}</view> -->
-								<view class="distance "><text class="{{blurTop?'blur':''}}">{{item.a.distance}}KM</text> <text class="{{blurTop?'blur':''}}"> {{item.a.city}}</text></view>
+								<view class="distance "><text class="{{blurTop?'blur':''}}">{{item.a.distance}}k'm</text> <text class="{{blurTop?'blur':''}}"> {{item.a.city}}</text></view>
 							</view>
 						</view>
 						<view class="divider {{bothLike?'rotated':''}}" style="top:{{isphoneX?'632rpx':'532rpx'}}" @tap="bothLike">
 							<view class="vs-pic front {{bothLikeRotate ?'rotated':''}} {{!bothLike && !init?'notRotate':''}}">
-								<image src="https://images.facedog.cn/public/battle/fist-left.png" class="left {{fistAnimation?'ani':''}}" mode="aspectFill"></image>
+								<image src="https://images.facedog.cn/public/battle/fist-left.png?2" class="left {{fistAnimation?'ani':''}}" mode="scaleToFill"></image>
 								<image src="https://images.facedog.cn/public/battle/vs.png?7" class="vs {{fistAnimation?'ani':''}} " mode="aspectFill"></image>
 								<image src="https://images.facedog.cn/public/battle/star.png?7" class="star {{fistAnimation?'ani':''}}" mode="aspectFill"></image>
-								<image src="https://images.facedog.cn/public/battle/fist-right.png" class="right  {{fistAnimation?'ani':''}}" mode="aspectFill"></image>
+								<image src="https://images.facedog.cn/public/battle/fist-right.png?2" class="right  {{fistAnimation?'ani':''}}" mode="scaleToFill"></image>
 							</view>
 							<view class="vs-pic back {{bothLikeRotate ?'rotated':''}} {{!bothLike && !init?'notRotate':''}} {{bothLikeMove ?'bothLikeMove':''}}" style="opacity:0">
 								<image src="https://images.facedog.cn/public/battle/both-like.png" class="both-like" mode="aspectFill"></image>
@@ -40,14 +53,17 @@
 							<image src="{{item.b.images[0]}}" class="{{blurBottom?'blur':''}}" mode="aspectFill"></image>
 							<image src="https://images.facedog.cn/public/battle/pick.png" style="opacity:{{opacityBottomPick}}" class="pick" mode="aspectFill" />
 							<view class="info" wx:if="{{draggingBottom}}">
-								<view class="name">{{item.b.nick_name}}</view>
-								<view class="distance"><text class="number">{{item.b.distance}}KM</text> <text class="city"> {{item.b.city}}</text></view>
+								<image class="ssr" src="https://images.facedog.cn/public/battle/ssr.png" mode="scaleToFill" />
+
+								<view class="name">{{item.b.nick_name}}<view class="xingzuo">{{item.b.constellation}}</view>
+								</view>
+								<!-- <view class="distance"><text class="number">{{item.b.distance}}km</text> <text class="city"> {{item.b.city}}</text></view> -->
 								<view class="desc">{{item.b.gender}}/{{item.b.age}}/{{item.b.constellation}}</view>
 							</view>
 							<view class="info" wx:else>
 								<view class="name {{blurBottom?'blur':''}}">{{item.b.nick_name}}<text> {{item.b.age}}</text></view>
 								<!-- <view class="desc {{draggingTop?'blur':''}}">{{item.b.gender}} / {{item.b.age}} / {{item.b.constellation}}</view> -->
-								<view class="distance"><text class="{{blurBottom?'blur':''}}">{{item.b.distance}}KM</text> <text class="{{blurBottom?'blur':''}}"> {{item.b.city}}</text></view>
+								<view class="distance"><text class="{{blurBottom?'blur':''}}">{{item.b.distance}}km</text> <text class="{{blurBottom?'blur':''}}"> {{item.b.city}}</text></view>
 							</view>
 						</view>
 					</view>
@@ -139,7 +155,7 @@
 	  }
 	  // 切换下一组
 	  switchBattle() {
-	    setTimeout(() => {
+	    setTimeout(async () => {
 	      setTimeout(() => {
 	        // battle切换的时候拳头动画还原,200ms正好看不到还原过程
 	        this.fistAnimation = false;
@@ -151,7 +167,8 @@
 
 	      // 判断如果
 	      if (this.battleList.length - this.swiperCurrent < 3) {
-	        // 如果当前组次数已不足3组，加载下一组
+			// 如果当前组次数已不足3组，加载下一组
+			await this.getBattle();
 	      }
 	      this.swiperCurrent++;
 	      this.blurTop = false;
@@ -204,7 +221,7 @@
 	      if (tranY > 80) {
 	        tranY = 80;
 	      }
-	      throttle(this.setValue(tranY, id, 'top'), 300);
+	      throttle(this.setValue(tranY, id, 'top'), 500);
 	      this.opacityTopPick = tranY / 80;
 	      //   this.tranTopY[id] = clientY;
 	      //   this.$apply();
@@ -215,18 +232,18 @@
 	      this.draggingBottom = true;
 	      this.blurTop = true; // 拖动下面的时候上面的背景变blur
 	      let currentTouch = e.changedTouches[0];
-	      this.bottomDragDistance = this.tranBottomY[id] < -205;
+	      this.bottomDragDistance = this.tranBottomY[id] < -185;
 	      let { clientY } = currentTouch;
-	      let tranY = clientY - 440;
+	      let tranY = clientY - 500;
 
-	      if (tranY < -220) {
-	        tranY = -220;
+	      if (tranY < -200) {
+	        tranY = -200;
 	      }
-	      if (tranY > -50) {
-	        tranY = -50;
+	      if (tranY > -80) {
+	        tranY = -80;
 	      }
-	      this.opacityBottomPick = tranY / -220;
-	      throttle(this.setValue(tranY, id, 'bottom'), 300);
+	      this.opacityBottomPick = tranY / -200;
+	      throttle(this.setValue(tranY, id, 'bottom'), 500);
 	      //   this.tranBottomY[this.currentMovingID] = tranY;
 	      //   console.log(tranY);
 	      //   this.$apply();
@@ -543,8 +560,8 @@
 	  }
 	  .left,
 	  .right {
-	    width: 326rpx;
-	    height: 96rpx;
+	    width: 320rpx;
+	    height: 92rpx;
 	    z-index: 2;
 	  }
 	  .both-like {
@@ -554,7 +571,7 @@
 	    transform: translateX(-50%);
 	  }
 	  .left {
-	    left: -10rpx;
+	    left: -6rpx;
 	    transform: translateX(-100%);
 	    &.ani {
 	      animation: fistLeft 0.6s ease-in 1;
@@ -576,7 +593,7 @@
 	    }
 	  }
 	  .right {
-	    right: -10rpx;
+	    right: -6rpx;
 	    transform: translateX(100%);
 	    &.ani {
 	      animation: fistRight 0.6s ease-in 1;
@@ -607,7 +624,7 @@
 	    &.ani {
 	      animation: starShine 0.3s ease-in 1;
 	      animation-fill-mode: both;
-	      animation-delay: 0.3s;
+	      animation-delay: 0.4s;
 	      @keyframes starShine {
 	        0% {
 	          opacity: 0;
@@ -651,54 +668,7 @@
 	  align-items: center;
 	  justify-content: space-between;
 	  box-sizing: border-box;
-
 	  width: 100%;
-	  .heart {
-	    display: flex;
-	    flex-direction: column;
-	    width: 100%;
-	    height: 200vh;
-	    position: absolute;
-	    z-index: 9999;
-	    .top-heart,
-	    .bottom-heart {
-	      position: absolute;
-	      left: 50%;
-	      top: 200rpx;
-	      transform: translateX(-50%);
-	      image {
-	        width: 180rpx;
-	        height: 180rpx;
-	      }
-	    }
-	    .bottom-heart {
-	      top: 700rpx;
-	    }
-	    .bottom-heart.active,
-	    .top-heart.active {
-	      animation: flashHeart 0.6s ease-in-out 1;
-	      animation-fill-mode: both;
-	    }
-	    @keyframes flashHeart {
-	      /** 第一种写法**/
-	      0% {
-	        opacity: 0;
-	        transform: translateX(-50%) scale(0.4, 0.4);
-	      }
-	      30% {
-	        opacity: 1;
-	        transform: translateX(-50%) scale(1, 1);
-	      }
-	      70% {
-	        opacity: 1;
-	        transform: translateX(-50%) scale(1, 1);
-	      }
-	      100% {
-	        opacity: 0;
-	        transform: translateX(-50%) scale(0.4, 0.4);
-	      }
-	    }
-	  }
 	  image {
 	    width: 100%;
 	    height: 100%;
@@ -736,46 +706,107 @@
 	        opacity: 0;
 	      }
 	    }
-	    .gift-box-top {
+	    .cubit-box-top {
 	      top: 20rpx;
-	      &.wave {
-	        animation: boxWave 0.5s ease-in-out 1;
-	        animation-fill-mode: both;
+	      .wave {
+	        animation: boxWave 0.4s ease-in-out 1;
+			animation-fill-mode: both;
+			animation-delay: .4s;
 	      }
 	    }
-	    .gift-box-bottom {
+	    .cubit-box-bottom {
 	      bottom: 20rpx;
-	      &.wave {
-	        animation: boxWave 0.5s ease-in-out 1;
-	        animation-fill-mode: both;
+	      .wave {
+	        animation: boxWave 0.4s ease-in-out 1;
+			animation-fill-mode: both;
+			animation-delay: .4s;
 	      }
 	    }
 	    @keyframes boxWave {
+	      //   0% {
+	      //     transform: translateX(-50%) rotate(-10deg);
+	      //   }
+	      //   25% {
+	      //     transform: translateX(-50%) rotate(10deg);
+	      //   }
+	      //   50% {
+	      //     transform: translateX(-50%) rotate(-10deg);
+	      //   }
+	      //   75% {
+	      //     transform: translateX(-50%) rotate(10deg);
+	      //   }
+	      //   100% {
+	      //     transform: translateX(-50%) rotate(0);
+	      //   }
 	      0% {
-	        transform: translateX(-50%) rotate(-10deg);
+	        opacity: 1;
+	        transform: scale(1);
 	      }
-	      25% {
-	        transform: translateX(-50%) rotate(10deg);
+	      33% {
+	        opacity: 1;
+	        transform: scale(1.15);
 	      }
-	      50% {
-	        transform: translateX(-50%) rotate(-10deg);
-	      }
-	      75% {
-	        transform: translateX(-50%) rotate(10deg);
+	      66% {
+	        opacity: 1;
+	        transform: scale(1);
 	      }
 	      100% {
-	        transform: translateX(-50%) rotate(0);
+	        opacity: 1;
+	        transform: scale(1.15);
 	      }
 	    }
-	    .gift-box {
+	    .cubit-box {
 	      position: absolute;
 	      left: 50%;
 	      transform: translateX(-50%);
-	      width: 203rpx;
-	      height: 106rpx;
-	      background: url(https://images.facedog.cn/public/battle/box-close.png);
-	      background-size: cover;
-	      transform-origin: center;
+	      width: 708rpx;
+	      height: 123rpx;
+	      display: flex;
+	      justify-content: center;
+	      &.cubit-box-top {
+	        background: url(https://images.facedog.cn/public/battle/cubit-top.png);
+	        background-size: cover;
+	        transform-origin: center;
+	      }
+	      &.cubit-box-bottom {
+	        background: url(https://images.facedog.cn/public/battle/cubit-bottom.png);
+	        background-size: cover;
+	        transform-origin: center;
+	        .cubit-heart {
+	          position: relative;
+	          top: 40rpx;
+	        }
+	      }
+	      .cubit-heart {
+	        width: 95rpx;
+	        height: 82rpx;
+	        background: url(https://images.facedog.cn/public/battle/cubit-heart.png);
+	        background-size: cover;
+	        transform-origin: center;
+	        display: flex;
+	        justify-content: center;
+	        align-items: center;
+	        &.wave {
+	          animation: heartWave 0.4s ease-in-out 1;
+	          animation-fill-mode: both;
+	          @keyframes heartWave {
+	            0% {
+	              transform: scale(1);
+	            }
+	            50% {
+	              transform: scale(1.15);
+	            }
+	            100% {
+	              transform: scale(1);
+	            }
+	          }
+	        }
+	        image {
+	          width: 51rpx;
+	          height: 42rpx;
+	          opacity: 0;
+	        }
+	      }
 	      &.open {
 	        background: url(https://images.facedog.cn/public/battle/box-open.png);
 	        background-size: cover;
@@ -830,7 +861,7 @@
 	          transform: translate(0, 10%) scale(1, 1);
 	        }
 	        to {
-	          transform: translate(0, -30%) scale(0, 0);
+	          transform: translate(0, -45%) scale(0, 0);
 	        }
 	      }
 	      &.flyBottom {
@@ -843,7 +874,7 @@
 	          transform: translate(0, -30%) scale(1, 1);
 	        }
 	        to {
-	          transform: translate(0, 20%) scale(0, 0);
+	          transform: translate(0, 8%) scale(0, 0);
 	        }
 	      }
 	      &.frame {
@@ -855,34 +886,60 @@
 	        z-index: 999999 !important;
 	        border-radius: 27rpx !important;
 	        display: flex;
-	        justify-content: center;
+	        // justify-content: center;
 	        flex-wrap: wrap;
 
 	        image:not(.pick) {
-	          margin-top: 11rpx;
+	          margin: 11rpx;
 	          width: 595rpx;
 	          height: 595rpx;
 	          border-radius: 27rpx;
+	          border-bottom-left-radius: 0rpx;
+	          border-bottom-right-radius: 0rpx;
 	        }
 	        .info {
-	          top: 7rpx;
 	          position: relative;
+	          width: 100%;
+	          .ssr {
+	            position: absolute;
+	            right: 40rpx;
+	            top: 48rpx;
+	            width: 115rpx;
+				height: 53rpx;
+				border-radius: 0;
+	          }
 	          .name {
-	            background: url(https://images.facedog.cn/public/battle/name-wrapper.png);
-	            width: 513rpx;
-	            height: 25rpx;
-	            background-size: cover;
-	            text-align: center;
-	            line-height: 25rpx;
-	            font-size: 35rpx;
+	            // background: url(https://images.facedog.cn/public/battle/name-wrapper.png);
+	            // width: 513rpx;
+	            // height: 25rpx;
+	            // background-size: cover;
+	            // text-align: center;
+	            // line-height: 25rpx;
+	            // font-size: 35rpx;
+	            // color: #000;
+	            // position: relative;
+	            // margin: 0 auto;
+	            // font-weight: bold;
+	            // text-shadow: none;
+	            margin-left: 15rpx;
+	            margin-top: 38rpx;
 	            color: #000;
-	            position: relative;
-	            margin: 0 auto;
-	            font-weight: bold;
+	            font-size: 40rpx;
 	            text-shadow: none;
+	            .xingzuo {
+	              display: inline-block;
+	              border-radius: 5rpx;
+	              padding: 3rpx 4rpx;
+	              background: #48acff;
+	              color: white;
+	              font-size: 14rpx;
+	              margin-left: 4rpx;
+	              position: relative;
+	              top: -4rpx;
+	            }
 	          }
 	          .distance {
-	            font-size: 20rpx;
+	            font-size: 15rpx;
 	            margin-top: 22rpx;
 	            text-align: center;
 	            font-weight: 300;
@@ -898,12 +955,17 @@
 	            }
 	          }
 	          .desc {
-	            font-weight: 300;
-	            margin-top: 10rpx;
-	            text-align: center;
+	            // font-weight: 300;
+	            // margin-top: 10rpx;
+	            // text-align: center;
+	            // font-size: 20rpx;
+	            // text-shadow: none;
+	            // color: #000;
+	            margin-top: 9rpx;
+	            color: #888;
+	            margin-left: 19rpx;
 	            font-size: 20rpx;
 	            text-shadow: none;
-	            color: #000;
 	          }
 	        }
 	      }

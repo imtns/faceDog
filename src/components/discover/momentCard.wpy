@@ -35,7 +35,7 @@
                         </swiper>
                     </view>
                     <view class="actions">
-                        <view class="post-info">
+                        <view class="post-info" @tap="toLikes({{item._id}})">
                             <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
                                 <view class="like-box" wx:if="{{indexlikes<3}}">
                                     <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" mode="aspectFill"></image>
@@ -62,7 +62,7 @@
                 <view class="moment" @tap="toMomentDetail({{item._id}})">
                     <text selectable='true'>{{item.content}}</text>
                 </view>
-                <view class="comment-box">
+                <view class="comment-box" @tap="toComments({{item._id}})">
                     <!-- <view class="comment-who {{item.comments.length?'border':''}}" wx:if="{{item.likes.length <= 6 && item.likes.length}}">
                         <image class="icon" src="https://images.facedog.cn/public/discover/discover-zan.png?c2"></image>
                         <repeat for="{{item.likes}}" key="indexlikes" index="indexlikes" item="pic">
@@ -87,7 +87,7 @@
                     </view> -->
                     <view class="comment-info-box" wx:if="{{item.comments.length}}">
                         <repeat for="{{item.comments}}" key="indexcomments" index="indexcomments" item="comments">
-                            <view class="comment-info" @tap="handleCommentAction" data-index="{{index}}" data-commentindex="{{indexcomments}}" data-username="{{comments.user_nick_name}}">
+                            <view class="comment-info" @tap.stop="handleCommentAction" data-index="{{index}}" data-commentindex="{{indexcomments}}" data-username="{{comments.user_nick_name}}">
                                 <view class="from" @tap.stop="toProfile({{comments.user_id}})">{{comments.user_nick_name}}</view>
                                 <view class="reply" wx:if="{{comments.replay_user_nick_name}}">回复</view>
                                 <view class="to" wx:if="{{comments.replay_user_nick_name}}">{{comments.replay_user_nick_name}}</view>
@@ -164,6 +164,12 @@
       components = {};
 
       methods = {
+		toLikes(id){
+			wepy.navigateTo({ url: `discover/likeList?id=${id}` });
+		},
+		toComments(id){
+			wepy.navigateTo({ url: `discover/commentList?id=${id}` });
+		},
         // 收起
         expandFasle(index) {
           this.momentList[index].expanded = false;
