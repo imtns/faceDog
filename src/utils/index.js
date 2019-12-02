@@ -131,7 +131,7 @@ function formatDateFromSeconds(timestamp) {
         if (newDate.getFullYear() == Y && newDate.getMonth() + 1 == m && newDate.getDate() == d) {
             return '昨天' + zeroize(H) + ':' + zeroize(i);
         } else if (newDate.getDate() - d >= 6) {
-            return zeroize(newDate.getDate() - d) + '天前';
+            return Number(zeroize(newDate.getDate() - d)) + '天前';
         } else if (curDate.getFullYear() == Y) {
             return newDate.getMonth() + 2  - zeroize(m) + '个月前';
         } else {

@@ -229,9 +229,9 @@
 	  }
 	  onShareAppMessage() {
 	    return {
-	      title: '好看的人才能加入的高颜值社交圈',
+	      title: '好看的人都在这',
 	      path: `/pages/home?userid=${this.user.ID}`,
-	      imageUrl: 'https://images.facedog.cn/public/discover/share.jpeg',
+	      imageUrl: 'https://images.facedog.cn/public/yg-share.jpeg',
 	      success: res => {
 	        console.log('转发成功', res);
 	      },

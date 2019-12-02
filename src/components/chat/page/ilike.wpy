@@ -8,29 +8,31 @@
 			<view class="tab" @tap="clearFavorites('all')">一键清空列表</view>
 			<view class="tab" @tap="makeFriend('all')">一键添加好友</view>
 		</view>
-		<repeat for="{{list}}" key="index" index="index" item="item">
-			<view class="like-box">
-				<view class="like-list">
-					<image class="avatar" @tap="goProfile({{item.user_id}},{{item.dentifier}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
-					<view class="desc">
-						<view class="left">
-							<view class="name">{{item.nick_name}}</view>
-							<view class="info">22岁 / 射手座</view>
-						</view>
-						<form report-submit='true' bindsubmit='agree' data-user="">
-							<view class="right">
-								<view class="apply" wx:if="{{!item.liked}}" @tap="makeFriend({{item.user_id}})">
-									<image class="apply-icon" src="https://images.facedog.cn/public/chat/heart.png" mode="scaleToFill"></image>
-								</view>
-								<image class="apply-clock" wx:if="{{item.friend}}"  mode="aspectFill" @tap="gochat({{item.avatar}},{{item.dentifier}},{{item.nick_name}})" src="https://images.facedog.cn/public/profile/icon-chat.png"></image>
-								<image class="apply-clock" wx:if="{{item.liked && !item.friend}}" mode="aspectFill" @tap="toastTip" src="https://images.facedog.cn/public/profile/icon-clock.png"></image>
-								<image class="apply-icon" src="https://images.facedog.cn/public/chat/cancel.png" @tap="clearFavorites({{item._id}})" mode="aspectFill"></image>
+		<scroll-view scroll-y="true" style="height: 80vh;" bindscrolltolower="load" bindscroll="scroll">
+			<repeat for="{{list}}" key="index" index="index" item="item">
+				<view class="like-box">
+					<view class="like-list">
+						<image class="avatar" @tap="goProfile({{item.user_id}},{{item.dentifier}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
+						<view class="desc">
+							<view class="left">
+								<view class="name">{{item.nick_name}}</view>
+								<view class="info">22岁 / 射手座</view>
 							</view>
-						</form>
+							<form report-submit='true' bindsubmit='agree' data-user="">
+								<view class="right">
+									<view class="apply" wx:if="{{!item.liked}}" @tap="makeFriend({{item.user_id}})">
+										<image class="apply-icon" src="https://images.facedog.cn/public/chat/heart.png" mode="scaleToFill"></image>
+									</view>
+									<image class="apply-clock" wx:if="{{item.friend}}" mode="aspectFill" @tap="gochat({{item.avatar}},{{item.dentifier}},{{item.nick_name}})" src="https://images.facedog.cn/public/profile/icon-chat.png"></image>
+									<image class="apply-clock" wx:if="{{item.liked && !item.friend}}" mode="aspectFill" @tap="toastTip" src="https://images.facedog.cn/public/profile/icon-clock.png"></image>
+									<image class="apply-icon" src="https://images.facedog.cn/public/chat/cancel.png" @tap="clearFavorites({{item._id}})" mode="aspectFill"></image>
+								</view>
+							</form>
+						</view>
 					</view>
 				</view>
-			</view>
-		</repeat>
+			</repeat>
+		</scroll-view>
 	</view>
 </template>
 
@@ -40,31 +42,56 @@
 	import { getAge } from '@/utils';
 	import { get, post } from '@/utils/request';
 	import empty from '@/components/empty';
-	import { MAKEFRIEND, MY_FAVORITE,DELETE_FAVORITE } from '@/utils/url';
+	import { MAKEFRIEND, MY_FAVORITE, DELETE_FAVORITE } from '@/utils/url';
 	import Dialog from '@/components/vant/dialog/dialog';
 	import Toast from '@/components/vant/toast/toast';
 	export default class Like extends wepy.component {
 	  props = {};
 
 	  data = {
-	    list: {},
-	    init: false
+	    list: [],
+	    init: false,
+	    page: 1,
+	    nomore: false,
+	    show: false
 	  };
 
 	  components = {
 	    empty
 	  };
 	  async initList() {
-	    const result = await get(MY_FAVORITE);
-	    this.list = result;
+		this.page = 1;
+		this.nomore = false;
+		this.show = false;
+		this.list = [];
+	    this.fetchData();
+	  }
+	  async fetchData() {
+	    if (this.nomore) {
+	      this.show = true;
+	      Toast('没有更多啦...');
+	      return;
+	    }
+	    const result = await get(MY_FAVORITE, { page: this.page });
+	    console.log(result.length);
+	    if (!result.length && this.init) {
+	      this.nomore = true;
+	      this.$apply();
+	      return;
+	    }
+	    this.list.push(...result);
 	    this.init = true;
 	    this.$apply();
 	  }
 	  methods = {
+	    load() {
+	      this.page++;
+	      if (!this.show) this.fetchData();
+	    },
 	    toastTip() {
 	      Toast('已发送过好友申请');
 	    },
-	    goProfile(id,dentifier) {
+	    goProfile(id, dentifier) {
 	      wx.navigateTo({
 	        url: `battle/profile?id=${id}&dentifier=${dentifier}`,
 	        success: result => {},
@@ -74,13 +101,13 @@
 	    },
 	    async initData() {
 	      this.initList();
-		},
-		gochat(avartar,dentifier,nickname) {
-            wx.setStorageSync('chatIcon', avartar);
-            wepy.navigateTo({
-                url: `/pages/chat/chat?id=${dentifier}&nick=${nickname}`
-            });
-        },
+	    },
+	    gochat(avartar, dentifier, nickname) {
+	      wx.setStorageSync('chatIcon', avartar);
+	      wepy.navigateTo({
+	        url: `/pages/chat/chat?id=${dentifier}&nick=${nickname}`
+	      });
+	    },
 	    async makeFriend(id) {
 	      wepy.showLoading({
 	        title: '', //提示的内容,
@@ -98,9 +125,9 @@
 	      await post(MAKEFRIEND, {
 	        to_be: 'friend',
 	        user_id: id
-		  });
-		  wx.hideLoading();
-		  Toast('申请成功');
+	      });
+	      wx.hideLoading();
+	      Toast('申请成功');
 	      this.initList();
 	      this.$apply();
 	    },
@@ -139,7 +166,7 @@
 <style lang='less' scoped>
 	.wrapper {
 	  width: 690rpx;
-	  margin-top: 20rpx;
+	  padding-top: 20rpx;
 	  margin-left: 30rpx;
 	  .tabs {
 	    width: 100%;

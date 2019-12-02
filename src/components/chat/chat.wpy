@@ -151,7 +151,7 @@
 	      // }
 	      this.$apply();
 	    });
-	    this.$invoke('ilike', 'initData');
+	    // this.$invoke('ilike', 'initData');
 	    this.$apply();
 	  }
 	  // 初始化聊天界面最近会话列表

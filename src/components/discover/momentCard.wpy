@@ -168,7 +168,7 @@
 			wepy.navigateTo({ url: `discover/likeList?id=${id}` });
 		},
 		toComments(id){
-			wepy.navigateTo({ url: `discover/commentList?id=${id}` });
+			// wepy.navigateTo({ url: `discover/commentList?id=${id}` });
 		},
         // 收起
         expandFasle(index) {

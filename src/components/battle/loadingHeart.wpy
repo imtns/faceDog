@@ -1,0 +1,84 @@
+<!--  -->
+<template>
+	<view class='wrapper'>
+		<view class="loading">
+			<image class="heart" src="https://images.facedog.cn/public/battle/loading-heart.png" mode="scaleToFill">
+			</image>
+			<image class="text" src="https://images.facedog.cn/public/battle/loading-text.png" mode="scaleToFill">
+			</image>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	export default class LoadingHeart extends wepy.component {
+	  props = {};
+
+	  data = {};
+
+	  components = {};
+
+	  methods = {};
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='less' scoped>
+	.wrapper {
+	  position: relative;
+	  width: 100%;
+	  height: 100vh;
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  .loading {
+	    width: 400rpx;
+	    display: flex;
+	    top: -30rpx;
+	    align-items: center;
+	    position: relative;
+	    .heart {
+	      width: 92rpx;
+	      height: 82rpx;
+	      animation: scaleHeart 1.4s ease-in-out  infinite;
+		  animation-fill-mode: both;
+		  transform-origin: center center;
+	      @keyframes scaleHeart {
+	        0% {
+                    transform: scale(1, 1);
+                }
+                10% {
+                    transform: scale(1.3, 1.3);
+                }
+                20% {
+                    transform: scale(1, 1);
+                }
+                30% {
+                    transform: scale(1.2, 1.2);
+                }
+                40% {
+                    transform: scale(1, 1);
+                }
+                100% {
+                    transform: scale(1, 1);
+                }
+	      }
+	    }
+	    .text {
+	      margin-left: 22rpx;
+	      width: 273rpx;
+	      height: 71rpx;
+	    }
+	  }
+	}
+</style>

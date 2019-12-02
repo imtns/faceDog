@@ -55,7 +55,7 @@ export default class Mixin extends wepy.mixin {
     async getProfile(noLoading, fresh) {
         const data = await get(PROFILE, noLoading);
         data.images = this.switchOrder(data.images);
-        if ((data.images && data.images.length === 1) || fresh) {
+        if ((data.images && data.images.length === 1 && !data.images[0].is_avatar) || fresh) {
             this.changeAvatar({
                 image_id: data.images[0]._id
             }, true);

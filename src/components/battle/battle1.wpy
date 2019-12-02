@@ -3,25 +3,28 @@
 	<block wx:if="{{tutorialShow}}">
 		<tutorial @closeTutorial.user="closeTutorial" />
 	</block>
-	<view class='container'>
+	<block wx:if="{{!tutorialShow && show}}">
+		<loadingHeart />
+	</block>
+	<view class='container' wx:if="{{!show}}" style="top:{{isphoneX?'100rpx':'0'}};">
 		<view class="blurLayer"></view>
-		<swiper class="swiper" indicator-dots="{{false}}" autoplay="{{false}}" duration="{{400}}" current="{{swiperCurrent}}">
-			<repeat key="index" for="{{battleList}}">
+		<swiper class="swiper" indicator-dots="{{false}}" autoplay="{{false}}" duration="{{200}}" current="{{swiperCurrent}}">
+			<repeat key="index" for="{{battleList}}" key="index" index="index" item="item">
 				<swiper-item catchtouchmove="stopTouchMove">
 					<view class="battle-container " style="top:{{isphoneX?'100rpx':'0'}};">
 						<view class="cubit-box cubit-box-top">
 							<view class="cubit-heart {{topWave?'wave':''}}" wx:if="{{topDragDistance}}">
-								<image class="{{topWave?'wave':''}}" src="https://images.facedog.cn/public/battle/cubit-star.png" mode="scaleToFill">
+								<image class="star {{topWave?'wave':''}}" src="https://images.facedog.cn/public/battle/cubit-star.png" mode="scaleToFill">
 								</image>
 							</view>
 						</view>
 						<view class="cubit-box cubit-box-bottom">
-							<view class="cubit-heart {{bottomWave?'wave':''}}"  wx:if="{{bottomDragDistance}}">
-								<image class="{{bottomWave?'wave':''}}" src="https://images.facedog.cn/public/battle/cubit-star.png" mode="scaleToFill">
+							<view class="cubit-heart {{bottomWave?'wave':''}}" wx:if="{{bottomDragDistance}}">
+								<image class="star {{bottomWave?'wave':''}}" src="https://images.facedog.cn/public/battle/cubit-star.png" mode="scaleToFill">
 								</image>
 							</view>
 						</view>
-						<view @tap="boxClick({{item.a.originalImages}})" class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[currentMovingID]?'flyTop':''}}" style="transform: translate3d(0px, {{tranTopY[currentMovingID]}}px, 0px)!important;" catch:touchmove="touchTopMove('1')" catch:touchend="touchEnd">
+						<view @tap="boxClick({{item.a.originalImages}})" class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[swiperCurrent]?'flyTop':''}}" style="transform: translate3d(0px, {{tranTopY[index] || 0}}px, 0px)!important;" catch:touchmove="touchTopMove({{swiperCurrent}})" catch:touchend="touchEnd">
 							<!-- <view @tap="boxClick({{item.a.originalImages}})" class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[currentMovingID]?'flyTop':''}}" style="transform: translate3d(0px, 90px, 0px)!important;" catch:touchmove="touchTopMove('1')" catch:touchend="touchEnd"> -->
 							<image src="{{item.a.images[0]}}" class="{{blurTop?'blur':''}}" mode="aspectFill"></image>
 							<image src="https://images.facedog.cn/public/battle/pick.png" style="opacity:{{opacityTopPick}}" class="pick" mode="aspectFill" />
@@ -29,16 +32,16 @@
 								<image src="https://images.facedog.cn/public/battle/ssr.png" class="ssr" mode="scaleToFill" />
 								<view class="name">{{item.a.nick_name}}<view class="xingzuo">{{item.a.constellation}}</view>
 								</view>
-								<view class="signature"></text></view>
+								<view class="signature">{{item.a.signature}}</view>
 								<!-- <view class="desc">{{item.a.gender}}/{{item.a.age}}/{{item.a.constellation}}</view> -->
 							</view>
 							<view class="info" wx:else>
 								<view class="name {{blurTop?'blur':''}}">{{item.a.nick_name}}<text> {{item.a.age}}</text></view>
 								<!-- <view class="desc {{draggingBottom?'blur':''}}">{{item.a.gender}} / {{item.a.age}} / {{item.a.constellation}}</view> -->
-								<view class="distance "><text class="{{blurTop?'blur':''}}">{{item.a.distance}}k'm</text> <text class="{{blurTop?'blur':''}}"> {{item.a.city}}</text></view>
+								<view class="distance "><text class="{{blurTop?'blur':''}}">{{item.a.distance}}km</text> <text class="{{blurTop?'blur':''}}"> {{item.a.city}}</text></view>
 							</view>
 						</view>
-						<view class="divider {{bothLike?'rotated':''}}" style="top:{{isphoneX?'632rpx':'532rpx'}}" @tap="bothLike">
+						<view class="divider {{bothLike?'rotated':''}}" style="top:532rpx" @tap="bothLike">
 							<view class="vs-pic front {{bothLikeRotate ?'rotated':''}} {{!bothLike && !init?'notRotate':''}}">
 								<image src="https://images.facedog.cn/public/battle/fist-left.png?2" class="left {{fistAnimation?'ani':''}}" mode="scaleToFill"></image>
 								<image src="https://images.facedog.cn/public/battle/vs.png?7" class="vs {{fistAnimation?'ani':''}} " mode="aspectFill"></image>
@@ -49,7 +52,7 @@
 								<image src="https://images.facedog.cn/public/battle/both-like.png" class="both-like" mode="aspectFill"></image>
 							</view>
 						</view>
-						<view @tap="boxClick({{item.b.originalImages}})" class="battle-box bottom {{bothLikeMove ?'bothLikeMove':''}} {{draggingBottom?'frame':''}} {{flyBottom[currentMovingID]?'flyBottom':''}}" style="transform: translate3d(0px, {{tranBottomY[currentMovingID]}}px, 0px);" catch:touchmove="touchBottomMove('1')" catch:touchend="touchEnd">
+						<view @tap="boxClick({{item.b.originalImages}})" class="battle-box bottom {{bothLikeMove ?'bothLikeMove':''}} {{draggingBottom?'frame':''}} {{flyBottom[swiperCurrent]?'flyBottom':''}}" style="transform: translate3d(0px, {{tranBottomY[index] || 0}}px, 0px);" catch:touchmove="touchBottomMove({{swiperCurrent}})" catch:touchend="touchEnd">
 							<image src="{{item.b.images[0]}}" class="{{blurBottom?'blur':''}}" mode="aspectFill"></image>
 							<image src="https://images.facedog.cn/public/battle/pick.png" style="opacity:{{opacityBottomPick}}" class="pick" mode="aspectFill" />
 							<view class="info" wx:if="{{draggingBottom}}">
@@ -57,8 +60,9 @@
 
 								<view class="name">{{item.b.nick_name}}<view class="xingzuo">{{item.b.constellation}}</view>
 								</view>
+								<view class="signature">{{item.b.signature}}</view>
 								<!-- <view class="distance"><text class="number">{{item.b.distance}}km</text> <text class="city"> {{item.b.city}}</text></view> -->
-								<view class="desc">{{item.b.gender}}/{{item.b.age}}/{{item.b.constellation}}</view>
+								<!-- <view class="desc">{{item.b.gender}}/{{item.b.age}}/{{item.b.constellation}}</view> -->
 							</view>
 							<view class="info" wx:else>
 								<view class="name {{blurBottom?'blur':''}}">{{item.b.nick_name}}<text> {{item.b.age}}</text></view>
@@ -81,8 +85,11 @@
 	import { Event } from '@/utils/event.js';
 	import { removeDuplicates, throttle } from '@/utils';
 	import tutorial from './tutorial';
+	import loadingHeart from './loadingHeart';
 	export default class Battle extends wepy.component {
 	  data = {
+	    show: true,
+	    isphoneX: false,
 	    tranTopY: {}, // 当前激活元素的 Y轴 偏移量
 	    tranBottomY: {},
 	    draggingTop: false, // 是否在拖拽中
@@ -98,7 +105,6 @@
 	    bottomWave: false, // 执行完图片飞行后盒子的抖动
 	    bothLikeMove: false,
 	    swiperCurrent: 0, // 当前swiperIndex
-	    currentMovingID: '1', //
 	    tutorialShow: false,
 	    battleList: [],
 	    likeImageId: '',
@@ -107,22 +113,25 @@
 	    blurBottom: false,
 	    fistAnimation: false, // 中间vs的动画
 	    opacityTopPick: 0, // pick的透明度
-	    opacityBottomPick: 0
+	    opacityBottomPick: 0,
+	    flyTempID: 0 // 当前动画的临时Id
 	  };
 
 	  components = {
-	    tutorial
+	    tutorial,
+	    loadingHeart
 	  };
 	  fly(position) {
+	    this.flyTempID = this.swiperCurrent;
 	    if (position == 'top') {
-	      this.flyTop[this.currentMovingID] = true; //图片飞走时间
+	      this.flyTop[this.flyTempID] = true; //图片飞走时间
 	      setTimeout(() => {
 	        this.topWave = true; // 飞走后盒子晃动时间
 	        this.switchBattle();
 	        this.$apply();
 	      }, 800);
 	    } else {
-	      this.flyBottom[this.currentMovingID] = true;
+	      this.flyBottom[this.flyTempID] = true;
 	      setTimeout(() => {
 	        this.bottomWave = true;
 	        // 晃动完后切换下一组
@@ -131,8 +140,8 @@
 	      }, 800);
 	    }
 	    setTimeout(() => {
-	      this.tranBottomY[this.currentMovingID] = '1px';
-	      this.tranTopY[this.currentMovingID] = '1px';
+	      this.tranBottomY[this.swiperCurrent - 1] = 0;
+		  this.tranTopY[this.swiperCurrent - 1] = 0;
 	      this.flyTop = {};
 	      this.flyBottom = {};
 	      this.topWave = false;
@@ -166,9 +175,10 @@
 	      this.battleCommit();
 
 	      // 判断如果
-	      if (this.battleList.length - this.swiperCurrent < 3) {
-			// 如果当前组次数已不足3组，加载下一组
-			await this.getBattle();
+	      console.log(this.battleList.length, this.swiperCurrent);
+	      if (this.battleList.length - 1 == this.swiperCurrent) {
+	        // 如果当前组次数已不足3组，加载下一组
+	        await this.getBattle();
 	      }
 	      this.swiperCurrent++;
 	      this.blurTop = false;
@@ -181,7 +191,7 @@
 	      setTimeout(() => {
 	        this.fistAnimation = true;
 	        this.$apply();
-	      }, 500);
+	      }, 400);
 	    }, 800);
 	  }
 	  methods = {
@@ -204,12 +214,12 @@
 	    },
 	    //上面的box拖动事件
 	    touchTopMove(id, e) {
-	      this.currentMovingID = id;
+	      if (this.draggingBottom) return;
 	      this.draggingTop = true;
 	      this.blurBottom = true; // 拖动上面的时候下面的背景变blur
 	      let currentTouch = e.changedTouches[0];
 	      this.topDragDistance = this.tranTopY[id] > 50;
-	      console.log(currentTouch);
+	      //   console.log(currentTouch);
 	      let { clientY } = currentTouch;
 	      // 如果不是同一个触发点则返回
 	      // 通过 当前坐标点, 初始坐标点, 初始偏移量 来计算当前偏移量
@@ -221,14 +231,14 @@
 	      if (tranY > 80) {
 	        tranY = 80;
 	      }
-	      throttle(this.setValue(tranY, id, 'top'), 500);
+	      throttle(this.setValue(tranY, this.swiperCurrent, 'top'), 500);
 	      this.opacityTopPick = tranY / 80;
 	      //   this.tranTopY[id] = clientY;
 	      //   this.$apply();
 	    },
 	    //下面box拖动事件
 	    touchBottomMove(id, e) {
-	      this.currentMovingID = id;
+	      if (this.draggingTop) return;
 	      this.draggingBottom = true;
 	      this.blurTop = true; // 拖动下面的时候上面的背景变blur
 	      let currentTouch = e.changedTouches[0];
@@ -236,14 +246,14 @@
 	      let { clientY } = currentTouch;
 	      let tranY = clientY - 500;
 
-	      if (tranY < -200) {
-	        tranY = -200;
+	      if (tranY < -210) {
+	        tranY = -210;
 	      }
 	      if (tranY > -80) {
 	        tranY = -80;
 	      }
 	      this.opacityBottomPick = tranY / -200;
-	      throttle(this.setValue(tranY, id, 'bottom'), 500);
+	      throttle(this.setValue(tranY, this.swiperCurrent, 'bottom'), 500);
 	      //   this.tranBottomY[this.currentMovingID] = tranY;
 	      //   console.log(tranY);
 	      //   this.$apply();
@@ -285,7 +295,7 @@
 	        this.blurTop = false;
 	        this.draggingBottom = false;
 	        this.opacityBottomPick = 0;
-	        this.tranBottomY[this.currentMovingID] = '1px';
+	        this.tranBottomY[this.swiperCurrent] = '1';
 	      }
 	      if (this.topDragDistance) {
 	        this.fly('top');
@@ -296,7 +306,7 @@
 	        this.draggingTop = false;
 	        this.blurBottom = false;
 	        this.opacityTopPick = 0;
-	        this.tranTopY[this.currentMovingID] = '1px';
+	        this.tranTopY[this.swiperCurrent] = '1';
 	      }
 	      this.$apply();
 	    },
@@ -314,7 +324,11 @@
 	    this.$apply();
 	  }
 	  async getBattle() {
-	    const result = await get(BATTLE, { battle: '' });
+	    this.show = true;
+	    this.swiperCurrent = 0;
+	    this.battleList = [];
+		const result = await get(BATTLE, { battle: '' });
+		console.warn('result',result);
 	    result.a.forEach((item, index) => {
 	      result.a[index].distance = (result.a[index].distance / 1000).toFixed(2);
 	      result.a[index].gender = result.a[index].gender == 'female' ? '女' : '男';
@@ -335,6 +349,10 @@
 	        a: result.a[index],
 	        b: result.b[index]
 	      });
+	      setTimeout(() => {
+	        this.show = false;
+	        this.$apply();
+	      }, 1500);
 	      this.$apply();
 	    });
 	    // this.battleList = result;
@@ -350,11 +368,24 @@
 	      this.tutorialShow = true;
 	      this.$apply();
 	    }
+	    let that = this;
+	    wx.getSystemInfo({
+	      success(res) {
+	        var name = 'iPhone X';
+	        if (
+	          res.model.indexOf(name) > -1 ||
+	          res.model.indexOf('unknown<iPhone') > -1
+	        ) {
+	          that.isphoneX = true;
+	          that.$apply();
+	        }
+	      }
+	    });
 	    this.getBattle();
 	    setTimeout(() => {
 	      this.fistAnimation = true;
 	      this.$apply();
-	    }, 1000);
+	    }, 900);
 	  }
 	  onShow() {}
 	}
@@ -572,44 +603,44 @@
 	  }
 	  .left {
 	    left: -6rpx;
-	    transform: translateX(-100%);
+	    transform: translate3d(-100%,0,0);
 	    &.ani {
 	      animation: fistLeft 0.6s ease-in 1;
 	      animation-fill-mode: both;
 	      @keyframes fistLeft {
 	        0% {
-	          transform: translateX(-100%);
+	          transform: translate3d(-100%,0,0);
 	        }
 	        60% {
-	          transform: translateX(0%);
+	          transform: translate3d(0%,0,0);
 	        }
 	        70% {
-	          transform: translateX(-7%);
+	          transform: translate3d(-7%,0,0);
 	        }
 	        100% {
-	          transform: translateX(-1%);
+	          transform: translate3d(-1%,0,0);
 	        }
 	      }
 	    }
 	  }
 	  .right {
 	    right: -6rpx;
-	    transform: translateX(100%);
+	    transform: translate3d(100%,0,0);
 	    &.ani {
 	      animation: fistRight 0.6s ease-in 1;
 	      animation-fill-mode: both;
 	      @keyframes fistRight {
 	        0% {
-	          transform: translateX(100%);
+	          transform: translate3d(100%,0,0);
 	        }
 	        60% {
-	          transform: translateX(0%);
+	          transform: translate3d(0,0%,0);
 	        }
 	        70% {
-	          transform: translateX(7%);
+	          transform: translate3d(7%,0,0);
 	        }
 	        100% {
-	          transform: translateX(1%);
+	          transform: translate3d(1%,0,0);
 	        }
 	      }
 	    }
@@ -624,7 +655,7 @@
 	    &.ani {
 	      animation: starShine 0.3s ease-in 1;
 	      animation-fill-mode: both;
-	      animation-delay: 0.4s;
+	      animation-delay: 0.3s;
 	      @keyframes starShine {
 	        0% {
 	          opacity: 0;
@@ -683,7 +714,7 @@
 	    position: absolute;
 	    top: 40%;
 	    left: 50%;
-	    transform: translate(-50%, -50%);
+	    transform: translate3d(-50%, -50%,0);
 	  }
 	  .battle-container {
 	    width: 690rpx;
@@ -708,42 +739,33 @@
 	    }
 	    .cubit-box-top {
 	      top: 20rpx;
+	      .star {
+	        opacity: 0;
+	      }
 	      .wave {
 	        animation: boxWave 0.4s ease-in-out 1;
-			animation-fill-mode: both;
-			animation-delay: .4s;
+	        animation-fill-mode: both;
+	        animation-delay: 0.4s;
 	      }
 	    }
 	    .cubit-box-bottom {
 	      bottom: 20rpx;
+	      .star {
+	        opacity: 0;
+	      }
 	      .wave {
 	        animation: boxWave 0.4s ease-in-out 1;
-			animation-fill-mode: both;
-			animation-delay: .4s;
+	        animation-fill-mode: both;
+	        animation-delay: 0.4s;
 	      }
 	    }
 	    @keyframes boxWave {
-	      //   0% {
-	      //     transform: translateX(-50%) rotate(-10deg);
-	      //   }
-	      //   25% {
-	      //     transform: translateX(-50%) rotate(10deg);
-	      //   }
-	      //   50% {
-	      //     transform: translateX(-50%) rotate(-10deg);
-	      //   }
-	      //   75% {
-	      //     transform: translateX(-50%) rotate(10deg);
-	      //   }
-	      //   100% {
-	      //     transform: translateX(-50%) rotate(0);
-	      //   }
 	      0% {
-	        opacity: 1;
+	        opacity: 0;
 	        transform: scale(1);
 	      }
 	      33% {
-	        opacity: 1;
+	        opacity: 0;
 	        transform: scale(1.15);
 	      }
 	      66% {
@@ -857,11 +879,11 @@
 	      }
 	      @keyframes flyTop {
 	        /** 第一种写法**/
-	        from {
-	          transform: translate(0, 10%) scale(1, 1);
+	        0% {
+	          transform: translate3d(0, 10%,0) scale(1, 1);
 	        }
-	        to {
-	          transform: translate(0, -45%) scale(0, 0);
+	        100% {
+	          transform: translate3d(0, -45%,0) scale(0, 0);
 	        }
 	      }
 	      &.flyBottom {
@@ -870,11 +892,11 @@
 	      }
 	      @keyframes flyBottom {
 	        /** 第一种写法**/
-	        from {
-	          transform: translate(0, -30%) scale(1, 1);
+	        0% {
+	          transform: translate3d(0, -30%,0) scale(1, 1);
 	        }
-	        to {
-	          transform: translate(0, 8%) scale(0, 0);
+	        100% {
+	          transform: translate3d(0, 8%,0) scale(0, 0);
 	        }
 	      }
 	      &.frame {
@@ -905,8 +927,8 @@
 	            right: 40rpx;
 	            top: 48rpx;
 	            width: 115rpx;
-				height: 53rpx;
-				border-radius: 0;
+	            height: 53rpx;
+	            border-radius: 0;
 	          }
 	          .name {
 	            // background: url(https://images.facedog.cn/public/battle/name-wrapper.png);
@@ -937,6 +959,13 @@
 	              position: relative;
 	              top: -4rpx;
 	            }
+	          }
+	          .signature {
+	            color: #888888;
+	            font-size: 20rpx;
+	            text-shadow: none;
+	            margin-left: 13rpx;
+	            margin-top: 5rpx;
 	          }
 	          .distance {
 	            font-size: 15rpx;
@@ -975,10 +1004,10 @@
 	      }
 	      @keyframes flyAway {
 	        0% {
-	          transform: translateX(0);
+	          transform: translate3d(0,0,0);
 	        }
 	        100% {
-	          transform: translateX(-150%);
+	          transform: translate3d(-150%,0,0);
 	        }
 	      }
 	      .info {
