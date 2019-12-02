@@ -180,7 +180,9 @@ export default class fabu extends wepy.page {
             try {
                 if (this.isPublishing) {
                     return;
-                }
+				}
+				await this.checkContent(this.content);
+				return;
                 const subData = this.uploadedPics.reduce(
                     (sub, file) => {
                         sub.images.push(file.id);
@@ -225,7 +227,26 @@ export default class fabu extends wepy.page {
     computed = {};
 
     onLoad() {}
+	async checkContent(content){
+		return new Promise((resolve,reject)=>{
+			let data = {
+				content
+			}
+			let token = wepy.getStorageSync('token')
+			wepy.request({
+			  url: `https://api.weixin.qq.com/wxa/msg_sec_check?access_token=${token}`,
+			  data,
+			  method: 'POST',
+			  dataType: 'json',
+			  success: res => {
+				  console.log(res);
+			  },
+			  fail: () => {},
+			  complete: () => {}
+			});
 
+		})
+	}
     onShow() {
         auth = false;
     }

@@ -1,8 +1,8 @@
 import { toast } from './index';
 
-// const domain = 'https://www.facedog.cn';
+const domain = 'https://www.facedog.cn';
 
-const domain = 'http://39.97.187.201:8080';
+// const domain = 'http://39.97.187.201:8080';
 
 const http = (method, ...props) => new Promise((resolve, reject) => {
 	try {

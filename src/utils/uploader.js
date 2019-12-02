@@ -1,13 +1,13 @@
 /*eslint-disable */
-// let uploadUrl = 'https://www.facedog.cn/api/user/profile';
-let uploadUrl =  'http://39.97.187.201:8080/api/user/profile';
+let uploadUrl = 'https://www.facedog.cn/api/user/profile';
+// let uploadUrl =  'http://39.97.187.201:8080/api/user/profile';
 import { toast } from './index';
 module.exports.uploader = (tempFilePath, ...props) => {
     let [params, callback] = props;
-    // if (params && params.isVideo) uploadUrl = 'https://www.facedog.cn/api/user/certify/video';
-    if (params && params.isVideo) uploadUrl = 'http://39.97.187.201:8080/api/user/certify/video';
-	// if (params && params.profile) uploadUrl = 'https://www.facedog.cn/api/user/image';
-    if (params && params.profile) uploadUrl = 'http://39.97.187.201:8080/api/user/image';
+    if (params && params.isVideo) uploadUrl = 'https://www.facedog.cn/api/user/certify/video';
+    // if (params && params.isVideo) uploadUrl = 'http://39.97.187.201:8080/api/user/certify/video';
+	if (params && params.profile) uploadUrl = 'https://www.facedog.cn/api/user/image';
+    // if (params && params.profile) uploadUrl = 'http://39.97.187.201:8080/api/user/image';
     if (typeof params === 'function') {
         callback = params;
         params = {};

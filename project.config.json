@@ -6,6 +6,7 @@
     "postcss": false,
     "minified": false
   },
+  "cloudfunctionRoot": "./functions",
   "compileType": "miniprogram",
   "appid": "wx83bb88f9c0f7263d",
   "projectname": "battle",

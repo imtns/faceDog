@@ -1,120 +1,128 @@
 <style lang="less">
-@import 'components/vant/common/index.wxss';
-.van-tabbar--fixed {
-    z-index: 9999 !important;
-}
-::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    color: transparent;
-}
+	@import 'components/vant/common/index.wxss';
+	.van-tabbar--fixed {
+	  z-index: 9999 !important;
+	}
+	::-webkit-scrollbar {
+	  width: 0;
+	  height: 0;
+	  color: transparent;
+	}
 </style>
 
 <script>
-import wepy from 'wepy';
-import 'wepy-async-function';
+	import wepy from 'wepy';
+	import 'wepy-async-function';
 
-export default class extends wepy.app {
-    config = {
-        pages: [
-            'pages/home',
-            'pages/test',  // 切换
-            'pages/register',
-            'pages/index',
-            'pages/battle/profile',
-            'pages/fabu/fabu', // 发布页面
-            'pages/my/setting',
-            'pages/my/editname',
-            'pages/my/editdesc',
-            'pages/my/editfile',
-            'pages/chat/chat',
-            'pages/rank/rank', // 排行榜页面
-            'pages/chat/like',
-            'pages/my/mytime',
-            'pages/my/myrank', // 我的排名
-            'pages/chat/becomeFriend',
-            'pages/ta/taMomentList', // TA的动态
-            'pages/ta/momentDetail', // 动态详情页面
-            'pages/my/mymoment', // 我的动态
-            'pages/my/propaganda', // 我的推广
-            'pages/my/withdraw', // 红包提现
-            'pages/my/activityRule', // 活动规则
-            'pages/my/contactService', // 联系客服
-            'pages/my/myCard', // 生成美图
-            'pages/activity/activity',
-            'pages/activity/webview', // webview页面
-            'pages/register/chooseName',
-            'pages/register/chooseGender',
-            'pages/register/chooseBirth',
-            'pages/register/uploadAvatar', // 上传头像
-            'pages/register/verify',
-			'pages/register/uploadVideo',
-			'pages/discover/likeList', // 点赞列表
-			'pages/discover/commentList', // 评论列表
-			'pages/my/likeHelp' // 评论列表
-        ],
-        window: {
-            backgroundTextStyle: 'light',
-            navigationBarBackgroundColor: '#fff',
-            navigationBarTitleText: '颜狗',
-            navigationBarTextStyle: 'black',
-            onReachBottomDistance: 200
-        },
-        permission: {
-            'scope.userLocation': {
-                desc: '你的位置信息将用于小程序位置接口的效果展示'
-            }
-        }
-    };
+	export default class extends wepy.app {
+	  config = {
+	    pages: [
+	      'pages/home',
+	      'pages/test', // 切换
+	      'pages/register',
+	      'pages/index',
+	      'pages/battle/profile',
+	      'pages/fabu/fabu', // 发布页面
+	      'pages/my/setting',
+	      'pages/my/editname',
+	      'pages/my/editdesc',
+	      'pages/my/editfile',
+	      'pages/chat/chat',
+	      'pages/rank/rank', // 排行榜页面
+	      'pages/chat/like',
+	      'pages/my/mytime',
+	      'pages/my/myrank', // 我的排名
+	      'pages/chat/becomeFriend',
+	      'pages/ta/taMomentList', // TA的动态
+	      'pages/ta/momentDetail', // 动态详情页面
+	      'pages/my/mymoment', // 我的动态
+	      'pages/my/propaganda', // 我的推广
+	      'pages/my/withdraw', // 红包提现
+	      'pages/my/activityRule', // 活动规则
+	      'pages/my/contactService', // 联系客服
+	      'pages/my/myCard', // 生成美图
+	      'pages/activity/activity',
+	      'pages/activity/webview', // webview页面
+	      'pages/register/chooseName',
+	      'pages/register/chooseGender',
+	      'pages/register/chooseBirth',
+	      'pages/register/uploadAvatar', // 上传头像
+	      'pages/register/verify',
+	      'pages/register/uploadVideo',
+	      'pages/discover/likeList', // 点赞列表
+	      'pages/discover/commentList', // 评论列表
+	      'pages/my/likeHelp' // 评论列表
+	    ],
+	    window: {
+	      backgroundTextStyle: 'light',
+	      navigationBarBackgroundColor: '#fff',
+	      navigationBarTitleText: '颜狗',
+	      navigationBarTextStyle: 'black',
+	      onReachBottomDistance: 200
+	    },
+	    permission: {
+	      'scope.userLocation': {
+	        desc: '你的位置信息将用于小程序位置接口的效果展示'
+	      }
+	    }
+	  };
 
-    globalData = {
-        userInfo: {},
-        location: {},
-        welcome: false,
-        inviteCode: '',
-        isphoneX: false
-    };
+	  globalData = {
+	    userInfo: {},
+	    location: {},
+	    welcome: false,
+	    inviteCode: '',
+	    isphoneX: false
+	  };
 
-    constructor() {
-        super();
-        this.use('requestfix');
-        this.use('promisify');
-    }
+	  constructor() {
+	    super();
+	    this.use('requestfix');
+	    this.use('promisify');
+	  }
 
-    onLaunch() {
-        var that = this;
-        wx.getSystemInfo({
-            success(res) {
-                var name = 'iPhone X';
-                if (res.model.indexOf(name) > -1) {
-                    that.globalData.isphoneX = true;
-                }
-                console.warn(res);
-            }
-        });
-    }
-    onHide() {
-        console.log(5);
-    }
-    onShow() {
-        console.log(77);
-    }
-    async testAsync() {
-        const data = await this.sleep(3);
-        console.log(data);
-    }
+	  onLaunch() {
+	    var that = this;
+	    wx.getSystemInfo({
+	      success(res) {
+	        var name = 'iPhone X';
+	        if (res.model.indexOf(name) > -1) {
+	          that.globalData.isphoneX = true;
+	        }
+	        console.warn(res);
+	      }
+	    });
+	    console.log('on launch');
+	    if (!wx.cloud) {
+	      console.error('请使用 2.2.3 或以上的基础库以使用云能力');
+	    } else {
+	      wx.cloud.init({
+	        traceUser: true
+	      });
+	    }
+	  }
+	  onHide() {
+	    console.log(5);
+	  }
+	  onShow() {
+	    console.log(77);
+	  }
+	  async testAsync() {
+	    const data = await this.sleep(3);
+	    console.log(data);
+	  }
 
-    getUserInfo(cb) {
-        const that = this;
-        if (this.globalData.userInfo) {
-            return this.globalData.userInfo;
-        }
-        wepy.getUserInfo({
-            success(res) {
-                that.globalData.userInfo = res.userInfo;
-                cb && cb(res.userInfo);
-            }
-        });
-    }
-}
+	  getUserInfo(cb) {
+	    const that = this;
+	    if (this.globalData.userInfo) {
+	      return this.globalData.userInfo;
+	    }
+	    wepy.getUserInfo({
+	      success(res) {
+	        that.globalData.userInfo = res.userInfo;
+	        cb && cb(res.userInfo);
+	      }
+	    });
+	  }
+	}
 </script>
