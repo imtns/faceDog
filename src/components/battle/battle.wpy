@@ -141,7 +141,7 @@
 	    }
 	    setTimeout(() => {
 	      this.tranBottomY[this.swiperCurrent - 1] = 0;
-		  this.tranTopY[this.swiperCurrent - 1] = 0;
+	      this.tranTopY[this.swiperCurrent - 1] = 0;
 	      this.flyTop = {};
 	      this.flyBottom = {};
 	      this.topWave = false;
@@ -327,8 +327,8 @@
 	    this.show = true;
 	    this.swiperCurrent = 0;
 	    this.battleList = [];
-		const result = await get(BATTLE, { battle: '' });
-		console.warn('result',result);
+	    const result = await get(BATTLE, { battle: '' });
+	    console.warn('result', result);
 	    result.a.forEach((item, index) => {
 	      result.a[index].distance = (result.a[index].distance / 1000).toFixed(2);
 	      result.a[index].gender = result.a[index].gender == 'female' ? '女' : '男';
@@ -381,10 +381,10 @@
 	        }
 	      }
 	    });
-		this.getBattle();
-		Event.listen("battleFresh",()=>{
-			this.getBattle();
-		})
+	    this.getBattle();
+	    Event.listen('battleFresh', () => {
+	      this.getBattle();
+	    });
 	    setTimeout(() => {
 	      this.fistAnimation = true;
 	      this.$apply();
@@ -606,44 +606,44 @@
 	  }
 	  .left {
 	    left: -6rpx;
-	    transform: translate3d(-100%,0,0);
+	    transform: translate3d(-100%, 0, 0);
 	    &.ani {
 	      animation: fistLeft 0.6s ease-in 1;
 	      animation-fill-mode: both;
 	      @keyframes fistLeft {
 	        0% {
-	          transform: translate3d(-100%,0,0);
+	          transform: translate3d(-100%, 0, 0);
 	        }
 	        60% {
-	          transform: translate3d(0%,0,0);
+	          transform: translate3d(0%, 0, 0);
 	        }
 	        70% {
-	          transform: translate3d(-7%,0,0);
+	          transform: translate3d(-7%, 0, 0);
 	        }
 	        100% {
-	          transform: translate3d(-1%,0,0);
+	          transform: translate3d(-1%, 0, 0);
 	        }
 	      }
 	    }
 	  }
 	  .right {
 	    right: -6rpx;
-	    transform: translate3d(100%,0,0);
+	    transform: translate3d(100%, 0, 0);
 	    &.ani {
 	      animation: fistRight 0.6s ease-in 1;
 	      animation-fill-mode: both;
 	      @keyframes fistRight {
 	        0% {
-	          transform: translate3d(100%,0,0);
+	          transform: translate3d(100%, 0, 0);
 	        }
 	        60% {
-	          transform: translate3d(0,0%,0);
+	          transform: translate3d(0, 0%, 0);
 	        }
 	        70% {
-	          transform: translate3d(7%,0,0);
+	          transform: translate3d(7%, 0, 0);
 	        }
 	        100% {
-	          transform: translate3d(1%,0,0);
+	          transform: translate3d(1%, 0, 0);
 	        }
 	      }
 	    }
@@ -717,7 +717,7 @@
 	    position: absolute;
 	    top: 40%;
 	    left: 50%;
-	    transform: translate3d(-50%, -50%,0);
+	    transform: translate3d(-50%, -50%, 0);
 	  }
 	  .battle-container {
 	    width: 690rpx;
@@ -883,10 +883,10 @@
 	      @keyframes flyTop {
 	        /** 第一种写法**/
 	        0% {
-	          transform: translate3d(0, 10%,0) scale(1, 1);
+	          transform: translate3d(0, 10%, 0) scale(1, 1);
 	        }
 	        100% {
-	          transform: translate3d(0, -45%,0) scale(0, 0);
+	          transform: translate3d(0, -45%, 0) scale(0, 0);
 	        }
 	      }
 	      &.flyBottom {
@@ -896,10 +896,10 @@
 	      @keyframes flyBottom {
 	        /** 第一种写法**/
 	        0% {
-	          transform: translate3d(0, -30%,0) scale(1, 1);
+	          transform: translate3d(0, -30%, 0) scale(1, 1);
 	        }
 	        100% {
-	          transform: translate3d(0, 8%,0) scale(0, 0);
+	          transform: translate3d(0, 8%, 0) scale(0, 0);
 	        }
 	      }
 	      &.frame {
@@ -1007,10 +1007,10 @@
 	      }
 	      @keyframes flyAway {
 	        0% {
-	          transform: translate3d(0,0,0);
+	          transform: translate3d(0, 0, 0);
 	        }
 	        100% {
-	          transform: translate3d(-150%,0,0);
+	          transform: translate3d(-150%, 0, 0);
 	        }
 	      }
 	      .info {
