@@ -182,7 +182,7 @@ export default class Propaganda extends wepy.page {
             path: `/pages/home?userid=${ID}`,
             imageUrl: 'https://images.facedog.cn/public/yg-share.jpeg',
             success: res => {
-                console.error(this.profile.ID);
+                // console.error(this.profile.ID);
             },
             fail(res) {
                 // 分享失败

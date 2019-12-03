@@ -53,7 +53,7 @@ export default class Cropper extends wepy.component {
             this.$.touchEnd(e);
         },
         canvasError(e) {
-            console.error(e.detail.errMsg);
+            // console.error(e.detail.errMsg);
         },
         getFinalImage() {
             this.loading = true;

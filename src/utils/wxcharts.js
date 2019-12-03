@@ -1898,7 +1898,7 @@ Event.prototype.trigger = function () {
             try {
                 listener.apply(null, params);
             } catch (e) {
-                console.error(e);
+                // console.error(e);
             }
         });
     }

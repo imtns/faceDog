@@ -1,9 +1,6 @@
 import { toast } from './index';
-
-const domain = 'https://www.facedog.cn';
-
-// const domain = 'http://39.97.187.201:8080';
-
+import wepy from 'wepy';
+let baseUrl = wepy.$appConfig.baseUrl;
 const http = (method, ...props) => new Promise((resolve, reject) => {
 	try {
 		let url = props[0];
@@ -33,7 +30,7 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
 		}
 		// console.log('请求参数-》', data);
 		wx.request({
-			url: domain + url,
+			url: baseUrl + url,
 			data,
 			method: method === 'DELETETEMP' ? 'DELETE' : method,
 			dataType: 'json',

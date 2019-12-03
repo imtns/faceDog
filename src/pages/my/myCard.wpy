@@ -71,11 +71,11 @@ export default class MyCard extends wepy.page {
         },
 
         async toTempFile(res) {
-            console.error(res);
+            // console.error(res);
             const { tempFilePath } = res.detail;
             this.sharePic = tempFilePath;
             const path = this.sharePic;
-            console.error(path);
+            // console.error(path);
             await this.savePhotosAlbum(path);
 
             this.$apply();
@@ -95,7 +95,7 @@ export default class MyCard extends wepy.page {
             this.$apply();
 
             // await wepy.saveImageToPhotosAlbum({ filePath: path });
-            console.error(path);
+            // console.error(path);
             wx.previewImage({
                 current: path, // 当前显示图片的http链接
                 urls: [path] // 需要预览的图片http链接列表

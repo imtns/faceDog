@@ -2,11 +2,8 @@
 	<block wx:if="{{verify}}">
 		<verify />
 	</block>
-	<!-- <view hidden="{{selectedTab != 0 && test}}">
-		<battle />
-	</view> -->
 	<view wx:if="{{selectedTab == 0}}">
-		<battle1 />
+		<battle />
 	</view>
 	<view wx:if="{{selectedTab == 1}}">
 		<discover />
@@ -27,8 +24,7 @@
 <script>
 	import wepy from 'wepy';
 	import tabbar from '@/components/tabbar';
-	// import battle from '@/components/battle/battle';
-	import battle1 from '@/components/battle/battle1';
+	import battle from '@/components/battle/battle';
 	import discover from '@/components/discover/discover';
 	import my from '@/components/my/my';
 	import chat from '@/components/chat/chat';
@@ -63,7 +59,7 @@
 	  };
 	  components = {
 	    tabbar,
-	    battle1,
+	    battle,
 	    discover,
 	    chat,
 	    my,
@@ -102,7 +98,7 @@
 	    }
 	  };
 	  onPullDownRefresh() {
-	    console.error('ssss');
+	    // console.error('ssss');
 	  }
 	  async setProfile() {
 	    try {
@@ -128,7 +124,7 @@
 	      wepy.setStorageSync('profile', this.profile);
 	      this.$invoke('my', 'setProfile', this.profile);
 	    } catch (e) {
-	      console.error(e);
+	      // console.error(e);
 	      this.hasProfile = false;
 	      wepy.setStorageSync('hasProfile', false);
 	      this.$apply();
@@ -162,7 +158,7 @@
 	          }
 	        //   this.$invoke('battle', 'displayPage');
 	        }
-	        this.$invoke('battle1', 'init');
+	        this.$invoke('battle', 'init');
 	      }
 	      if (this.selectedTab == 2) {
 	        wx.setNavigationBarTitle({
@@ -214,7 +210,7 @@
 	    } else {
 	      this.selectedTab = 0;
 	    }
-	    this.$invoke('battle1', 'init');
+	    this.$invoke('battle', 'init');
 	    this.$invoke('discover', 'initList');
 	    this.$invoke('chat', 'initChat');
 	    Event.listen('refresh', () => {

@@ -113,7 +113,7 @@ export default class Register extends wepy.page {
 
     onLoad(options) {
         if (options.userid) {
-            console.error(options.userid);
+            // console.error(options.userid);
             this.code = options.userid;
             wepy.setStorageSync('inviteCode', this.code);
         }

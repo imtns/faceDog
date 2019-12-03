@@ -22,9 +22,9 @@
 							<image src="https://images.facedog.cn/public/my/level-{{level}}.png" mode="scaleToFill" lazy-load="false">
 							</image>
 						</view>
-						<view class="click-count">累计点击{{profile.play}}次 <image @tap="toRules" src="https://images.facedog.cn/public/my/question-mark.png" mode="scaleToFill"
-						  lazy-load="false">
-						</image></view>
+						<view class="click-count">累计点击{{profile.play}}次 <image @tap="toRules" src="https://images.facedog.cn/public/my/question-mark.png" mode="scaleToFill" lazy-load="false">
+							</image>
+						</view>
 					</view>
 					<view class="progress">
 						<van-progress show-pivot="{{false}}" color="{{levelColor[level]}}" percentage="{{levelPercent}}" />
@@ -148,12 +148,12 @@
 	  components = {};
 
 	  methods = {
-		toRules(){
-			wepy.navigateTo({ url: 'my/likeHelp' });
-		},
+	    toRules() {
+	      wepy.navigateTo({ url: 'my/likeHelp' });
+	    },
 	    addDebugCount() {
-			this.debug++;
-		},
+	      this.debug++;
+	    },
 	    checkVerify(state) {
 	      console.log(state);
 	      let userid = wepy.getStorageSync('inviteCode');
@@ -191,7 +191,7 @@
 	      wepy.navigateTo({ url: `my/${name}` });
 	    },
 	    setProfile(profile) {
-	      console.error(profile);
+	      // console.error(profile);
 	      this.tempName = wepy.getStorageSync('tempName');
 	      this.profile = profile;
 	      this.clickCount = profile.play;
@@ -200,22 +200,22 @@
 	    }
 	  };
 	  getLevel() {
-	    if (this.clickCount == 0) {
+	    if (this.clickCount > 0 && this.clickCount < 10) {
 	      this.level = 1;
-	      this.levelPercent = 0;
-	    } else if (this.clickCount > 0 && this.clickCount < 10) {
-	      this.level = 2;
 	      this.levelPercent = this.clickCount / 10;
 	    } else if (this.clickCount >= 10 && this.clickCount < 30) {
-	      this.level = 3;
+	      this.level = 2;
 	      this.levelPercent = this.clickCount / 30;
 	    } else if (this.clickCount >= 30 && this.clickCount < 99) {
-	      this.level = 4;
+	      this.level = 3;
 	      this.levelPercent = this.clickCount / 99;
+	    } else if (this.clickCount >= 100 && this.clickCount < 999) {
+	      this.level = 4;
+	      this.levelPercent = this.clickCount / 999;
 	    } else {
 	      this.level = 5;
-	      if (this.clickCount > 999) this.clickCount = 999;
-	      this.levelPercent = this.clickCount / 999;
+	      if (this.clickCount > 9999) this.clickCount = 9999;
+	      this.levelPercent = this.levelPercent / 9999;
 	    }
 	    this.levelPercent = this.levelPercent * 100;
 	  }
@@ -328,13 +328,13 @@
 	        color: #000;
 	        font-size: 22rpx;
 	        top: 17rpx;
-			position: relative;
-			image{
-				width:22rpx;
-				height:22rpx;
-				position:relative;
-				top:1rpx;
-			}
+	        position: relative;
+	        image {
+	          width: 22rpx;
+	          height: 22rpx;
+	          position: relative;
+	          top: 1rpx;
+	        }
 	      }
 	    }
 	  }

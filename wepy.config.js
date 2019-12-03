@@ -3,7 +3,7 @@ var prod = process.env.NODE_ENV === 'production';
 
 module.exports = {
     wpyExt: '.wpy',
-    eslint: true,
+    eslint: false,
     cliLogs: !prod,
     build: {
     },
@@ -38,7 +38,8 @@ module.exports = {
     plugins: {
     },
     appConfig: {
-        noPromiseAPI: ['createSelectorQuery']
+		noPromiseAPI: ['createSelectorQuery'],
+		baseUrl: process.env.NODE_ENV === 'production' ? 'https://www.facedog.cn' : 'http://39.97.187.201:8080'
     }
 };
 

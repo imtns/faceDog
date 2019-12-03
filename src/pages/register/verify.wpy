@@ -80,7 +80,7 @@
 
         async onLoad() {
             let data = await get(USER_VERIFY);
-            console.error(data);
+            // console.error(data);
             this.status = data.general;
             this.$apply();
         }

@@ -165,7 +165,7 @@ export default class Chat extends wepy.page {
 
     computed = {};
     initChat() {
-        console.error(this.id);
+        // console.error(this.id);
         webimhandler.init({
             selToID: this.id,
             selType: webim.SESSION_TYPE.C2C,

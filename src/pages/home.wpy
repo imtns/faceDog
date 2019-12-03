@@ -87,8 +87,8 @@
 	      }
 	    },
 	    async onGetPosition(e) {
-		  //   this.getLocationAuth();
-		  this.msgSecCheck('法轮功')
+		    this.getLocationAuth();
+		//   this.msgSecCheck('法轮功')
 	    },
 
 	    onGetUserInfo(e) {

@@ -89,8 +89,8 @@ export default class UploadVide extends wepy.page {
         });
     }
     goUpload(tempFilePath) {
-        console.error(this.number);
-        console.error(this.wechat);
+        // console.error(this.number);
+        // console.error(this.wechat);
         try {
             uploader(
                 tempFilePath,

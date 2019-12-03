@@ -73,7 +73,7 @@ function handlderMsg(msg) {
                     console.log('hahahaha')
                     Event.trigger('msgDetect', msg);
                     Event.trigger('msgDetectChat', msg);
-                    // console.error('收到一条c2c消息(好友消息或者全员推送消息): 发送人=' + fromAccountNick + ', 内容=' + contentHtml);
+                    // // console.error('收到一条c2c消息(好友消息或者全员推送消息): 发送人=' + fromAccountNick + ', 内容=' + contentHtml);
                     break;
             }
             break;
@@ -130,7 +130,7 @@ function sdkLogin(userInfo, listeners, options, cb) {
             // initEmotionUL();//初始化表情
         },
         function (err) {
-            console.error(err);
+            // console.error(err);
             wx.showToast({
                 title: '登录失败，code=' + err.ErrorCode,
                 icon: 'none',
@@ -171,7 +171,7 @@ function createBigGroup(groupId, loginInfo, callback) {
             callback();
         },
         function (err) {
-            console.error(err.ErrorInfo);
+            // console.error(err.ErrorInfo);
             callback();
         }
     );
@@ -189,11 +189,11 @@ function applyJoinBigGroup(groupId) {
                 webim.Log.info('进群成功');
                 selToID = groupId;
             } else {
-                console.error('进群失败');
+                // console.error('进群失败');
             }
         },
         function (err) {
-            console.error(err.ErrorInfo);
+            // console.error(err.ErrorInfo);
         }
     );
 }
@@ -511,7 +511,7 @@ function tlsGetUserSig(res) {
         if (res.ErrorCode == webim.TLS_ERROR_CODE.SIGNATURE_EXPIRATION) {
             tlsLogin();
         } else {
-            console.error('[' + res.ErrorCode + ']' + res.ErrorInfo);
+            // console.error('[' + res.ErrorCode + ']' + res.ErrorInfo);
         }
     }
 }
@@ -548,7 +548,7 @@ function smsPicClick() {
             // 调用tls登录服务
             tlsLogin();
         } else { // 独立模式
-            console.error('请填写帐号和票据');
+            // console.error('请填写帐号和票据');
         }
     } else {
         hideDiscussTool();// 隐藏评论工具栏
@@ -566,13 +566,13 @@ function onSendMsg(msg, callback) {
             // 调用tls登录服务
             tlsLogin();
         } else { // 独立模式
-            console.error('请填写帐号和票据');
+            // console.error('请填写帐号和票据');
         }
         return;
     }
 
     if (!selToID) {
-        console.error('您还没有进入房间，暂不能聊天');
+        // console.error('您还没有进入房间，暂不能聊天');
         return;
     }
     // 获取消息内容
@@ -580,7 +580,7 @@ function onSendMsg(msg, callback) {
     var msgLen = webim.Tool.getStrBytes(msg);
 
     if (msgtosend.length < 1) {
-        console.error('发送的消息不能为空!');
+        // console.error('发送的消息不能为空!');
         return;
     }
 
@@ -593,7 +593,7 @@ function onSendMsg(msg, callback) {
         errInfo = '消息长度超出限制(最多' + Math.round(maxLen / 3) + '汉字)';
     }
     if (msgLen > maxLen) {
-        console.error(errInfo);
+        // console.error(errInfo);
         return;
     }
 
@@ -664,7 +664,7 @@ function onSendMsg(msg, callback) {
     }, function (err) {
         selSess = null;
         webim.Log.error('发消息失败:' + err.ErrorInfo);
-        console.error('发消息失败:' + err.ErrorInfo);
+        // console.error('发消息失败:' + err.ErrorInfo);
         callback && callback('发送失败')
     });
 }
@@ -678,13 +678,13 @@ function sendGroupLoveMsg() {
             // 调用tls登录服务
             tlsLogin();
         } else { // 独立模式
-            console.error('请填写帐号和票据');
+            // console.error('请填写帐号和票据');
         }
         return;
     }
 
     if (!selToID) {
-        console.error('您还没有进入房间，暂不能点赞');
+        // console.error('您还没有进入房间，暂不能点赞');
         return;
     }
 
@@ -714,7 +714,7 @@ function sendGroupLoveMsg() {
         webim.Log.info('点赞成功');
     }, function (err) {
         webim.Log.error('发送点赞消息失败:' + err.ErrorInfo);
-        console.error('发送点赞消息失败:' + err.ErrorInfo);
+        // console.error('发送点赞消息失败:' + err.ErrorInfo);
     });
 }
 // 隐藏评论文本框
@@ -804,7 +804,7 @@ function quitBigGroup() {
             // applyJoinBigGroup(avChatRoomId2);//加入大群
         },
         function (err) {
-            console.error(err.ErrorInfo);
+            // console.error(err.ErrorInfo);
         }
     );
 }
@@ -929,7 +929,7 @@ function onGroupInfoChangeNotify(groupInfo) {
 function showGroupSystemMsg(type, typeCh, group_id, group_name, msg_content, msg_time) {
     var sysMsgStr = '收到一条群系统消息: type=' + type + ', typeCh=' + typeCh + ',群ID=' + group_id + ', 群名称=' + group_name + ', 内容=' + msg_content + ', 时间=' + webim.Tool.formatTimeStamp(msg_time);
     webim.Log.warn(sysMsgStr);
-    console.error(sysMsgStr);
+    // console.error(sysMsgStr);
 }
 
 function init(opts) {

@@ -51,7 +51,7 @@
 	      'pages/register/uploadVideo',
 	      'pages/discover/likeList', // 点赞列表
 	      'pages/discover/commentList', // 评论列表
-	      'pages/my/likeHelp' // 评论列表
+	      'pages/my/likeHelp' // 点击说明
 	    ],
 	    window: {
 	      backgroundTextStyle: 'light',
@@ -82,6 +82,8 @@
 	  }
 
 	  onLaunch() {
+		const baseUrl = wepy.$appConfig.baseUrl;
+		console.log('baseUrl',baseUrl);
 	    var that = this;
 	    wx.getSystemInfo({
 	      success(res) {
@@ -94,7 +96,7 @@
 	    });
 	    console.log('on launch');
 	    if (!wx.cloud) {
-	      console.error('请使用 2.2.3 或以上的基础库以使用云能力');
+	      // console.error('请使用 2.2.3 或以上的基础库以使用云能力');
 	    } else {
 	      wx.cloud.init({
 	        traceUser: true

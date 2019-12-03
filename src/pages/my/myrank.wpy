@@ -171,10 +171,10 @@ export default class Example extends wepy.page {
             this.$apply();
         },
         async toTempFile(res) {
-            console.error(res);
+            // console.error(res);
             const { tempFilePath } = res.detail;
             const path = tempFilePath;
-            console.error(path);
+            // console.error(path);
             await this.savePhotosAlbum(path);
 
             this.$apply();
@@ -319,7 +319,7 @@ export default class Example extends wepy.page {
                     canvasId: 'radarCanvas',
                     async success(res) {
                         var tempFilePath = res.tempFilePath;
-                        // console.error(tempFilePath);
+                        // // console.error(tempFilePath);
                         that.canvasImage = tempFilePath;
                         that.$apply();
                     },
