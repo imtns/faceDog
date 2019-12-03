@@ -1244,7 +1244,7 @@ module.exports = function () {
 
             this.error = function (logStr) {
                 try {
-                    on && // console.error(logStr);
+                    on && console.error(logStr);
                 } catch (e) { }
             };
             this.warn = function (logStr) {
