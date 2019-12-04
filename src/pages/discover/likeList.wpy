@@ -4,7 +4,7 @@
 		<view class="list">
 			<repeat for="{{list}}" key="index" index="index" item="item">
 				<view class="box">
-					<image src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
+					<image @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
 					<view class="name">
 						{{item.nick_name}}
 					</view>
@@ -18,7 +18,7 @@
 <script>
 	import wepy from 'wepy';
 
-    import { GET_MOMENT_DETAIL } from '@/utils/url';
+	import { GET_MOMENT_DETAIL } from '@/utils/url';
 	import { get } from '@/utils/request';
 	export default class LikeList extends wepy.page {
 	  config = {
@@ -31,7 +31,14 @@
 
 	  components = {};
 
-	  methods = {};
+	  methods = {
+	    goProfile(id) {
+	      //   console.log(id)
+	      // wepy.navigateTo({
+	      //     url: '../battle/profile?dentifier=' + id
+	      // });
+	    }
+	  };
 
 	  events = {};
 
@@ -72,7 +79,7 @@
 	        color: #000;
 	        font-size: 23rpx;
 	        margin-right: auto;
-	        margin-left: 34rpx;
+	        margin-left: 26rpx;
 	      }
 	      .time {
 	        color: #9a9a9a;

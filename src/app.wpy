@@ -51,7 +51,8 @@
 	      'pages/register/uploadVideo',
 	      'pages/discover/likeList', // 点赞列表
 	      'pages/discover/commentList', // 评论列表
-	      'pages/my/likeHelp' // 点击说明
+		  'pages/my/likeHelp', // 点击说明
+		  'pages/test/testBattle'
 	    ],
 	    window: {
 	      backgroundTextStyle: 'light',

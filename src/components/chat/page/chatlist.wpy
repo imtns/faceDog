@@ -135,9 +135,13 @@ export default class Chatlist extends wepy.component {
                         if (item.To_Account === 'administrator') {
                             item.C2cImage = 'https://images.facedog.cn/public/chat/chatIcon.png';
                             item.C2cNick = '颜狗客服';
-                        }
-                        if (item.To_Account == sess.id()) {
-                            item.UnreadMsgCount = sess.unread();
+						}
+                        if (item.To_Account == sess.id() && msg.fromAccount) {
+							item.UnreadMsgCount = sess.unread();
+							console.log('init',init);
+							console.log( Object.keys(msg).length)
+							console.log('item.To_Account',item.To_Account)
+							console.log('msg',msg)
                             if (!init && Object.keys(msg).length !== 0 && item.To_Account == msg.fromAccount) {
                                 item.MsgShow = decodeURIComponent(
                                 msg.elems[0].content.text
@@ -147,8 +151,19 @@ export default class Chatlist extends wepy.component {
                             );
                                 item.time = msg.sess.time();
                             }
-                        }
-                    });
+                        }else{
+							console.log('22222',sess.msgs());
+							if (!init && Object.keys(msg).length !== 0 && item.To_Account == sess.id()) {
+                                item.MsgShow = decodeURIComponent(
+                                sess.msgs()[sess.msgs().length-1].elems[0].content.text
+                            );
+                                item.showTime = formatDateFromSeconds(
+                                sess.time()
+                            );
+                                item.time = sess.time();
+                            }
+						}
+					});
                 }
                 this.list.sort((a, b) => {
                     return b.time - a.time;
@@ -158,8 +173,9 @@ export default class Chatlist extends wepy.component {
                 this.$apply();
                 console.log('unrenad:', unread);
                 console.log('sess.unread()', sess.unread());
-                console.log('sess.id', sess.id());
-                console.log('sess.msg', sess.msgs()[0].elems[0].content.text);
+				console.log('sess.id', sess.id());
+				console.log('sess.msg', sess.msgs());
+                console.log('sess.msg', decodeURIComponent(sess.msgs()[0].elems[0].content.text));
             }
             this.$emit('unreadSet', unread);
             this.$apply();

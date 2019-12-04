@@ -164,6 +164,7 @@
 	        Count: 100 // 最近的会话数 ,最大为 100
 	      },
 	      function(resp) {
+
 	        wx.hideLoading();
 	        // console.log('resp:' + JSON.stringify(resp));
 	        if (resp.SessionItem) {
@@ -173,7 +174,7 @@
 	            });
 	          } else {
 	            that.$invoke('chatTab', 'getChatList', resp.SessionItem);
-	            that.initUnreadMsgCount(that, null, true);
+	            // that.initUnreadMsgCount(that, null, true);
 	          }
 	        }
 	      },
