@@ -1,6 +1,6 @@
 # 颜狗faceDog
 
-@(微信小程序)[Jason|强强]
+@(微信小程序)[Jason(黄鑫)]
 
 ## UI框架:Vant Weapp
 
@@ -12,4 +12,4 @@
 
 npm  install
 
-wepy build --watch
+npm run dev
