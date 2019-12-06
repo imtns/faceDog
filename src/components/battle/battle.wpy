@@ -84,6 +84,7 @@
 	import { get, post } from '@/utils/request';
 	import { Event } from '@/utils/event.js';
 	import { removeDuplicates, throttle } from '@/utils';
+	import Toast from '@/components/vant/toast/toast';
 	import tutorial from './tutorial';
 	import loadingHeart from './loadingHeart';
 	export default class Battle extends wepy.component {
@@ -114,6 +115,8 @@
 	    fistAnimation: false, // 中间vs的动画
 	    opacityTopPick: 0, // pick的透明度
 	    opacityBottomPick: 0,
+	    noProfile: false,
+	    noProfileCount: 0,
 	    flyTempID: 0 // 当前动画的临时Id
 	  };
 
@@ -160,6 +163,7 @@
 	          fail: this.dislikeImageId
 	        }
 	      });
+	      this.noProfileCount++;
 	    } catch (e) {}
 	  }
 	  // 切换下一组
@@ -214,6 +218,10 @@
 	    },
 	    //上面的box拖动事件
 	    touchTopMove(id, e) {
+	      if (this.noProfile && this.noProfileCount >= 2) {
+	        Event.trigger('showVerify', true);
+	        return;
+	      }
 	      if (this.draggingBottom) return;
 	      this.draggingTop = true;
 	      this.blurBottom = true; // 拖动上面的时候下面的背景变blur
@@ -238,6 +246,10 @@
 	    },
 	    //下面box拖动事件
 	    touchBottomMove(id, e) {
+	      if (this.noProfile && this.noProfileCount >= 2) {
+	        Event.trigger('showVerify', true);
+	        return;
+	      }
 	      if (this.draggingTop) return;
 	      this.draggingBottom = true;
 	      this.blurTop = true; // 拖动下面的时候上面的背景变blur
@@ -251,10 +263,10 @@
 	      }
 	      if (tranY > -115) {
 	        tranY = -115;
-		  }
+	      }
 	      this.opacityBottomPick = (tranY == -115 ? 0 : tranY) / -215;
-	        throttle(this.setValue(tranY, this.swiperCurrent, 'bottom'), 500);
-	    //   this.tranBottomY[this.swiperCurrent] = tranY;
+	      throttle(this.setValue(tranY, this.swiperCurrent, 'bottom'), 500);
+	      //   this.tranBottomY[this.swiperCurrent] = tranY;
 	      console.log(tranY);
 	      //   this.$apply();
 	    },
@@ -366,6 +378,10 @@
 	  onLoad() {
 	    if (!wepy.getStorageSync('tutorial')) {
 	      this.tutorialShow = true;
+	      this.$apply();
+	    }
+	    if (!wepy.getStorageSync('hasProfile')) {
+	      this.noProfile = true;
 	      this.$apply();
 	    }
 	    let that = this;

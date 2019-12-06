@@ -70,7 +70,8 @@ export default class tabbar extends wepy.component {
 <style lang="less">
 .van-info{
     right:40rpx !important;
-    z-index: 9999;
+	z-index: 9999;
+	top:0 !important;
 }
 .van-tabbar-item__icon image {
     width:136rpx !important;

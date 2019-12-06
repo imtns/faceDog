@@ -20,6 +20,7 @@
 import wepy from 'wepy';
 import { uploader } from '@/utils/uploader';
 import Toast from '@/components/vant/toast/toast';
+import { post } from '@/utils/request';
 import Dialog from '@/components/vant/dialog/dialog';
 import { SUBMIT_FORMID } from '@/utils/url';
 export default class UploadVide extends wepy.page {

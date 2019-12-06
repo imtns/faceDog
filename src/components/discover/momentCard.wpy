@@ -691,7 +691,8 @@
                 }
                 &:last-child {
                   width: 36rpx;
-                  height: 10rpx;
+				  height: 10rpx;
+				  padding:15rpx 0;
                 }
               }
             }

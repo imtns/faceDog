@@ -12,7 +12,7 @@
 					<view class="desc">{{profile.age || '未知'}}岁 · {{profile.city || ''}}</view>
 				</view>
 				<view class="verify" @tap="checkVerify({{profile.progress}})">
-					<image src="https://images.facedog.cn/public/profile/{{profile.progress || 'refuse'}}.png" mode="aspectFill" lazy-load="false">
+					<image src="https://images.facedog.cn/public/profile/{{profile.progress || 'profile'}}.png" mode="aspectFill" lazy-load="false">
 					</image>
 					<!-- {{profile.progress?progress[profile.progress]:'未认证'}} -->
 				</view>
@@ -200,7 +200,7 @@
 	    }
 	  };
 	  getLevel() {
-	    if (this.clickCount > 0 && this.clickCount < 10) {
+	    if (this.clickCount >= 0 && this.clickCount < 10) {
 	      this.level = 1;
 	      this.levelPercent = this.clickCount / 10;
 	    } else if (this.clickCount >= 10 && this.clickCount < 30) {

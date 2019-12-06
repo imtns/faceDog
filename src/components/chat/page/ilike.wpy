@@ -45,6 +45,8 @@
 	import { MAKEFRIEND, MY_FAVORITE, DELETE_FAVORITE } from '@/utils/url';
 	import Dialog from '@/components/vant/dialog/dialog';
 	import Toast from '@/components/vant/toast/toast';
+
+    import { Event } from '@/utils/event.js';
 	export default class Like extends wepy.component {
 	  props = {};
 
@@ -60,10 +62,10 @@
 	    empty
 	  };
 	  async initList() {
-		this.page = 1;
-		this.nomore = false;
-		this.show = false;
-		this.list = [];
+	    this.page = 1;
+	    this.nomore = false;
+	    this.show = false;
+	    this.list = [];
 	    this.fetchData();
 	  }
 	  async fetchData() {
@@ -122,10 +124,18 @@
 	          }
 	        });
 	      }
-	      await post(MAKEFRIEND, {
-	        to_be: 'friend',
-	        user_id: id
-	      });
+	      try {
+	        await post(MAKEFRIEND, {
+	          to_be: 'friend',
+	          user_id: id
+	        });
+	      } catch (e) {
+	        if (e == '用户未完善资料') {
+	          Event.trigger('showVerify', true, 2);
+	        }
+	        return;
+	      }
+
 	      wx.hideLoading();
 	      Toast('申请成功');
 	      this.initList();
