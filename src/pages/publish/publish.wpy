@@ -67,7 +67,7 @@
 	  }
 	  return true;
 	}
-	export default class fabu extends wepy.page {
+	export default class Publish extends wepy.page {
 	  config = {
 	    navigationBarTitleText: '发布动态',
 	    usingComponents: {

@@ -115,7 +115,7 @@
             return;
           }
           wepy.navigateTo({
-            url: 'fabu/fabu'
+            url: 'publish/publish'
           });
         },
         async initList({ page = 1, same_city = 0, opposite = '' }) {

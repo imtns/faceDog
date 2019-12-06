@@ -22,7 +22,7 @@
 	      'pages/register',
 	      'pages/index',
 	      'pages/battle/profile',
-	      'pages/fabu/fabu', // 发布页面
+	      'pages/publish/publish', // 发布页面
 	      'pages/my/setting',
 	      'pages/my/editname',
 	      'pages/my/editdesc',
