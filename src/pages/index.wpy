@@ -1,4 +1,15 @@
 <template>
+	<navbar center="true" showHome="true" wx:if="{{selectedTab !=2 && selectedTab != 3}}">
+		<view slot="center" >
+			<view class="square">
+				<view class="tab {{tabSelect==0?'active':''}}" @tap="tabClick(0)">tab1</view>
+				<view class="tab {{tabSelect==1?'active':''}}" @tap="tabClick(1)">tab2</view>
+				<view class="underline" style="left:{{tabSelect==0?'20rpx':'110rpx'}}"></view>
+			</view>
+		</view>
+	</navbar>
+	<navbar  showHome="true" wx:else title="{{pageTitle}}">
+	</navbar>
 	<block wx:if="{{verify}}">
 		<verify />
 	</block>
@@ -43,6 +54,7 @@
 	    navigationBarTitleText: '谁的颜值更高？',
 	    // disableScroll: true,
 	    usingComponents: {
+	      navbar: '../components/navbar/index',
 	      'van-button': '../components/vant/button/index',
 	      'van-tabbar': '../components/vant/tabbar/index',
 	      'van-tabbar-item': '../components/vant/tabbar-item/index',
@@ -77,7 +89,9 @@
 	    hide: false,
 	    user: {},
 	    verify: false,
-	    hasProfile: false
+	    hasProfile: false,
+		tabSelect: 0,
+		pageTitle:''
 	  };
 	  computed = {
 	    now() {
@@ -85,6 +99,10 @@
 	    }
 	  };
 	  methods = {
+	    tabClick(tab) {
+			this.tabSelect = this.selectedTab = tab;
+
+		},
 	    onGotUserInfo(e) {
 	      console.log(e.detail.errMsg);
 	      console.log(e.detail.userInfo);
@@ -120,6 +138,7 @@
 	          }
 	        });
 	      wepy.setStorageSync('hasProfile', this.hasProfile);
+	      this.$invoke('battle', 'hasProfile', this.hasProfile);
 	      this.profile.images = this.switchOrder(this.profile.images);
 	      wepy.setStorageSync('profile', this.profile);
 	      this.$invoke('my', 'setProfile', this.profile);
@@ -156,7 +175,7 @@
 	            tabClicked = true;
 	            return;
 	          }
-	        //   this.$invoke('battle', 'displayPage');
+	          //   this.$invoke('battle', 'displayPage');
 	        }
 	        this.$invoke('battle', 'init');
 	      }
@@ -169,7 +188,8 @@
 	      if (this.selectedTab == 3) {
 	        wx.setNavigationBarTitle({
 	          title: ''
-	        });
+			});
+			this.pageTitle = '我的';
 	        // this.$invoke('my', 'setProfile');
 	      } else if (this.selectedTab == 1) {
 	        wx.setNavigationBarTitle({
@@ -197,12 +217,12 @@
 	      optionFrom = true;
 	      this.selectedTab = options.select;
 	      setTimeout(() => {
-	        if (options.select == 2) {
-	          Event.trigger('tab', options.tab);
-	          wx.setNavigationBarTitle({
-	            title: ''
-	          });
-	        }
+	        // if (options.select == 2) {
+	        Event.trigger('tab', options.tab);
+	        wx.setNavigationBarTitle({
+	          title: ''
+	        });
+	        // }
 	      }, 500);
 	      console.log(options.select);
 	      this.$apply();
@@ -243,7 +263,7 @@
 	      //   this.$invoke('battle', 'init');
 	    }
 	    if (this.selectedTab === 2) {
-	    //   this.$invoke('chat', 'initChat');
+	      //   this.$invoke('chat', 'initChat');
 	    } else if (this.selectedTab === 3) {
 	      // this.setProfile();
 	      // this.$invoke('my', 'setProfile', this.profile);
@@ -254,3 +274,27 @@
 	  }
 	}
 </script>
+<style lang="less">
+	.square {
+	  display: flex;
+	  justify-content: center;
+	  padding: 8rpx 0;
+	  position: relative;
+	  .tab {
+	    margin: 0 10rpx;
+	    &.active {
+	      color: burlywood;
+	    }
+	  }
+	  .underline {
+	    position: absolute;
+	    left: 20rpx;
+	    bottom: 0rpx;
+	    width: 40rpx;
+	    height: 4rpx;
+	    background: #4092cb;
+	    transition: left 0.3s ease-in;
+	    will-change: left;
+	  }
+	}
+</style>

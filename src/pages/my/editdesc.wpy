@@ -1,5 +1,7 @@
 <!--  -->
 <template>
+	<navbar  title="个性签名">
+	</navbar>
     <view class='wrapper'>
         <view class="input">
             <textarea placeholder="最多16个字符" type="text" value="{{profile.signature}}" @input="inputChange" maxlength="16" auto-focus></textarea>

@@ -7,47 +7,46 @@
 </template>
 
 <script>
-import wepy from 'wepy';
-export default class Empty extends wepy.component {
-    props = {};
+    import wepy from 'wepy';
+    export default class Empty extends wepy.component {
+      props = {};
 
-    data = {};
+      data = {};
 
-    components = {};
+      components = {};
 
-    methods = {};
+      methods = {};
 
-    events = {};
+      events = {};
 
-    watch = {};
+      watch = {};
+      computed = {};
 
-    computed = {};
+      onLoad() {}
 
-    onLoad() {}
-
-    onShow() {}
-}
+      onShow() {}
+    }
 </script>
 
 <style lang='less' scoped>
-.empty {
-    display: flex;
-    justify-content: center;
-    padding-top: 180rpx;
-    flex-wrap: wrap;
-    width: 100%;
-    align-items: center;
-    flex-direction: column;
-    .img {
+    .empty {
+      display: flex;
+      justify-content: center;
+      padding-top: 180rpx;
+      flex-wrap: wrap;
+      width: 100%;
+      align-items: center;
+      flex-direction: column;
+      .img {
         width: 359rpx;
         height: 359rpx;
-    }
-    .text {
+      }
+      .text {
         font-size: 32rpx;
         font-weight: 600;
         color: rgba(40, 40, 40, 1);
         opacity: 1;
-        margin-top:26rpx;
+        margin-top: 26rpx;
+      }
     }
-}
 </style>

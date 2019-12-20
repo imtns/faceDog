@@ -1,5 +1,7 @@
 <!--  -->
 <template>
+	<navbar  title="编辑资料">
+	</navbar>
     <view class='wrapper'>
         <view class="avatar-box">
             <view class="avatar big">

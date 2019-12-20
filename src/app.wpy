@@ -59,7 +59,8 @@
 	      navigationBarBackgroundColor: '#fff',
 	      navigationBarTitleText: '颜狗',
 	      navigationBarTextStyle: 'black',
-	      onReachBottomDistance: 200
+	      onReachBottomDistance: 200,
+		  navigationStyle:"custom"
 	    },
 	    permission: {
 	      'scope.userLocation': {
@@ -73,7 +74,9 @@
 	    location: {},
 	    welcome: false,
 	    inviteCode: '',
-	    isphoneX: false
+		isphoneX: false,
+		navHeight:0
+
 	  };
 
 	  constructor() {
@@ -86,8 +89,10 @@
 		const baseUrl = wepy.$appConfig.baseUrl;
 		console.log('baseUrl',baseUrl);
 	    var that = this;
+
 	    wx.getSystemInfo({
 	      success(res) {
+			wx.setStorageSync('navHeight', res.statusBarHeight + 46);
 	        var name = 'iPhone X';
 	        if (res.model.indexOf(name) > -1) {
 	          that.globalData.isphoneX = true;

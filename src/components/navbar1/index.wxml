@@ -1,0 +1,15 @@
+<view class="navbar" style='height:{{navH}}px'>
+	<view class="navbar-action-wrap ">
+		<view>123123</view>
+	</view>
+	<block wx:if='{{tab==0}}'>
+		<view class='navbar-title-1'>
+			<view class="tab {{tabIndex==1?'active':''}}" bindtap="tabSelect" data-tab="1">abc</view>
+			<view class="tab {{tabIndex==2?'active':''}}" bindtap="tabSelect" data-tab="2">123</view>
+			<view class="underline" style="left:{{tabIndex==1?'320rpx;':'390rpx'}}"></view>
+		</view>
+	</block>
+	<block wx:else>
+		<view class='navbar-title'>232323</view>
+	</block>
+</view>

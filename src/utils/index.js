@@ -64,7 +64,7 @@ function removeDuplicates(originalArray, prop) {
     }
     return newArray;
 }
-function toast(title, cb, time = 2000) {
+function toast(title, cb, time = 2500) {
     wx.showToast({
         title,
         icon: 'none',

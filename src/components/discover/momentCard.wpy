@@ -684,7 +684,8 @@
                 width: 33rpx;
                 height: 33rpx;
                 display: inline-block;
-                margin-left: 30rpx;
+				margin-left: 30rpx;
+				padding:15rpx 0;
                 image {
                   width: 100%;
                   height: 100%;

@@ -39,7 +39,7 @@ export default class Constellation extends wepy.component {
             icon: 'https://images.facedog.cn/public/rank/a6-vir.png',
         }, {
             value: 7,
-            text: '天平座',
+            text: '天秤座',
             icon: 'https://images.facedog.cn/public/rank/a7-lib.png',
         }, {
             value: 8,
@@ -51,7 +51,7 @@ export default class Constellation extends wepy.component {
             icon: 'https://images.facedog.cn/public/rank/a9-sgr.png',
         }, {
             value: 10,
-            text: '摩羯座',
+            text: '魔羯座',
             icon: 'https://images.facedog.cn/public/rank/a10-cap.png',
         }, {
             value: 11,

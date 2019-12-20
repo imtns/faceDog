@@ -146,9 +146,12 @@
 	    Event.listen('tab', tab => {
 	      this.tabIndex = tab;
 	      console.log('tab', tab);
-	      // if (tab == 2) {
-	      //     this.$invoke('like', 'initData');
-	      // }
+	      if (tab == 1) {
+	        this.$invoke('ilike', 'initData');
+	      }
+	      //   if (tab == 2) {
+	      //       this.$invoke('like', 'initData');
+	      //   }
 	      this.$apply();
 	    });
 	    // this.$invoke('ilike', 'initData');
@@ -164,7 +167,6 @@
 	        Count: 100 // 最近的会话数 ,最大为 100
 	      },
 	      function(resp) {
-
 	        wx.hideLoading();
 	        // console.log('resp:' + JSON.stringify(resp));
 	        if (resp.SessionItem) {
@@ -192,7 +194,7 @@
 	    that.$invoke('chatTab', 'receivingMsg', sessMap, msg || {}, init);
 	  }
 	}
-</script> 
+</script>
 
 <style lang='less' scoped>
 	.container {

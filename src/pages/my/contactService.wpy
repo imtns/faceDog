@@ -1,5 +1,7 @@
 <!--  -->
 <template>
+	<navbar  title="联系客服">
+	</navbar>
     <view class='wrapper'>
         <view class="desc">
             <view class="title">审核及使用问题请通过以下方式联系客服：</view>

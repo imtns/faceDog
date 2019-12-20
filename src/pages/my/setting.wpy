@@ -1,5 +1,7 @@
 <!--  -->
 <template>
+	<navbar title="设置">
+	</navbar>
     <view class='wrapper'>
         <view class='item'>
             <view class="title">只看</view>
@@ -52,6 +54,7 @@ export default class Setting extends wepy.page {
         navigationBarTitleText: '设置',
         disableScroll: true,
         usingComponents: {
+			 navbar: '../../components/navbar/index',
             'van-button': '../../components/vant/button/index',
             'van-icon': '../../components/vant/icon/index',
             'van-switch': '../../components/vant/switch/index'
@@ -65,7 +68,8 @@ export default class Setting extends wepy.page {
         gender: 1
     };
 
-    components = {};
+    components = {
+	};
 
     methods = {
         async onChange(name, { detail }) {
