@@ -1,5 +1,7 @@
 <!--  -->
 <template>
+	<navbar  title="排行榜">
+	</navbar>
     <view class="rank-page">
         <view class="rank-search">
             <van-tabs class="tabs" bind:change="onChange" bind:click="onClickTabs" active="{{ active }}">
@@ -55,7 +57,8 @@ export default class fabu extends wepy.page {
         navigationBarTitleText: '排行榜',
         usingComponents: {
             'van-tabs': '../../components/vant/tabs/index',
-            'van-tab': '../../components/vant/tab/index'
+			'van-tab': '../../components/vant/tab/index',
+			navbar: '../../components/navbar/index',
         }
     };
     data = {
@@ -248,9 +251,9 @@ export default class fabu extends wepy.page {
         }
     }
     .tips{
-		position: absolute;
-		right:30rpx;
-		top:20rpx;
+		float:right;
+		margin-right:30rpx;
+		margin-top:20rpx;
         width: 101rpx;
         height:40rpx;
 		image{

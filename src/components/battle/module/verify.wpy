@@ -10,7 +10,9 @@
             </view> -->
             <view class="pop2" >
                 <image src="https://images.facedog.cn/public/profile/close1.png" mode="aspectFill" class="close" @tap="close"></image>
-                <button form-type='submit' class="btn" @tap="verify">现在去完善</button>
+				<view class="text">只有通过真人认证的用户才可以</view>
+				<view class="text">被其他人看到并使用全部的功能哦</view>
+                <button form-type='submit' class="btn" @tap="verify">现在去认证</button>
             </view>
         </form>
     </view>
@@ -127,10 +129,10 @@
         position: absolute;
         width: 520rpx;
         height: 595rpx;
-        top: 245rpx;
+        top: 305rpx;
         left: 50%;
         transform: translateX(-50%);
-        background: url('https://images.facedog.cn/public/register/verify.png');
+        background: url('https://images.facedog.cn/public/register/verify.png?2');
         background-size: cover;
         .close {
           position: absolute;
@@ -173,10 +175,10 @@
         position: absolute;
         width: 520rpx;
         height: 595rpx;
-        top: 245rpx;
+        top: 315rpx;
         left: 50%;
         transform: translateX(-50%);
-        background: url('https://images.facedog.cn/public/register/verify-2.png');
+        background: url('https://images.facedog.cn/public/register/verify.png?3');
         background-size: cover;
         .close {
           position: absolute;
@@ -189,9 +191,12 @@
           font-size: 24rpx;
           color: #777676;
           width: 414rpx;
-          white-space: normal;
-          margin: 282rpx auto 0;
-          text-align: center;
+		  white-space: normal;
+		  position:relative;
+		  top:300rpx;
+		  text-align: center;
+		  left:50%;
+		  transform: translateX(-50%);
         }
         .btn {
           width: 420rpx;
@@ -202,7 +207,7 @@
           line-height: 100rpx;
           color: white;
           font-size: 28rpx;
-          margin-top: 440rpx;
+          margin-top: 390rpx;
         }
       }
     }

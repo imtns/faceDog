@@ -1,51 +1,13 @@
 <!--  -->
 <template>
 	<view class="container">
-		<van-collapse value="{{ activeNames }}" bind:change="onChange">
-			<van-collapse-item title="喜欢我的({{likemeList.length}})" name="1">
-				<scroll-view scroll-x class="scroll-x" style="width:100%;">
-					<image @tap="checkAllLikeMe" src="https://images.facedog.cn/public/chat/like-me-all.png" mode="scaleToFill" lazy-load="false">
-					</image>
-					<block wx:if="{{likemeList.length}}">
-						<repeat for="{{likemeList}}" key="index" index="index" item="item">
-							<image class="icon" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
-						</repeat>
-					</block>
-					<block wx:else>
-						<repeat for="{{[0,1,2,3]}}" key="index" index="index" item="item">
-							<view class="icon-empty"></view>
-						</repeat>
-					</block>
-				</scroll-view>
-
-			</van-collapse-item>
-			<van-collapse-item title="我喜欢的({{ilikeTotal}})" name="2">
-				<scroll-view scroll-x class="scroll-x" style="width:100%;">
-					<image @tap="checkAllIlike" src="https://images.facedog.cn/public/chat/i-like-all.png" mode="scaleToFill" lazy-load="false">
-					</image>
-					<block wx:if="{{ilikeList.length}}">
-						<repeat for="{{ilikeList}}" key="index" index="index" item="item">
-							<image class="icon blue" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
-						</repeat>
-					</block>
-					<block wx:else>
-						<repeat for="{{[0,1,2,3]}}" key="index" index="index" item="item">
-							<view class="icon-empty"></view>
-						</repeat>
-					</block>
-				</scroll-view>
-			</van-collapse-item>
-		</van-collapse>
-		<!-- <scroll-view scroll-y class="scroll" style="height:{{scrollHeight}}px"> -->
-		<chatlist />
-		<!-- </scroll-view> -->
-		<!-- <view class="tabs">
+		<view class="tabs">
 			<image class="tab" @tap="tabClick(1)" src="{{tabIndex == 1?'https://images.facedog.cn/public/chat/ilike-active.png?4':'https://images.facedog.cn/public/chat/ilike.png?4'}}" mode="aspectFill"></image>
 			<image class="tab" @tap="tabClick(2)" src="{{tabIndex == 2?'https://images.facedog.cn/public/chat/likeme-active.png?4':'https://images.facedog.cn/public/chat/likeme.png?4'}}" mode="aspectFill"></image>
 			<image class="tab" @tap="tabClick(3)" src="{{tabIndex == 3?'https://images.facedog.cn/public/chat/friends-active.png?4':'https://images.facedog.cn/public/chat/friends.png?4'}}" mode="aspectFill"></image>
 			<image class="tab" @tap="tabClick(4)" src="{{tabIndex == 4?'https://images.facedog.cn/public/chat/notify-active.png?4':'https://images.facedog.cn/public/chat/notify.png?4'}}" mode="aspectFill"></image>
-		</view> -->
-		<!-- <scroll-view scroll-y style="height:{{scrollHeight}}px" class="scroll" wx:if="{{tabIndex == 1}}">
+		</view>
+		<scroll-view scroll-y style="height:{{scrollHeight}}px" class="scroll" wx:if="{{tabIndex == 1}}">
 			<ilike />
 		</scroll-view>
 		<scroll-view scroll-y class="scroll" style="height:{{scrollHeight}}px" wx:if="{{tabIndex == 2}}">
@@ -56,7 +18,7 @@
 		</scroll-view>
 		<scroll-view scroll-y class="scroll" style="height:{{scrollHeight}}px" wx:if="{{tabIndex == 4}}">
 			<notify />
-		</scroll-view> -->
+		</scroll-view>
 	</view>
 </template>
 
@@ -74,58 +36,25 @@
 	import likeme from './page/likeme';
 	import ilike from './page/ilike';
 	import chatTab from './page/chatTab';
-	import chatlist from './page/chatlist';
 	import notify from './page/notify';
 	import { Event } from '@/utils/event.js';
 	import wepy from 'wepy';
-	import { get, post } from '@/utils/request';
-	import { MY_FAVORITE, LIKE_ME } from '@/utils/url';
-
 	export default class Chat extends wepy.component {
 	  data = {
 	    isNoData: true,
 	    noData: '/no-msg.png', // 无数据的图片
 	    contactList: [], // 会话列表
 	    tabIndex: 1,
-	    scrollHeight: 0,
-	    activeNames: ['1', '2'],
-	    ilikeList: [],
-	    likemeList: [],
-	    ilikeTotal: 0,
-	    likeMeTotal: 0
+	    scrollHeight: 0
 	  };
 	  components = {
 	    likeme,
 	    ilike,
-	    chatlist,
+	    chatTab,
 	    notify
 	  };
 
 	  methods = {
-	    // getChatList(data) {
-	    //   this.$invoke('chatlist', 'getChatList', data);
-	    // },
-	   goProfile(id) {
-	      wx.navigateTo({
-	        url: `battle/profile?id=${id}`,
-	        success: result => {},
-	        fail: () => {},
-	        complete: () => {}
-	      });
-	    },
-	    checkAllLikeMe() {
-	      wepy.navigateTo({ url: '/pages/chat/likeme' });
-	    },
-	    checkAllIlike() {
-	      wepy.navigateTo({ url: '/pages/chat/ilike' });
-	    },
-	    receivingMsg(data) {
-	      this.$invoke('chatlist', 'receivingMsg', data);
-	    },
-	    onChange(event) {
-	      console.log(event.detail);
-	      this.activeNames = event.detail;
-	    },
 	    tabClick(index) {
 	      this.tabIndex = index;
 	      if (index == 1) {
@@ -138,11 +67,8 @@
 	        this.$invoke('notify', 'initData');
 	      }
 	    },
-	    refreshData() {
-	      this.fetchData();
-	    },
 	    initLike() {
-	      //   this.$invoke('ilike', 'initData');
+	      this.$invoke('ilike', 'initData');
 	    },
 	    initChat() {
 	      var selToID = ''; // 会话列表不设置对方私聊账号
@@ -230,25 +156,6 @@
 	    });
 	    // this.$invoke('ilike', 'initData');
 	    this.$apply();
-	    // this.fetchData();
-	  }
-	  async fetchData() {
-	    this.likemeList = [];
-	    this.ilikeList = [];
-	    const ilike = await get(MY_FAVORITE);
-	    console.log(ilike.length);
-	    this.ilikeTotal = ilike.total;
-	    this.ilikeList = ilike.favorites.slice(-5);
-	    const likeme = await get(LIKE_ME);
-	    this.likemeList = likeme;
-	    this.likemeList.forEach(item => {
-	      item.day = item.date_time.split('-')[2];
-	      item.month = new Date(item.date_time).toDateString().split(' ')[1];
-	      item.users.forEach(t => {
-	        t.age = getAge(t.birthday);
-	      });
-	    });
-	    this.$apply();
 	  }
 	  // 初始化聊天界面最近会话列表
 	  initRecentContactList() {
@@ -268,7 +175,7 @@
 	              isNoData: false
 	            });
 	          } else {
-	            that.$invoke('chatlist', 'getChatList', resp.SessionItem);
+	            that.$invoke('chatTab', 'getChatList', resp.SessionItem);
 	            // that.initUnreadMsgCount(that, null, true);
 	          }
 	        }
@@ -284,19 +191,10 @@
 	    var sessMap = webim.MsgStore.sessMap();
 	    console.log(sessMap);
 	    var sess = null;
-	    that.$invoke('chatlist', 'receivingMsg', sessMap, msg || {}, init);
+	    that.$invoke('chatTab', 'receivingMsg', sessMap, msg || {}, init);
 	  }
 	}
 </script>
-<style lang="less">
-	.van-collapse-item__content {
-	  padding: 0 !important;
-	  width: 100%;
-	}
-	.van-cell:after {
-	  left: 0 !important;
-	}
-</style>
 
 <style lang='less' scoped>
 	.container {
@@ -310,62 +208,6 @@
 	      width: 157rpx;
 	      height: 64rpx;
 	    }
-	  }
-	}
-
-	.scroll-x {
-	  height: 186rpx;
-	  width: 500rpx;
-	  display: flex;
-	  align-items: center;
-	  background: #f5f6f7;
-	  white-space: nowrap;
-	  //   &:first-child {
-	  //     image:not(:first-child) {
-	  //       border: 4rpx solid red;
-	  //     }
-	  //   }
-	  &.i-like {
-	  }
-	  .icon-empty {
-	    width: 122rpx;
-	    height: 122rpx;
-	    border-radius: 50%;
-	    display: inline-block;
-	    margin-right: 18rpx;
-	    border: 4rpx dashed #ccc;
-	  }
-	  .icon {
-	    width: 122rpx;
-	    height: 122rpx;
-	    border-radius: 50%;
-	    display: inline-block;
-	    position: relative;
-	    margin-right: 18rpx;
-	    border: 4rpx solid red;
-	    &::before {
-	      border: 4rpx solid white;
-	      content: '';
-	      display: block;
-	      position: absolute;
-	      border-radius: 50%;
-	      top: 0rpx;
-	      left: 0rpx;
-	      right: 0rpx;
-	      bottom: 0rpx;
-	    }
-	    &.blue {
-	      border: 4rpx solid #5cd4d4;
-	    }
-	  }
-	  image {
-	    margin-top: 24rpx;
-	  }
-	  image:first-child {
-	    margin-left: 32rpx;
-	    margin-right: 30rpx;
-	    width: 130rpx;
-	    height: 139rpx;
 	  }
 	}
 	.msg-con {

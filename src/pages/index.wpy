@@ -1,28 +1,36 @@
 <template>
-	<navbar center="true" showHome="true" wx:if="{{selectedTab !=2 && selectedTab != 3}}">
-		<view slot="center" >
-			<view class="square">
-				<view class="tab {{tabSelect==0?'active':''}}" @tap="tabClick(0)">tab1</view>
-				<view class="tab {{tabSelect==1?'active':''}}" @tap="tabClick(1)">tab2</view>
-				<view class="underline" style="left:{{tabSelect==0?'20rpx':'110rpx'}}"></view>
+	<navbar center="true" showHome="{{showHome}}" wx:if="{{selectedTab ==1 }}">
+		<view slot="center">
+			<view class="square"> 
+				<view class="tab {{tabSelect==0?'active':''}}" @tap="tabClick(0)">PK</view>
+				<view class="tab-split"></view>
+				<view class="tab {{tabSelect==1?'active':''}}" @tap="tabClick(1)">探索</view>
+				<view class="underline" style="left:{{tabSelect==0?'21rpx':'123rpx'}}"></view>
 			</view>
 		</view>
 	</navbar>
-	<navbar  showHome="true" wx:else title="{{pageTitle}}">
+	<navbar wx:else title="{{pageTitle}}">
 	</navbar>
+	<view class="guest-button" wx:if="{{selectedTab != 2 && !hasProfile && loaded}}" @tap="verifyShow">游客模式</view>
 	<block wx:if="{{verify}}">
 		<verify />
 	</block>
 	<view wx:if="{{selectedTab == 0}}">
-		<battle />
-	</view>
-	<view wx:if="{{selectedTab == 1}}">
-		<discover />
-	</view>
-	<view wx:if="{{selectedTab == 2}}">
 		<chat />
 	</view>
-	<view wx:if="{{selectedTab == 3}}">
+	<view wx:if="{{selectedTab == 1}}">
+		<block wx:if="{{tabSelect == 0}}">
+			<battle />
+		</block>
+		<block wx:if="{{tabSelect == 1}}">
+			<explore :verify.sync="hasProfile"/>
+		</block>
+	</view>
+	<!-- <view wx:if="{{selectedTab == 1}}">
+		<discover />
+	</view> -->
+
+	<view wx:if="{{selectedTab == 2}}">
 		<my />
 	</view>
 	<block wx:if="{{tabbarshow}}">
@@ -36,6 +44,7 @@
 	import wepy from 'wepy';
 	import tabbar from '@/components/tabbar';
 	import battle from '@/components/battle/battle';
+	import explore from '@/components/explore/index';
 	import discover from '@/components/discover/discover';
 	import my from '@/components/my/my';
 	import chat from '@/components/chat/chat';
@@ -45,7 +54,7 @@
 	import { NEW_PROFILE } from '@/utils/url';
 	import { getAge } from '@/utils';
 	import { Event } from '@/utils/event.js';
-	import verify from '@/components/battle/verify';
+	import verify from '@/components/battle/module/verify';
 	let tabClicked = false;
 	let optionFrom = false;
 	// import { toast } from '@/utils';
@@ -66,12 +75,15 @@
 	      'van-overlay': '../components/vant/overlay/index',
 	      'van-swipe-cell': '../components/vant/swipe-cell/index',
 	      'van-toast': '../components/vant/toast/index',
-	      'van-progress': '../components/vant/progress/index'
+	      'van-progress': '../components/vant/progress/index',
+	      'van-collapse': '../components/vant/collapse/index',
+	      'van-collapse-item': '../components/vant/collapse-item/index'
 	    }
 	  };
 	  components = {
 	    tabbar,
 	    battle,
+	    explore,
 	    discover,
 	    chat,
 	    my,
@@ -90,8 +102,10 @@
 	    user: {},
 	    verify: false,
 	    hasProfile: false,
-		tabSelect: 0,
-		pageTitle:''
+	    tabSelect: 0,
+		pageTitle: '',
+		loaded:false,
+		showHome:true
 	  };
 	  computed = {
 	    now() {
@@ -99,10 +113,12 @@
 	    }
 	  };
 	  methods = {
-	    tabClick(tab) {
-			this.tabSelect = this.selectedTab = tab;
-
+		verifyShow(){
+			this.verify = true;
 		},
+	    tabClick(tab) {
+	      this.tabSelect = tab;
+	    },
 	    onGotUserInfo(e) {
 	      console.log(e.detail.errMsg);
 	      console.log(e.detail.userInfo);
@@ -141,14 +157,18 @@
 	      this.$invoke('battle', 'hasProfile', this.hasProfile);
 	      this.profile.images = this.switchOrder(this.profile.images);
 	      wepy.setStorageSync('profile', this.profile);
-	      this.$invoke('my', 'setProfile', this.profile);
+		  this.$invoke('my', 'setProfile', this.profile);
+		  this.loaded = true;
+		  this.$apply();
 	    } catch (e) {
 	      // console.error(e);
 	      this.hasProfile = false;
 	      wepy.setStorageSync('hasProfile', false);
 	      this.$apply();
 	      let profile = wepy.getStorageSync('wx_profile');
-	      this.$invoke('my', 'setProfile', profile);
+		  this.$invoke('my', 'setProfile', profile);
+		  this.loaded = true;
+		  this.$apply();
 	      // setTimeout(() => {
 	      //     wepy.redirectTo({ url: 'home' });
 	      // }, 1000);
@@ -163,13 +183,29 @@
 	    return r;
 	  }
 	  events = {
+		verifyShow(){
+			this.verify = true;
+		},
+	    recommendTap() {
+	      this.tabSelect = 1;
+	    },
 	    tabSelect: (...args) => {
 	      let $event = args[args.length - 1];
-	      this.selectedTab = $event.source.tabIndex;
+		  this.selectedTab = $event.source.tabIndex;
+		  this.showHome = false;
 	      if (this.selectedTab == 0) {
-	        wx.setNavigationBarTitle({
-	          title: '谁的颜值更高？'
-	        });
+	        this.pageTitle = '消息';
+	        // wx.setNavigationBarTitle({
+	        //   title: ''
+	        // });
+	        this.$invoke('chat', 'initLike');
+	        this.$invoke('chat', 'refreshData');
+	      }
+	      if (this.selectedTab == 1) {
+	        // wx.setNavigationBarTitle({
+	        //   title: '谁的颜值更高？'
+			// });
+			this.showHome = true;
 	        if (optionFrom) {
 	          if (!tabClicked) {
 	            tabClicked = true;
@@ -177,19 +213,14 @@
 	          }
 	          //   this.$invoke('battle', 'displayPage');
 	        }
-	        this.$invoke('battle', 'init');
+	        // this.$invoke('battle', 'init');
 	      }
+
 	      if (this.selectedTab == 2) {
-	        wx.setNavigationBarTitle({
-	          title: ''
-	        });
-	        this.$invoke('chat', 'initLike');
-	      }
-	      if (this.selectedTab == 3) {
-	        wx.setNavigationBarTitle({
-	          title: ''
-			});
-			this.pageTitle = '我的';
+	        // wx.setNavigationBarTitle({
+	        //   title: ''
+	        // });
+	        this.pageTitle = '';
 	        // this.$invoke('my', 'setProfile');
 	      } else if (this.selectedTab == 1) {
 	        wx.setNavigationBarTitle({
@@ -216,6 +247,11 @@
 	    if (options.select) {
 	      optionFrom = true;
 	      this.selectedTab = options.select;
+	      if (options.select == 0) {
+	        this.pageTitle = '消息';
+	      } else if (options.select == 2) {
+	        this.pageTitle = '我';
+	      }
 	      setTimeout(() => {
 	        // if (options.select == 2) {
 	        Event.trigger('tab', options.tab);
@@ -228,7 +264,7 @@
 	      this.$apply();
 	      // return;
 	    } else {
-	      this.selectedTab = 0;
+	      this.selectedTab = 1;
 	    }
 	    this.$invoke('battle', 'init');
 	    this.$invoke('discover', 'initList');
@@ -260,6 +296,7 @@
 	    this.setProfile();
 	    // this.$invoke('chat', 'initChat');
 	    if (this.selectedTab === 0) {
+	      this.$invoke('chat', 'refreshData');
 	      //   this.$invoke('battle', 'init');
 	    }
 	    if (this.selectedTab === 2) {
@@ -275,26 +312,53 @@
 	}
 </script>
 <style lang="less">
+	.guest-button {
+	  position: fixed;
+	  right: 0;
+	  top: 170rpx;
+	  width: 156rpx;
+	  line-height: 55rpx;
+	  text-align: center;
+	  color: white;
+	  font-size: 25rpx;
+	  height: 55rpx;
+	  background: rgba(0, 77, 193, 1);
+	  box-shadow: 0px 3rpx 6rpx rgba(0, 0, 0, 0.38);
+	  opacity: 1;
+	  border-radius: 20rpx 0px 0px 20rpx;
+	  z-index: 9;
+	}
 	.square {
 	  display: flex;
 	  justify-content: center;
 	  padding: 8rpx 0;
 	  position: relative;
 	  .tab {
-	    margin: 0 10rpx;
+	    margin: 0 24rpx;
+	    font-size: 35rpx; 
+	    color: #c5c5c5;
+	    font-weight: bold;
 	    &.active {
-	      color: burlywood;
+	      color: #000;
 	    }
+	  }
+	  .tab-split {
+	    width: 2rpx;
+	    height: 34rpx;
+	    background: #c5c5c5;
+	    position: relative;
+	    top: 3rpx;
 	  }
 	  .underline {
 	    position: absolute;
 	    left: 20rpx;
 	    bottom: 0rpx;
-	    width: 40rpx;
+	    width: 50rpx;
 	    height: 4rpx;
-	    background: #4092cb;
-	    transition: left 0.3s ease-in;
+	    background: #f25458;
+	    transition: left 0.2s ease-in-out;
 	    will-change: left;
+	    border-radius: 12rpx;
 	  }
 	}
 </style>

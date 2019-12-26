@@ -67,15 +67,11 @@
             </view>
         </view>
         <view class="line"></view> -->
-		<view class='nav' @tap="redirect('mymoment')">
-			<!-- <view class="title">我的排名</view>
-            <view class="detail2">
-                <van-icon name="arrow" />
-            </view> -->
+		<!-- <view class='nav' @tap="redirect('mymoment')">
 			<image src="https://images.facedog.cn/public/profile/myshare.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
-		</view>
-		<view class="line"></view>
+		</view> -->
+		<!-- <view class="line"></view> -->
 		<!-- <view class='item' @tap="redirect('mymoment')">
             <view class="title">我的动态</view>
             <view class="detail2">
@@ -157,11 +153,8 @@
 	    checkVerify(state) {
 	      console.log(state);
 	      let userid = wepy.getStorageSync('inviteCode');
-	      if (state == 'refuse') {
-	        wepy.navigateTo({ url: `register?verify=true&userid=${userid}` });
-	      }
-	      if (state == 'certify') {
-	        wepy.navigateTo({ url: `register?certify=true&userid=${userid}` });
+	      if (state == 'refuse' || state == 'certify' || state == 'profile') {
+	        wepy.navigateTo({ url: `register/verify` });
 	      }
 	    },
 	    goProfile() {

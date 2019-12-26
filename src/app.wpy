@@ -13,13 +13,14 @@
 <script>
 	import wepy from 'wepy';
 	import 'wepy-async-function';
-
+	import '@/utils/dsp_sdk.js';
 	export default class extends wepy.app {
 	  config = {
 	    pages: [
+	      'pages/blank',
 	      'pages/home',
 	      'pages/test', // 切换
-	      'pages/register',
+	      'pages/register/index',
 	      'pages/index',
 	      'pages/battle/profile',
 	      'pages/publish/publish', // 发布页面
@@ -49,10 +50,12 @@
 	      'pages/register/uploadAvatar', // 上传头像
 	      'pages/register/verify',
 	      'pages/register/uploadVideo',
-	      'pages/discover/likeList', // 点赞列表
-	      'pages/discover/commentList', // 评论列表
-		  'pages/my/likeHelp', // 点击说明
-		  'pages/test/testBattle'
+	      //   'pages/discover/likeList', // 点赞列表
+	      //   'pages/discover/commentList', // 评论列表
+	      'pages/my/likeHelp', // 点击说明
+	      'pages/test/testBattle',
+	      'pages/chat/ilike', //我喜欢的
+	      'pages/chat/likeme' //喜欢我的
 	    ],
 	    window: {
 	      backgroundTextStyle: 'light',
@@ -60,7 +63,7 @@
 	      navigationBarTitleText: '颜狗',
 	      navigationBarTextStyle: 'black',
 	      onReachBottomDistance: 200,
-		  navigationStyle:"custom"
+	      navigationStyle: 'custom'
 	    },
 	    permission: {
 	      'scope.userLocation': {
@@ -74,9 +77,8 @@
 	    location: {},
 	    welcome: false,
 	    inviteCode: '',
-		isphoneX: false,
-		navHeight:0
-
+	    isphoneX: false,
+	    navHeight: 0
 	  };
 
 	  constructor() {
@@ -86,13 +88,13 @@
 	  }
 
 	  onLaunch() {
-		const baseUrl = wepy.$appConfig.baseUrl;
-		console.log('baseUrl',baseUrl);
+	    const baseUrl = wepy.$appConfig.baseUrl;
+	    console.log('baseUrl', baseUrl);
 	    var that = this;
 
 	    wx.getSystemInfo({
 	      success(res) {
-			wx.setStorageSync('navHeight', res.statusBarHeight + 46);
+	        wx.setStorageSync('navHeight', res.statusBarHeight + 46);
 	        var name = 'iPhone X';
 	        if (res.model.indexOf(name) > -1) {
 	          that.globalData.isphoneX = true;
@@ -107,14 +109,29 @@
 	      wx.cloud.init({
 	        traceUser: true
 	      });
+	      setTimeout(() => {
+	        wx.cloud
+	          .callFunction({
+	            name: 'getOpenID'
+	          })
+	          .then(res => {
+	            console.log(res.result.userInfo.openId);
+	            wx.dsp.setOpenid(res.result.userInfo.openId);
+	            console.log('call sdk!!!!!!');
+	          });
+	      }, 500);
 	    }
 	  }
 	  onHide() {
-	    console.log(5);
+	    wx.cloud
+	      .callFunction({
+	        name: 'getOpenID'
+	      })
+	      .then(res => {
+	        wx.dsp.setOpenid(res.result.userInfo.openId);
+	      });
 	  }
-	  onShow() {
-	    console.log(77);
-	  }
+	  onShow() {}
 	  async testAsync() {
 	    const data = await this.sleep(3);
 	    console.log(data);

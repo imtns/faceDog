@@ -1,5 +1,7 @@
 <!--  -->
 <template>
+	<navbar  title="推广有奖">
+	</navbar>
     <view class='wrapper'>
         <view class="headerTitle">
             <view class="line"></view>
@@ -115,7 +117,8 @@ export default class Propaganda extends wepy.page {
     config = {
         navigationBarTitleText: '推广有奖',
         usingComponents: {
-            'van-action-sheet': '../components/vant/action-sheet/index'
+			'van-action-sheet': '../components/vant/action-sheet/index',
+			navbar: '../../components/navbar/index'
         }
     };
 
@@ -455,8 +458,11 @@ navigator{
         left: 0;
         background: rgba(0, 0, 0, 0.71);
         .content {
-            width: 627rpx;
-            margin: 100rpx auto;
+			width: 627rpx;
+			position:absolute;
+			top:50%;
+			left:50%;
+			transform: translate(-50%,-50%);
             box-sizing: border-box;
             padding: 0 32rpx;
             background: rgba(255, 255, 255, 1);

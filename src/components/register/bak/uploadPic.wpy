@@ -21,7 +21,7 @@ import wepy from 'wepy';
 import { uploader } from '@/utils/uploader';
 import { get } from '@/utils/request';
 import { toast, sleep } from '@/utils';
-import cropper from '../cropper';
+import cropper from '../../cropper';
 import { PROFILE } from '@/utils/url';
 import Toast from '@/components/vant/toast/toast';
 import loading from '@/components/loading';

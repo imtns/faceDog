@@ -4,7 +4,7 @@
         <!-- <block wx:if="{{step===1}}">
             <getInfo></getInfo>
         </block> -->
-        <block wx:if="{{step===2}}">
+        <!-- <block wx:if="{{step===2}}">
             <profile :code.sync="code" :userInfo.sync="userInfo"></profile>
         </block>
         <block wx:if="{{step===3}}">
@@ -18,7 +18,7 @@
         </block>
         <view @tap="back" wx:if="{{step != 2 && step!= 1 && step != 4}}" class="back">返回</view>
         <van-toast id="van-toast" />
-        <van-dialog id="van-dialog" />
+        <van-dialog id="van-dialog" /> -->
     </view>
 
 </template>
@@ -26,10 +26,10 @@
 <script>
 import wepy from 'wepy';
 // import getInfo from '@/components/register/getInfo';
-import profile from '@/components/register/profile';
-import uploadPic from '@/components/register/uploadPic';
-import chooseVerify from '@/components/register/chooseVerify';
-import uploadVideo from '@/components/register/uploadVideo';
+// import profile from '@/components/register/profile';
+// import uploadPic from '@/components/register/uploadPic';
+// import chooseVerify from '@/components/register/chooseVerify';
+// import uploadVideo from '@/components/register/uploadVideo';
 import { post } from '@/utils/request';
 import { LOGIN } from '@/utils/url';
 
@@ -60,11 +60,11 @@ export default class Register extends wepy.page {
     };
 
     components = {
-        profile,
+        // profile,
         // getInfo,
-        uploadPic,
-        chooseVerify,
-        uploadVideo
+        // uploadPic,
+        // chooseVerify,
+        // uploadVideo
     };
 
     methods = {

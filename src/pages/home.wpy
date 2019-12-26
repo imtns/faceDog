@@ -2,11 +2,13 @@
 <template>
 	<view class="wrapper" wx:if="{{show}}" style="padding-top:{{isphoneX?'100rpx':'0'}};height:{{isphoneX?'93vh':'100vh'}}">
 		<view class="wrap">
-			<image class="logo" src="https://images.facedog.cn/public/discover/welcome.png?1" mode="aspectFill"></image>
+			<image class="logo-text" src="https://images.facedog.cn/public/home/logo-text.png?1" mode="aspectFill"></image>
+
+			<image class="logo" src="https://images.facedog.cn/public/home/home-logo.png?1" mode="aspectFill"></image>
 			<view class="bottom">
 				<form report-submit='true' bindsubmit='submitForm'>
 					<!-- <image class="btn try" src="https://images.facedog.cn/public/index/try.png" @tap="onGotUserInfo" mode="scaleToFill"></image>          </view> -->
-					<button size="large" wx:if="{{showPositionButton}}" form-type='submit' @tap="onGetPosition">进入颜狗</button>
+					<button size="large" wx:if="{{showPositionButton}}" form-type='submit' @tap="onGetPosition">{{buttonText}}</button>
 					<!-- <button size="large" wx:if="{{showUserInfoButton}}" from-type='submit' open-type="getUserInfo" bindgetuserinfo="onGetUserInfo">微信授权登录</button> -->
 				</form>
 			</view>
@@ -46,7 +48,8 @@
 	    isphoneX: false,
 	    showPositionButton: true,
 	    // showUserInfoButton: false,
-	    loading: false
+	    loading: false,
+	    buttonText: ''
 	  };
 
 	  components = {};
@@ -78,7 +81,7 @@
 	      wepy.setStorageSync('identifier', result.identifier);
 	      if (result.welcome) {
 	        wx.redirectTo({
-	          url: `register/chooseGender?userid=${inviteUserId}`
+	          url: `register/index?userid=${inviteUserId}`
 	        });
 	      } else {
 	        wx.redirectTo({
@@ -87,7 +90,7 @@
 	      }
 	    },
 	    async onGetPosition(e) {
-		    this.getLocationAuth();
+	      this.getLocationAuth();
 	    },
 
 	    onGetUserInfo(e) {
@@ -184,7 +187,8 @@
 	  computed = {};
 
 	  onLoad(options) {
-	    console.log(options);
+		console.log(options);
+		// this.getLocationAuth();
 	    var that = this;
 	    // wx.getSetting({
 	    //     success(res) {
@@ -246,6 +250,8 @@
 	    //     });
 	    // } else {
 	    this.show = true;
+	    this.buttonText = wepy.getStorageSync('latitude') ? '进入颜狗' : '快速注册';
+
 	    // }
 	  }
 
@@ -267,17 +273,24 @@
 	  transform: translateX(-50%);
 	}
 	.wrapper {
-	  background: white;
+	  background: url(https://images.facedog.cn/public/home/home-bg.png);
+	  background-size: cover;
 	  width: 100%;
 	  height: 100vh;
 	  overflow: hidden;
 	  .wrap {
 	    width: 692rpx;
 	    margin: 0rpx auto 0;
+	    .logo-text {
+	      width: 552rpx;
+	      display: block;
+	      height: 121rpx;
+	      margin: 320rpx auto 0;
+	    }
 	    .logo {
-	      width: 328rpx;
-	      height: 413rpx;
-	      margin: 175rpx auto;
+	      width: 200rpx;
+	      height: 340rpx;
+	      margin: 60rpx auto;
 	      display: block;
 	    }
 	    image {

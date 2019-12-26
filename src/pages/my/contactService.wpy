@@ -42,7 +42,10 @@
 import wepy from 'wepy';
 export default class ContactService extends wepy.page {
     config = {
-        navigationBarTitleText: '联系客服'
+		navigationBarTitleText: '联系客服',
+		usingComponents: {
+			navbar: '../../components/navbar/index'
+		}
     };
 
     data = {};

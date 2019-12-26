@@ -95,7 +95,7 @@ import Toast from '@/components/vant/toast/toast';
 import { get, post } from '@/utils/request';
 import { getAge, toast } from '@/utils';
 import { Event } from '@/utils/event.js';
-import verify from '@/components/battle/verify';
+import verify from '@/components/battle/module/verify';
 var index = 0;
 var position = '';
 var systemInfo = wx.getSystemInfoSync();

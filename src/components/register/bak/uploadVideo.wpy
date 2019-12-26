@@ -1,41 +1,34 @@
 <!--  -->
 <template>
-    <view>
-        <view class='wrapper'>
-            <view class="thumb">
-                <image src="https://images.facedog.cn/public/profile/model.jpg" mode="aspectFill"></image>
-            </view>
-            <view class="text">请对着摄像头读出：</view>
-            <view class="word">“颜狗认证，{{number}}”</view>
-            <form report-submit='true' bindsubmit='submitForm'>
-                <button class="button" form-type='submit' @tap="uploadVideo">开始录制</button>
-            </form>
+    <view class='wrapper'>
+        <view class="thumb">
+            <image src="https://images.facedog.cn/public/profile/model.jpg" mode="aspectFill"></image>
         </view>
-        <van-toast id="van-toast" />
-        <van-dialog id="van-dialog" />
+        <view class="text">请对着摄像头读出：</view>
+        <view class="word">“颜狗认证，{{number}}”</view>
+        <button class="button" @tap="uploadVideo">开始录制</button>
     </view>
+    <van-toast id="van-toast" />
 </template>
 
 <script>
 import wepy from 'wepy';
 import { uploader } from '@/utils/uploader';
+import { toast, sleep } from '@/utils';
 import Toast from '@/components/vant/toast/toast';
-import { post } from '@/utils/request';
 import Dialog from '@/components/vant/dialog/dialog';
-import { SUBMIT_FORMID } from '@/utils/url';
-export default class UploadVide extends wepy.page {
-    config = {
-        navigationBarTitleText: '视频认证',
-        // disableScroll: true,
-        usingComponents: {
-            'van-toast': '../../components/vant/toast/index',
-            'van-dialog': '../../components/vant/dialog/index'
+export default class Example extends wepy.component {
+    props = {
+        step: {
+            type: Number,
+            default: 0,
+            twoWay: true
         }
     };
+
     data = {
         video: {},
-        number: 0,
-        wechat: ''
+        number: 0
     };
 
     components = {};
@@ -55,13 +48,6 @@ export default class UploadVide extends wepy.page {
         return val;
     }
     methods = {
-        async submitForm(e) {
-            console.warn(this.currentDate);
-            wepy.setStorageSync('birthday', this.currentDate);
-            await post(SUBMIT_FORMID, {
-                formId: e.detail.formId
-            });
-        },
         async uploadVideo() {
             try {
                 console.log('ssss');
@@ -70,19 +56,21 @@ export default class UploadVide extends wepy.page {
                     confirmButtonText: '确认',
                     cancelButtonText: '重录',
                     message: '录制完成,确认发送么?'
-                })
-                    .then(() => {
-                        this.goUpload(tempFilePath);
-                    })
-                    .catch(() => {
-                        this.methods.uploadVideo.bind(this)();
-                    });
-            } catch (e) {}
+                }).then(() => {
+                    this.goUpload(tempFilePath);
+                }).catch(() => {
+                    this.methods.uploadVideo.bind(this)();
+                });
+            } catch (e) {
+
+            }
         }
     };
     async record() {
-        return new Promise(async (resolve, reject) => {
-            const { tempFilePath } = await wepy.chooseVideo({
+        return new Promise(async(resolve, reject) => {
+            const {
+                tempFilePath
+            } = await wepy.chooseVideo({
                 camera: 'front',
                 sourceType: ['camera']
             });
@@ -90,47 +78,43 @@ export default class UploadVide extends wepy.page {
         });
     }
     goUpload(tempFilePath) {
-        // console.error(this.number);
-        // console.error(this.wechat);
         try {
             uploader(
-                tempFilePath,
+                    tempFilePath,
                 {
                     isVideo: true,
                     data: {
                         code: this.number,
-                        wechat: this.wechat
+                        wechat: wepy.getStorageSync('wechat')
                     },
                     name: 'files'
                 },
-                async result => {
-                    if (result == 'ok') {
-                        Dialog.alert({
-                            message:
-                                '认证将于1个工作日内完成,你可以在我的页面查看进度',
-                            confirmButtonText: '返回首页'
-                        }).then(() => {
-                            wx.redirectTo({
-                                url: '/pages/index'
+                    async result => {
+                        if (result == 'ok') {
+                            Dialog.alert({
+                                message: '认证将于1个工作日内完成,你可以在我的页面查看进度',
+                                confirmButtonText: '返回首页'
+                            }).then(() => {
+                                wx.redirectTo({
+                                    url: 'index'
+                                });
                             });
-                        });
-                    } else {
-                        Toast.fail(result);
+                        } else {
+                            Toast.fail(result);
+                        }
                     }
-                }
-            );
+                );
         } catch (e) {
             // toast('上传失败', 3000);
         }
-    }
+    };
     events = {};
 
     watch = {};
 
     computed = {};
-    onLoad(options) {
+    onLoad() {
         this.number = this.RondomPass(5);
-        this.wechat = options.wechat;
         this.$apply();
     }
 }
@@ -144,7 +128,7 @@ export default class UploadVide extends wepy.page {
     .thumb {
         width: 470rpx;
         height: 470rpx;
-        margin: 247rpx auto 110rpx;
+        margin: 147rpx auto 110rpx;
         image {
             width: 100%;
             height: 100%;

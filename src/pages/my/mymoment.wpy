@@ -1,5 +1,6 @@
 <!--  -->
 <template>
+<navbar  title="我的动态"></navbar>
     <block wx:if="{{!list.length}}">
         <empty></empty>
     </block>
@@ -16,7 +17,8 @@ export default class mymoment extends wepy.page {
     config = {
         navigationBarTitleText: '我的动态',
         usingComponents: {
-            'van-popup': '../../components/vant/popup/index',
+			'van-popup': '../../components/vant/popup/index',
+			navbar: '../../components/navbar/index'
         }
     }
     data = {

@@ -1,0 +1,388 @@
+<!--  -->
+<template>
+	<view class='container'>
+		<view class="dog-wrap" wx:if="{{!showRegister}}">
+			<image class="wave {{initAnimation == 'init'?'ani':initAnimation=='loaded'?'anied':''}}" src="https://images.facedog.cn/public/register/wave.png" mode="scaleToFill">
+			</image>
+			<image class="dog {{initAnimation =='init' ?'ani':initAnimation=='loaded'?'anied':''}}" src="https://images.facedog.cn/public/register/dog.png" mode="scaleToFill">
+			</image>
+		</view>
+		<swiper class="swiper1" wx:if="{{!showRegister}}" current="{{textCurrent}}">
+			<swiper-item catchtouchmove='catchTouchMove'>
+				<view class="swiper-item {{initAnimation && textCurrent==0?'ani-1':''}}">
+					<text class="text ani-1">
+						<text class="text1" style="font-size:64rpx;color:#F24858;position:relative;left:-30rpx;">「颜狗」
+						</text>
+						<text class="text2" style="font-size:48rpx;color:#181818;">是一个纯粹的高颜值社交平台
+						</text>
+						<text class="text3" style="font-size:36rpx;color:#181818;">这里不看灵魂，不看学历，颜值即王道
+						</text>
+					</text>
+					<view class="pop-icon">
+						<image class="img" src="https://images.facedog.cn/public/register/reg-ani-1.png" mode="scaleToFill" lazy-load="false">
+						</image>
+						<image class="img" src="https://images.facedog.cn/public/register/reg-ani-2.png" mode="scaleToFill" lazy-load="false">
+						</image>
+						<image class="img" src="https://images.facedog.cn/public/register/reg-ani-3.png" mode="scaleToFill" lazy-load="false">
+						</image>
+						<image class="img" src="https://images.facedog.cn/public/register/reg-ani-4.png" mode="scaleToFill" lazy-load="false">
+						</image>
+					</view>
+				</view>
+			</swiper-item>
+			<swiper-item catchtouchmove='catchTouchMove'>
+				<view class="swiper-item">
+					<text class="text">
+						截至目前，
+						已经有<text style="font-size: 56rpx;">{{numObj.count1}}</text> 多个网红小哥哥和小姐姐加入颜狗
+						我们发掘了<text style="font-size: 56rpx;">{{numObj.count2}}</text>多个藏在高校中的宝藏男女
+						已经达成了<text style="font-size: 55rpx;color: #f24858;">{{numObj.count3}}次</text>配对。
+					</text>
+					<button class="btn" @tap="clickShowRegister">我也要认识</button>
+				</view>
+			</swiper-item>
+			<swiper-item catchtouchmove='catchTouchMove'>
+				<view class="swiper-item {{textCurrent==2?'ani-3':''}}">
+					<text class="text">
+						<text style="font-size:50rpx;color:#000">只有通过真人认证的用户
+						</text>
+						<text style="font-size:34rpx;color:#000">才可以和别人匹配，最快只需要5分钟</text>
+					</text>
+					<button class="btn btn-1" @tap="goVerify">现在认证</button>
+					<button class="btn btn-2" @tap="goGuest">我先看看</button>
+				</view>
+			</swiper-item>
+		</swiper>
+		<swiper class="swiper2" wx:else current="{{current}}">
+			<swiper-item catchtouchmove='catchTouchMove'>
+				<view class="register-item">
+					<chooseGender />
+				</view>
+			</swiper-item>
+			<swiper-item catchtouchmove='catchTouchMove'>
+				<view class="register-item">
+					<chooseName :number.sync="number" />
+				</view>
+			</swiper-item>
+			<swiper-item catchtouchmove='catchTouchMove'>
+				<view class="register-item">
+					<chooseBirth />
+				</view>
+			</swiper-item>
+			<swiper-item catchtouchmove='catchTouchMove'>
+				<view class="register-item">
+					<uploadAvatar />
+				</view>
+			</swiper-item>
+		</swiper>
+	</view>
+	<canvas canvas-id="canvas-img-0" style="top:-500rpx;position:fixed;"></canvas>
+	<van-toast id="van-toast" />
+	<van-dialog id="van-dialog" />
+</template>
+
+<script>
+	import wepy from 'wepy';
+	import chooseGender from '@/components/register/chooseGender';
+	import chooseName from '@/components/register/chooseName';
+	import chooseBirth from '@/components/register/chooseBirth';
+	import uploadAvatar from '@/components/register/uploadAvatar';
+
+	import { get, post } from '@/utils/request';
+	import { GET_REGISTER_NUMBER } from '@/utils/url';
+	let timeout = null;
+	let timeout1 = null;
+	export default class Example extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '',
+	    usingComponents: {
+	      'van-toast': '../../components/vant/toast/index',
+	      'van-dialog': '../../components/vant/dialog/index',
+	      'van-loading': '../../components/vant/loading/index'
+	    }
+	  };
+
+	  data = {
+	    number: '',
+	    current: 0,
+	    showRegister: false,
+	    wechat: '',
+	    textCurrent: 0,
+	    numObj: {},
+	    initAnimation: false,
+	    timeout: null
+	  };
+
+	  components = {
+	    chooseGender,
+	    chooseName,
+	    chooseBirth,
+	    uploadAvatar
+	  };
+
+	  methods = {
+	    goVerify() {
+	      wepy.redirectTo({ url: 'verify' });
+	    },
+	    goGuest() {
+	      wx.redirectTo({
+	        url: '/pages/index'
+	      });
+	    },
+	    clickShowRegister() {
+	      this.showRegister = true;
+	      this.current = 0;
+	    },
+	    catchTouchMove() {
+	      return false;
+	    }
+	  };
+
+	  events = {
+	    changeStep(step) {
+	      if (step == 4) {
+	        this.initAnimation = 'loaded';
+	        this.showRegister = false;
+	        this.textCurrent = 2;
+	      }
+	      this.current = step;
+	    }
+	  };
+
+	  watch = {};
+
+	  computed = {};
+	  async GetNumber() {
+	    this.numObj = await get(GET_REGISTER_NUMBER);
+	    this.$apply();
+	  }
+	  async onLoad(options) {
+	    this.initAnimation = false;
+	    this.current = 0;
+
+	    this.showRegister = false;
+	    this.textCurrent = 0;
+	    this.numObj = {};
+	    this.$apply();
+	    timeout1 = setTimeout(() => {
+	      clearTimeout(timeout1);
+	      this.initAnimation = 'init';
+	      this.$apply();
+	    }, 500);
+	    timeout = setTimeout(() => {
+	      clearTimeout(timeout);
+	      this.textCurrent = 1;
+	      this.$apply();
+	    }, 7700);
+	    this.GetNumber();
+	  }
+	  onHide() {}
+	  onShow() {}
+	}
+</script>
+
+<style lang='scss'>
+	.container {
+	  swiper {
+	    height: 100%;
+	    width: 100%;
+	  }
+	  width: 100%;
+	  height: 100vh;
+	  position: relative;
+	  .dog-wrap {
+	    position: absolute;
+	    width: 100%;
+	    height: 438rpx;
+	    bottom: 0;
+	    left: 0;
+	    opacity: 1;
+	    image {
+	      width: 100%;
+	      height: 100%;
+	      position: absolute;
+	      bottom: 0;
+	      left: 0;
+	      opacity: 0;
+	    }
+	    .wave {
+	      &.anied {
+	        opacity: 1;
+	      }
+	      &.ani {
+	        animation: waveFly 1s ease-in-out 1;
+	        animation-fill-mode: both;
+
+	        @keyframes waveFly {
+	          0% {
+	            opacity: 0;
+	            transform: translateY(100%);
+	          }
+	          10% {
+	            opacity: 1;
+	            transform: translateY(90%);
+	          }
+	          to {
+	            opacity: 1;
+	            transform: translateY(0%);
+	          }
+	        }
+	      }
+	    }
+	    .dog {
+	      &.anied {
+	        opacity: 1;
+	      }
+	      &.ani {
+	        animation: dogFly 1s ease-in-out 1;
+	        animation-fill-mode: both;
+	        animation-delay: 0.8s;
+	        @keyframes dogFly {
+	          0% {
+	            opacity: 0;
+	            transform: translateX(100%);
+	          }
+	          10% {
+	            opacity: 1;
+	            transform: translateX(90%);
+	          }
+	          to {
+	            opacity: 1;
+	            transform: translateX(0%);
+	          }
+	        }
+	      }
+	    }
+	  }
+	  .swiper-item {
+	    width: 100%;
+	    height: 100vh;
+	    text {
+	      &.ani-1 {
+	        opacity: 0;
+	      }
+	    }
+	    &.ani-3 {
+	      text {
+	        animation: textShow1 1.2s ease-in-out 1;
+	        animation-fill-mode: both;
+	      }
+	      @keyframes textShow1 {
+	        from {
+	          transform: translate(-50%, -200%);
+	        }
+	        to {
+	          transform: translate(-50%, 0%);
+	        }
+	      }
+	    }
+	    &.ani-1 {
+	      text {
+	        opacity: 0;
+	        animation: textShow 1.1s ease-in-out 1;
+	        animation-fill-mode: both;
+	        animation-delay: 1.3s;
+	      }
+	      .text2 {
+	        animation-delay: 2.3s;
+	      }
+	      .text3 {
+	        animation-delay: 3.3s;
+	      }
+	      @keyframes textShow {
+	        from {
+	          opacity: 0;
+	        }
+	        to {
+	          opacity: 1;
+	        }
+	      }
+	      .img {
+	        animation: imgShow 1s ease-in 1;
+	        animation-fill-mode: both;
+	        animation-delay: 4s;
+	        &:nth-child(3) {
+	          animation-delay: 4.7s;
+	        }
+	        @keyframes imgShow {
+	          from {
+	            opacity: 0;
+	            transform: translateY(50%);
+	          }
+	          to {
+	            opacity: 1;
+	            transform: translateY(0);
+	          }
+	        }
+	      }
+	    }
+
+	    .btn {
+	      width: 420rpx;
+	      height: 100rpx;
+	      background: rgba(0, 0, 0, 1);
+	      opacity: 1;
+	      color: #fcfcfc;
+	      font-size: 28rpx;
+	      text-align: center;
+	      line-height: 92rpx;
+	      position: absolute;
+	      left: 50%;
+	      top: 750rpx;
+	      transform: translateX(-50%);
+	      &.btn-1 {
+	        top: 610rpx;
+	      }
+	      &.btn-2 {
+	        background: #f3f4f5;
+	        color: #737373;
+	      }
+	    }
+	    .text {
+	      width: 643rpx;
+	      display: flex;
+	      top: 165rpx;
+	      position: relative;
+	      left: 50%;
+	      transform: translateX(-50%);
+	      font-size: 28rpx;
+	      font-family: PingFang HK;
+	      font-weight: 400;
+	      line-height: 95rpx;
+	      color: rgba(24, 24, 24, 1);
+	      opacity: 1;
+	    }
+	    .pop-icon {
+	      position: absolute;
+	      bottom: 730rpx;
+	      image {
+	        opacity: 0;
+	        position: absolute;
+	        &:nth-child(1) {
+	          left: 51rpx;
+	          top: 220rpx;
+	          width: 101rpx;
+	          height: 100rpx;
+	        }
+	        &:nth-child(2) {
+	          top: 120rpx;
+	          left: 118rpx;
+	          width: 138rpx;
+	          height: 141rpx;
+	        }
+	        &:nth-child(3) {
+	          left: 228rpx;
+	          width: 310rpx;
+	          height: 290rpx;
+	        }
+	        &:nth-child(4) {
+	          top: 120rpx;
+	          left: 521rpx;
+	          width: 156rpx;
+	          height: 140rpx;
+	        }
+	      }
+	    }
+	  }
+	}
+</style>

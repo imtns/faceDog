@@ -1,0 +1,247 @@
+<!--  -->
+<template>
+	<view class='container'>
+		<scroll-view scroll-y class="scroll" style="height:83vh" bindscrolltolower="bindscrolltolower">
+			<topBanner></topBanner>
+			<view class="update-tip">
+				<text>距离下次更新 {{countdown}}</text>
+			</view>
+			<view class="explore">
+				<repeat for="{{list}}" key="index" index="index" item="item">
+					<view class="box" @tap="goProfile({{item._id}})">
+						<!-- <image class="guess-like" src="https://images.facedog.cn/public/explore/guess-like.png" mode="scaleToFill" lazy-load="false">
+						</image> -->
+						<image class="guess-like" wx:if="{{item.type == 'high_score_user'}}" src="https://images.facedog.cn/public/explore/high-face.png" mode="scaleToFill" lazy-load="false">
+						</image>
+						<image class="guess-like" wx:else src="https://images.facedog.cn/public/explore/best-rookie.png" mode="scaleToFill" lazy-load="false">
+						</image>
+						<image class="pic" src="{{item.avatar+'?x-oss-process=image/resize,w_600,h_600/format,jpg'}}" mode="aspectFill" lazy-load="false">
+						</image>
+						<view class="info">
+							<view class="name">{{item.nick_name}}<view class="age">{{item.age}}</view>
+							</view>
+							<view class="distance "><text class="number">{{item.distance}}km</text> <text class="city">{{item.province}}</text></view>
+						</view>
+						<image wx:if="{{!item.friend}}" class="like-button" @tap.stop="makeFriend({{item._id}})" src="https://images.facedog.cn/public/explore/like-heart.png" mode="scaleToFill" lazy-load="false">
+						</image>
+						<image wx:else class="like-button" @tap.stop="clockClick" src="https://images.facedog.cn/public/explore/like-clock.png" mode="scaleToFill" lazy-load="false">
+						</image>
+					</view>
+				</repeat>
+			</view>
+		</scroll-view>
+		<view class="unlock-button" @tap="showVerify" wx:if="{{!verify}}">解锁每日探索板块</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+
+	import topBanner from '@/components/discover/topBanner';
+	import { get, post } from '@/utils/request';
+	import { GET_RECOMMENT_LIST } from '@/utils/url';
+	import { countDown } from '@/utils';
+	import Toast from '@/components/vant/toast/toast';
+	import { MAKEFRIEND } from '@/utils/url';
+	export default class Explore extends wepy.component {
+	  props = {
+	    verify: {
+	      type: Boolean,
+	      value: false
+	    }
+	  };
+
+	  data = {
+	    list: [],
+	    countdown: countDown()
+	  };
+
+	  components = {
+	    topBanner
+	  };
+
+	  methods = {
+	    clockClick() {
+	      Toast('已发送过好友申请');
+	    },
+	    goProfile(id) {
+	      if (!this.verify) {
+	        this.$emit('verifyShow');
+	        return;
+	      }
+	      wepy.navigateTo({ url: `battle/profile?id=${id}` });
+	    },
+	    async makeFriend(id) {
+	      if (!this.verify) {
+	        this.$emit('verifyShow');
+	        return;
+	      }
+	      wepy.showLoading({
+	        title: '', //提示的内容,
+	        mask: true, //显示透明蒙层，防止触摸穿透,
+	        success: res => {}
+	      });
+	      await post(MAKEFRIEND, {
+	        to_be: 'friend',
+	        user_id: id
+	      });
+	      wx.hideLoading();
+	      Toast('申请成功');
+	      this.fetchData();
+	    },
+	    showVerify() {
+	      this.$emit('verifyShow');
+	    },
+	    bindscrolltolower() {
+	      console.log(1111);
+	    }
+	  };
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {
+	    this.fetchData();
+	    setInterval(() => {
+	      this.countdown = countDown();
+	      this.$apply();
+	    }, 1000);
+	  }
+	  async fetchData() {
+	    this.list = [];
+	    let result = await get(GET_RECOMMENT_LIST);
+	    result.forEach(item => {
+	      item.distance = (item.distance / 1000).toFixed(2);
+	    });
+	    this.list = result;
+	    this.$apply();
+	  }
+	  onShow() {}
+	}
+</script>
+
+<style lang='scss' scoped>
+	.container {
+	  position: relative;
+	  width: 100%;
+	  margin: 0 auto;
+	  padding-bottom: 100rpx;
+	  .unlock-button {
+	    width: 525rpx;
+	    height: 93rpx;
+	    background: linear-gradient(
+	      90deg,
+	      rgba(251, 216, 135, 1) 0%,
+	      rgba(226, 76, 76, 1) 100%
+	    );
+	    box-shadow: 0px 3rpx 6rpx rgba(0, 0, 0, 0.3);
+	    opacity: 1;
+	    border-radius: 68rpx;
+	    position: fixed;
+	    bottom: 145rpx;
+	    font-size: 40rpx;
+	    font-weight: bold;
+	    text-align: center;
+	    left: 50%;
+	    z-index: 99;
+	    transform: translateX(-50%);
+	    line-height: 93rpx;
+	    color: rgba(246, 246, 246, 1);
+	    opacity: 1;
+	  }
+	  .update-tip {
+	    text-align: center;
+	    margin: 0rpx auto 28rpx;
+	    text {
+	      background: #efefef;
+	      color: #828282;
+	      border-radius: 25rpx;
+	      padding: 5rpx 25rpx;
+	      font-size: 26rpx;
+	    }
+	  }
+	  .explore {
+	    width: 700rpx;
+	    margin: 0 auto;
+	    .box {
+	      width: 700rpx;
+	      height: 820rpx;
+	      margin-bottom: 20rpx;
+	      position: relative;
+	      .guess-like {
+	        position: absolute;
+	        left: 0;
+	        top: 0;
+	        width: 207rpx;
+	        height: 72rpx;
+	        z-index: 2;
+	      }
+	      .like-button {
+	        width: 148rpx;
+	        height: 148rpx;
+	        position: absolute;
+	        right: 20rpx;
+	        bottom: 20rpx;
+	      }
+	      .pic {
+	        width: 100%;
+	        height: 820rpx;
+	        display: flex;
+	        border-radius: 26rpx;
+	        overflow: hidden;
+	        position: absolute;
+	        image {
+	          width: 100%;
+	          height: 100%;
+	          display: block;
+	        }
+	      }
+	      .info {
+	        position: absolute;
+	        width: 100%;
+	        bottom: 50rpx;
+	        padding-left: 25rpx;
+	        .name {
+	          color: white;
+	          font-size: 50rpx;
+	          font-weight: 500;
+	          line-height: 48rpx;
+	          text-shadow: 0px 2rpx 1rpx rgba(0, 0, 0, 0.72);
+	          .age {
+	            text-shadow: none;
+	            margin-left: 10rpx;
+	            font-size: 22rpx;
+	            display: inline-block;
+	          }
+	        }
+	        .distance {
+	          font-size: 20rpx;
+	          font-weight: bold;
+	          text {
+	            &.number {
+	              font-size: 25rpx;
+	              font-weight: 400;
+	              line-height: 24rpx;
+	              color: rgba(255, 217, 0, 1);
+	              text-shadow: 0rpx 2rpx 1rpx rgba(0, 0, 0, 0.72);
+	            }
+	            &.city {
+	              margin-left: 10rpx;
+	              font-size: 25rpx;
+	              font-family: PingFang HK;
+	              font-weight: 400;
+	              line-height: 24rpx;
+	              color: rgba(255, 255, 255, 1);
+	              text-shadow: 0rpx 2rpx 1rpx rgba(0, 0, 0, 0.72);
+	              opacity: 1;
+	            }
+	          }
+	        }
+	      }
+	    }
+	  }
+	}
+</style>

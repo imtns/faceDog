@@ -1,12 +1,12 @@
 <!--  -->
 <template>
-	<block wx:if="{{!list.length}}">
+	<!-- <block wx:if="{{!list.length}}">
 		<empty></empty>
-	</block>
-	<view wx:else class='wrapper'>
+	</block> -->
+	<view wx:if="{{list.length}}" class='wrapper'>
 		<repeat for="{{list}}" key="index" index="index" item="item">
 			<van-swipe-cell class="swipe" id="{{item.To_Account}}" async-close data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
-				<view class="chat-box">
+				<view class="chat-box {{index==list.length-1?'last':''}}">
 					<image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" src="{{item.C2cImage}}" mode="aspectFill"></image>
 					<view class="msg" @tap.capture.stop="onClick({{item.To_Account}},{{item.C2cNick}},{{item.C2cImage}},{{item.C2cNick}},{{item.UnreadMsgCount}})">
 						<view class="name">{{item.C2cNick}}</view>
@@ -42,8 +42,8 @@
 
 	  data = {
 	    list: {},
-		initLength: 0,
-		unread:0
+	    initLength: 0,
+	    unread: 0
 	  };
 
 	  components = {
@@ -183,8 +183,8 @@
 	              : 0;
 	        });
 	        unread += sess.unread();
-			this.$apply();
-			this.unread = unread;
+	        this.$apply();
+	        this.unread = unread;
 	        console.log('unrenad:', unread);
 	        console.log('sess.unread()', sess.unread());
 	        console.log('sess.id', sess.id());
@@ -193,16 +193,16 @@
 	          'sess.msg',
 	          decodeURIComponent(sess.msgs()[0].elems[0].content.text)
 	        );
-		  }
+	      }
 
 	      this.$emit('unreadSet', unread);
 	      this.$apply();
 	    },
-	    onClick(id, name, icon, nickname,unread) {
-		  if(unread){
-			  this.unread = this.unread - unread;
-			  this.$emit('unreadSet', this.unread);
-		  }
+	    onClick(id, name, icon, nickname, unread) {
+	      if (unread) {
+	        this.unread = this.unread - unread;
+	        this.$emit('unreadSet', this.unread);
+	      }
 	      wx.setStorageSync('chatIcon', icon);
 	      wx.navigateTo({
 	        url: `chat/chat?id=${id}&name=${name}&nick=${nickname}`
@@ -280,19 +280,30 @@
 	    display: flex;
 	    justify-content: space-between;
 	    align-items: center;
-	    margin-bottom: 61rpx;
-	    padding: 0 30rpx;
+	    margin-bottom: 34rpx;
+	    position: relative;
+	    padding: 0 32rpx;
+	    &:not(.last):after {
+	      content: ''; 
+	      position: absolute;
+		  bottom: -12rpx; 
+		  left:186rpx;
+	      width: 533rpx;
+	      height: 2rpx;
+	      background: rgba(223, 223, 223, 1);
+	      opacity: 1;
+	    }
 	    .icon {
-	      width: 100rpx;
-	      height: 100rpx;
+	      width: 126rpx;
+	      height: 126rpx;
 	      border-radius: 50%;
 	    }
 	    .msg {
 	      margin-right: auto;
-	      margin-left: 27rpx;
+	      margin-left: 30rpx;
 	      width: 450rpx;
 	      .name {
-	        font-size: 28rpx;
+	        font-size: 31rpx;
 	        font-family: PingFang SC;
 	        font-weight: 600;
 	        color: rgba(0, 0, 0, 1);
@@ -302,7 +313,7 @@
 	        font-size: 25rpx;
 	        font-family: PingFang SC;
 	        font-weight: 300;
-	        color: #7e7e7e;
+	        color: #A2A7B2;
 	        text-overflow: ellipsis;
 	        white-space: nowrap;
 	        overflow: hidden;

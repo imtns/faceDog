@@ -1,0 +1,93 @@
+<!--  -->
+<template>
+	<view class='container'>
+		<loadingHeart />
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+
+	import { post } from '@/utils/request';
+	import { LOGIN, SUBMIT_FORMID } from '@/utils/url';
+	import loadingHeart from '@/components/battle/module/loadingHeart';
+	export default class Example extends wepy.page {
+	  config = {
+	    navigationBarTitleText: ''
+	  };
+
+	  data = {};
+
+	  components = {
+	    loadingHeart
+	  };
+
+	  methods = {
+	    async goLogin(latitude, longitude) {
+	      const result = await post(
+	        LOGIN,
+	        { code: wepy.getStorageSync('code') },
+	        {
+	          latitude,
+	          longitude
+	        }
+	      );
+	      wepy.setStorageSync('welcome', result.welcome);
+	      wepy.setStorageSync('token', result.access_token);
+	      wepy.setStorageSync('tencent_token', result.tencent_token);
+	      wepy.setStorageSync('identifier', result.identifier);
+	      if (result.welcome) {
+	        wx.redirectTo({
+	          url: `register/index`
+	        });
+	      } else {
+	        wx.redirectTo({
+	          url: 'index'
+	        });
+	      }
+	    }
+	  };
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+	  getLocation(t) {
+	    wx.getLocation({
+	      type: 'wgs84',
+	      success: res => {
+	        wepy.setStorageSync('latitude', res.latitude);
+	        wepy.setStorageSync('longitude', res.longitude);
+	        wx.login({
+	          success: ress => {
+	            wepy.setStorageSync('code', ress.code);
+	            t.methods.goLogin(res.latitude, res.longitude);
+	          }
+	        });
+	      },
+	      fail: err => {
+	        // console.log(err);
+	        // t.authorizeLocation();
+	      }
+	    });
+	  }
+	  onShow() {
+	    wx.getSetting({
+	      success: res => {
+	        console.log('1111', res.authSetting['scope.userLocation']);
+	        if (res.authSetting['scope.userLocation'] == undefined || !wepy.getStorageSync('latitude')) {
+	          wepy.redirectTo({ url: 'home' });
+	        } else {
+	          this.getLocation(this);
+	        }
+	      }
+	    });
+	  }
+	}
+</script>
+
+<style lang='scss'>
+</style>

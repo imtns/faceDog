@@ -60,3 +60,7 @@ export const MY_FAVORITE = '/api/v1.5/face/favorites' // 收藏夹
 export const DELETE_FAVORITE = '/api/v1.5/face/favorites/delete'
 // 获取动态的详情
 export const GET_MOMENT_DETAIL = '/api/v1.5/discover'
+// 注册页获取数字
+export const GET_REGISTER_NUMBER = '/api/v1.5/show_user_count';
+// 获取推荐
+export const GET_RECOMMENT_LIST = '/api/v1.5/recommend';

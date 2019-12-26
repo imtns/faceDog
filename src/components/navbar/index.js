@@ -11,11 +11,12 @@ Component({
 	properties: {
 		backImage: {
 			type: String,
-			value: '/static/icon/icon_back.svg'
+			value: '/static/icon/icon_back.png'
 		},
 		homeImage: {
 			type: String,
-			value: '/static/icon/icon_home.png'
+			// value: '/static/icon/icon_home.png'
+			value:'https://images.facedog.cn/public/battle/filter.png'
 		},
 		extClass: {
 			type: String,
@@ -112,9 +113,11 @@ Component({
 		},
 		//返回首页
 		goHome: function () {
-			wx.reLaunch({
-				url: '/pages/index/index'
-			})
+			wx.navigateTo({ url: 'my/setting' });
+			
+			// wx.reLaunch({
+			// 	url: '/pages/index/index'
+			// })
 		},
 		//双击返回顶部
 		doubleClick(e) {

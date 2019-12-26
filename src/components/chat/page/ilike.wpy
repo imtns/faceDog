@@ -236,9 +236,9 @@
 	      .avatar {
 	        overflow: hidden;
 	        border-radius: 50%;
-	        width: 110rpx;
+	        width: 157rpx;
 	        flex: 1;
-	        height: 110rpx;
+	        height: 157rpx;
 	        display: block;
 	      }
 	      .desc {

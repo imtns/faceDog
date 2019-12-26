@@ -1,7 +1,7 @@
 <!--  -->
 <template>
 	<view class='wrapper'>
-		<view class="loading">
+		<view class="loading" style="top:{{top}}">
 			<image class="heart" src="https://images.facedog.cn/public/battle/loading-heart.png" mode="scaleToFill">
 			</image>
 			<image class="text" src="https://images.facedog.cn/public/battle/loading-text.png" mode="scaleToFill">
@@ -13,7 +13,12 @@
 <script>
 	import wepy from 'wepy';
 	export default class LoadingHeart extends wepy.component {
-	  props = {};
+	  props = {
+		  top:{
+			  type:String,
+			  value:'-30rpx'
+		  }
+	  };
 
 	  data = {};
 
@@ -41,6 +46,7 @@
 	  display: flex;
 	  justify-content: center;
 	  align-items: center;
+	  z-index: 999;
 	  .loading {
 	    width: 400rpx;
 	    display: flex;

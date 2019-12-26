@@ -1,0 +1,127 @@
+<!--  -->
+<template>
+	<navbar title="喜欢我的">
+	</navbar>
+	<view class='container'>
+		<view class="box">
+			<view class="content">
+				<image class="avatar" src="https://images.facedog.cn/avatar/5d8721d1f0dbb897813a3ce4-d41d8cd98f00b204e9800998ecf8427e-1575822444.086549.png" mode="scaleToFill"></image>
+				<view class="info">
+					<view class="name">可达鸭 28</view>
+					<view class="city">北京</view>
+				</view>
+				<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+		</view>
+		<view class="box">
+			<view class="content">
+				<image class="avatar" src="https://images.facedog.cn/avatar/5d8721d1f0dbb897813a3ce4-d41d8cd98f00b204e9800998ecf8427e-1575822444.086549.png" mode="scaleToFill"></image>
+				<view class="info">
+					<view class="name">可达鸭 28</view>
+					<view class="city">北京</view>
+				</view>
+				<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+		</view>
+		<view class="box">
+			<view class="content">
+				<image class="avatar" src="https://images.facedog.cn/avatar/5d8721d1f0dbb897813a3ce4-d41d8cd98f00b204e9800998ecf8427e-1575822444.086549.png" mode="scaleToFill"></image>
+				<view class="info">
+					<view class="name">可达鸭 28</view>
+					<view class="city">北京</view>
+				</view>
+				<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	export default class Example extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '',
+	    usingComponents: {
+	      navbar: '../../components/navbar/index'
+	    }
+	  };
+
+	  data = {};
+
+	  components = {};
+
+	  methods = {};
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='scss'>
+	page {
+	  background: #f7f7f7;
+	}
+	.container {
+	  display: flex;
+	  flex-wrap: wrap;
+	  justify-content: center;
+	  padding-top: 10rpx;
+	  .box {
+	    width: 722rpx;
+	    background: white;
+	    margin: 10rpx 0;
+	    .content {
+	      display: flex;
+	      justify-content: space-between;
+	      align-items: center;
+	      padding: 25rpx 0;
+	    }
+	    .avatar {
+	      width: 157rpx;
+	      height: 157rpx;
+	      border-radius: 50%;
+	      border: 4rpx solid #F25458;
+	      position: relative;
+	      margin-left: 30rpx;
+	      &::before {
+	        border: 5rpx solid white;
+	        content: '';
+	        display: block;
+	        position: absolute;
+	        border-radius: 50%;
+	        top: 0rpx;
+	        left: 0rpx;
+	        right: 0rpx;
+	        bottom: 0rpx;
+	      }
+	    }
+	    .info {
+	      margin-right: auto;
+	      margin-left: 20rpx;
+	      .name {
+	        font-size: 31rpx;
+	        color: #000;
+	      }
+	      .city {
+	        color: #A2A7B2;
+	        font-size: 25rpx;
+	      }
+	    }
+	    .delete {
+	      width: 43rpx;
+	      height: 43rpx;
+	      margin-right: 60rpx;
+	    }
+	  }
+	}
+</style>

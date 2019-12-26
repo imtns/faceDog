@@ -8,7 +8,7 @@
       </block>
       <block wx:else>
         <view class="btn-back nice-focus" bindtap="goBack" wx:if="{{showBack}}">
-          <image src="{{backImage}}"></image>
+          <image src="{{backImage}}" style="color:white;"></image>
         </view>      
         <view class="btn-home nice-focus" bindtap="goHome" wx:if="{{showHome}}">
           <image src="{{homeImage}}"></image>

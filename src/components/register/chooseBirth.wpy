@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-    <view class='container'>
+    <view class='container-birth'>
         <view class="title">请选择您的生日</view>
         <view class="wrap">
             <picker mode="date" value="{{currentDate}}" start="1970-01-01" end="2019-01-01" bindchange="bindDateChange">
@@ -24,7 +24,7 @@
 import wepy from 'wepy';
 import { post } from '@/utils/request';
 import { SUBMIT_FORMID } from '@/utils/url';
-export default class ChooseBirth extends wepy.page {
+export default class ChooseBirth extends wepy.component {
     config = {
         navigationBarTitleText: '2/4'
     };
@@ -44,8 +44,9 @@ export default class ChooseBirth extends wepy.page {
             wepy.setStorageSync('birthday', this.currentDate);
             await post(SUBMIT_FORMID, {
                 formId: e.detail.formId
-            });
-            wepy.navigateTo({ url: 'uploadAvatar' });
+			});
+			this.$emit('changeStep',3);
+            // wepy.navigateTo({ url: 'uploadAvatar' });
         },
 
         bindDateChange(event) {
@@ -66,7 +67,7 @@ export default class ChooseBirth extends wepy.page {
     computed = {};
 
     onLoad() {
-		this.currentDate = '1995-01-01'
+        this.currentDate = '1995-01-01';
         var dateObj = new Date('1995-01-01');
         this.month = dateObj.getUTCMonth() + 1; // months from 1-12
         this.day = dateObj.getUTCDate();
@@ -93,7 +94,7 @@ export default class ChooseBirth extends wepy.page {
 </script>
 
 <style lang='scss'>
-.container {
+.container-birth {
     height: 100vh;
     position: relative;
     overflow: hidden;

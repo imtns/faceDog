@@ -1,5 +1,6 @@
 <!--  -->
 <template>
+<navbar  title="累计点击次数"></navbar>
 	<view class='wrapper'>
 		<view class="block">
 			<view class="title">数值说明：</view>
@@ -30,7 +31,10 @@
 	import { get } from '@/utils/request';
 	export default class LikeHelp extends wepy.page {
 	  config = {
-	    navigationBarTitleText: '累计点击次数'
+		navigationBarTitleText: '累计点击次数',
+		usingComponents: {
+	      navbar: '../../components/navbar/index'
+	    }
 	  };
 
 	  data = {

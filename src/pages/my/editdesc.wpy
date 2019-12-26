@@ -1,104 +1,123 @@
 <!--  -->
 <template>
-	<navbar  title="个性签名">
+	<navbar title="个性签名">
 	</navbar>
-    <view class='wrapper'>
-        <view class="input">
-            <textarea placeholder="最多16个字符" type="text" value="{{profile.signature}}" @input="inputChange" maxlength="16" auto-focus></textarea>
-        </view>
-        <view class="textleft">{{textleft}} / 16</view>
-        <form bindsubmit="formSubmit" report-submit="{{true}}">
-            <button class="btn" formType="submit">
-                确定
-            </button>
-        </form>
-    </view>
+	<view class='wrapper'>
+		<view class="input">
+			<textarea placeholder="最多16个字符" type="text" value="{{profile.signature}}" @input="inputChange" maxlength="16" auto-focus></textarea>
+		</view>
+		<view class="textleft">{{textleft}} / 16</view>
+		<form bindsubmit="formSubmit" report-submit="{{true}}">
+			<button class="btn" formType="submit">
+				确定
+			</button>
+		</form>
+	</view>
 </template>
 
 <script>
-import wepy from 'wepy';
-import mixin from '@/mixins/editMixin';
-export default class EditDesc extends wepy.page {
-    config = {
-        navigationBarTitleText: '个性签名'
-    };
-    data = {
-        textleft: 0
-    };
-    mixins = [mixin];
-    components = {};
+	import wepy from 'wepy';
+	import mixin from '@/mixins/editMixin';
 
-    methods = {
-        inputChange({ detail }) {
-            this.text = detail.value;
-            this.textleft = detail.value.length;
-        },
-        formSubmit(e) {
-            console.log(e);
-            this.submit({
-                formId: e.detail.formId,
-                signature: this.text
-            });
-            // if (e.detail.formId != 'the formId is a mock one') {
-            //     this.setData({
-            //         formIdString: e.detail.formId + ',' + this.data.formIdString
-            //     });
-            // }
-            // console.log(this.data.formIdString);
-        }
-        // submit() {
-        //     this.submit({
-        //         signature: this.text
-        //     });
-        // }
-    };
+	import { toast, contentCheck } from '@/utils';
+	export default class EditDesc extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '个性签名',
+	    usingComponents: {
+	      navbar: '../../components/navbar/index'
+	    }
+	  };
+	  data = {
+	    textleft: 0
+	  };
+	  mixins = [mixin];
+	  components = {};
 
-    events = {};
+	  methods = {
+	    inputChange({ detail }) {
+	      this.text = detail.value;
+	      this.textleft = detail.value.length;
+	    },
+	    formSubmit(e) {
+	      console.log(e);
+	      if (this.text) {
+	        contentCheck(this.text).then(res => {
+	          console.log(res);
+	          if (!res) {
+	            toast('内容包含敏感内容，请重新输入');
+	            return;
+	          } else {
+	            this.submit({
+	              nick_name: this.text
+	            });
+	          }
+	        });
+	      } else {
+	        this.submit({
+	          formId: e.detail.formId,
+	          signature: this.text
+	        });
+	      }
+	      // if (e.detail.formId != 'the formId is a mock one') {
+	      //     this.setData({
+	      //         formIdString: e.detail.formId + ',' + this.data.formIdString
+	      //     });
+	      // }
+	      // console.log(this.data.formIdString);
+	    }
+	    // submit() {
+	    //     this.submit({
+	    //         signature: this.text
+	    //     });
+	    // }
+	  };
 
-    watch = {};
+	  events = {};
 
-    computed = {};
+	  watch = {};
 
-    onLoad() {}
+	  computed = {};
 
-    onShow() {}
-}
+	  onLoad() {}
+
+	  onShow() {}
+	}
 </script>
 
 <style lang='less'>
-.wrapper {
-    width: 620rpx;
-    margin: 0 auto;
-    .textleft {
-        color: #9e9d9d;
-        position: absolute;
-        right: 93rpx;
-        top: 290rpx;
-        font-size: 28rpx;
-    }
-    .input {
-        width: 100%;
-        height: 259rpx;
-        border: 2rpx solid rgba(0, 0, 0, 1);
-        opacity: 1;
-        font-size: 28rpx;
-        color: #000;
-        textarea {
-            margin: 15rpx 24rpx;
-        }
-    }
-    .btn {
-        width: 620rpx;
-        height: 92rpx;
-        color: #fcfcfc;
-        font-size: 28rpx;
-        text-align: center;
-        line-height: 92rpx;
-        position: absolute;
-        bottom: 95rpx;
-        left: 50%;
-        background: #000;
-        transform: translateX(-50%);
-    }
-}
+	.wrapper {
+	  width: 620rpx;
+	  margin: 0 auto;
+	  .textleft {
+	    color: #9e9d9d;
+	    position: absolute;
+	    right: 93rpx;
+	    top: 290rpx;
+	    font-size: 28rpx;
+	  }
+	  .input {
+	    width: 100%;
+	    height: 259rpx;
+	    border: 2rpx solid rgba(0, 0, 0, 1);
+	    opacity: 1;
+	    font-size: 28rpx;
+	    color: #000;
+	    textarea {
+	      margin: 15rpx 24rpx;
+	    }
+	  }
+	  .btn {
+	    width: 620rpx;
+	    height: 92rpx;
+	    color: #fcfcfc;
+	    font-size: 28rpx;
+	    text-align: center;
+	    line-height: 92rpx;
+	    position: absolute;
+	    bottom: 95rpx;
+	    left: 50%;
+	    background: #000;
+	    transform: translateX(-50%);
+	  }
+	}
 </style>

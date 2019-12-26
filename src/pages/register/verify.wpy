@@ -1,168 +1,174 @@
 <!--  -->
 <template>
-  <view class='container'>
-    <view class='title'>请完成真人认证</view>
-    <view class='desc'>我们保证颜狗上绝没有可恶的假人</view>
-    <view class='desc'>也希望你可以配合我们完成最后一步</view>
-    <view class='wrap'>
-      <view class='field'>
-        <view class='label'>输入真实微信号(必填)</view>
-        <input class='input' @change='onName' type='text' placeholder='不公开，仅在发放奖励时使用' placeholder-class='placeholder' />
-      </view>
-      <form report-submit='true' bindsubmit='submitForm'>
-        <button class='verify1' form-type='submit' @tap='goVideo'>视频认证</button>
-        <button class='verify2' form-type='submit' @tap='verify' disabled='{{!status}}'>邀请人认证</button>
-      </form>
-      <view class='text' style='margin-bottom:0'>*仅在被「创始会员」邀请的情况下</view>
-      <view class='text' style='margin-top:0'>可以选择此种方式，无需录制视频</view>
-    </view>
-  </view>
+
+	<navbar title=""></navbar>
+	<view class='container'>
+		<view class='title'>请完成真人认证</view>
+		<view class='desc'>我们保证颜狗上绝没有可恶的假人</view>
+		<view class='desc'>也希望你可以配合我们完成最后一步</view>
+		<view class='wrap'>
+			<view class='field'>
+				<view class='label'>输入真实微信号(必填)</view>
+				<input class='input' @change='onName' type='text' placeholder='不公开，仅在发放奖励时使用' placeholder-class='placeholder' />
+			</view>
+			<form report-submit='true' bindsubmit='submitForm'>
+				<button class='verify2' form-type='submit' @tap='verify'>直接认证</button>
+				<button class='verify1' form-type='submit' @tap='goVideo'>视频认证</button>
+			</form>
+			<view class='text' style='margin-bottom:0'>直接认证：客服可能会加你的微信核实</view>
+			<view class='text' style='margin-top:0'>视频认证：客服不会主动添加你的微信</view>
+		</view>
+	</view>
 </template>
 
 <script>
-    import wepy from 'wepy';
-    import { get, post } from '@/utils/request';
-    import { USER_VERIFY, VERIFY, SUBMIT_FORMID } from '@/utils/url';
-    import { toast, sleep } from '@/utils';
-    export default class Verify extends wepy.page {
-        config = {
-            navigationBarTitleText: '4/4'
-        };
+	import wepy from 'wepy';
+	import { get, post } from '@/utils/request';
+	import { USER_VERIFY, VERIFY, SUBMIT_FORMID } from '@/utils/url';
+	import { toast, sleep } from '@/utils';
+	export default class Verify extends wepy.page {
+	  config = {
+		navigationBarTitleText: '4/4',
+		usingComponents: {
+	      navbar: '../../components/navbar/index'
+	    }
+	  };
 
-        data = {
-            wechat: '',
-            status: false
-        };
+	  data = {
+	    wechat: '',
+	    status: false
+	  };
 
-        components = {};
+	  components = {};
 
-        methods = {
-            async submitForm(e) {
-                console.warn(this.currentDate);
-                wepy.setStorageSync('birthday', this.currentDate);
-                await post(SUBMIT_FORMID, {
-                    formId: e.detail.formId
-                });
-            },
-            onName(event) {
-                this.wechat = event.detail.value;
-            },
-            async verify() {
-                if (!this.wechat) {
-                    toast('微信号不能为空');
-                    return;
-                }
-                const data = await post(VERIFY, {
-                    wechat: this.wechat
-                });
-                console.log(data);
-                toast('已提交审核');
-                await sleep(2);
-                wx.redirectTo({
-                    url: 'index'
-                });
-                wepy.navigateTo({ url: '/pages/index' });
-            },
-            goVideo() {
-                if (!this.wechat) {
-                    toast('微信号不能为空');
-                    return;
-                }
-                wepy.navigateTo({ url: `uploadVideo?wechat=${this.wechat}` });
-            }
-        };
+	  methods = {
+	    async submitForm(e) {
+	      console.warn(this.currentDate);
+	      wepy.setStorageSync('birthday', this.currentDate);
+	      await post(SUBMIT_FORMID, {
+	        formId: e.detail.formId
+	      });
+	    },
+	    onName(event) {
+	      this.wechat = event.detail.value;
+	    },
+	    async verify() {
+	      if (!this.wechat) {
+	        toast('微信号不能为空');
+	        return;
+	      }
+	      const data = await post(VERIFY, {
+	        wechat: this.wechat
+	      });
+	      console.log(data);
+	      toast('已提交审核');
+	      await sleep(2);
+	    //   wx.redirectTo({
+	    //     url: 'index'
+	    //   });
+	      wepy.redirectTo({ url: '/pages/index' });
+	    },
+	    goVideo() {
+	      if (!this.wechat) {
+	        toast('微信号不能为空');
+	        return;
+	      }
+	      wepy.navigateTo({ url: `uploadVideo?wechat=${this.wechat}` });
+	    }
+	  };
 
-        events = {};
+	  events = {};
 
-        watch = {};
+	  watch = {};
 
-        computed = {};
+	  computed = {};
 
-        async onLoad() {
-            let data = await get(USER_VERIFY);
-            // console.error(data);
-            this.status = data.general;
-            this.$apply();
-        }
+	  async onLoad() {
+	    let data = await get(USER_VERIFY);
+	    // console.error(data);
+	    this.status = data.general;
+	    this.$apply();
+	  }
 
-        onShow() {}
-    }
+	  onShow() {}
+	}
 </script>
 
 <style lang='scss'>
-    .container {
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-        margin: 0 auto;
-        .title {
-            margin-top: 152rpx;
-            text-align: center;
-            color: #302f2f;
-            font-size: 42rpx;
-        }
-        .desc {
-            color: #a6aaa8;
-            font-size: 24rpx;
-            margin: 10rpx auto;
-            text-align: center;
-            width: 384rpx;
-            white-space: normal;
-        }
-        .wrap {
-            margin: 150rpx 60rpx 0;
-            .filed {
-                text-align: left;
-                .label {
-                    font-size: 28rpx;
-                    color: #302f2f;
-                }
-            }
-        }
+	.container {
+	  height: 100vh;
+	  position: relative;
+	  overflow: hidden;
+	  width: 100%;
+	  margin: 0 auto;
+	  .title {
+	    margin-top: 152rpx;
+	    text-align: center;
+	    color: #302f2f;
+	    font-size: 42rpx;
+	  }
+	  .desc {
+	    color: #a6aaa8;
+	    font-size: 24rpx;
+	    margin: 10rpx auto;
+	    text-align: center;
+	    width: 384rpx;
+	    white-space: normal;
+	  }
+	  .wrap {
+	    margin: 150rpx 60rpx 0;
+	    .filed {
+	      text-align: left;
+	      .label {
+	        font-size: 28rpx;
+	        color: #302f2f;
+	      }
+	    }
+	  }
 
-        input {
-            margin-top: 22rpx;
-            width: 630rpx;
-            height: 96rpx;
-            line-height: 96rpx;
-            border-radius: 10rpx;
-            padding-left: 22rpx;
-            font-size: 24rpx;
-            background: #f2f4f5;
-        }
-        .verify1 {
-            margin-top: 180rpx;
-            width: 420rpx;
-            height: 92rpx;
-            background: rgba(45, 45, 45, 1);
-            opacity: 1;
-            color: white;
-            font-size: 28rpx;
-            line-height: 92rpx;
-            border-radius: 10rpx;
-        }
-        .verify2 {
-            margin-top: 28rpx;
-            width: 420rpx;
-            height: 92rpx;
-            background: rgba(9, 167, 118, 1);
-            line-height: 92rpx;
-            opacity: 1;
-            color: white;
-            font-size: 28rpx;
-            border-radius: 10rpx;
-        }
-        .text {
-            font-size: 24rpx;
-            color: #a6aaa8;
-            text-align: center;
-            width: 390rpx;
-            white-space: normal;
-            margin: 25rpx auto;
-        }
-    }
-    .placeholder {
-        color: #a6aaa8;
-    }
+	  input {
+	    margin-top: 22rpx;
+	    width: 630rpx;
+	    height: 96rpx;
+	    line-height: 96rpx;
+	    border-radius: 10rpx;
+	    padding-left: 22rpx;
+	    font-size: 24rpx;
+	    background: #f2f4f5;
+	  }
+	  .verify1 {
+	    margin-top: 28rpx;
+	    width: 420rpx;
+	    height: 92rpx;
+	    background: rgba(45, 45, 45, 1);
+	    opacity: 1;
+	    color: white;
+	    font-size: 28rpx;
+	    line-height: 92rpx;
+	    border-radius: 10rpx;
+	  }
+	  .verify2 {
+	    margin-top: 180rpx;
+
+	    width: 420rpx;
+	    height: 92rpx;
+	    background: rgba(9, 167, 118, 1);
+	    line-height: 92rpx;
+	    opacity: 1;
+	    color: white;
+	    font-size: 28rpx;
+	    border-radius: 10rpx;
+	  }
+	  .text {
+	    font-size: 24rpx;
+	    color: #a6aaa8;
+	    text-align: center;
+	    width: 410rpx;
+	    white-space: normal;
+	    margin: 25rpx auto;
+	  }
+	}
+	.placeholder {
+	  color: #a6aaa8;
+	}
 </style>

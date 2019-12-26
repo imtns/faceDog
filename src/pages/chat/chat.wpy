@@ -1,5 +1,6 @@
 <!--  -->
 <template>
+	<navbar title="{{nick}}"></navbar>
 	<scroll-view class="scrollView" scroll-y bindscrolltoupper="getMoreData" lower-threshold="200" style="height:{{scrollHeight}}px" scroll-into-view="{{toview}}">
 		<view class="chatBox-content-demo" wx:for="{{msgList}}" id="chat{{index}}" wx:key="index">
 			<view class="clearfloat" wx:if="{{!item.isSend}}">
@@ -68,7 +69,11 @@
 	var loading = false;
 	export default class Chat extends wepy.page {
 	  config = {
-	    navigationBarTitleText: ''
+	    navigationBarTitleText: '',
+	    usingComponents: {
+			navbar: '../../components/navbar/index'
+		}
+          
 	  };
 	  data = {
 	    id: '',
@@ -260,7 +265,8 @@
 	    this.id = options.id;
 	    wx.setNavigationBarTitle({
 	      title: options.nick
-	    });
+		});
+		this.title = options.nick;
 	    this.nick = options.nick;
 	    this.icon = wx.getStorageSync('chatIcon');
 	    this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
