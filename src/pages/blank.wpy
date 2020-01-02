@@ -16,7 +16,8 @@
 	    navigationBarTitleText: ''
 	  };
 
-	  data = {};
+	  data = {
+	  };
 
 	  components = {
 	    loadingHeart
@@ -54,7 +55,9 @@
 
 	  computed = {};
 
-	  onLoad() {}
+	  onLoad() {
+
+	  }
 	  getLocation(t) {
 	    wx.getLocation({
 	      type: 'wgs84',

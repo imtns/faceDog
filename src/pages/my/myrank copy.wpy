@@ -231,18 +231,21 @@ export default class Example extends wepy.page {
         console.log('text:', text);
     }
     onShareAppMessage() {
-        return {
-            title: '好看的人都在这',
-            path: '/pages/home',
-            imageUrl: 'https://images.facedog.cn/public/yg-share.jpeg',
-            success: res => {
-                console.log('转发成功', res);
-            },
-            fail: res => {
-                console.log('转发失败', res);
-            }
-        };
-    }
+	    let user = wx.getStorageSync('profile') || '';
+		let num = Math.floor(Math.random() * 2) + 1;
+		
+	    return {
+	      title: num == 1?'你这么美，不来看看吗':'只有好看的人才能收到',
+	      path: `/pages/home?userid=${user ? user.ID : ''}`,
+	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg`,
+	      success: res => {
+	        console.log('转发成功', res);
+	      },
+	      fail: res => {
+	        console.log('转发失败', res);
+	      }
+	    };
+	  }
     async onLoad() {
         let profile = wepy.getStorageSync('profile');
         let gender = profile.gender;

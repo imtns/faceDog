@@ -68,14 +68,16 @@
         },
         verify() {
           let profile = wepy.getStorageSync('profile');
-          if (Object.keys(profile).length>0 && profile.progress == 'profile') {
+        //   if (Object.keys(profile).length>0 && profile.progress == 'profile') {
             wepy.navigateTo({ url: '/pages/register/verify' });
-          } else {
-            wepy.navigateTo({ url: '/pages/register/chooseName' });
-          }
+        //   } else {
+        //     wepy.navigateTo({ url: '/pages/register/chooseName' });
+		//   }
+		  
           Event.trigger('showVerify', false);
         },
         close() {
+		  this.$emit('close');
           Event.trigger('showVerify', false);
         }
       };
@@ -119,7 +121,7 @@
     .wrapper {
       width: 100%;
       height: 100%;
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       background: rgba(0, 0, 0, 0.75);

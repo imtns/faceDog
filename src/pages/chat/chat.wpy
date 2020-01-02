@@ -3,7 +3,7 @@
 	<navbar title="{{nick}}"></navbar>
 	<scroll-view class="scrollView" scroll-y bindscrolltoupper="getMoreData" lower-threshold="200" style="height:{{scrollHeight}}px" scroll-into-view="{{toview}}">
 		<view class="chatBox-content-demo" wx:for="{{msgList}}" id="chat{{index}}" wx:key="index">
-			<view class="clearfloat" wx:if="{{!item.isSend}}">
+			<view class="clearfloat" wx:if="{{!item.isSend}}" style="margin-bottom:{{index == msgList.length-1 && isphoneX?'270rpx':''}}">
 				<view class="author-name" wx:if="{{item.showtime}}">
 					<text class="chat-date">{{item.sendTime}}</text>
 				</view>
@@ -34,7 +34,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="clearfloat" wx:if="{{item.isSend}}">
+			<view class="clearfloat" style="margin-bottom:{{index == msgList.length-1 && isphoneX?'70rpx':''}}" wx:if="{{item.isSend}}">
 				<view class="author-name" wx:if="{{item.showtime}}">
 					<text class="chat-date">{{item.sendTime}}</text>
 				</view>
@@ -43,9 +43,9 @@
 						<!-- <image src="{{item.item}}" wx:if="{{item.typ =='images'}}"></image> -->
 						<text selectable="true">{{item.msg}}</text>
 					</view>
-					<view class="chat-avatars">
+					<!-- <view class="chat-avatars">
 						<image class="avatar" src="{{item.icon}}" mode="aspectFill" @tap="goProfile('self')"></image>
-					</view>
+					</view> -->
 				</view>
 			</view>
 		</view>
@@ -71,9 +71,8 @@
 	  config = {
 	    navigationBarTitleText: '',
 	    usingComponents: {
-			navbar: '../../components/navbar/index'
-		}
-          
+	      navbar: '../../components/navbar/index'
+	    }
 	  };
 	  data = {
 	    id: '',
@@ -89,7 +88,8 @@
 	    Complete: false,
 	    nick: '',
 	    count: 0,
-	    user: {}
+	    user: {},
+	    isphoneX: false
 	  };
 
 	  components = {};
@@ -265,13 +265,31 @@
 	    this.id = options.id;
 	    wx.setNavigationBarTitle({
 	      title: options.nick
-		});
-		this.title = options.nick;
+	    });
+	    this.title = options.nick;
 	    this.nick = options.nick;
 	    this.icon = wx.getStorageSync('chatIcon');
-	    this.scrollHeight = wx.getSystemInfoSync().windowHeight - 57;
-	    this.profile = wx.getStorageSync('profile');
 
+	    this.profile = wx.getStorageSync('profile');
+	    let that = this;
+	    wx.getSystemInfo({
+	      success(res) {
+	        var name = 'iPhone X';
+	        if (
+	          res.model.indexOf('iPhone 11') > -1 ||
+	          res.model.indexOf('iPhone X') > -1 ||
+	          res.model.indexOf('unknown<iPhone') > -1
+	        ) {
+	          that.scrollHeight = wx.getSystemInfoSync().windowHeight - 150;
+	          console.warn('isIphoneX !!!!!!!');
+	          that.isphoneX = true;
+	          that.$apply();
+	        } else {
+			  that.scrollHeight = wx.getSystemInfoSync().windowHeight - 124;
+			  that.$apply();
+	        }
+	      }
+	    });
 	    if (this.nick == '颜狗客服') {
 	      this.icon = 'https://images.facedog.cn/public/chat/chatIcon.png';
 	    } else {
@@ -315,7 +333,7 @@
 	    var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
 	    var skey = 'C2C' + this.id; // 拼装 skey
 	    var selSess = sessMap[skey]; // 获取 Session 的实例
-	    webim.setAutoRead(selSess, false, false);
+	    webim.setAutoRead(selSess, true, true);
 	    Event.remove('msgDetectChat');
 	    Event.trigger('send');
 	    loading = false;
@@ -344,8 +362,15 @@
 	}
 
 	.chatBox-content-demo {
+	  padding-bottom: 10rpx;
 	  width: 100%;
-	  overflow-y: scroll;
+	  //   overflow-y: scroll;
+	  &:last-of-type {
+	    // margin-bottom: 45rpx;
+	    .clearfloat {
+	      margin-bottom: 25rpx;
+	    }
+	  }
 	}
 
 	.clearfloat:after {
@@ -442,42 +467,53 @@
 	}
 
 	.clearfloat .left .chat-message {
-	  background: white;
+	  //   background: white;
 	  font-size: 24rpx;
 	  margin-left: 22rpx;
+	  color: #4b4b4b;
+	  background: rgba(255, 255, 255, 1);
+	  box-shadow: 0px 0px 6rpx rgba(0, 0, 0, 0.16);
+	  opacity: 1;
+	  border-radius: 10rpx 51rpx 51rpx 51rpx;
 	}
 
-	.clearfloat .left .chat-message:before {
-	  position: absolute;
-	  content: '';
-	  top: 8px;
-	  left: -6px;
-	  border-top: 10px solid transparent;
-	  border-bottom: 10px solid transparent;
-	  border-right: 10px solid white;
-	}
+	// .clearfloat .left .chat-message:before {
+	//   position: absolute;
+	//   content: '';
+	//   top: 8px;
+	//   left: -6px;
+	//   border-top: 10px solid transparent;
+	//   border-bottom: 10px solid transparent;
+	//   border-right: 10px solid white;
+	// }
 
 	.clearfloat .right {
 	  text-align: right;
 	}
 
 	.clearfloat .right .chat-message {
-	  background: #1ccddf;
+	  //   background: #1ccddf;
 	  text-align: left;
-	  font-size: 24rpx;
-	  font-weight: 600;
+	  //   font-size: 24rpx;
+	  //   font-weight: 600;
 	  margin-right: 22rpx;
+	  font-size: 24rpx;
+	  color: white;
+	  background: rgba(0, 219, 219, 1);
+	  box-shadow: 0px 0px 6rpx rgba(0, 0, 0, 0.16);
+	  opacity: 1;
+	  border-radius: 51rpx 10rpx 51rpx 51rpx;
 	}
 
-	.clearfloat .right .chat-message:before {
-	  position: absolute;
-	  content: '';
-	  top: 23rpx;
-	  right: -6px;
-	  border-top: 20rpx solid transparent;
-	  border-bottom: 20rpx solid transparent;
-	  border-left: 20rpx solid #1ccddf;
-	}
+	// .clearfloat .right .chat-message:before {
+	//   position: absolute;
+	//   content: '';
+	//   top: 23rpx;
+	//   right: -6px;
+	//   border-top: 20rpx solid transparent;
+	//   border-bottom: 20rpx solid transparent;
+	//   border-left: 20rpx solid #1ccddf;
+	// }
 
 	.clearfloat .chat-avatars {
 	  display: inline-block;

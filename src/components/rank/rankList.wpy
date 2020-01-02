@@ -1,5 +1,8 @@
 <!--  -->
 <template>
+	<block wx:if="{{verify}}">
+		<verify />
+	</block>
 	<view class="rankList">
 		<view class="top3">
 			<view wx:if="{{top3[0]}}" class="top1" @tap="toProfile" data-id="{{top3[0]._id}}">
@@ -54,8 +57,12 @@
 
 <script>
 	import wepy from 'wepy';
+
+	import verify from '@/components/battle/module/verify';
 	export default class Discover extends wepy.component {
-	  data = {};
+	  data = {
+		  verify:false
+	  };
 	  props = {
 	    top3: {
 	      type: Array,
@@ -70,9 +77,15 @@
 	      default: 'all'
 	    }
 	  };
-	  components = {};
+	  components = {
+		  verify
+	  };
 
-	  events = {};
+	  events = {
+		  close(){
+			  this.verify = false;
+		  }
+	  };
 
 	  watch = {};
 
@@ -89,6 +102,10 @@
 	  }
 	  methods = {
 	    toProfile(e) {
+	      if (!wepy.getStorageSync('hasProfile')) {
+	        this.verify = true;
+	        return;
+	      }
 	      const { id } = e.currentTarget.dataset;
 	      wepy.navigateTo({
 	        url: `/pages/battle/profile?id=${id}`
@@ -143,7 +160,7 @@
 	      height: 465rpx;
 	      float: left;
 	      position: relative;
-	      border-radius:5rpx;
+	      border-radius: 5rpx;
 	      overflow: hidden;
 	      .img {
 	        width: 100%;
@@ -167,7 +184,7 @@
 	        width: 230rpx;
 	        height: 230rpx;
 	        position: relative;
-	        border-radius:5rpx;
+	        border-radius: 5rpx;
 	        overflow: hidden;
 	        &:first-child {
 	          margin-bottom: 5rpx;
@@ -199,7 +216,7 @@
 	      width: 230rpx;
 	      height: 230rpx;
 	      position: relative;
-	      border-radius:5rpx;
+	      border-radius: 5rpx;
 	      overflow: hidden;
 	      margin: 5rpx 5rpx 0 0;
 	      .img {

@@ -48,8 +48,11 @@
 						</text>
 						<text style="font-size:34rpx;color:#000">才可以和别人匹配，最快只需要5分钟</text>
 					</text>
-					<button class="btn btn-1" @tap="goVerify">现在认证</button>
-					<button class="btn btn-2" @tap="goGuest">我先看看</button>
+
+					<button class="btn btn-1" open-type="getUserInfo" bindgetuserinfo="goVerify">现在认证</button>
+					<button class="btn btn-2" open-type="getUserInfo" bindgetuserinfo="goGuest">我先看看</button>
+					<!-- <button class="btn btn-1" @tap="goVerify">现在认证</button>
+					<button class="btn btn-2" @tap="goGuest">我先看看</button> -->
 				</view>
 			</swiper-item>
 		</swiper>
@@ -61,7 +64,7 @@
 			</swiper-item>
 			<swiper-item catchtouchmove='catchTouchMove'>
 				<view class="register-item">
-					<chooseName :number.sync="number" />
+					<chooseName  />
 				</view>
 			</swiper-item>
 			<swiper-item catchtouchmove='catchTouchMove'>
@@ -71,7 +74,7 @@
 			</swiper-item>
 			<swiper-item catchtouchmove='catchTouchMove'>
 				<view class="register-item">
-					<uploadAvatar />
+					<uploadAvatar :number.sync="number"/>
 				</view>
 			</swiper-item>
 		</swiper>
@@ -159,7 +162,7 @@
 	  async onLoad(options) {
 	    this.initAnimation = false;
 	    this.current = 0;
-
+		this.number = options.userid;
 	    this.showRegister = false;
 	    this.textCurrent = 0;
 	    this.numObj = {};

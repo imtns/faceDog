@@ -1,5 +1,7 @@
 <!-- 详情资料页 -->
 <template>
+	<navbar title="{{title}}">
+	</navbar>
     <view class='container'>
             <block wx:if="{{verify}}">
         <verify  />
@@ -44,7 +46,7 @@
 
             </view>
         </view>
-        <view class="bottom-box" wx:if="{{!self}}">
+        <view class="bottom-box" wx:if="{{!self && loaded}}">
             <block wx:if="{{!profile.is_friend}}">
                 <image class="close" mode="aspectFill" @tap="close" src="https://images.facedog.cn/public/profile/close1.png"></image>
                 <!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="https://images.facedog.cn/public/profile/menu.png"></image> -->
@@ -103,6 +105,7 @@ export default class Profile extends wepy.page {
     config = {
         navigationBarTitleText: '',
         usingComponents: {
+			navbar: '../../components/navbar/index',
             'van-icon': '../../components/vant/icon/index',
             'van-toast': '../components/vant/toast/index'
         }
@@ -126,7 +129,9 @@ export default class Profile extends wepy.page {
             lover: '一见钟情'
         },
         self: false,
-        verify: false
+		verify: false,
+		title:"",
+		loaded:false
     };
 
     components = {
@@ -158,13 +163,12 @@ export default class Profile extends wepy.page {
                 return;
             }
             if (data.friend) {
-                this.profile.is_friend = true;
+				this.profile.is_friend = true;
+				wx.setStorageSync('chatIcon', this.profile.avartar);
                 wx.navigateTo({
                     url: `../chat/becomeFriend?id=${
                         this.profile.dentifier
-                    }&nick=${this.profile.nick_name}&icon=${encodeURI(
-                        this.profile.avartar
-                    )}`
+                    }&nick=${this.profile.nick_name}`
                 });
             } else {
                 Toast('已发送好友申请');
@@ -268,8 +272,9 @@ export default class Profile extends wepy.page {
             success: result => {},
             fail: () => {},
             complete: () => {}
-        });
-
+        });	
+		this.title = result.nick_name;
+		this.loaded = true;
         this.$apply();
     }
 

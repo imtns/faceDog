@@ -4,7 +4,7 @@
         <empty></empty>
     </block>
     <view class='wrapper' wx:else>
-        <repeat for="{{list}}" key="index" index="index" item="item">
+        <repeat for="{{list.users}}" key="index" index="index" item="item">
             <view class="like-box">
                 <view class="header">
                     <view class="date"><text>{{item.day}}</text><text>/{{item.month}}</text></view>

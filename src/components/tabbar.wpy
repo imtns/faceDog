@@ -5,7 +5,7 @@
 			<image slot="icon-active" src="{{ icon.message.active }}" mode="aspectFit"></image>
 			<!-- 消息 -->
 		</van-tabbar-item>
-		<van-tabbar-item>
+		<van-tabbar-item info="{{enjoy}}"> 
 			<image slot="icon" src="{{ icon.home.normal }}" mode="aspectFit"></image>
 			<image slot="icon-active" src="{{ icon.home.active }}" mode="aspectFit"></image>
 			<!-- 颜值 -->
@@ -28,7 +28,8 @@
 	export default class tabbar extends wepy.component {
 	  data = {
 	    active: 0,
-	    unread: '',
+		unread: '',
+		enjoy:'',
 	    icon: {
 	      home: {
 	        normal: 'https://images.facedog.cn/public/tabbar/tab1.png?1',
@@ -63,7 +64,11 @@
 	    unreadSet(num) {
 	      this.unread = num || '';
 	      this.$apply();
-	    }
+		},
+		enjoySet(num) {
+	      this.enjoy = num || '';
+	      this.$apply();
+		}
 	  };
 	}
 </script>

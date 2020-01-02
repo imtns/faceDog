@@ -4,8 +4,8 @@
 			<view class="square"> 
 				<view class="tab {{tabSelect==0?'active':''}}" @tap="tabClick(0)">PK</view>
 				<view class="tab-split"></view>
-				<view class="tab {{tabSelect==1?'active':''}}" @tap="tabClick(1)">探索</view>
-				<view class="underline" style="left:{{tabSelect==0?'21rpx':'123rpx'}}"></view>
+				<view class="tab tab2 {{tabSelect==1?'active':''}}" @tap="tabClick(1)">探索</view>
+				<view class="underline" style="left:{{tabSelect==0?'42rpx':'149rpx'}}"></view>
 			</view>
 		</view>
 	</navbar>
@@ -139,7 +139,7 @@
 	      const data = await get(NEW_PROFILE, { loading: false });
 	      console.warn(data);
 	      data.age = (data.birthday && getAge(data.birthday)) || 18;
-	      if (data.progress == 'profile') {
+	      if (data.progress == 'profile'  || data.progress == 'refuse') {
 	        this.hasProfile = false;
 	        this.$apply();
 	      } else {
@@ -197,7 +197,8 @@
 	        this.pageTitle = '消息';
 	        // wx.setNavigationBarTitle({
 	        //   title: ''
-	        // });
+			// });
+			this.$invoke('chat', 'initChat');
 	        this.$invoke('chat', 'initLike');
 	        this.$invoke('chat', 'refreshData');
 	      }
@@ -231,6 +232,9 @@
 	    },
 	    unreadSet(num) {
 	      this.$invoke('tabbar', 'unreadSet', num);
+		},
+		enjoySet(num) {
+	      this.$invoke('tabbar', 'enjoySet', num);
 	    },
 	    showtab(status) {
 	      this.tabbarshow = status;
@@ -280,10 +284,13 @@
 	    });
 	  }
 	  onShareAppMessage() {
+	    let user = wx.getStorageSync('profile') || '';
+		let num = Math.floor(Math.random() * 2) + 1;
+		
 	    return {
-	      title: '好看的人都在这',
-	      path: `/pages/home?userid=${this.user.ID}`,
-	      imageUrl: 'https://images.facedog.cn/public/yg-share.jpeg',
+	      title: num == 1?'你这么美，不来看看吗':'只有好看的人才能收到',
+	      path: `/pages/home?userid=${user ? user.ID : ''}`,
+	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg`,
 	      success: res => {
 	        console.log('转发成功', res);
 	      },
@@ -294,9 +301,9 @@
 	  }
 	  onShow() {
 	    this.setProfile();
-	    // this.$invoke('chat', 'initChat');
+	    this.$invoke('chat', 'initChat');
 	    if (this.selectedTab === 0) {
-	      this.$invoke('chat', 'refreshData');
+	    //   this.$invoke('chat', 'refreshData');
 	      //   this.$invoke('battle', 'init');
 	    }
 	    if (this.selectedTab === 2) {
@@ -334,10 +341,17 @@
 	  padding: 8rpx 0;
 	  position: relative;
 	  .tab {
-	    margin: 0 24rpx;
+		margin: 0 24rpx;
+		padding:10rpx 0;
 	    font-size: 35rpx; 
 	    color: #c5c5c5;
-	    font-weight: bold;
+		font-weight: bold;
+		&:first-child{
+			padding-left:20rpx;
+		}
+		&.tab2{
+			padding-right: 20rpx;
+		}
 	    &.active {
 	      color: #000;
 	    }
@@ -347,12 +361,12 @@
 	    height: 34rpx;
 	    background: #c5c5c5;
 	    position: relative;
-	    top: 3rpx;
+	    top: 18rpx;
 	  }
 	  .underline {
 	    position: absolute;
 	    left: 20rpx;
-	    bottom: 0rpx;
+	    bottom: 10rpx;
 	    width: 50rpx;
 	    height: 4rpx;
 	    background: #f25458;

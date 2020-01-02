@@ -1,7 +1,8 @@
 <!--  -->
 <template>
 	<view class='container-gender'>
-		<view class="title">请选择您的性别</view>
+		<view class="title">请选择你的性别</view>
+		<view class="tip">性别一旦选择无法更改</view>
 		<view class="wrap">
 			<view class="box" @tap="choose(1)">
 				<image src="https://images.facedog.cn/public/register/male{{select==1?'-active':''}}.png" mode="aspectFill" />
@@ -57,19 +58,19 @@
 	      let profile = wepy.getStorageSync('wx_profile');
 	      let gender = this.select === '1' ? 'male' : 'female';
 	      wepy.setStorageSync('gender', gender);
-	    //   let tempName = '颜狗_' + Math.floor(Math.random() * 100000);
-	    //   wepy.setStorageSync('tempName', tempName);
-	    //   let data = await post(USER_REGISTER, {
-	    //     nick_name: tempName,
-	    //     gender,
-	    //     src: 'https://images.facedog.cn/public/discover/default-avatar.png',
-	    //     number: this.number
-		//   });
-		  this.$emit('changeStep',1)
-	    //   wx.redirectTo({
-	    //     url: '../index'
-	    //   });
-	    //   console.log(data);
+	      //   let tempName = '颜狗_' + Math.floor(Math.random() * 100000);
+	      //   wepy.setStorageSync('tempName', tempName);
+	      //   let data = await post(USER_REGISTER, {
+	      //     nick_name: tempName,
+	      //     gender,
+	      //     src: 'https://images.facedog.cn/public/discover/default-avatar.png',
+	      //     number: this.number
+	      //   });
+	      this.$emit('changeStep', 1);
+	      //   wx.redirectTo({
+	      //     url: '../index'
+	      //   });
+	      //   console.log(data);
 	    }
 	  };
 
@@ -93,6 +94,12 @@
 	    text-align: center;
 	    color: #302f2f;
 	    font-size: 42rpx;
+	  }
+	  .tip {
+	    color: #a6aaa8;
+	    font-size: 24rpx;
+	    margin-top: 10rpx;
+	    text-align: center;
 	  }
 	  .wrap {
 	    margin: 206rpx 132rpx 0;

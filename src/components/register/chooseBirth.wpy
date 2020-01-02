@@ -1,7 +1,7 @@
 <!--  -->
 <template>
     <view class='container-birth'>
-        <view class="title">请选择您的生日</view>
+        <view class="title">请选择你的生日</view>
         <view class="wrap">
             <picker mode="date" value="{{currentDate}}" start="1970-01-01" end="2019-01-01" bindchange="bindDateChange">
                 <view class="field">
@@ -31,9 +31,9 @@ export default class ChooseBirth extends wepy.component {
 
     data = {
         currentDate: '1995-01-01',
-        year: '',
-        month: '',
-        day: ''
+        year: '1995',
+        month: '1',
+        day: '1'
     };
 
     components = {};
@@ -138,7 +138,7 @@ export default class ChooseBirth extends wepy.component {
                 color:#302F2F;
             }
             .year{
-                left:66rpx;
+                left:75rpx;
             }
             .month{
                 left:294rpx;

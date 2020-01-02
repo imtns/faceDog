@@ -55,7 +55,8 @@
 	      'pages/my/likeHelp', // 点击说明
 	      'pages/test/testBattle',
 	      'pages/chat/ilike', //我喜欢的
-	      'pages/chat/likeme' //喜欢我的
+		  'pages/chat/likeme', //喜欢我的
+		  'pages/chat/friendList'
 	    ],
 	    window: {
 	      backgroundTextStyle: 'light',

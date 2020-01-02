@@ -1,7 +1,7 @@
 <!--  -->
 <template>
 	<view class='container-name'>
-		<view class="title">请选择您的昵称</view>
+		<view class="title">请填写你的昵称</view>
 		<view class="wrap">
 			<input type="text" value="{{name}}" maxlength="6" placeholder="最多6个字符" @input="inputChange" />
 		</view>

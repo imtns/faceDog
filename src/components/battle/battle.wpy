@@ -92,6 +92,7 @@
 	import pop from './module/pop';
 	export default class Battle extends wepy.component {
 	  data = {
+	    haveEnjoy: 0,
 	    show: true,
 	    showPop: false,
 	    isphoneX: false,
@@ -161,20 +162,39 @@
 	  }
 	  // 提交喜欢
 	  async battleCommit() {
+	    if (this.noProfile) {
+	      Event.trigger('showVerify', true);
+	      return;
+	    }
 	    try {
 	      const data = await post(BATTLE_COMMIT, {
 	        result: {
 	          win: this.likeImageId,
-	          fail: this.dislikeImageId 
+	          fail: this.dislikeImageId
 	        }
 	      });
-	      if (data.count_enjoy >= 10) {
+	      console.log('commit!!!!!!!', data);
+	      Event.trigger('refreshData');
+	      if (this.haveEnjoy <= 0) {
 	        let name = `commit-${formatDate(new Date())}`;
-			wepy.setStorageSync(name, true);
-			this.showPop = true;
-			this.$apply();
-	      }   
+	        wepy.setStorageSync(name, true);
+	        this.showPop = true;
+	        this.$apply();
+	        return;
+	      }
+	      let enjoyCount = this.haveEnjoy - 1;
+	      this.$emit('enjoySet', --this.haveEnjoy);
+	      this.haveEnjoy = enjoyCount;
+
 	      console.log(data);
+	      if (data.is_friend) {
+	        wx.setStorageSync('chatIcon', data.enjoy_user_avatar);
+	        wx.navigateTo({
+	          url: `/pages/chat/becomeFriend?id=${data.enjoy_user_dentifier}&nick=${
+	            data.enjoy_user_nick_name
+	          }`
+	        });
+	      }
 	      this.noProfileCount++;
 	    } catch (e) {}
 	  }
@@ -238,10 +258,6 @@
 	    },
 	    //上面的box拖动事件
 	    touchTopMove(id, e) {
-	      if (this.noProfile && this.noProfileCount >= 2) {
-	        Event.trigger('showVerify', true);
-	        return;
-	      }
 	      if (this.draggingBottom) return;
 	      this.draggingTop = true;
 	      this.blurBottom = true; // 拖动上面的时候下面的背景变blur
@@ -251,7 +267,7 @@
 	      let { clientY } = currentTouch;
 	      // 如果不是同一个触发点则返回
 	      // 通过 当前坐标点, 初始坐标点, 初始偏移量 来计算当前偏移量
-	      let tranY = clientY - 100;
+	      let tranY = clientY - 180;
 
 	      if (tranY < 0) {
 	        tranY = 0;
@@ -266,17 +282,18 @@
 	    },
 	    //下面box拖动事件
 	    touchBottomMove(id, e) {
-	      if (this.noProfile && this.noProfileCount >= 2) {
-	        Event.trigger('showVerify', true);
-	        return;
-	      }
+	      //   if (this.noProfile && this.noProfileCount >= 2) {
+	      //     Event.trigger('showVerify', true);
+	      //     return;
+	      //   }
 	      if (this.draggingTop) return;
 	      this.draggingBottom = true;
 	      this.blurTop = true; // 拖动下面的时候上面的背景变blur
 	      let currentTouch = e.changedTouches[0];
+	      //   console.log(currentTouch);
 	      this.bottomDragDistance = this.tranBottomY[id] < -190;
 	      let { clientY } = currentTouch;
-	      let tranY = clientY - 500;
+	      let tranY = clientY - 600;
 
 	      if (tranY < -215) {
 	        tranY = -215;
@@ -287,7 +304,7 @@
 	      this.opacityBottomPick = (tranY == -115 ? 0 : tranY) / -215;
 	      throttle(this.setValue(tranY, this.swiperCurrent, 'bottom'), 500);
 	      //   this.tranBottomY[this.swiperCurrent] = tranY;
-	      console.log(tranY);
+	      //   console.log(tranY);
 	      //   this.$apply();
 	    },
 	    //bothlike 事件
@@ -361,7 +378,18 @@
 	    this.show = true;
 	    this.swiperCurrent = 0;
 	    this.battleList = [];
-	    const result = await get(BATTLE, { battle: '' });
+	    let res = await get(BATTLE, { battle: '' });
+	    let result = res.data;
+	    this.haveEnjoy = res.have_enjoy;
+	    if (this.haveEnjoy <= 0) {
+	      let name = `commit-${formatDate(new Date())}`;
+	      wepy.setStorageSync(name, true);
+	      this.showPop = true;
+	      this.show = false;
+	      this.$apply();
+	      return;
+	    }
+	    this.$emit('enjoySet', this.haveEnjoy);
 	    console.warn('result', result);
 	    result.a.forEach((item, index) => {
 	      result.a[index].distance = (result.a[index].distance / 1000).toFixed(2);
@@ -408,17 +436,19 @@
 	    }
 	    let name = `commit-${formatDate(new Date())}`;
 	    if (wepy.getStorageSync(name)) {
-			this.showPop = true;
-			this.$apply();
+	      this.showPop = true;
+	      this.$apply();
 	    }
 	    let that = this;
 	    wx.getSystemInfo({
 	      success(res) {
 	        var name = 'iPhone X';
 	        if (
-	          res.model.indexOf(name) > -1 ||
+	          res.model.indexOf('iPhone 11') > -1 ||
+	          res.model.indexOf('iPhone X') > -1 ||
 	          res.model.indexOf('unknown<iPhone') > -1
 	        ) {
+	          console.warn('isIphoneX !!!!!!!');
 	          that.isphoneX = true;
 	          that.$apply();
 	        }
@@ -440,7 +470,7 @@
 <style lang='less' scoped>
 	.swiper {
 	  width: 100%;
-	  height: 100vh;
+	  height: 90vh;
 	}
 	@keyframes fadeIn {
 	  0% {
@@ -827,7 +857,7 @@
 	      position: absolute;
 	      left: 50%;
 	      transform: translateX(-50%);
-	      width: 708rpx;
+	      width: 690rpx;
 	      height: 123rpx;
 	      display: flex;
 	      justify-content: center;

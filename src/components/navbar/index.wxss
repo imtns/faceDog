@@ -18,7 +18,7 @@ page{--height:44px;--right:190rpx;}
 .weui-navigation-bar__inner .weui-navigation-bar__left .btn-back{width:15px;height:30px;}
 .weui-navigation-bar__inner .weui-navigation-bar__left .btn-back image{width:100%;height:100%;}
 /* .weui-navigation-bar__left .btn-home{ width: 20px; height: 20px;} */
-.weui-navigation-bar__left .btn-home{ width: 50px; height: 20px;}
+.weui-navigation-bar__left .btn-home{ width: 50px; height: 20px;padding:10rpx;}
 .weui-navigation-bar__left .btn-back+.btn-home{margin-left:50rpx;}
 .weui-navigation-bar__left .btn-home image{width:100%;height:100%;}
 .weui-navigation-bar__inner .weui-navigation-bar__left .weui-navigation-bar__btn_goback:active{opacity:.5}

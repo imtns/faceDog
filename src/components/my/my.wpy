@@ -12,7 +12,7 @@
 					<view class="desc">{{profile.age || '未知'}}岁 · {{profile.city || ''}}</view>
 				</view>
 				<view class="verify" @tap="checkVerify({{profile.progress}})">
-					<image src="https://images.facedog.cn/public/profile/{{profile.progress || 'profile'}}.png" mode="aspectFill" lazy-load="false">
+					<image src="https://images.facedog.cn/public/profile/{{profile.progress || 'profile'}}.png?2" mode="scaleToFill" lazy-load="false">
 					</image>
 					<!-- {{profile.progress?progress[profile.progress]:'未认证'}} -->
 				</view>
@@ -158,10 +158,10 @@
 	      }
 	    },
 	    goProfile() {
-	      if (!wepy.getStorageSync('hasProfile')) {
-	        Event.trigger('showVerify', true);
-	        return;
-	      }
+	    //   if (!wepy.getStorageSync('hasProfile')) {
+	    //     Event.trigger('showVerify', true);
+	    //     return;
+	    //   }
 	      wx.navigateTo({
 	        url: 'battle/profile?id=' + this.profile._id,
 	        success: result => {},
@@ -170,15 +170,18 @@
 	      });
 	    },
 	    redirect(name) {
-	      if (!wepy.getStorageSync('hasProfile')) {
+	      if (!wepy.getStorageSync('hasProfile') && name == 'propaganda') {
 	        Event.trigger('showVerify', true);
 	        return;
 	      }
 	      // 跳转到我的动态页面需要带参数
 	      if (name === 'mymoment') {
-	        wepy.navigateTo({
-	          url: `/pages/my/mymoment?id=${this.profile._id}`
-	        });
+	        // wepy.navigateTo({
+	        //   url: `/pages/my/mymoment?id=${this.profile._id}`
+			// });
+			wepy.navigateTo({
+	          url: `/pages/chat/friendList`
+			});
 	        return;
 	      }
 	      wepy.navigateTo({ url: `my/${name}` });
@@ -293,8 +296,8 @@
 	    }
 	  }
 	  .verify {
-	    width: 198rpx;
-	    height: 60rpx;
+	    width: 216rpx;
+	    height: 64rpx;
 	    margin-top: 12rpx;
 	    image {
 	      width: 100%;

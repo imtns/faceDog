@@ -2,6 +2,9 @@
 <template>
 	<navbar title="我喜欢的">
 	</navbar>
+	<block wx:if="{{!list.length}}">
+		<empty></empty>
+	</block>
 	<view class='container'>
 		<repeat for="{{list}}" key="index" index="index" item="item">
 			<view class="box">
@@ -11,11 +14,13 @@
 						<view class="name">{{item.nick_name}} {{item.age}}</view>
 						<view class="city">{{item.province}} {{item.city}}</view>
 					</view>
+					<!-- <image class="icon" src="https://images.facedog.cn/public/likeme/heart.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
+					</image> -->
 					<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
 					</image>
 				</view>
 			</view>
-		</repeat> 
+		</repeat>
 	</view>
 	<van-toast id="van-toast" />
 </template>
@@ -24,6 +29,7 @@
 	import wepy from 'wepy';
 	import { get, post } from '@/utils/request';
 
+	import empty from '@/components/empty';
 	import Toast from '@/components/vant/toast/toast';
 	import { MAKEFRIEND, MY_FAVORITE, DELETE_FAVORITE } from '@/utils/url';
 	export default class ILIKE extends wepy.page {
@@ -42,11 +48,13 @@
 	    show: false
 	  };
 
-	  components = {};
+	  components = {
+		  empty
+	  };
 
 	  methods = {
-		goProfile(id) {
-			console.log(id);
+	    goProfile(id) {
+	      console.log(id);
 	      wx.navigateTo({
 	        url: `../battle/profile?id=${id}`,
 	        success: result => {},
@@ -85,7 +93,7 @@
 	  }
 	  async fetchData() {
 	    this.list = [];
-	    const result = await get(MY_FAVORITE);
+	    const result = await get(MY_FAVORITE, { page: 1 });
 	    this.list.push(...result.favorites);
 	    this.init = true;
 	    this.$apply();
@@ -140,9 +148,15 @@
 	        color: #000;
 	      }
 	      .city {
-	        color: #A2A7B2;
+	        color: #a2a7b2;
 	        font-size: 25rpx;
 	      }
+	    }
+
+	    .icon {
+	      width: 119rpx;
+	      height: 119rpx;
+	      margin-right: 20rpx;
 	    }
 	    .delete {
 	      width: 43rpx;

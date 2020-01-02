@@ -1,7 +1,7 @@
 <!--  -->
 <template>
 	<view class='container-avatar'>
-		<view class='title'>请上传你最满意的照片</view>
+		<view class='title'>请上传本人清晰头像</view>
 		<view class='desc'>好看的照片会收获更多关注，你可以随时修改</view>
 		<view class='wrap'>
 			<image class='thumb' src='{{src}}' @tap='uploadPic' mode='aspectFill' />
@@ -33,6 +33,12 @@
 	const height = device.windowHeight - 50;
 
 	export default class ChooseGender extends wepy.component {
+	  props = {
+	    number: {
+	      type: String,
+	      default: ''
+	    }
+	  };
 	  config = {
 	    navigationBarTitleText: '3/4',
 	    usingComponents: {
@@ -71,9 +77,10 @@
 	    const data = {
 	      birthday: wepy.getStorageSync('birthday'),
 	      nick_name: wepy.getStorageSync('name'),
-	      gender: wepy.getStorageSync('gender')
+		  gender: wepy.getStorageSync('gender'),
+		  number:this.number
 	    };
-	    console.log(data);
+	    console.log('注册data!!!!!!!!:',data);
 	    uploader(
 	      src,
 	      {
@@ -140,8 +147,8 @@
 	    getCropImage: () => {
 	      this.$invoke('cropper', 'getCropperImage')
 	        .then(src => {
-			  this.loading = true;
-			  this.$apply();
+	          this.loading = true;
+	          this.$apply();
 	          console.log(src);
 	          checkImgSafe(src, 0)
 	            .then(res => {
@@ -149,8 +156,8 @@
 	            })
 	            .catch(err => {
 	              Toast('上传图片包含敏感信息，请重新上传');
-				  this.show = false;
-				  this.loading = false;
+	              this.show = false;
+	              this.loading = false;
 	              this.$apply();
 	            });
 	        })

@@ -1,127 +1,227 @@
 <!--  -->
 <template>
-    <view class='wrapper'>
-        <view class="matched">
-            <image src="https://images.facedog.cn/public/profile/matched.png" mode="aspectFill"></image>
-        </view>
-        <view class="avatars">
-            <image class="avatar" src="{{me.icon}}" mode="aspectFill"></image>
-            <image class="avatar" src="{{friendIcon}}" mode="aspectFill"></image>
-        </view>
-        <view class="text">你 与 <text>{{nick}}</text>互相喜欢了对方匹配成功</view>
-        <view class="goChat" @tap="redirect">
-            发送消息
-        </view>
-        <view class="back" @tap="back">返回</view>
-    </view>
+	<view class='wrapper' style="padding-top:{{isphoneX?'200rpx':'110rpx'}}">
+		<view class="matched">
+			<image src="https://images.facedog.cn/public/match/match-title.png" mode="aspectFill"></image>
+		</view>
+		<image class="heart-left" src="https://images.facedog.cn/public/match/heart-left.png" mode="aspectFill"></image>
+		<image class="heart-right" src="https://images.facedog.cn/public/match/heart-right.png" mode="aspectFill"></image>
+		<view class="avatars">
+			<image class="avatar flyleft" src="{{me.icon}}" mode="aspectFill"></image>
+			<image class="avatar flyright" src="{{friendIcon}}" mode="aspectFill"></image>
+		</view>
+		<!-- <view class="text">你 与 <text>{{nick}}</text>互相喜欢了对方匹配成功</view> -->
+		<view class="goChat" @tap="redirect">
+			发送消息
+		</view>
+		<view class="back" @tap="back">继续探索</view>
+	</view>
 </template>
 
 <script>
-import wepy from 'wepy';
-export default class BecomeFriend extends wepy.page {
-    config = {
-        navigationBarTitleText: '成为朋友'
-    };
+	import wepy from 'wepy';
+	import Config from '@/utils/config';
+	import {
+	  onMsgNotify,
+	  onMsgNotifyChat,
+	  init,
+	  sdkLogin
+	} from '@/utils/handler.js'; // 这个是所有事件的腾讯js，这个页面需要用到登录
+	import webim from '@/utils/webim.js'; // 腾讯云im包
+	import webimhandler from '@/utils/handler';
+	export default class BecomeFriend extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '成为朋友'
+	  };
 
-    data = {
-        friendIcon: '',
-        nick: '',
-        dentifier: '',
-        me: {}
-    };
+	  data = {
+	    friendIcon: '',
+	    nick: '',
+	    id: '',
+	    icon: '',
+	    dentifier: '',
+		me: {},
+		isphoneX:false
+	  };
 
-    components = {};
+	  components = {};
 
-    methods = {
-        redirect() {
-            wx.setStorageSync('chatIcon', this.friendIcon);
-            wx.redirectTo({
-                url: `chat?id=${this.dentifier}&nick=${this.nick}&icon=${encodeURI(this.friendIcon)}`
-            });
-        },
-        back() {
-            wx.navigateBack({
-                delta: -1
-            });
-        }
-    };
+	  methods = {
+	    redirect() {
+	      wx.setStorageSync('chatIcon', this.friendIcon);
+	      wx.redirectTo({
+	        url: `chat?id=${this.id}&nick=${this.nick}&icon=${encodeURI(
+	          this.friendIcon
+	        )}`
+	      });
+	    },
+	    back() {
+	      wx.navigateBack({
+	        delta: -1
+	      });
+	    }
+	  };
 
-    events = {};
+	  events = {};
 
-    watch = {};
+	  watch = {};
 
-    computed = {};
+	  computed = {};
 
-    onLoad(options) {
-        this.friendIcon = decodeURI(options.icon);
-        this.dentifier = options.id;
-        this.nick = options.nick;
-        this.me = wepy.getStorageSync('profile');
+	  onLoad(options) {
+	    this.id = options.id;
+	    this.title = options.nick;
+	    this.nick = options.nick;
+	    this.me = wx.getStorageSync('profile');
+	    if (this.me.icon.indexOf('oss') == -1) {
+	      this.me.icon =
+	        this.me.icon + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
+	    }
+	    this.friendIcon = wx.getStorageSync('chatIcon');
 
-        this.$apply();
-    }
-
-    onShow() {}
-}
+		 this.initChat();
+		let that = this;
+		wx.getSystemInfo({
+	      success(res) {
+	        var name = 'iPhone X';
+	        if (
+	          res.model.indexOf('iPhone 11') > -1 ||
+	          res.model.indexOf('iPhone X') > -1 ||
+	          res.model.indexOf('unknown<iPhone') > -1
+	        ) {
+	          console.warn('isIphoneX !!!!!!!');
+	          that.isphoneX = true;
+	          that.$apply();
+	        }
+	      }
+	    });
+	  }
+	  initChat() {
+	    webimhandler.init({
+	      selToID: this.id,
+	      selType: webim.SESSION_TYPE.C2C,
+	      selSessHeadUrl: this.friendIcon
+	    });
+	    if (webim.checkLogin()) {
+	      // 检查是否登录返回true和false,不登录则重新登录
+	      console.log('匹配好友,已登录', this.id);
+	      setTimeout(() => {
+	        webimhandler.onSendMsg(encodeURIComponent('你们已经可以进行会话了'));
+	      }, 500);
+	    }
+	  }
+	  onShow() {}
+	}
 </script>
 
 <style lang='less'>
-.wrapper {
-    width: 100%;
-    background: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAkACQAAD/4QB0RXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAIdpAAQAAAABAAAATgAAAAAAAACQAAAAAQAAAJAAAAABAAKgAgAEAAAAAQAAACagAwAEAAAAAQAAACAAAAAA/+0AOFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAAOEJJTQQlAAAAAAAQ1B2M2Y8AsgTpgAmY7PhCfv/iC2BJQ0NfUFJPRklMRQABAQAAC1BhcHBsAhAAAG1udHJSR0IgWFlaIAfiAAsABQAKADgAHmFjc3BBUFBMAAAAAEFQUEwAAAAAAAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEWRlc2MAAAFQAAAAZ2RzY20AAAG4AAAANGNwcnQAAAHsAAAAI3d0cHQAAAIQAAAAFHJYWVoAAAIkAAAAFGdYWVoAAAI4AAAAFGJYWVoAAAJMAAAAFHJUUkMAAAJgAAAIDGFhcmcAAApsAAAAIHZjZ3QAAAqMAAAAMG5kaW4AAAq8AAAAPmNoYWQAAAr8AAAALG1tb2QAAAsoAAAAKGJUUkMAAAJgAAAIDGdUUkMAAAJgAAAIDGFhYmcAAApsAAAAIGFhZ2cAAApsAAAAIGRlc2MAAAAAAAAADT8/Pz8/Pz8gTENEPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAABAAAADHpoQ04AAAAYAAAAHF3yaCFRxnaEIBxfaYJyACAATABDAEQgHXRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIEluYy4sIDIwMTgAAFhZWiAAAAAAAADzFgABAAAAARbKWFlaIAAAAAAAAIIPAAA8+f///7xYWVogAAAAAAAATCUAALSGAAAK5lhZWiAAAAAAAAAoogAADoEAAMiLY3VydgAAAAAAAAQAAAAABQAKAA8AFAAZAB4AIwAoAC0AMgA2ADsAQABFAEoATwBUAFkAXgBjAGgAbQByAHcAfACBAIYAiwCQAJUAmgCfAKMAqACtALIAtwC8AMEAxgDLANAA1QDbAOAA5QDrAPAA9gD7AQEBBwENARMBGQEfASUBKwEyATgBPgFFAUwBUgFZAWABZwFuAXUBfAGDAYsBkgGaAaEBqQGxAbkBwQHJAdEB2QHhAekB8gH6AgMCDAIUAh0CJgIvAjgCQQJLAlQCXQJnAnECegKEAo4CmAKiAqwCtgLBAssC1QLgAusC9QMAAwsDFgMhAy0DOANDA08DWgNmA3IDfgOKA5YDogOuA7oDxwPTA+AD7AP5BAYEEwQgBC0EOwRIBFUEYwRxBH4EjASaBKgEtgTEBNME4QTwBP4FDQUcBSsFOgVJBVgFZwV3BYYFlgWmBbUFxQXVBeUF9gYGBhYGJwY3BkgGWQZqBnsGjAadBq8GwAbRBuMG9QcHBxkHKwc9B08HYQd0B4YHmQesB78H0gflB/gICwgfCDIIRghaCG4IggiWCKoIvgjSCOcI+wkQCSUJOglPCWQJeQmPCaQJugnPCeUJ+woRCicKPQpUCmoKgQqYCq4KxQrcCvMLCwsiCzkLUQtpC4ALmAuwC8gL4Qv5DBIMKgxDDFwMdQyODKcMwAzZDPMNDQ0mDUANWg10DY4NqQ3DDd4N+A4TDi4OSQ5kDn8Omw62DtIO7g8JDyUPQQ9eD3oPlg+zD88P7BAJECYQQxBhEH4QmxC5ENcQ9RETETERTxFtEYwRqhHJEegSBxImEkUSZBKEEqMSwxLjEwMTIxNDE2MTgxOkE8UT5RQGFCcUSRRqFIsUrRTOFPAVEhU0FVYVeBWbFb0V4BYDFiYWSRZsFo8WshbWFvoXHRdBF2UXiReuF9IX9xgbGEAYZRiKGK8Y1Rj6GSAZRRlrGZEZtxndGgQaKhpRGncanhrFGuwbFBs7G2MbihuyG9ocAhwqHFIcexyjHMwc9R0eHUcdcB2ZHcMd7B4WHkAeah6UHr4e6R8THz4faR+UH78f6iAVIEEgbCCYIMQg8CEcIUghdSGhIc4h+yInIlUigiKvIt0jCiM4I2YjlCPCI/AkHyRNJHwkqyTaJQklOCVoJZclxyX3JicmVyaHJrcm6CcYJ0kneierJ9woDSg/KHEooijUKQYpOClrKZ0p0CoCKjUqaCqbKs8rAis2K2krnSvRLAUsOSxuLKIs1y0MLUEtdi2rLeEuFi5MLoIuty7uLyQvWi+RL8cv/jA1MGwwpDDbMRIxSjGCMbox8jIqMmMymzLUMw0zRjN/M7gz8TQrNGU0njTYNRM1TTWHNcI1/TY3NnI2rjbpNyQ3YDecN9c4FDhQOIw4yDkFOUI5fzm8Ofk6Njp0OrI67zstO2s7qjvoPCc8ZTykPOM9Ij1hPaE94D4gPmA+oD7gPyE/YT+iP+JAI0BkQKZA50EpQWpBrEHuQjBCckK1QvdDOkN9Q8BEA0RHRIpEzkUSRVVFmkXeRiJGZ0arRvBHNUd7R8BIBUhLSJFI10kdSWNJqUnwSjdKfUrESwxLU0uaS+JMKkxyTLpNAk1KTZNN3E4lTm5Ot08AT0lPk0/dUCdQcVC7UQZRUFGbUeZSMVJ8UsdTE1NfU6pT9lRCVI9U21UoVXVVwlYPVlxWqVb3V0RXklfgWC9YfVjLWRpZaVm4WgdaVlqmWvVbRVuVW+VcNVyGXNZdJ114XcleGl5sXr1fD19hX7NgBWBXYKpg/GFPYaJh9WJJYpxi8GNDY5dj62RAZJRk6WU9ZZJl52Y9ZpJm6Gc9Z5Nn6Wg/aJZo7GlDaZpp8WpIap9q92tPa6dr/2xXbK9tCG1gbbluEm5rbsRvHm94b9FwK3CGcOBxOnGVcfByS3KmcwFzXXO4dBR0cHTMdSh1hXXhdj52m3b4d1Z3s3gReG54zHkqeYl553pGeqV7BHtje8J8IXyBfOF9QX2hfgF+Yn7CfyN/hH/lgEeAqIEKgWuBzYIwgpKC9INXg7qEHYSAhOOFR4Wrhg6GcobXhzuHn4gEiGmIzokziZmJ/opkisqLMIuWi/yMY4zKjTGNmI3/jmaOzo82j56QBpBukNaRP5GokhGSepLjk02TtpQglIqU9JVflcmWNJaflwqXdZfgmEyYuJkkmZCZ/JpomtWbQpuvnByciZz3nWSd0p5Anq6fHZ+Ln/qgaaDYoUehtqImopajBqN2o+akVqTHpTilqaYapoum/adup+CoUqjEqTepqaocqo+rAqt1q+msXKzQrUStuK4trqGvFq+LsACwdbDqsWCx1rJLssKzOLOutCW0nLUTtYq2AbZ5tvC3aLfguFm40blKucK6O7q1uy67p7whvJu9Fb2Pvgq+hL7/v3q/9cBwwOzBZ8Hjwl/C28NYw9TEUcTOxUvFyMZGxsPHQce/yD3IvMk6ybnKOMq3yzbLtsw1zLXNNc21zjbOts83z7jQOdC60TzRvtI/0sHTRNPG1EnUy9VO1dHWVdbY11zX4Nhk2OjZbNnx2nba+9uA3AXcit0Q3ZbeHN6i3ynfr+A24L3hROHM4lPi2+Nj4+vkc+T85YTmDeaW5x/nqegy6LzpRunQ6lvq5etw6/vshu0R7ZzuKO6070DvzPBY8OXxcvH/8ozzGfOn9DT0wvVQ9d72bfb794r4Gfio+Tj5x/pX+uf7d/wH/Jj9Kf26/kv+3P9t//9wYXJhAAAAAAADAAAAAmZmAADypwAADVkAABPQAAAKW3ZjZ3QAAAAAAAAAAQABAAAAAAAAAAEAAAABAAAAAAAAAAEAAAABAAAAAAAAAAEAAG5kaW4AAAAAAAAANgAArgAAAFIAAABDwAAAsMAAACcAAAANgAAAUAAAAFRAAAIzMwACMzMAAjMzAAAAAAAAAABzZjMyAAAAAAABDHIAAAX4///zHQAAB7oAAP1y///7nf///aQAAAPZAADAcW1tb2QAAAAAAAAGEAAAoDMAAAAA0hZ4gAAAAAAAAAAAAAAAAAAAAAD/wAARCAAgACYDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9sAQwACAgICAgIDAgIDBQMDAwUGBQUFBQYIBgYGBgYICggICAgICAoKCgoKCgoKDAwMDAwMDg4ODg4PDw8PDw8PDw8P/9sAQwECAgIEBAQHBAQHEAsJCxAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQ/90ABAAD/9oADAMBAAIRAxEAPwD0CiiigAooooAKKKKAP//Q9AooooAKKKKACiiigD//2Q== );
-    background-size: cover;
-    height: 100vh;
-    text-align: center;
-    .matched {
-        width: 481rpx;
-        height: 81rpx;
-        margin: 0 auto;
-        padding-top: 50rpx;
-        image {
-            width: 100%;
-            height: 100%;
-        }
-    }
-    .avatars {
-        margin-top: 69rpx;
-        .avatar {
-            width: 230rpx;
-            position: relative;
-            height: 230rpx;
-            border: 6rpx solid snow;
-            border-radius: 50%;
-            &:first-child {
-                left: 38rpx;
-            }
-            &:last-child {
-                right: 38rpx;
-            }
-        }
-    }
-    .text {
-        margin: 0 auto;
-        margin-top: 67rpx;
-        text-align: center;
-        font-size: 24rpx;
-        color: white;
-        width: 408rpx;
-    }
-    .goChat {
-        width: 436rpx;
-        height: 113rpx;
-        background: rgba(255, 255, 255, 1);
-        border-radius: 57rpx;
-        text-align: center;
-        line-height: 113rpx;
-        font-size: 32rpx;
-        font-weight: 800;
-        color: rgba(0, 0, 0, 1);
-        margin: 164rpx auto 64rpx;
-    }
-    .back {
-        font-size: 32rpx;
-        font-weight: 800;
-        color: rgba(255, 255, 255, 1);
-    }
-}
+	.wrapper {
+	  width: 100%;
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  background: #343434;
+	  z-index: 99999;
+	  height: 100vh;
+	  padding-top: 100rpx;
+	  text-align: center;
+	  .heart-left {
+	    width: 58rpx;
+	    height: 56rpx;
+	    left: 330rpx;
+	    top: 235rpx;
+	    position: absolute;
+	  }
+	  .heart-right {
+	    width: 41rpx;
+	    height: 40rpx;
+	    left: 380rpx;
+	    top: 270rpx;
+	    position: absolute;
+	  }
+	  .matched {
+	    width: 416rpx;
+	    height: 58rpx;
+	    margin: 0 auto;
+	    padding-top: 50rpx;
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
+	  }
+	  .avatars {
+	    margin-top: 80rpx;
+	    .avatar {
+	      width: 230rpx;
+	      position: relative;
+	      height: 230rpx;
+	      border: 6rpx solid snow;
+	      border-radius: 50%;
+	      &.flyleft {
+	        animation: flyleft 0.7s ease-in-out 1;
+	        animation-fill-mode: both;
+	        @keyframes flyleft {
+	          from {
+	            transform: translateX(-150%);
+	          }
+	          to {
+	            transform: translateX(0);
+	          }
+	        }
+	      }
+	      &.flyright {
+	        animation: flyright 0.7s ease-in-out 1;
+	        animation-fill-mode: both;
+	        @keyframes flyright {
+	          from {
+	            transform: translateX(150%);
+	          }
+	          to {
+	            transform: translateX(0);
+	          }
+	        }
+	      }
+	      &:first-child {
+	        left: 18rpx;
+	        transform: translateX(-150%);
+	      }
+	      &:last-child {
+	        transform: translateX(150%);
+	        right: 18rpx;
+	      }
+	    }
+	  }
+	  .text {
+	    margin: 0 auto;
+	    margin-top: 67rpx;
+	    text-align: center;
+	    font-size: 24rpx;
+	    color: white;
+	    width: 408rpx;
+	  }
+	  .goChat {
+	    width: 362rpx;
+	    height: 70rpx;
+	    background: rgba(242, 84, 88, 1);
+	    opacity: 1;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    border-radius: 46rpx;
+	    color: white;
+	    font-size: 35rpx;
+	    margin: 400rpx auto 40rpx;
+	  }
+	  .back {
+	    width: 362rpx;
+	    height: 70rpx;
+	    background: rgba(246, 246, 246, 1);
+	    opacity: 1;
+	    border-radius: 46rpx;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    margin: 0 auto;
+	  }
+	}
 </style>

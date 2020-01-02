@@ -1,9 +1,11 @@
 <!--  -->
 <template>
+	<navbar title="真人认证">
+	</navbar>
     <view>
         <view class='wrapper'>
             <view class="thumb">
-                <image src="https://images.facedog.cn/public/profile/model.jpg" mode="aspectFill"></image>
+                <image src="https://images.facedog.cn/public/register/model.png" mode="aspectFill"></image>
             </view>
             <view class="text">请对着摄像头读出：</view>
             <view class="word">“颜狗认证，{{number}}”</view>
@@ -28,6 +30,7 @@ export default class UploadVide extends wepy.page {
         navigationBarTitleText: '视频认证',
         // disableScroll: true,
         usingComponents: {
+			 navbar: '../../components/navbar/index',
             'van-toast': '../../components/vant/toast/index',
             'van-dialog': '../../components/vant/dialog/index'
         }
@@ -107,7 +110,7 @@ export default class UploadVide extends wepy.page {
                     if (result == 'ok') {
                         Dialog.alert({
                             message:
-                                '认证将于1个工作日内完成,你可以在我的页面查看进度',
+                                '认证将于1个工作日内完成',
                             confirmButtonText: '返回首页'
                         }).then(() => {
                             wx.redirectTo({
@@ -144,7 +147,7 @@ export default class UploadVide extends wepy.page {
     .thumb {
         width: 470rpx;
         height: 470rpx;
-        margin: 247rpx auto 110rpx;
+        margin: 147rpx auto 110rpx;
         image {
             width: 100%;
             height: 100%;
@@ -168,7 +171,8 @@ export default class UploadVide extends wepy.page {
         font-size: 28rpx;
         line-height: 84rpx;
         font-weight: 600;
-        border-radius: 0;
+		border-radius: 0;
+		border-radius: 8rpx;
         margin-top: 97rpx;
         color: rgba(252, 252, 252, 1);
         background: rgba(0, 0, 0, 1);

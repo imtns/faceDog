@@ -61,12 +61,14 @@
 	        wechat: this.wechat
 	      });
 	      console.log(data);
-	      toast('已提交审核');
+	      toast('申请已提交，最晚1个工作日内完成完成审核');
 	      await sleep(2);
 	    //   wx.redirectTo({
 	    //     url: 'index'
-	    //   });
-	      wepy.redirectTo({ url: '/pages/index' });
+		//   });
+		wepy.reLaunch({ url: '/pages/index' });
+		
+	    //   wepy.redirectTo({ url: '/pages/index' });
 	    },
 	    goVideo() {
 	      if (!this.wechat) {

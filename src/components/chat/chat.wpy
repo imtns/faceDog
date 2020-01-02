@@ -8,7 +8,7 @@
 					</image>
 					<block wx:if="{{likemeList.length}}">
 						<repeat for="{{likemeList}}" key="index" index="index" item="item">
-							<image class="icon" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
+							<image class="icon" @tap="goProfile({{item._id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
 						</repeat>
 					</block>
 					<block wx:else>
@@ -79,7 +79,7 @@
 	import { Event } from '@/utils/event.js';
 	import wepy from 'wepy';
 	import { get, post } from '@/utils/request';
-	import { MY_FAVORITE, LIKE_ME } from '@/utils/url';
+	import { MY_FAVORITE, LIKE_ME, FRIENDS_LIST } from '@/utils/url';
 
 	export default class Chat extends wepy.component {
 	  data = {
@@ -91,6 +91,7 @@
 	    activeNames: ['1', '2'],
 	    ilikeList: [],
 	    likemeList: [],
+	    friendList: [],
 	    ilikeTotal: 0,
 	    likeMeTotal: 0
 	  };
@@ -105,7 +106,7 @@
 	    // getChatList(data) {
 	    //   this.$invoke('chatlist', 'getChatList', data);
 	    // },
-	   goProfile(id) {
+	    goProfile(id) {
 	      wx.navigateTo({
 	        url: `battle/profile?id=${id}`,
 	        success: result => {},
@@ -138,9 +139,9 @@
 	        this.$invoke('notify', 'initData');
 	      }
 	    },
-	    refreshData() {
-	      this.fetchData();
-	    },
+	    // refreshData() {
+	    //   this.fetchData();
+	    // },
 	    initLike() {
 	      //   this.$invoke('ilike', 'initData');
 	    },
@@ -197,7 +198,9 @@
 	        Event.listen('msgDetect', msg => {
 	          this.initUnreadMsgCount(this, msg);
 	        });
-
+	        Event.listen('refreshData', () => {
+	          this.refreshData();
+	        });
 	        webimhandler.sdkLogin(loginInfo, listeners, options, () => {
 	          this.initRecentContactList();
 	          webim.syncMsgs(onMsgNotify);
@@ -205,7 +208,9 @@
 	      }
 	    }
 	  };
-
+	  refreshData() {
+	    this.fetchData();
+	  }
 	  events = {};
 
 	  watch = {};
@@ -233,21 +238,35 @@
 	    // this.fetchData();
 	  }
 	  async fetchData() {
+	    this.getIlikeList();
+	    this.getLikeMeList();
+	    this.getFriendList();
+	  }
+	  async getLikeMeList() {
 	    this.likemeList = [];
+	    const likeme = await get(LIKE_ME);
+	    likeme.forEach(item => {
+	      this.likemeList.push(...item.users);
+	    });
+	    this.likemeList = this.likemeList.slice(-5);
+	    this.$apply();
+	  }
+	  async getIlikeList() {
 	    this.ilikeList = [];
 	    const ilike = await get(MY_FAVORITE);
 	    console.log(ilike.length);
 	    this.ilikeTotal = ilike.total;
 	    this.ilikeList = ilike.favorites.slice(-5);
-	    const likeme = await get(LIKE_ME);
-	    this.likemeList = likeme;
-	    this.likemeList.forEach(item => {
-	      item.day = item.date_time.split('-')[2];
-	      item.month = new Date(item.date_time).toDateString().split(' ')[1];
-	      item.users.forEach(t => {
-	        t.age = getAge(t.birthday);
-	      });
-	    });
+	    this.$apply();
+	  }
+	  async getFriendList() {
+	    this.friendList = [];
+	    const result = await get(FRIENDS_LIST);
+	    this.friendList = result;
+	    // this.friendList.forEach(item => {
+	    //   item.month = item.create_time.split(' ')[0].split('-')[1];
+	    //   item.day = item.create_time.split(' ')[0].split('-')[2];
+	    // });
 	    this.$apply();
 	  }
 	  // 初始化聊天界面最近会话列表
@@ -295,6 +314,9 @@
 	}
 	.van-cell:after {
 	  left: 0 !important;
+	}
+	.van-cell__title {
+	  font-weight: bold;
 	}
 </style>
 

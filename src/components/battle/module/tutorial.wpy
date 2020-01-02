@@ -1,97 +1,171 @@
 <!--  -->
 <template>
-    <view class='wrapper'>
-        <image style="top:{{isphoneX?'106rpx':'0'}}" class="tutorial1" @tap="show(1)" wx:if="{{step1}}" src="https://images.facedog.cn/public/battle/tutorial/guide1.png?v2" mode="aspectFill">
-        </image>
-        <image style="bottom:5rpx" class="tutorial2" @tap="show(2)" wx:if="{{step2}}" src="https://images.facedog.cn/public/battle/tutorial/guide2.png?v7" mode="aspectFill">
-        </image>
-        <image style="top:{{isphoneX?'300rpx':'0'}}" class="tutorial3" @tap="show(3)" wx:if="{{step3}}" src="https://images.facedog.cn/public/battle/tutorial/guide3.png" mode="aspectFill">
-        </image>
-    </view>
+	<view class='wrapper' wx:if="{{showCover}}" @tap="show" style="padding-top:{{isphoneX?'150rpx':0}}">
+		<view class="step1 step" wx:if="{{step1}}">
+			<image class="tutorial1" src="https://images.facedog.cn/public/tutorial/swipe-down.png?v2" mode="aspectFill">
+			</image>
+			<view class="content">
+				<view class="text">“如果更喜欢上面的人</view>
+				<view class="text">下拉图片至屏幕中央”</view>
+			</view>
+		</view>
+		<view class="step2 step" wx:if="{{step2}}">
+			<image style="bottom:5rpx" class="tutorial2" src="https://images.facedog.cn/public/tutorial/swipe-up.png?v7" mode="aspectFill">
+			</image>
+			<view class="content">
+				<view class="text">“如果更喜欢下面的人</view>
+				<view class="text">上拉图片至屏幕中央”</view>
+			</view>
+		</view>
+		<!-- <image style="top:{{isphoneX?'300rpx':'0'}}" class="tutorial3" @tap="show(3)" wx:if="{{step3}}" src="https://images.facedog.cn/public/battle/tutorial/guide3.png" mode="aspectFill">
+        </image> -->
+	</view>
+	<image  style="top:{{isphoneX?'160rpx':'110rpx'}}" class="tutorial3" @tap="show(3)" wx:if="{{step3 && !showCover}}" src="https://images.facedog.cn/public/tutorial/step3.png" mode="aspectFill">
+	</image>
 </template>
 
 <script>
-import wepy from 'wepy';
-export default class Turorial extends wepy.component {
-    props = {};
+	import wepy from 'wepy';
+	export default class Turorial extends wepy.component {
+	  props = {};
 
-    data = {
-        step1: true,
-        step2: false,
-        step3: false,
-        isphoneX: false
-    };
+	  data = {
+	    step1: true,
+	    step2: false,
+	    step3: false,
+	    isphoneX: false,
+		num: 1,
+		showCover:true
+	  };
 
-    components = {};
+	  components = {};
 
-    methods = {
-        show(num) {
-            if (num == 1) {
-                this.step2 = true;
-                this.step1 = false;
-            } else if (num == 2) {
-                this.step3 = true;
-                this.step2 = false;
-            } else {
-                this.$emit('closeTutorial');
-            }
-        }
-    };
+	  methods = {
+	    show() {
+	      if (this.num == 1) {
+	        this.step2 = true;
+	        this.step1 = false;
+	        this.num = 2;
+	      } else if (this.num == 2) {
+	        this.step2 = false;
+			this.step3 = true;
+			this.showCover = false;
+	        this.num = 3;
+	      } else {
+	        this.$emit('closeTutorial');
+	      }
+	    }
+	  };
 
-    events = {};
+	  events = {};
 
-    watch = {};
+	  watch = {};
 
-    computed = {};
+	  computed = {};
 
-    onLoad() {
-        var that = this;
-        wx.getSystemInfo({
-            success(res) {
-                var name = 'iPhone X';
-                if (res.model.indexOf(name) > -1) {
-                    that.isphoneX = true;
-                    that.$apply();
-                }
-            }
-        });
-    }
+	  onLoad() {
+	    var that = this;
+	    wx.getSystemInfo({
+	      success(res) {
+	        var name = 'iPhone X';
+	        if (
+	          res.model.indexOf('iPhone 11') > -1 ||
+	          res.model.indexOf('iPhone X') > -1 ||
+	          res.model.indexOf('unknown<iPhone') > -1
+	        ) {
+	          that.isphoneX = true;
+	          that.$apply();
+	        }
+	      }
+	    });
+	  }
 
-    onShow() {}
-}
+	  onShow() {}
+	}
 </script>
 
 <style lang='less' scoped>
-.wrapper {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 99999;
-    .tutorial1 {
-        position: absolute;
-        width: 750rpx;
-        height: 1068rpx;
-        top: 0rpx;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    .tutorial2 {
-        position: absolute;
-		width: 547rpx;
-		height:490rpx;
-        left: 51%;
-        transform: translateX(-50%);
-    }
-    .tutorial3 {
-        position: absolute;
-        width: 648rpx;
-        top: 0rpx;
-		left: 50%;
-		height: 600rpx;
-        transform: translateX(-50%);
-    }
-}
+	.tutorial3 {
+	  width: 456rpx;
+	  height: 88rpx;
+	  position:absolute;
+	  right: 50rpx;
+	  z-index: 999999;
+	}
+	.wrapper {
+	  width: 100%;
+	  height: 100%;
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  background: rgba(0, 0, 0, 0.75);
+	  z-index: 99999;
+	  .step {
+	    display: flex;
+	    justify-content: center;
+	    flex-wrap: wrap;
+	    &.step1 {
+	      .content {
+	        position: relative;
+	        top: 600rpx;
+	        font-size: 38rpx;
+	        color: white;
+	        width: 100%;
+	        text-align: center;
+	      }
+	      image {
+	        left: 20rpx;
+	        position: relative;
+	        top: 300rpx;
+	        width: 261rpx;
+	        height: 218rpx;
+	      }
+	    }
+	    &.step2 {
+	      .content {
+	        position: relative;
+	        top: 100rpx;
+	        font-size: 38rpx;
+	        color: white;
+	        width: 100%;
+	        text-align: center;
+	      }
+	      image {
+	        left: 20rpx;
+	        position: relative;
+	        top: 780rpx;
+	        width: 261rpx;
+	        height: 239rpx;
+	      }
+	    }
+	    .tutorial1 {
+	      animation: swipedown 2s linear infinite;
+	      @keyframes swipedown {
+	        0% {
+	          transform: translateY(0);
+	        }
+	        40% {
+	          transform: translateY(200rpx);
+	        }
+	        100% {
+	          transform: translateY(200rpx);
+	        }
+	      }
+	    }
+	    .tutorial2 {
+	      animation: swipeup 2s linear infinite;
+	      @keyframes swipeup {
+	        0% {
+	          transform: translateY(0);
+	        }
+	        40% {
+	          transform: translateY(-200rpx);
+	        }
+	        100% {
+	          transform: translateY(-200rpx);
+	        }
+	      }
+	    }
+	  }
+	}
 </style>

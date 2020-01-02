@@ -6,7 +6,7 @@
 	<view wx:if="{{list.length}}" class='wrapper'>
 		<repeat for="{{list}}" key="index" index="index" item="item">
 			<van-swipe-cell class="swipe" id="{{item.To_Account}}" async-close data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
-				<view class="chat-box {{index==list.length-1?'last':''}}">
+				<view class="chat-box {{index==list.length-1?'last':''}}" catchtouchmove="touchstart">
 					<image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" src="{{item.C2cImage}}" mode="aspectFill"></image>
 					<view class="msg" @tap.capture.stop="onClick({{item.To_Account}},{{item.C2cNick}},{{item.C2cImage}},{{item.C2cNick}},{{item.UnreadMsgCount}})">
 						<view class="name">{{item.C2cNick}}</view>
@@ -22,7 +22,7 @@
 						<view class="unread" wx:if="{{item.UnreadMsgCount>0}}">{{item.UnreadMsgCount}}</view>
 					</view>
 				</view>
-				<view class="delete" slot="right">删除</view>
+				<view class="delete" slot="right">解除匹配</view>
 			</van-swipe-cell>
 		</repeat>
 	</view>
@@ -32,6 +32,8 @@
 <script>
 	import wepy from 'wepy';
 	import { formatDateFromSeconds } from '@/utils';
+	import { get, deltemp } from '@/utils/request';
+	import { FRIENDS_LIST } from '@/utils/url';
 	import webimhandler from '@/utils/handler';
 	import webim from '@/utils/webim.js'; // 腾讯云im包
 	import empty from '@/components/empty';
@@ -41,15 +43,20 @@
 	  props = {};
 
 	  data = {
-	    list: {},
+	    list: [],
 	    initLength: 0,
-	    unread: 0
+	    unread: 0,
+	    touch: false,
+	    friendList: []
 	  };
 
 	  components = {
 	    empty
 	  };
 	  methods = {
+	    touchstart() {
+	      this.touch = true;
+	    },
 	    goProfile(id) {
 	      if (id === 'administrator') return;
 	      wx.navigateTo({
@@ -87,6 +94,11 @@
 	      var sess = null;
 	      unread = 0;
 	      wx.hideLoading();
+	      var pages = getCurrentPages(); //获取加载的页面
+
+	      var currentPage = pages[pages.length - 1]; //获取当前页面的对象
+
+	      var url = currentPage.route;
 	      console.warn('msg', msg);
 	      for (var i in sessMap) {
 	        sess = sessMap[i];
@@ -182,7 +194,15 @@
 	              ? 1
 	              : 0;
 	        });
-	        unread += sess.unread();
+	        console.log('currentPage:', url);
+	        if (
+	          url != 'pages/chat/chat' &&
+	          url != 'pages/chat/becomeFriend' &&
+	          sess.msgs() != '你们已经可以进行会话了'
+	        ) {
+	          unread += sess.unread();
+	        }
+
 	        this.$apply();
 	        this.unread = unread;
 	        console.log('unrenad:', unread);
@@ -195,7 +215,10 @@
 	        );
 	      }
 
-	      this.$emit('unreadSet', unread);
+	      //   console.log('currentPage:', url);
+	      //   if (url != 'pages/chat/chat' && url != 'pages/chat/becomeFriend') {
+	      //     this.$emit('unreadSet', unread);
+	      //   }
 	      this.$apply();
 	    },
 	    onClick(id, name, icon, nickname, unread) {
@@ -203,12 +226,16 @@
 	        this.unread = this.unread - unread;
 	        this.$emit('unreadSet', this.unread);
 	      }
+	      1;
 	      wx.setStorageSync('chatIcon', icon);
 	      wx.navigateTo({
 	        url: `chat/chat?id=${id}&name=${name}&nick=${nickname}`
 	      });
+	      //   wx.navigateTo({
+	      //     url: `chat/becomeFriend?id=${id}&name=${name}&nick=${nickname}`
+	      //   });
 	    },
-	    onDelete(event) {
+	    async onDelete(event) {
 	      // console.error(event.detail);
 	      const { position, instance } = event.detail;
 	      switch (position) {
@@ -218,7 +245,7 @@
 	          event.preventDefault();
 	          break;
 	        case 'right':
-	          console.log(this);
+	          console.log('delete', instance);
 	          instance.close();
 	          var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
 	          var skey = 'C2C' + instance.id; // 拼装 skey
@@ -227,6 +254,12 @@
 	          setTimeout(() => {
 	            webim.setAutoRead(selSess, false, false);
 	          }, 2000);
+	          console.log(instance.id);
+	          if (instance.id != 'administrator') {
+	            await deltemp(FRIENDS_LIST, {
+	              user_id: instance.id
+	            });
+	          }
 	          webimhandler.delChat(instance.id);
 	          this.list.splice(instance.dataset.index, 1);
 	          unread = unread - instance.dataset.unread;
@@ -242,7 +275,7 @@
 
 	  computed = {};
 
-	  onLoad() {
+	  async onLoad() {
 	    Event.listen('chatDelete', id => {
 	      var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
 	      var skey = 'C2C' + id; // 拼装 skey
@@ -258,6 +291,9 @@
 	      this.$emit('unreadSet', unread);
 	      this.$apply();
 	    });
+	    const result = await get(FRIENDS_LIST);
+	    this.friendList = result;
+	    this.$apply();
 	  }
 
 	  onShow() {}
@@ -268,6 +304,7 @@
 	.wrapper {
 	  width: 750rpx;
 	  margin-top: 32rpx;
+	  padding-bottom: 70rpx;
 	  .delete {
 	    background: red;
 	    height: 100rpx;
@@ -283,11 +320,14 @@
 	    margin-bottom: 34rpx;
 	    position: relative;
 	    padding: 0 32rpx;
+	    &.active {
+	      background: red;
+	    }
 	    &:not(.last):after {
-	      content: ''; 
+	      content: '';
 	      position: absolute;
-		  bottom: -12rpx; 
-		  left:186rpx;
+	      bottom: -12rpx;
+	      left: 186rpx;
 	      width: 533rpx;
 	      height: 2rpx;
 	      background: rgba(223, 223, 223, 1);
@@ -313,7 +353,7 @@
 	        font-size: 25rpx;
 	        font-family: PingFang SC;
 	        font-weight: 300;
-	        color: #A2A7B2;
+	        color: #a2a7b2;
 	        text-overflow: ellipsis;
 	        white-space: nowrap;
 	        overflow: hidden;
