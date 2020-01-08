@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-	<view class="container">
+	<scroll-view scroll-y class="container">
 		<van-collapse value="{{ activeNames }}" bind:change="onChange">
 			<van-collapse-item title="喜欢我的({{likemeList.length}})" name="1">
 				<scroll-view scroll-x class="scroll-x" style="width:100%;">
@@ -57,7 +57,7 @@
 		<scroll-view scroll-y class="scroll" style="height:{{scrollHeight}}px" wx:if="{{tabIndex == 4}}">
 			<notify />
 		</scroll-view> -->
-	</view>
+	</scroll-view>
 </template>
 
 <script>
@@ -323,6 +323,7 @@
 <style lang='less' scoped>
 	.container {
 	  width: 100%;
+	  overflow:scroll;
 	  .tabs {
 	    width: 690rpx;
 	    display: flex;

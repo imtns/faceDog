@@ -117,7 +117,7 @@ export default class Propaganda extends wepy.page {
     config = {
         navigationBarTitleText: '推广有奖',
         usingComponents: {
-			'van-action-sheet': '../components/vant/action-sheet/index',
+			'van-action-sheet': '../../components/vant/action-sheet/index',
 			navbar: '../../components/navbar/index'
         }
     };

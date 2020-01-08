@@ -5,18 +5,13 @@
 	</block> -->
 	<view wx:if="{{list.length}}" class='wrapper'>
 		<repeat for="{{list}}" key="index" index="index" item="item">
-			<van-swipe-cell class="swipe" id="{{item.To_Account}}" async-close data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
+			<van-swipe-cell class="swipe" id="{{item.To_Account}}" async-close data-index="{{index}}" right-width="{{ 80 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
 				<view class="chat-box {{index==list.length-1?'last':''}}" catchtouchmove="touchstart">
 					<image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" src="{{item.C2cImage}}" mode="aspectFill"></image>
 					<view class="msg" @tap.capture.stop="onClick({{item.To_Account}},{{item.C2cNick}},{{item.C2cImage}},{{item.C2cNick}},{{item.UnreadMsgCount}})">
 						<view class="name">{{item.C2cNick}}</view>
 						<view class="content">{{item.MsgShow}}</view>
 					</view>
-					<!-- <image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" slot="left" src="{{item.C2cImage}}" mode="aspectFill"></image>
-                    <view class="msg">
-                        <view class="name">{{item.C2cNick}}</view>
-                        <view class="content">{{item.MsgShow}}</view>
-                    </view> -->
 					<view class="right-part">
 						<view class="time">{{item.showTime}}</view>
 						<view class="unread" wx:if="{{item.UnreadMsgCount>0}}">{{item.UnreadMsgCount}}</view>
