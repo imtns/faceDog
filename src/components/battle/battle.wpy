@@ -40,6 +40,9 @@
 								<!-- <view class="desc {{draggingBottom?'blur':''}}">{{item.a.gender}} / {{item.a.age}} / {{item.a.constellation}}</view> -->
 								<view class="distance "><text class="{{blurTop?'blur':''}}">{{item.a.distance}}km</text> <text class="{{blurTop?'blur':''}}"> {{item.a.city}}</text></view>
 							</view>
+							<view class="pass-box {{passShow?'show':''}}"><image src="https://images.facedog.cn/public/battle/pass-box.png" mode="scaleToFill"
+							  lazy-load="false">
+							</image></view>
 						</view>
 						<view class="divider {{bothLike?'rotated':''}}" style="top:532rpx" @tap="bothLike">
 							<view class="vs-pic front {{bothLikeRotate ?'rotated':''}} {{!bothLike && !init?'notRotate':''}}">
@@ -48,9 +51,9 @@
 								<image src="https://images.facedog.cn/public/battle/star.png?7" class="star {{fistAnimation?'ani':''}}" mode="aspectFill"></image>
 								<image src="https://images.facedog.cn/public/battle/fist-right.png?2" class="right  {{fistAnimation?'ani':''}}" mode="scaleToFill"></image>
 							</view>
-							<view class="vs-pic back {{bothLikeRotate ?'rotated':''}} {{!bothLike && !init?'notRotate':''}} {{bothLikeMove ?'bothLikeMove':''}}" style="opacity:0">
+							<!-- <view class="vs-pic back {{bothLikeRotate ?'rotated':''}} {{!bothLike && !init?'notRotate':''}} {{bothLikeMove ?'bothLikeMove':''}}" style="opacity:0">
 								<image src="https://images.facedog.cn/public/battle/both-like.png" class="both-like" mode="aspectFill"></image>
-							</view>
+							</view> -->
 						</view>
 						<view @tap="boxClick({{item.b.originalImages}})" class="battle-box bottom {{bothLikeMove ?'bothLikeMove':''}} {{draggingBottom?'frame':''}} {{flyBottom[swiperCurrent]?'flyBottom':''}}" style="transform: translate3d(0px, {{tranBottomY[index] || 0}}px, 0px);" catch:touchmove="touchBottomMove({{swiperCurrent}})" catch:touchend="touchEnd">
 							<image src="{{item.b.images[0]}}" class="{{blurBottom?'blur':''}}" mode="aspectFill"></image>
@@ -69,11 +72,18 @@
 								<!-- <view class="desc {{draggingTop?'blur':''}}">{{item.b.gender}} / {{item.b.age}} / {{item.b.constellation}}</view> -->
 								<view class="distance"><text class="{{blurBottom?'blur':''}}">{{item.b.distance}}km</text> <text class="{{blurBottom?'blur':''}}"> {{item.b.city}}</text></view>
 							</view>
+							<view class="pass-box {{passShow?'show':'' }}"><image src="https://images.facedog.cn/public/battle/pass-box.png" mode="scaleToFill"
+							  lazy-load="false">
+							</image></view>
 						</view>
 					</view>
-				</swiper-item>
-			</repeat>
+				</swiper-item> 
+			</repeat> 
 		</swiper>
+		<view class="PASS {{passTouch?'hover':''}}" @tap="passHandler" @touchstart="passTouchStart" @touchend="passTouchEnd">
+			<image  src="https://images.facedog.cn/public/battle/pass.png?8" mode="aspectFill"></image>
+			<view class="text">PASS</view>
+		</view>
 	</view>
 	<block wx:if="{{showPop}}">
 		<pop />
@@ -82,7 +92,7 @@
 
 <script>
 	import wepy from 'wepy';
-	import { BATTLE, BATTLE_COMMIT, DAILY_REPORT } from '@/utils/url';
+	import { BATTLE, BATTLE_COMMIT, DAILY_REPORT, BATTLE_PASS } from '@/utils/url';
 	import { get, post } from '@/utils/request';
 	import { Event } from '@/utils/event.js';
 	import { removeDuplicates, throttle, formatDate } from '@/utils';
@@ -92,6 +102,8 @@
 	import pop from './module/pop';
 	export default class Battle extends wepy.component {
 	  data = {
+	    passTouch: false,
+		passDuaring:false,
 	    haveEnjoy: 0,
 	    show: true,
 	    showPop: false,
@@ -122,7 +134,8 @@
 	    opacityBottomPick: 0,
 	    noProfile: false,
 	    noProfileCount: 0,
-	    flyTempID: 0 // 当前动画的临时Id
+		flyTempID: 0, // 当前动画的临时Id
+		passShow:false
 	  };
 
 	  components = {
@@ -130,6 +143,18 @@
 	    loadingHeart,
 	    pop
 	  };
+	  setEnjoyCount() {
+	    if (this.haveEnjoy <= 0) {
+	      let name = `commit-${formatDate(new Date())}`;
+	      wepy.setStorageSync(name, true);
+	      this.showPop = true;
+	      this.$apply();
+	      return;
+	    }
+	    let enjoyCount = this.haveEnjoy - 1;
+	    this.$emit('enjoySet', --this.haveEnjoy);
+	    this.haveEnjoy = enjoyCount;
+	  }
 	  fly(position) {
 	    this.flyTempID = this.swiperCurrent;
 	    if (position == 'top') {
@@ -175,16 +200,7 @@
 	      });
 	      console.log('commit!!!!!!!', data);
 	      Event.trigger('refreshData');
-	      if (this.haveEnjoy <= 0) {
-	        let name = `commit-${formatDate(new Date())}`;
-	        wepy.setStorageSync(name, true);
-	        this.showPop = true;
-	        this.$apply();
-	        return;
-	      }
-	      let enjoyCount = this.haveEnjoy - 1;
-	      this.$emit('enjoySet', --this.haveEnjoy);
-	      this.haveEnjoy = enjoyCount;
+	      this.setEnjoyCount();
 
 	      console.log(data);
 	      if (data.is_friend) {
@@ -199,7 +215,7 @@
 	    } catch (e) {}
 	  }
 	  // 切换下一组
-	  switchBattle() {
+	  switchBattle(isPass) {
 	    setTimeout(async () => {
 	      setTimeout(() => {
 	        // battle切换的时候拳头动画还原,200ms正好看不到还原过程
@@ -208,7 +224,7 @@
 	      }, 200);
 
 	      // 晃动完后切换下一组
-	      this.battleCommit();
+	      if (!isPass) this.battleCommit();
 
 	      // 判断如果
 	      console.log(this.battleList.length, this.swiperCurrent);
@@ -223,14 +239,39 @@
 	      this.draggingTop = false;
 	      this.opacityBottomPick = 0;
 	      this.opacityTopPick = 0;
+	      this.setEnjoyCount();
 	      this.$apply();
 	      setTimeout(() => {
 	        this.fistAnimation = true;
+			this.passDuaring = false;
 	        this.$apply();
 	      }, 400);
 	    }, 800);
 	  }
 	  methods = {
+	    passTouchStart() {
+	      this.passTouch = true;
+	    },
+	    passTouchEnd() {
+	      this.passTouch = false;
+	    },
+	    async passHandler() {
+		  if(this.passDuaring) return;
+		  this.passDuaring = true;
+	      const data = await post(BATTLE_PASS, {
+	        result: {
+	          win: this.battleList[this.swiperCurrent].a._id,
+	          fail: this.battleList[this.swiperCurrent].b._id
+	        }
+		  });
+		  this.passShow = true;
+		  this.$apply();
+		  setTimeout(()=>{
+			  this.passShow = false;
+			  this.$apply();
+		  },800);
+	      this.switchBattle(true);
+	    },
 	    bindanimationfinish() {
 	      // 防止swiper滑动后，滑块有的时候不还原位置的问题
 	      setTimeout(() => {
@@ -1133,7 +1174,24 @@
 	            text-shadow: #fff 0 0 8rpx;
 	          }
 	        }
-	      }
+		  }
+		  .pass-box{
+			  width:429rpx;
+			  height:317rpx;
+			  position:absolute;
+			  left:50%;
+			  top:50%;
+			  transform: translate(-50%,-50%);
+			  image{
+				  width:100%;
+				  height:100%;
+			  }
+			  transition: all .3s;
+			  opacity: 0;
+			  &.show{
+				  opacity: 1;
+			  }
+		  }
 	      &.top {
 	        border-radius: 36rpx 36rpx 0rpx 0rpx;
 	        z-index: 10;
@@ -1149,6 +1207,36 @@
 	        //     border-radius: 0rpx 0rpx 36rpx 36rpx;
 	        // }
 	      }
+	    }
+	  }
+	  .PASS {
+	    position: absolute;
+	    right: 80rpx;
+	    bottom: 180rpx;
+	    z-index: 101;
+	    width: 95rpx;
+	    height: 95rpx;
+	    background: rgba(255, 255, 255, 1);
+	    border: 1rpx solid rgba(255, 255, 255, 1);
+	    box-shadow: 0px 3rpx 6rpx rgba(74, 74, 74, 0.72);
+	    opacity: 1;
+	    border-radius: 48rpx;
+	    text-align: center;
+	    &.hover {
+	      background: rgba(238, 238, 238, 1);
+	    }
+	    image {
+	      width: 54rpx;
+	      height: 37rpx;
+	      position: relative;
+	      top: 15rpx;
+	      left: -1rpx;
+	    }
+	    .text {
+	      color: #f5a77e;
+	      font-size: 17rpx;
+	      position: relative;
+	      top: 11rpx;
 	    }
 	  }
 	}

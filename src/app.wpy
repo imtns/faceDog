@@ -55,8 +55,10 @@
 	      'pages/my/likeHelp', // 点击说明
 	      'pages/test/testBattle',
 	      'pages/chat/ilike', //我喜欢的
-		  'pages/chat/likeme', //喜欢我的
-		  'pages/chat/friendList'
+	      'pages/chat/likeme', //喜欢我的
+	      'pages/chat/friendList',
+		//   'pages/notify/notify',
+		  'pages/redPacket/list' // 红包列表
 	    ],
 	    window: {
 	      backgroundTextStyle: 'light',
@@ -152,3 +154,8 @@
 	  }
 	}
 </script>
+<style lang="less">
+	.van-popup{
+		background-color: transparent !important;
+	}
+</style>

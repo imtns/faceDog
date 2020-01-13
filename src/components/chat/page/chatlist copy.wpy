@@ -3,20 +3,15 @@
 	<!-- <block wx:if="{{!list.length}}">
 		<empty></empty>
 	</block> -->
-	<view class='wrapper'>
+	<!-- <view wx:if="{{list.length}}" class='wrapper'>
 		<repeat for="{{list}}" key="index" index="index" item="item">
-			<van-swipe-cell class="swipe" id="{{item.To_Account}}" async-close data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
-				<view class="chat-box {{index==list.length-1?'last':''}}">
-					<image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" src="{{item.C2cImage}}?x-oss-process=image/resize,w_200,h_200/format,jpg" mode="aspectFill"></image>
+			<van-swipe-cell class="swipe" id="{{item.To_Account}}" async-close data-index="{{index}}" right-width="{{ 80 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
+				<view class="chat-box {{index==list.length-1?'last':''}}" catchtouchmove="touchstart">
+					<image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" src="{{item.C2cImage}}" mode="aspectFill"></image>
 					<view class="msg" @tap.capture.stop="onClick({{item.To_Account}},{{item.C2cNick}},{{item.C2cImage}},{{item.C2cNick}},{{item.UnreadMsgCount}})">
 						<view class="name">{{item.C2cNick}}</view>
 						<view class="content">{{item.MsgShow}}</view>
 					</view>
-					<!-- <image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" slot="left" src="{{item.C2cImage}}" mode="aspectFill"></image>
-                    <view class="msg">
-                        <view class="name">{{item.C2cNick}}</view>
-                        <view class="content">{{item.MsgShow}}</view>
-                    </view> -->
 					<view class="right-part">
 						<view class="time">{{item.showTime}}</view>
 						<view class="unread" wx:if="{{item.UnreadMsgCount>0}}">{{item.UnreadMsgCount}}</view>
@@ -25,8 +20,30 @@
 				<view class="delete" slot="right">解除匹配</view>
 			</van-swipe-cell>
 		</repeat>
+	</view> -->
+	<view class="wrapper" wx:if="{{list.length}}">
+		<repeat for="{{list}}" key="index" index="index" item="item">
+			<view class="chat-box">
+				<movable-area>
+					<movable-view damping="100" out-of-bounds="true" direction="horizontal" x="{{x}}" animation="false" bindchange="handleMovableChange" @touchend="handleTouchend" @touchstart="handleTouchestart">
+						<view class="chat-box {{index==list.length-1?'last':''}}" catchtouchmove="touchstart">
+							<image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" src="{{item.C2cImage}}" mode="aspectFill"></image>
+							<view class="msg" @tap.capture.stop="onClick({{item.To_Account}},{{item.C2cNick}},{{item.C2cImage}},{{item.C2cNick}},{{item.UnreadMsgCount}})">
+								<view class="name">{{item.C2cNick}}</view>
+								<view class="content">{{item.MsgShow}}</view>
+							</view>
+							<view class="right-part">
+								<view class="time">{{item.showTime}}</view>
+								<view class="unread" wx:if="{{item.UnreadMsgCount>0}}">{{item.UnreadMsgCount}}</view>
+							</view>
+						</view>
+						<view class="delete" slot="right">解除匹配</view>
+					</movable-view>
+				</movable-area>
+				<view class="delete_btn " data-productIndex="{{index}} " bindtap="handleDeleteProduct ">删除</view>
+			</view>
+		</repeat>
 	</view>
-
 </template>
 
 <script>
@@ -43,25 +60,34 @@
 	  props = {};
 
 	  data = {
-	    list: [
-	      {
-	        C2cImage: 'https://images.facedog.cn/public/battle/redpacket.png',
-	        To_Account: '颜币红包',
-	        C2cNick: '颜币红包'
-	      }
-	    ],
+	    list: [],
 	    initLength: 0,
 	    unread: 0,
-	    touch: false,
-	    friendList: []
+	    friendList: [],
+	    // x轴方向的偏移
+	    x: 0,
+	    // 当前x的值
+	    currentX: 0
 	  };
 
 	  components = {
 	    empty
 	  };
 	  methods = {
-	    touchstart() {
-	      this.touch = true;
+	    handleTouchestart(e) {},
+	    handleMovableChange(e) {
+	      this.currentX = e.detail.x;
+	      console.log(this.currentX);
+	      this.$apply();
+	    },
+	    handleTouchend(e) {
+	      if (this.currentX < -46) {
+	        this.x = -92;
+	      } else {
+	        this.x = 0;
+	      }
+	      console.log(this.x);
+	      this.$apply();
 	    },
 	    goProfile(id) {
 	      if (id === 'administrator') return;
@@ -84,14 +110,7 @@
 	          item.C2cNick = '颜狗客服';
 	        }
 	      });
-	      this.list = [
-	        {
-	          C2cImage: 'https://images.facedog.cn/public/battle/redpacket.png',
-	          To_Account: '颜币红包',
-	          C2cNick: '颜币红包'
-	        }
-	      ];
-	      this.list.push(...data);
+	      this.list = data;
 	      this.list.sort((x, y) => {
 	        return x.To_Account === 'administrator'
 	          ? -1
@@ -207,7 +226,6 @@
 	              ? 1
 	              : 0;
 	        });
-
 	        console.log('currentPage:', url);
 	        if (
 	          url != 'pages/chat/chat' &&
@@ -236,12 +254,6 @@
 	      this.$apply();
 	    },
 	    onClick(id, name, icon, nickname, unread) {
-	      if (id == '颜币红包') {
-	        wx.navigateTo({
-	          url: `redPacket/list`
-	        });
-	        return;
-	      }
 	      if (unread) {
 	        this.unread = this.unread - unread;
 	        this.$emit('unreadSet', this.unread);
@@ -325,15 +337,6 @@
 	  width: 750rpx;
 	  margin-top: 32rpx;
 	  padding-bottom: 70rpx;
-	  .redpacket {
-	    width: 100%;
-	    height: 100rpx;
-	    background: red;
-	    color: white;
-	    display: flex;
-	    justify-content: center;
-	    align-items: center;
-	  }
 	  .delete {
 	    background: red;
 	    height: 100rpx;
@@ -349,6 +352,35 @@
 	    margin-bottom: 34rpx;
 	    position: relative;
 	    padding: 0 32rpx;
+	    movable-area {
+	      width: 532rpx;
+	      height: 201rpx;
+	      background: #fff;
+	      movable-view {
+	        width: 100%;
+	        height: 201rpx;
+	        .main_item_content {
+	          box-sizing: border-box;
+	          height: 201rpx;
+	          border-radius: 10rpx;
+	          line-height: 201rpx;
+	          color: #8e8e8e;
+	          padding-left: 10px;
+	          background: #eee;
+	        }
+	      }
+	    }
+	    .delete_btn {
+	      width: 184rpx;
+	      height: 201rpx;
+	      background-color: #ff81b4;
+	      border-top-right-radius: 10px;
+	      border-bottom-right-radius: 10px;
+	      color: #fff;
+	      font-size: 28rpx;
+	      text-align: center;
+	      line-height: 201rpx;
+	    }
 	    &.active {
 	      background: red;
 	    }

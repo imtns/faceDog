@@ -3,7 +3,7 @@
 	<view class="wrapper" wx:if="{{show}}" style="padding-top:{{isphoneX?'100rpx':'0'}};height:{{isphoneX?'93vh':'100vh'}}">
 		<view class="wrap">
 			<image class="logo-text" src="https://images.facedog.cn/public/home/logo-text.png?1" mode="aspectFill"></image>
-
+			<image class="beta" src="https://images.facedog.cn/public/home/icon-beta.png?1" mode="aspectFill"></image>
 			<image class="logo" src="https://images.facedog.cn/public/home/home-logo.png?1" mode="aspectFill"></image>
 			<view class="bottom">
 				<form report-submit='true' bindsubmit='submitForm'>
@@ -288,7 +288,14 @@
 	      display: block;
 	      height: 121rpx;
 	      margin: 320rpx auto 0;
-	    }
+		}
+		.beta{
+			width:94rpx;
+			height:39rpx;
+			position: relative;;
+			left:420rpx;
+			top:100rpx;
+		}
 	    .logo {
 	      width: 200rpx;
 	      height: 340rpx;

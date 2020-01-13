@@ -1,7 +1,7 @@
 <template>
 	<navbar center="true" showHome="{{showHome}}" wx:if="{{selectedTab ==1 }}">
 		<view slot="center">
-			<view class="square"> 
+			<view class="square">
 				<view class="tab {{tabSelect==0?'active':''}}" @tap="tabClick(0)">PK</view>
 				<view class="tab-split"></view>
 				<view class="tab tab2 {{tabSelect==1?'active':''}}" @tap="tabClick(1)">探索</view>
@@ -23,7 +23,7 @@
 			<battle />
 		</block>
 		<block wx:if="{{tabSelect == 1}}">
-			<explore :verify.sync="hasProfile"/>
+			<explore :verify.sync="hasProfile" />
 		</block>
 	</view>
 	<!-- <view wx:if="{{selectedTab == 1}}">
@@ -103,9 +103,9 @@
 	    verify: false,
 	    hasProfile: false,
 	    tabSelect: 0,
-		pageTitle: '',
-		loaded:false,
-		showHome:true
+	    pageTitle: '',
+	    loaded: false,
+	    showHome: true
 	  };
 	  computed = {
 	    now() {
@@ -113,9 +113,9 @@
 	    }
 	  };
 	  methods = {
-		verifyShow(){
-			this.verify = true;
-		},
+	    verifyShow() {
+	      this.verify = true;
+	    },
 	    tabClick(tab) {
 	      this.tabSelect = tab;
 	    },
@@ -137,9 +137,8 @@
 	  async setProfile() {
 	    try {
 	      const data = await get(NEW_PROFILE, { loading: false });
-	      console.warn(data);
 	      data.age = (data.birthday && getAge(data.birthday)) || 18;
-	      if (data.progress == 'profile'  || data.progress == 'refuse') {
+	      if (data.progress == 'profile' || data.progress == 'refuse') {
 	        this.hasProfile = false;
 	        this.$apply();
 	      } else {
@@ -157,18 +156,18 @@
 	      this.$invoke('battle', 'hasProfile', this.hasProfile);
 	      this.profile.images = this.switchOrder(this.profile.images);
 	      wepy.setStorageSync('profile', this.profile);
-		  this.$invoke('my', 'setProfile', this.profile);
-		  this.loaded = true;
-		  this.$apply();
+	      this.$invoke('my', 'setProfile', this.profile);
+	      this.loaded = true;
+	      this.$apply();
 	    } catch (e) {
 	      // console.error(e);
 	      this.hasProfile = false;
 	      wepy.setStorageSync('hasProfile', false);
 	      this.$apply();
 	      let profile = wepy.getStorageSync('wx_profile');
-		  this.$invoke('my', 'setProfile', profile);
-		  this.loaded = true;
-		  this.$apply();
+	      this.$invoke('my', 'setProfile', profile);
+	      this.loaded = true;
+	      this.$apply();
 	      // setTimeout(() => {
 	      //     wepy.redirectTo({ url: 'home' });
 	      // }, 1000);
@@ -183,30 +182,30 @@
 	    return r;
 	  }
 	  events = {
-		verifyShow(){
-			this.verify = true;
-		},
+	    verifyShow() {
+	      this.verify = true;
+	    },
 	    recommendTap() {
 	      this.tabSelect = 1;
 	    },
 	    tabSelect: (...args) => {
 	      let $event = args[args.length - 1];
-		  this.selectedTab = $event.source.tabIndex;
-		  this.showHome = false;
+	      this.selectedTab = $event.source.tabIndex;
+	      this.showHome = false;
 	      if (this.selectedTab == 0) {
 	        this.pageTitle = '消息';
 	        // wx.setNavigationBarTitle({
 	        //   title: ''
-			// });
-			this.$invoke('chat', 'initChat');
+	        // });
+	        this.$invoke('chat', 'initChat');
 	        this.$invoke('chat', 'initLike');
 	        this.$invoke('chat', 'refreshData');
 	      }
 	      if (this.selectedTab == 1) {
 	        // wx.setNavigationBarTitle({
 	        //   title: '谁的颜值更高？'
-			// });
-			this.showHome = true;
+	        // });
+	        this.showHome = true;
 	        if (optionFrom) {
 	          if (!tabClicked) {
 	            tabClicked = true;
@@ -232,8 +231,8 @@
 	    },
 	    unreadSet(num) {
 	      this.$invoke('tabbar', 'unreadSet', num);
-		},
-		enjoySet(num) {
+	    },
+	    enjoySet(num) {
 	      this.$invoke('tabbar', 'enjoySet', num);
 	    },
 	    showtab(status) {
@@ -285,10 +284,10 @@
 	  }
 	  onShareAppMessage() {
 	    let user = wx.getStorageSync('profile') || '';
-		let num = Math.floor(Math.random() * 2) + 1;
-		
+	    let num = Math.floor(Math.random() * 2) + 1;
+
 	    return {
-	      title: num == 1?'你这么美，不来看看吗':'只有好看的人才能收到',
+	      title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
 	      path: `/pages/home?userid=${user ? user.ID : ''}`,
 	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg`,
 	      success: res => {
@@ -303,7 +302,7 @@
 	    this.setProfile();
 	    this.$invoke('chat', 'initChat');
 	    if (this.selectedTab === 0) {
-	    //   this.$invoke('chat', 'refreshData');
+	      //   this.$invoke('chat', 'refreshData');
 	      //   this.$invoke('battle', 'init');
 	    }
 	    if (this.selectedTab === 2) {
@@ -341,17 +340,17 @@
 	  padding: 8rpx 0;
 	  position: relative;
 	  .tab {
-		margin: 0 24rpx;
-		padding:10rpx 0;
-	    font-size: 35rpx; 
+	    margin: 0 24rpx;
+	    padding: 10rpx 0;
+	    font-size: 35rpx;
 	    color: #c5c5c5;
-		font-weight: bold;
-		&:first-child{
-			padding-left:20rpx;
-		}
-		&.tab2{
-			padding-right: 20rpx;
-		}
+	    font-weight: bold;
+	    &:first-child {
+	      padding-left: 20rpx;
+	    }
+	    &.tab2 {
+	      padding-right: 20rpx;
+	    }
 	    &.active {
 	      color: #000;
 	    }

@@ -114,8 +114,10 @@
 	  async fetchData() {
 		this.show = true;
 	    setInterval(() => {
-	      this.countdown = countDown();
-	      this.$apply();
+	      if (wepy.$appConfig.isProd) {
+	        this.countdown = countDown();
+	        this.$apply();
+	      }
 	    }, 1000);
 	    this.list = [];
 	    let result = await get(GET_RECOMMENT_LIST);

@@ -43,7 +43,7 @@
 				<view class="item">
 					<image src="https://images.facedog.cn/public/profile/box-2.png?" mode="scaleToFill" lazy-load="false">
 					</image>
-					<text class="text value">0</text>
+					<text class="text value">{{profile.coin}}</text>
 					<text class="text label">我的颜币</text>
 					<text class="text unopen">功能未开启</text>
 				</view>
@@ -67,7 +67,7 @@
             </view>
         </view>
         <view class="line"></view> -->
-		<!-- <view class='nav' @tap="redirect('mymoment')">
+		<!-- <view class='nav-item' @tap="redirect('mymoment')">
 			<image src="https://images.facedog.cn/public/profile/myshare.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view> -->
@@ -79,21 +79,21 @@
             </view>
         </view>
         <view class="line"></view> -->
-		<view class="nav" @tap="redirect('propaganda')">
+		<view class="nav-item {{active[0]?'active':''}}" @touchstart="touchstart(0)" @touchend="touchend(0)" @tap="redirect('propaganda')">
 			<image src="https://images.facedog.cn/public/profile/share.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
-		<view class="nav" @tap="redirect('contactService')">
+		<view class="nav-item {{active[1]?'active':''}}" @touchstart="touchstart(1)" @touchend="touchend(1)" @tap="redirect('contactService')">
 			<image src="https://images.facedog.cn/public/profile/service.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
-		<view class="nav" @tap="redirect('setting')">
+		<view class="nav-item {{active[2]?'active':''}}" @touchstart="touchstart(2)" @touchend="touchend(2)" @tap="redirect('setting')">
 			<image src="https://images.facedog.cn/public/profile/setting.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
-		<view class="nav" wx:if="{{debug >= 7}}">
+		<view class="nav-item" wx:if="{{debug >= 7}}">
 			<navigator url="test" open-type="navigate" hover-class="none">
 				<view class="item">
 					<view class="title">切换</view>
@@ -120,6 +120,7 @@
 	import { Event } from '@/utils/event.js';
 	export default class My extends wepy.component {
 	  data = {
+		active:{},
 	    progress: {
 	      profile: '未认证',
 	      certify: '未认证',
@@ -144,6 +145,12 @@
 	  components = {};
 
 	  methods = {
+		touchstart(index){
+			this.active[index] = true;
+		},
+		touchend(index){
+			this.active[index] = false;
+		},
 	    toRules() {
 	      wepy.navigateTo({ url: 'my/likeHelp' });
 	    },
@@ -416,17 +423,22 @@
 	  background: rgba(246, 246, 246, 1);
 	}
 
-	.nav {
+	.nav-item {
 	  display: flex;
 	  flex-wrap: wrap;
+	  &.active{
+		  background:rgba(242,242,242,1);
+	  }
 	  image {
 	    width: 100%;
-	    height: 100%;
+	    height: 40rpx;
 	  }
 	  width: 653rpx;
-	  height: 40rpx;
-	  margin: 44rpx auto;
+	  padding:20rpx 0;
+	  height: 84rpx;
+	  margin: 0rpx auto;
 	  justify-content: center;
+	  align-items: center;
 	  //   .title {
 	  //     font-size: 28rpx;
 	  //     font-family: PingFang SC;

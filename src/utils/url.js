@@ -64,3 +64,11 @@ export const GET_MOMENT_DETAIL = '/api/v1.5/discover'
 export const GET_REGISTER_NUMBER = '/api/v1.5/show_user_count';
 // 获取推荐
 export const GET_RECOMMENT_LIST = '/api/v1.5/recommend';
+
+//  ------------   2.1
+// 跳过battle当前组
+export const BATTLE_PASS = '/api/face/double_pass';
+// 颜币
+export const GET_COIN = '/api/user/coin';
+// 发送微信请求
+export const ASK_WECHAT = '/api/user/ask_wechat';

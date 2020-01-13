@@ -37,11 +37,12 @@ module.exports = {
     },
     plugins: {
     },
-    appConfig: {
+	appConfig: {
+		isProd:process.env.NODE_ENV === 'production',
 		noPromiseAPI: ['createSelectorQuery'],
 		// baseUrl: process.env.NODE_ENV === 'production' ? 'https://www.facedog.cn' : 'http://39.97.187.201:8080',
-		// baseUrl:'http://39.97.187.201:8080'
-		baseUrl:'https://www.facedog.cn'
+		baseUrl:'http://39.97.187.201:8080'
+		// baseUrl:'https://www.facedog.cn'
     }
 };
 

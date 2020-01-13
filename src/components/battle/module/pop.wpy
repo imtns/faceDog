@@ -31,20 +31,19 @@
 	  props = {};
 
 	  data = {
-		  profile:null,
-		  countdown:countDown()
+	    profile: null,
+	    countdown: countDown()
 	  };
 
 	  components = {};
 
 	  methods = {
-		  toRecommend(){
-			this.$emit('recommendTap')
-		  },
-		  toRank(){
-			wepy.navigateTo({ url: '/pages/rank/rank' });
-			
-		  }
+	    toRecommend() {
+	      this.$emit('recommendTap');
+	    },
+	    toRank() {
+	      wepy.navigateTo({ url: '/pages/rank/rank' });
+	    }
 	  };
 
 	  events = {};
@@ -54,12 +53,14 @@
 	  computed = {};
 
 	  onLoad() {
-		  setInterval(()=>{
-			this.countdown = countDown();
-			this.$apply();
-		}, 1000);
-		  this.profile = wepy.getStorageSync('profile');
-		  this.$apply();
+	    setInterval(() => {
+	      if (wepy.$appConfig.isProd) {
+	        this.countdown = countDown();
+	        this.$apply();
+	      }
+	    }, 1000);
+	    this.profile = wepy.getStorageSync('profile');
+	    this.$apply();
 	  }
 
 	  onShow() {}
@@ -74,7 +75,7 @@
 	.pop {
 	  width: 580rpx;
 	  margin: 10rpx auto;
-	  display:flex;
+	  display: flex;
 	  justify-content: center;
 	  flex-wrap: wrap;
 	  .update-tip {
@@ -108,29 +109,29 @@
 	    width: 463rpx;
 	    height: 113rpx;
 	  }
-	  .buttons{
-		  margin-top:56rpx;
-		  width:100%;
-		  display:flex;
-		  justify-content: space-between;
-		  .btn{
-			  border-radius: 35rpx;
-			  line-height: 73rpx;
-			  text-align: center;
-			  font-size:28rpx;
-			  &:first-child{
-				  background:black;
-				  color:white;
-			  }
-			  &:last-child{
-				  background:white;
-				  color:black;
-				  border:1rpx solid #000;
-			  }
-			  width:307rpx;
-			  height:73rpx;
-			  margin:0 8rpx;
-		  }
+	  .buttons {
+	    margin-top: 56rpx;
+	    width: 100%;
+	    display: flex;
+	    justify-content: space-between;
+	    .btn {
+	      border-radius: 35rpx;
+	      line-height: 73rpx;
+	      text-align: center;
+	      font-size: 28rpx;
+	      &:first-child {
+	        background: black;
+	        color: white;
+	      }
+	      &:last-child {
+	        background: white;
+	        color: black;
+	        border: 1rpx solid #000;
+	      }
+	      width: 307rpx;
+	      height: 73rpx;
+	      margin: 0 8rpx;
+	    }
 	  }
 	}
 </style>
