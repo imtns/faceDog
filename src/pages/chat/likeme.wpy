@@ -14,8 +14,13 @@
 						<view class="name">{{item.nick_name}} {{item.age}}</view>
 						<view class="city">{{item.province}} {{item.city}}</view>
 					</view>
-					<image class="icon" src="https://images.facedog.cn/public/likeme/heart.png" @tap="agree({{item}})" mode="scaleToFill" lazy-load="false">
-					</image>
+					<form report-submit='true' bindsubmit='agree'>
+						<button form-type='submit' hover-class="hover-heart" class="icon">
+						</button>
+						<!-- </view> -->
+					</form>
+					<!-- <image class="icon" @touchstart="touchstart({{item._id}})" @touchend="touchend" src="{{likemeIcon}}" src="https://images.facedog.cn/public/likeme/heart.png" @tap="agree({{item}})" mode="scaleToFill" lazy-load="false">
+					</image> -->
 				</view>
 			</view>
 		</repeat>
@@ -42,14 +47,14 @@
 	  };
 
 	  components = {
-		  empty
+	    empty
 	  };
 
 	  methods = {
 	    async agree(user) {
-	    //   await get(AGREE_FRIEND, {
-	    //     user_id: user._id
-	    //   });
+	      //   await get(AGREE_FRIEND, {
+	      //     user_id: user._id
+	      //   });
 	      //   await post(MAKEFRIEND, {
 	      //     to_be: 'friend',
 	      //     user_id: user._id,
@@ -151,10 +156,28 @@
 	      }
 	    }
 	    .icon {
+		  &::after{
+			  content:"";
+			  border:none;
+		  }
+		  border:none;
+	      background: url('https://images.facedog.cn/public/likeme/heart.png');
+	      background-size: contain;
+	      background-repeat: no-repeat;
+	      margin-left: auto;
+	      margin-right: 30rpx;
+	      width: 149rpx;
+	      height: 149rpx; 
+	    }
+		.hover-heart{
+	      background: url('https://images.facedog.cn/public/likeme/heart-hover.png');
+	      background-size: contain;
+	      background-repeat: no-repeat;
+	      margin-left: auto;
+	      margin-right: 30rpx;
 	      width: 149rpx;
 	      height: 149rpx;
-	      margin-right: 30rpx;
-	    }
+		}
 	  }
 	}
 </style>

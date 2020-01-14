@@ -76,7 +76,7 @@
 	.van-info {
 	  right: 40rpx !important;
 	  z-index: 9999;
-	  top: 0 !important;
+	  top: -10rpx !important;
 	}
 	.van-tabbar-item__icon image {
 	  width: 136rpx !important;

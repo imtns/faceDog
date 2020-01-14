@@ -34,17 +34,31 @@ VantComponent({
             this.setIndex(defaultIndex);
         });
     },
+    computed: {
+        count() {
+            return this.data.options.length;
+        },
+        baseOffset() {
+            const { data } = this;
+            return (data.itemHeight * (data.visibleItemCount - 1)) / 2;
+        },
+        wrapperStyle() {
+            const { data } = this;
+            return [
+                `transition: ${data.duration}ms`,
+                `transform: translate3d(0, ${data.offset + data.baseOffset}px, 0)`,
+                `line-height: ${data.itemHeight}px`
+            ].join('; ');
+        }
+    },
     watch: {
         defaultIndex(value) {
             this.setIndex(value);
         }
     },
     methods: {
-        getCount() {
-            return this.data.options.length;
-        },
         onTouchStart(event) {
-            this.setData({
+            this.set({
                 startY: event.touches[0].clientY,
                 startOffset: this.data.offset,
                 duration: 0
@@ -53,15 +67,17 @@ VantComponent({
         onTouchMove(event) {
             const { data } = this;
             const deltaY = event.touches[0].clientY - data.startY;
-            this.setData({
-                offset: range(data.startOffset + deltaY, -(this.getCount() * data.itemHeight), data.itemHeight)
+            this.set({
+                offset: range(data.startOffset + deltaY, -(data.count * data.itemHeight), data.itemHeight)
             });
         },
         onTouchEnd() {
             const { data } = this;
             if (data.offset !== data.startOffset) {
-                this.setData({ duration: DEFAULT_DURATION });
-                const index = range(Math.round(-data.offset / data.itemHeight), 0, this.getCount() - 1);
+                this.set({
+                    duration: DEFAULT_DURATION
+                });
+                const index = range(Math.round(-data.offset / data.itemHeight), 0, data.count - 1);
                 this.setIndex(index, true);
             }
         },
@@ -71,9 +87,8 @@ VantComponent({
         },
         adjustIndex(index) {
             const { data } = this;
-            const count = this.getCount();
-            index = range(index, 0, count);
-            for (let i = index; i < count; i++) {
+            index = range(index, 0, data.count);
+            for (let i = index; i < data.count; i++) {
                 if (!this.isDisabled(data.options[i]))
                     return i;
             }
@@ -100,7 +115,9 @@ VantComponent({
                     userAction && this.$emit('change', index);
                 });
             }
-            return this.set({ offset });
+            else {
+                return this.set({ offset });
+            }
         },
         setValue(value) {
             const { options } = this.data;

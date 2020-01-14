@@ -160,6 +160,7 @@
 	  height: 100rpx !important;
 	}
 	.van-tabs__line {
+	  bottom:20rpx !important;
 	  width: 68rpx;
 	  background-color: #707070 !important;
 	}

@@ -91,7 +91,8 @@
 	          C2cNick: '颜币红包'
 	        }
 	      ];
-	      this.list.push(...data);
+		//   this.list.push(...data);
+		  this.list = data;
 	      this.list.sort((x, y) => {
 	        return x.To_Account === 'administrator'
 	          ? -1

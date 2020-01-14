@@ -3,48 +3,29 @@ VantComponent({
     field: true,
     relation: {
         name: 'radio-group',
-        type: 'ancestor',
-        linked(target) {
-            this.parent = target;
-        },
-        unlinked() {
-            this.parent = null;
-        }
+        type: 'ancestor'
     },
     classes: ['icon-class', 'label-class'],
     props: {
+        name: null,
         value: null,
         disabled: Boolean,
-        useIconSlot: Boolean,
-        checkedColor: String,
-        labelPosition: {
-            type: String,
-            value: 'right'
-        },
         labelDisabled: Boolean,
-        shape: {
-            type: String,
-            value: 'round'
-        },
-        iconSize: {
-            type: null,
-            value: 20
-        }
+        labelPosition: String,
+        checkedColor: String
     },
     methods: {
         emitChange(value) {
-            const instance = this.parent || this;
+            const instance = this.getRelationNodes('../radio-group/index')[0] || this;
             instance.$emit('input', value);
             instance.$emit('change', value);
         },
         onChange(event) {
-            console.log(event);
-            this.emitChange(this.data.name);
+            this.emitChange(event.detail.value);
         },
         onClickLabel() {
-            const { disabled, labelDisabled, name } = this.data;
-            if (!disabled && !labelDisabled) {
-                this.emitChange(name);
+            if (!this.data.disabled && !this.data.labelDisabled) {
+                this.emitChange(this.data.name);
             }
         }
     }

@@ -5,33 +5,28 @@ VantComponent({
         name: 'radio',
         type: 'descendant',
         linked(target) {
-            this.children = this.children || [];
-            this.children.push(target);
-            this.updateChild(target);
-        },
-        unlinked(target) {
-            this.children = this.children.filter((child) => child !== target);
+            const { value, disabled } = this.data;
+            target.set({
+                value: value,
+                disabled: disabled || target.data.disabled
+            });
         }
     },
     props: {
-        value: {
-            type: null,
-            observer: 'updateChildren'
-        },
-        disabled: {
-            type: Boolean,
-            observer: 'updateChildren'
-        }
+        value: null,
+        disabled: Boolean
     },
-    methods: {
-        updateChildren() {
-            (this.children || []).forEach((child) => this.updateChild(child));
+    watch: {
+        value(value) {
+            const children = this.getRelationNodes('../radio/index');
+            children.forEach(child => {
+                child.set({ value });
+            });
         },
-        updateChild(child) {
-            const { value, disabled } = this.data;
-            child.setData({
-                value,
-                disabled: disabled || child.data.disabled
+        disabled(disabled) {
+            const children = this.getRelationNodes('../radio/index');
+            children.forEach(child => {
+                child.set({ disabled: disabled || child.data.disabled });
             });
         }
     }

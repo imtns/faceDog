@@ -1,64 +1,59 @@
 import { VantComponent } from '../common/component';
+import { safeArea } from '../mixins/safe-area';
 VantComponent({
+    mixins: [safeArea()],
     relation: {
         name: 'tabbar-item',
         type: 'descendant',
         linked(target) {
+            this.children = this.children || [];
             this.children.push(target);
-            target.parent = this;
-            target.updateFromParent();
+            this.setActiveItem();
         },
         unlinked(target) {
-            this.children = this.children.filter((item) => item !== target);
-            this.updateChildren();
+            this.children = this.children || [];
+            this.children = this.children.filter(item => item !== target);
+            this.setActiveItem();
         }
     },
     props: {
-        active: {
-            type: null,
-            observer: 'updateChildren'
-        },
-        activeColor: {
-            type: String,
-            observer: 'updateChildren'
-        },
-        inactiveColor: {
-            type: String,
-            observer: 'updateChildren'
-        },
+        active: Number,
+        activeColor: String,
         fixed: {
-            type: Boolean,
-            value: true
-        },
-        border: {
             type: Boolean,
             value: true
         },
         zIndex: {
             type: Number,
             value: 1
-        },
-        safeAreaInsetBottom: {
-            type: Boolean,
-            value: true
         }
     },
-    beforeCreate() {
-        this.children = [];
+    watch: {
+        active(active) {
+            this.currentActive = active;
+            this.setActiveItem();
+        }
+    },
+    created() {
+        this.currentActive = this.data.active;
     },
     methods: {
-        updateChildren() {
-            const { children } = this;
-            if (!Array.isArray(children) || !children.length) {
+        setActiveItem() {
+            if (!Array.isArray(this.children) || !this.children.length) {
                 return Promise.resolve();
             }
-            return Promise.all(children.map((child) => child.updateFromParent()));
+            return Promise.all(this.children.map((item, index) => item.setActive({
+                active: index === this.currentActive,
+                color: this.data.activeColor
+            })));
         },
         onChange(child) {
-            const index = this.children.indexOf(child);
-            const active = child.data.name || index;
-            if (active !== this.data.active) {
-                this.$emit('change', active);
+            const active = (this.children || []).indexOf(child);
+            if (active !== this.currentActive && active !== -1) {
+                this.currentActive = active;
+                this.setActiveItem().then(() => {
+                    this.$emit('change', active);
+                });
             }
         }
     }

@@ -4,7 +4,7 @@
 		<van-collapse value="{{ activeNames }}" bind:change="onChange">
 			<van-collapse-item title="喜欢我的({{likemeList.length}})" name="1">
 				<scroll-view scroll-x class="scroll-x" style="width:100%;">
-					<image @tap="checkAllLikeMe" src="https://images.facedog.cn/public/chat/like-me-all.png" mode="scaleToFill" lazy-load="false">
+					<image @tap="checkAllLikeMe" @touchstart="touchstart('likeme')" @touchend="touchend" src="{{likemeIcon}}" mode="scaleToFill" lazy-load="false">
 					</image>
 					<block wx:if="{{likemeList.length}}">
 						<repeat for="{{likemeList}}" key="index" index="index" item="item">
@@ -21,13 +21,13 @@
 			</van-collapse-item>
 			<van-collapse-item title="我喜欢的({{ilikeTotal}})" name="2">
 				<scroll-view scroll-x class="scroll-x" style="width:100%;">
-					<image @tap="checkAllIlike" src="https://images.facedog.cn/public/chat/i-like-all.png" mode="scaleToFill" lazy-load="false">
+					<image @tap="checkAllIlike" @touchstart="touchstart('melike')" @touchend="touchend" src="{{meLikeIcon}}" mode="scaleToFill" lazy-load="false">
 					</image>
 					<block wx:if="{{ilikeList.length}}">
 						<repeat for="{{ilikeList}}" key="index" index="index" item="item">
 							<image class="icon blue" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
 						</repeat>
-					</block>
+					</block> 
 					<block wx:else>
 						<repeat for="{{[0,1,2,3]}}" key="index" index="index" item="item">
 							<view class="icon-empty"></view>
@@ -93,7 +93,9 @@
 	    likemeList: [],
 	    friendList: [],
 	    ilikeTotal: 0,
-	    likeMeTotal: 0
+	    likeMeTotal: 0,
+	    likemeIcon: 'https://images.facedog.cn/public/chat/like-me-all.png',
+	    meLikeIcon: 'https://images.facedog.cn/public/chat/i-like-all.png'
 	  };
 	  components = {
 	    likeme,
@@ -106,6 +108,19 @@
 	    // getChatList(data) {
 	    //   this.$invoke('chatlist', 'getChatList', data);
 	    // },
+	    touchstart(type) {
+	      if (type == 'likeme') {
+	        this.likemeIcon =
+	          'https://images.facedog.cn/public/chat/like-me-all-active.png';
+	      } else {
+	        this.meLikeIcon =
+	          'https://images.facedog.cn/public/chat/i-like-all-active.png';
+	      }
+	    },
+	    touchend() {
+	      this.likemeIcon = 'https://images.facedog.cn/public/chat/like-me-all.png';
+	      this.meLikeIcon = 'https://images.facedog.cn/public/chat/i-like-all.png';
+	    },
 	    goProfile(id) {
 	      wx.navigateTo({
 	        url: `battle/profile?id=${id}`,
@@ -323,7 +338,7 @@
 <style lang='less' scoped>
 	.container {
 	  width: 100%;
-	  overflow:scroll;
+	  overflow: scroll;
 	  .tabs {
 	    width: 690rpx;
 	    display: flex;

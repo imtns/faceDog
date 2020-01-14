@@ -1,5 +1,4 @@
 import { VantComponent } from '../common/component';
-import { getSystemInfoSync } from '../common/utils';
 VantComponent({
     field: true,
     classes: ['input-class', 'right-icon-class'],
@@ -21,25 +20,15 @@ VantComponent({
         password: Boolean,
         iconClass: String,
         clearable: Boolean,
-        clickable: Boolean,
         inputAlign: String,
-        placeholder: String,
+        customClass: String,
         customStyle: String,
         confirmType: String,
         confirmHold: Boolean,
-        holdKeyboard: Boolean,
         errorMessage: String,
-        arrowDirection: String,
+        placeholder: String,
         placeholderStyle: String,
         errorMessageAlign: String,
-        selectionEnd: {
-            type: Number,
-            value: -1
-        },
-        selectionStart: {
-            type: Number,
-            value: -1
-        },
         showConfirmBar: {
             type: Boolean,
             value: true
@@ -70,31 +59,63 @@ VantComponent({
         }
     },
     data: {
-        focused: false,
-        system: getSystemInfoSync().system.split(' ').shift().toLowerCase()
+        showClear: false
+    },
+    beforeCreate() {
+        this.focused = false;
     },
     methods: {
         onInput(event) {
             const { value = '' } = event.detail || {};
-            this.setData({ value });
-            wx.nextTick(() => {
+            this.set({
+                value,
+                showClear: this.getShowClear(value)
+            }, () => {
                 this.emitChange(value);
             });
         },
         onFocus(event) {
-            this.setData({ focused: true });
-            this.$emit('focus', event.detail);
+            const { value = '', height = 0 } = event.detail || {};
+            this.$emit('focus', { value, height });
+            this.focused = true;
+            this.blurFromClear = false;
+            this.set({
+                showClear: this.getShowClear()
+            });
         },
         onBlur(event) {
-            this.setData({ focused: false });
-            this.$emit('blur', event.detail);
+            const { value = '', cursor = 0 } = event.detail || {};
+            this.$emit('blur', { value, cursor });
+            this.focused = false;
+            const showClear = this.getShowClear();
+            if (this.data.value === value) {
+                this.set({
+                    showClear
+                });
+            }
+            else if (!this.blurFromClear) {
+                // fix: the handwritten keyboard does not trigger input change
+                this.set({
+                    value,
+                    showClear
+                }, () => {
+                    this.emitChange(value);
+                });
+            }
         },
         onClickIcon() {
             this.$emit('click-icon');
         },
+        getShowClear(value) {
+            value = value === undefined ? this.data.value : value;
+            return (this.data.clearable && this.focused && value && !this.data.readonly);
+        },
         onClear() {
-            this.setData({ value: '' });
-            wx.nextTick(() => {
+            this.blurFromClear = true;
+            this.set({
+                value: '',
+                showClear: this.getShowClear('')
+            }, () => {
                 this.emitChange('');
                 this.$emit('clear', '');
             });
@@ -105,7 +126,6 @@ VantComponent({
         emitChange(value) {
             this.$emit('input', value);
             this.$emit('change', value);
-        },
-        noop() { }
+        }
     }
 });

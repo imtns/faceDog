@@ -80,9 +80,9 @@
 				</swiper-item> 
 			</repeat> 
 		</swiper>
-		<view class="PASS {{passTouch?'hover':''}}" @tap="passHandler" @touchstart="passTouchStart" @touchend="passTouchEnd">
-			<image  src="https://images.facedog.cn/public/battle/pass.png?8" mode="aspectFill"></image>
-			<view class="text">PASS</view>
+		<view class="PASS {{passTouch?'hover':''}}" style="bottom:{{isphoneX?'450rpx':'300rpx'}};" @tap="passHandler" @touchstart="passTouchStart" @touchend="passTouchEnd">
+			<!-- 换一组 -->
+			<image  src="https://images.facedog.cn/public/battle/pass-new.png?8" mode="aspectFill"></image>
 		</view>
 	</view>
 	<block wx:if="{{showPop}}">
@@ -1211,26 +1211,26 @@
 	  }
 	  .PASS {
 	    position: absolute;
-	    right: 80rpx;
-	    bottom: 180rpx;
+	    right: -100rpx;
+	    bottom: 200rpx;
 	    z-index: 101;
-	    width: 95rpx;
-	    height: 95rpx;
-	    background: rgba(255, 255, 255, 1);
-	    border: 1rpx solid rgba(255, 255, 255, 1);
-	    box-shadow: 0px 3rpx 6rpx rgba(74, 74, 74, 0.72);
+	    width: 226rpx;
+		height: 78rpx;
+		display:flex;
+		justify-content: center; 
+		align-items: center;
+	    background: black; 
+		color:white; 
+		font-size:24rpx; 
 	    opacity: 1;
-	    border-radius: 48rpx;
+	    border-radius: 48rpx 0 0 48rpx;
 	    text-align: center;
 	    &.hover {
-	      background: rgba(238, 238, 238, 1);
+	      background: rgb(49, 49, 49);
 	    }
 	    image {
-	      width: 54rpx;
-	      height: 37rpx;
-	      position: relative;
-	      top: 15rpx;
-	      left: -1rpx;
+		  width:100%;
+		  height:100%;
 	    }
 	    .text {
 	      color: #f5a77e;

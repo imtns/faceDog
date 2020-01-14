@@ -1,7 +1,6 @@
 import { VantComponent } from '../common/component';
 import { button } from '../mixins/button';
 import { openType } from '../mixins/open-type';
-import { GRAY, BLUE } from '../common/color';
 VantComponent({
     mixins: [button, openType],
     props: {
@@ -10,15 +9,11 @@ VantComponent({
         message: String,
         useSlot: Boolean,
         className: String,
-        customStyle: String,
         asyncClose: Boolean,
         messageAlign: String,
-        overlayStyle: String,
-        useTitleSlot: Boolean,
         showCancelButton: Boolean,
         closeOnClickOverlay: Boolean,
         confirmButtonOpenType: String,
-        width: null,
         zIndex: {
             type: Number,
             value: 2000
@@ -30,14 +25,6 @@ VantComponent({
         cancelButtonText: {
             type: String,
             value: '取消'
-        },
-        confirmButtonColor: {
-            type: String,
-            value: BLUE
-        },
-        cancelButtonColor: {
-            type: String,
-            value: GRAY
         },
         showConfirmButton: {
             type: Boolean,
@@ -75,19 +62,19 @@ VantComponent({
         },
         handleAction(action) {
             if (this.data.asyncClose) {
-                this.setData({
+                this.set({
                     [`loading.${action}`]: true
                 });
             }
             this.onClose(action);
         },
         close() {
-            this.setData({
+            this.set({
                 show: false
             });
         },
         stopLoading() {
-            this.setData({
+            this.set({
                 loading: {
                     confirm: false,
                     cancel: false

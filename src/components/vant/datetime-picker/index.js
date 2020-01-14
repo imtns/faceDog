@@ -13,7 +13,7 @@ function padZero(val) {
 }
 function times(n, iteratee) {
     let index = -1;
-    const result = Array(n < 0 ? 0 : n);
+    const result = Array(n);
     while (++index < n) {
         result[index] = iteratee(index);
     }
@@ -33,15 +33,15 @@ function getMonthEndDay(year, month) {
 const defaultFormatter = (_, value) => value;
 VantComponent({
     classes: ['active-class', 'toolbar-class', 'column-class'],
-    props: Object.assign(Object.assign({}, pickerProps), { value: null, filter: null, type: {
+    props: Object.assign({}, pickerProps, { formatter: {
+            type: Function,
+            value: defaultFormatter
+        }, value: null, type: {
             type: String,
             value: 'datetime'
         }, showToolbar: {
             type: Boolean,
             value: true
-        }, formatter: {
-            type: null,
-            value: defaultFormatter
         }, minDate: {
             type: Number,
             value: new Date(currentYear - 10, 0, 1).getTime()
@@ -66,33 +66,26 @@ VantComponent({
         columns: []
     },
     watch: {
-        value: 'updateValue',
-        type: 'updateValue',
-        minDate: 'updateValue',
-        maxDate: 'updateValue',
-        minHour: 'updateValue',
-        maxHour: 'updateValue',
-        minMinute: 'updateValue',
-        maxMinute: 'updateValue'
-    },
-    methods: {
-        updateValue() {
+        value(val) {
             const { data } = this;
-            const val = this.correctValue(this.data.value);
+            val = this.correctValue(val);
             const isEqual = val === data.innerValue;
             if (!isEqual) {
                 this.updateColumnValue(val).then(() => {
                     this.$emit('input', val);
                 });
             }
-            else {
-                this.updateColumns();
-            }
         },
+        type: 'updateColumns',
+        minHour: 'updateColumns',
+        maxHour: 'updateColumns',
+        minMinute: 'updateColumns',
+        maxMinute: 'updateColumns'
+    },
+    methods: {
         getPicker() {
             if (this.picker == null) {
-                this.picker = this.selectComponent('.van-datetime-picker');
-                const { picker } = this;
+                const picker = (this.picker = this.selectComponent('.van-datetime-picker'));
                 const { setColumnValues } = picker;
                 picker.setColumnValues = (...args) => setColumnValues.apply(picker, [...args, false]);
             }
@@ -100,25 +93,15 @@ VantComponent({
         },
         updateColumns() {
             const { formatter = defaultFormatter } = this.data;
-            const results = this.getOriginColumns().map(column => ({
-                values: column.values.map(value => formatter(column.type, value))
-            }));
-            return this.set({ columns: results });
-        },
-        getOriginColumns() {
-            const { filter } = this.data;
-            const results = this.getRanges().map(({ type, range }) => {
-                let values = times(range[1] - range[0] + 1, index => {
+            const results = this.getRanges().map(({ type, range }, index) => {
+                const values = times(range[1] - range[0] + 1, index => {
                     let value = range[0] + index;
                     value = type === 'year' ? `${value}` : padZero(value);
-                    return value;
+                    return formatter(type, value);
                 });
-                if (filter) {
-                    values = filter(type, values);
-                }
-                return { type, values };
+                return { values };
             });
-            return results;
+            return this.set({ columns: results });
         },
         getRanges() {
             const { data } = this;
@@ -233,7 +216,7 @@ VantComponent({
             const picker = this.getPicker();
             if (data.type === 'time') {
                 const indexes = picker.getIndexes();
-                value = `${+data.columns[0].values[indexes[0]]}:${+data.columns[1].values[indexes[1]]}`;
+                value = `${indexes[0] + data.minHour}:${indexes[1] + data.minMinute}`;
             }
             else {
                 const values = picker.getValues();
