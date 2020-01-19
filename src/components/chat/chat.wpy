@@ -263,7 +263,7 @@
 	    likeme.forEach(item => {
 	      this.likemeList.push(...item.users);
 	    });
-	    this.likemeList = this.likemeList.slice(-5);
+	    this.likemeList = this.likemeList.slice(0,5);
 	    this.$apply();
 	  }
 	  async getIlikeList() {
@@ -271,7 +271,7 @@
 	    const ilike = await get(MY_FAVORITE);
 	    console.log(ilike.length);
 	    this.ilikeTotal = ilike.total;
-	    this.ilikeList = ilike.favorites.slice(-5);
+	    this.ilikeList = ilike.favorites.slice(0,5);
 	    this.$apply();
 	  }
 	  async getFriendList() {
@@ -303,7 +303,7 @@
 	            });
 	          } else {
 	            that.$invoke('chatlist', 'getChatList', resp.SessionItem);
-	            // that.initUnreadMsgCount(that, null, true);
+	            that.initUnreadMsgCount(that, null, true);
 	          }
 	        }
 	      },

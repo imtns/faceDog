@@ -17,7 +17,7 @@
 			</repeat>
 		</swiper>
 		<view class="wechat-icon" @tap="askWechat">
-			<image src="https://images.facedog.cn/public/battle/wechat.png" mode="scaleToFill" lazy-load="false">
+			<image src="https://images.facedog.cn/public/profile/wechat{{profile.ask_wechat?'-disable':''}}.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 		<view class="battle-profile-wrapper">
@@ -55,14 +55,16 @@
 		</view>
 		<view class="bottom-box" wx:if="{{!self && loaded}}">
 			<block wx:if="{{!profile.is_friend}}">
-				<image class="close" mode="aspectFill" @tap="close" src="https://images.facedog.cn/public/profile/close1.png"></image>
+				<button class="close" hover-class="hover" @tap="close"></button>
+				<!-- <image  mode="aspectFill" @tap="close" src=""></image> -->
 				<!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="https://images.facedog.cn/public/profile/menu.png"></image> -->
 				<image wx:if="{{!profile.is_like}}" src="https://images.facedog.cn/public/profile/apply-tip.png" mode="aspectFill" class="apply-tip"></image>
-				<form report-submit='true' bindsubmit='applyFriend'>
-					<button wx:if="{{!profile.is_like}}" style="background:url('https://images.facedog.cn/public/profile/friend.png?44');background-size:cover;border:0;" form-type='submit' class="menu apply-button"></button>
+				<form report-submit='true' wx:if="{{!profile.is_like}}" bindsubmit='applyFriend'>
+					<button form-type='submit' class="menu apply-button" hover-class="button-hover"></button>
 				</form>
 				<!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="makeFriend('friend')" src="https://images.facedog.cn/public/profile/friend.png?44"></image> -->
-				<image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="https://images.facedog.cn/public/profile/icon-clock.png"></image>
+				<button class="menu" wx:if="{{profile.is_like}}" @tap="toastTip">
+					<!-- <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="https://images.facedog.cn/public/profile/icon-clock.png"></image> -->
 			</block>
 			<block wx:else>
 				<image class="close" mode="aspectFill" @tap="gochat" src="https://images.facedog.cn/public/profile/icon-chat.png"></image>
@@ -154,19 +156,24 @@
 
 	  methods = {
 	    async askWechat() {
+		  if(this.profile.ask_wechat) return;
 	      let message = '';
 	      Dialog.confirm({
-	        confirmButtonText: this.profile.coin >= 100 ? '确认' : '如何获得?',
+	        confirmButtonText: this.me.coin >= 200 ? '确认' : '如何获得?',
 	        cancelButtonText: '取消',
 	        asyncClose: true,
 	        message: `向 ${this.title}申请微信号?
-						需要扣除100颜币
-						你当前的颜币为${this.me.coin}
-						如果没同意，7天后自动返还`
+								需要扣除200颜币
+								你当前的颜币为${this.me.coin}
+								如果没同意，3天后自动返还`
 	      })
-	        .then(() => {
-	          if (this.me.coin >= 100) {
+	        .then(async () => {
+	          if (this.me.coin >= 200) {
+				await post(ASK_WECHAT,{user_id:this.profile._id})
 	            setTimeout(() => {
+				  this.me.coin = this.me.coin - 200;
+				  this.profile.ask_wechat = true;
+				  this.$apply();
 	              Dialog.close();
 	              Dialog.alert({
 	                message: '已发送，请到消息页红包消息处查看进度'
@@ -175,15 +182,17 @@
 	              });
 	            }, 1000);
 	          } else {
-				 Dialog.close();
+				Dialog.close();
+				wepy.navigateTo({ url: '/pages/coin/coinHelp' });
+				
 	            console.log('如何获得');
 	          }
 	        })
 	        .catch(() => {
-				 Dialog.close();
+	          Dialog.close();
 	          // this.methods.uploadVideo.bind(this)();
 	        });
-	      // await post(ASK_WECHAT,{user_id:this.profile._id})
+	      
 	    },
 	    showOrHide() {
 	      if (this.isShow) {
@@ -345,8 +354,8 @@
 	  height: 868rpx;
 	}
 	.wechat-icon {
-	  width: 73rpx;
-	  height: 73rpx;
+	  width: 95rpx;
+	  height: 95rpx;
 	  position: absolute;
 	  top: 870rpx;
 	  right: 40rpx;
@@ -524,8 +533,43 @@
 	    .menu {
 	      width: 174rpx;
 	      height: 174rpx;
+		  margin: 0 15rpx;
+		  &.apply-button{
+			  background:url('https://images.facedog.cn/public/profile/friend.png?44');
+			  background-size:cover;
+			  border:0;
+			  &.button-hover{
+				  background:url('https://images.facedog.cn/public/profile/friend-hover.png?44');
+			  background-size:cover;
+			  border:0;
+			  }
+		  }
 	      &.apply-button::after {
 	        border: 0;
+	      }
+	    }
+	    .menu {
+	      background: url(https://images.facedog.cn/public/profile/icon-clock.png);
+	      background-size: cover;
+	      &::after {
+	        border: 0;
+	      }
+	      &.hover {
+	      }
+	    }
+	    .close {
+	      width: 174rpx;
+	      height: 174rpx;
+	      background: url(https://images.facedog.cn/public/profile/close1.png);
+	      background-size: cover;
+	      &::after {
+	        border: 0;
+	      }
+	      &.hover {
+	        background: url(https://images.facedog.cn/public/profile/close-hover.png);
+	        width: 174rpx;
+	        height: 174rpx;
+	        background-size: cover;
 	      }
 	    }
 	    .apply-tip {

@@ -1,0 +1,78 @@
+<!--  -->
+<template>
+	<view class='wrapper'>
+		<image class="bg" @tap="try" src="https://images.facedog.cn/public/battle/redpacket-bg.png?x-oss-process=image/resize,w_300,h_300/format,png" mode="scaleToFill" lazy-load="false">
+		</image>
+		<view class="box">
+			<image class="try" src="https://images.facedog.cn/public/battle/btn-try.png" mode="scaleToFill" lazy-load="false" @tap="try">
+			</image>
+		</view>
+		<view class="box">
+			<image class="close" src="https://images.facedog.cn/public/battle/redpacket-close.png" mode="scaleToFill" lazy-load="false" @tap="close">
+			</image>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	export default class Example extends wepy.component {
+	  props = {};
+
+	  data = {};
+
+	  components = {};
+
+	  methods = {
+	    try() {
+	      this.$emit('closeRedPacketLayer');
+	      wx.setStorageSync('showRedpacket', 'ok');
+	      wepy.navigateTo({ url: '/pages/invite/index' });
+	    },
+	    close() {
+	      wx.setStorageSync('showRedpacket', 'ok');
+	      this.$emit('closeRedPacketLayer');
+	    }
+	  };
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='scss' scoped>
+	.wrapper {
+	  width: 100%;
+	  display: flex;
+	  justify-content: center;
+	  flex-wrap: wrap;
+	  .bg {
+	    width: 531rpx;
+	    height: 554rpx;
+	  }
+	  .box {
+	    display: flex;
+	    justify-content: center;
+	    width: 100%;
+	    margin-top: 20rpx;
+	    &:nth-of-type(2) {
+	      margin-top: 56rpx;
+	    }
+	  }
+	  .try {
+	    width: 324rpx;
+	    height: 110rpx;
+	  }
+	  .close {
+	    width: 54rpx;
+	    height: 54rpx;
+	  }
+	}
+</style>

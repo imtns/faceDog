@@ -1,50 +1,59 @@
 <!--  -->
 <template>
-	<navbar title="我喜欢的">
+	<navbar title="颜币红包">
 	</navbar>
-	<block wx:if="{{!list.length}}">
-		<empty></empty>
-	</block>
-	<view class='container' wx:else>
+	<view class='container'>
 		<van-tabs active="receive" animated>
 			<van-tab title="我收到的" name="receive">
-				<repeat for="{{list}}" key="index" index="index" item="item">
-					<view class="box">
-						<view class="content">
-							<image class="avatar" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg"></image>
-							<view class="info">
-								<view class="name">{{item.nick_name}} {{item.age}}</view>
-								<view class="city">{{item.province}} {{item.city}}</view>
+				<block wx:if="{{!getList.length}}">
+					<empty></empty>
+				</block>
+				<block wx:else>
+					<repeat for="{{getList}}" key="index" index="index" item="item">
+						<view class="box">
+							<view class="content">
+								<image class="avatar" @tap="goProfile({{item._id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg"></image>
+								<view class="info">
+									<view class="name">{{item.nick_name}} {{item.age}}</view>
+									<view class="city">{{item.province}} {{item.city}}</view>
+								</view>
+								<image class="redpacket" @tap="redPacketClick({{item}},'get')" style="margin-left:5rpx;" src="https://images.facedog.cn/public/redpacket/redpacket-{{item.status=='no_receive'?'waiting':item.status=='expire'?'expire':'opened'}}1.png" mode="scaleToFill" lazy-load="false"></image>
+								<!-- <image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
+								</image> -->
 							</view>
-							<image class="redpacket" @tap="redPacketClick({{index}})" src="https://images.facedog.cn/public/redpacket/redpacket-{{index==0?'opened':index==1?'wating':'expired'}}.png" mode="scaleToFill" lazy-load="false"></image>
-							<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
-							</image>
 						</view>
-					</view>
-				</repeat>
+					</repeat>
+				</block>
 			</van-tab>
 			<van-tab title="我发出的">
-				<repeat for="{{list}}" key="index" index="index" item="item">
-					<view class="box">
-						<view class="content">
-							<image class="avatar" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg"></image>
-							<view class="info">
-								<view class="name">{{item.nick_name}} {{item.age}}</view>
-								<view class="city">{{item.province}} {{item.city}}</view>
+				<block wx:if="{{!sendList.length}}">
+					<empty></empty>
+				</block>
+				<block wx:else>
+					<repeat for="{{sendList}}" key="index" index="index" item="item">
+						<view class="box">
+							<view class="content">
+								<image class="avatar" @tap="goProfile({{item._id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg"></image>
+								<view class="info">
+									<view class="name">{{item.nick_name}} {{item.age}}</view>
+									<view class="city">{{item.province}} {{item.city}}</view>
+								</view>
+								<image class="redpacket" @tap="redPacketClick({{item}},'send')" style="width:{{item.status == 'receive'?'65rpx':'119rpx'}};height:{{item.status=='receive'?'105rpx':'119rpx'}};margin-right:{{item.status=='receive'?'40':'10'}}rpx" src="https://images.facedog.cn/public/redpacket/redpacket-{{item.status == 'receive'?'ok':item.status=='no_receive'?'waiting':'expire'}}.png?4" mode="aspectFill" lazy-load="false"></image>
+								<!-- <image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
+								</image> -->
 							</view>
-							<image class="redpacket" src="https://images.facedog.cn/public/redpacket/redpacket-{{index==0?'opened':index==1?'wating':'expired'}}.png" mode="scaleToFill" lazy-load="false"></image>
-							<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
-							</image>
 						</view>
-					</view>
-				</repeat>
+					</repeat>
+				</block>
 			</van-tab>
 		</van-tabs>
-
 	</view>
 	<van-toast id="van-toast" />
 	<van-popup show="{{ showPop }}" bind:close="onClose">
 		<notify />
+	</van-popup>
+	<van-popup show="{{ showCoinPop }}" bind:close="onClose">
+		<popCoin />
 	</van-popup>
 </template>
 
@@ -55,7 +64,8 @@
 	import empty from '@/components/empty';
 	import Toast from '@/components/vant/toast/toast';
 	import notify from '@/components/notify/notify';
-	import { MAKEFRIEND, MY_FAVORITE, DELETE_FAVORITE } from '@/utils/url';
+	import popCoin from '@/components/battle/module/popCoin';
+	import { SEND_WECHAT_LIST, GET_WECHAT_LIST, SEND_WECHAT } from '@/utils/url';
 	export default class RedPackList extends wepy.page {
 	  config = {
 	    navigationBarTitleText: '我喜欢的',
@@ -70,11 +80,13 @@
 
 	  data = {
 	    showPop: false,
-	    list: [],
+	    getList: [],
+	    sendList: [],
 	    init: false,
 	    nomore: false,
 	    show: false,
 	    active: 1,
+	    showCoinPop: false,
 	    redpacketTypeObj: {
 	      0: 'coin',
 	      1: 'invite',
@@ -86,17 +98,31 @@
 
 	  components = {
 	    empty,
-	    notify
+	    notify,
+	    popCoin
 	  };
 
 	  methods = {
-	    redPacketClick(index) {
-			console.log(index)
-		  console.log(this.redpacketTypeObj)
-		  this.redpacketType = this.redpacketTypeObj[index];
-		  this.$invoke('notify','setType',this.redpacketType)
+	    redPacketClick(user, type) {
+	      console.log(this.redpacketTypeObj);
+	      //   this.redpacketType = this.redpacketTypeObj[index];
+	      let status = '';
+	      if (type == 'send' && user.status == 'no_receive') return;
+	      if (type == 'get' && user.status == 'receive') return;
+	      if (user.status == 'no_receive') status = 'invite';
+	      if (user.status == 'receive') status = 'agree';
+	      if (user.status == 'expire') status = 'refund';
+
+	      let me = wepy.getStorageSync('profile');
+		  user.myWechat = me.wechat;
+	      this.$invoke('notify', 'setData', status, user);
 	      this.showPop = true;
 	    },
+	    // sendWechat(id){
+	    // 	this.$invoke('notify', 'setData', 'invite',id,);
+	    // 	this.$invoke('notify', 'setUserid', id);
+	    // 	this.showPop = true;
+	    // },
 	    onClose() {
 	      this.showPop = false;
 	    },
@@ -108,48 +134,38 @@
 	        fail: () => {},
 	        complete: () => {}
 	      });
-	    },
-	    async clearFavorites(id) {
-	      wepy.showLoading({
-	        title: '', //提示的内容,
-	        mask: true, //显示透明蒙层，防止触摸穿透,
-	        success: res => {}
-	      });
-
-	      if (id == 'all') {
-	        id = [];
-	        this.list.forEach(item => {
-	          id.push(item._id);
-	        });
-	      }
-	      await post(DELETE_FAVORITE, { id });
-	      Toast('删除成功');
-	      wepy.hideLoading();
-	      this.fetchData();
 	    }
 	  };
 	  onReachBottom() {}
 	  events = {
-		  closeNotify(){
-			  this.showPop = false;
+	    closeNotify(refresh) {
+	      if (refresh) {
+			this.showCoinPop = true;
+			setTimeout(() => {
+				this.showCoinPop = false;
+				this.$apply();
+			}, 2000);
+			this.fetchData();
+			this.$apply();
 		  }
+		  this.showPop = false;
+	    }
 	  };
 
 	  watch = {};
 
 	  computed = {};
 
-	  onLoad() {
-	    this.fetchData();
-	  }
+	  onLoad() {}
 	  async fetchData() {
-	    this.list = [];
-	    const result = await get(MY_FAVORITE, { page: 1 });
-	    this.list.push(...result.favorites);
+	    this.sendList = await get(SEND_WECHAT_LIST);
+	    this.getList = await get(GET_WECHAT_LIST);
 	    this.init = true;
 	    this.$apply();
 	  }
-	  onShow() {}
+	  onShow() {
+	    this.fetchData();
+	  }
 	}
 </script>
 
@@ -160,7 +176,7 @@
 	  height: 100rpx !important;
 	}
 	.van-tabs__line {
-	  bottom:20rpx !important;
+	  bottom: 20rpx !important;
 	  width: 68rpx;
 	  background-color: #707070 !important;
 	}
@@ -181,7 +197,7 @@
 	  .box {
 	    width: 722rpx;
 	    background: white;
-	    margin: 10rpx auto;
+	    margin: 20rpx auto;
 	    .content {
 	      display: flex;
 	      justify-content: space-between;

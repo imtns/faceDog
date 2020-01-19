@@ -15,6 +15,22 @@
 		<block wx:if='{{loading}}'>
 			<loading></loading>
 		</block>
+		<view class="wrong-tip" wx:if="{{tipCover}}">
+			<view class="text">颜狗是一个高颜值的社交圈</view>
+			<view class="text">上传优质的本人照片才可以通过认证</view>
+			<view class="pic-box">
+				<image src="https://images.facedog.cn/public/register/wrong1.png" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image src="https://images.facedog.cn/public/register/wrong2.png" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image src="https://images.facedog.cn/public/register/wrong3.png" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image src="https://images.facedog.cn/public/register/wrong4.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+			<view class="text">若不想露脸可在认证时选择「尊享认证」</view>
+			<view class="btn" @tap="closeTipCover">OK</view>
+		</view>
 	</view>
 </template>
 
@@ -48,6 +64,7 @@
 	  };
 
 	  data = {
+		tipCover:true,
 	    src: 'https://images.facedog.cn/public/reg/upload.png',
 	    show: false,
 	    loading: false,
@@ -77,10 +94,10 @@
 	    const data = {
 	      birthday: wepy.getStorageSync('birthday'),
 	      nick_name: wepy.getStorageSync('name'),
-		  gender: wepy.getStorageSync('gender'),
-		  number:this.number
+	      gender: wepy.getStorageSync('gender'),
+	      number: this.number
 	    };
-	    console.log('注册data!!!!!!!!:',data);
+	    console.log('注册data!!!!!!!!:', data);
 	    uploader(
 	      src,
 	      {
@@ -103,6 +120,9 @@
 	    );
 	  }
 	  methods = {
+		closeTipCover(){
+		 this.tipCover = false;
+		},
 	    async submitForm(e) {
 	      await post(SUBMIT_FORMID, {
 	        formId: e.detail.formId
@@ -273,6 +293,46 @@
 
 <style lang='scss'>
 	.container-avatar {
+	  .wrong-tip {
+	    width: 100%;
+	    background: rgba(0, 0, 0, 0.7);
+	    height: 100vh;
+	    position: absolute;
+	    z-index: 99;
+	    top: 0;
+	    left: 0;
+	    padding-top: 200rpx;
+	    text-align: center;
+	    .text {
+	      font-size: 32rpx;
+	      color: white;
+		  margin:6rpx auto;
+	    }
+	    .pic-box {
+	      width: 500rpx;
+	      display: flex;
+	      flex-wrap: wrap;
+	      margin: 52rpx auto;
+	      justify-content: center;
+	      image {
+	        width: 223rpx;
+	        height: 265rpx;
+	        object-fit: cover;
+	      }
+	    }
+	    .btn {
+	      width: 181rpx;
+	      height: 69rpx;
+		  margin:20rpx auto;
+	      border: 3rpx solid rgba(248, 184, 0, 1);
+	      opacity: 1;
+		  display:flex;
+		  justify-content: center;
+		  align-items: center;
+		  color:#F8B800;
+	      border-radius: 11rpx;
+	    }
+	  }
 	  height: 100vh;
 	  position: relative;
 	  overflow: hidden;

@@ -162,7 +162,7 @@
 	  async onLoad(options) {
 	    this.initAnimation = false;
 	    this.current = 0;
-		this.number = options.userid;
+		this.number = options.userid || '';
 	    this.showRegister = false;
 	    this.textCurrent = 0;
 	    this.numObj = {};

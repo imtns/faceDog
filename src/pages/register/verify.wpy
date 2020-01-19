@@ -13,10 +13,10 @@
 			</view>
 			<form report-submit='true' bindsubmit='submitForm'>
 				<button class='verify2' form-type='submit' @tap='verify'>直接认证</button>
-				<button class='verify1' form-type='submit' @tap='goVideo'>视频认证</button>
-			</form>
-			<view class='text' style='margin-bottom:0'>直接认证：客服可能会加你的微信核实</view>
-			<view class='text' style='margin-top:0'>视频认证：客服不会主动添加你的微信</view>
+				<button class="verify1" disabled="{{profile.progress != 'refuse'}}" form-type='submit' @tap='goVideo'>尊享认证</button>
+			</form> 
+			<!-- <view class='text' style='margin-bottom:0'>直接认证：客服可能会加你的微信核实</view> -->
+			<view class='text' style='margin-top:0'>尊享认证：认证失败后可以选择此方式，或者直接前往“我的颜币”页选择</view>
 		</view>
 	</view>
 </template>
@@ -28,15 +28,16 @@
 	import { toast, sleep } from '@/utils';
 	export default class Verify extends wepy.page {
 	  config = {
-		navigationBarTitleText: '4/4',
-		usingComponents: {
+	    navigationBarTitleText: '4/4',
+	    usingComponents: {
 	      navbar: '../../components/navbar/index'
 	    }
 	  };
 
 	  data = {
 	    wechat: '',
-	    status: false
+		status: false,
+		profile:{}
 	  };
 
 	  components = {};
@@ -61,21 +62,34 @@
 	        wechat: this.wechat
 	      });
 	      console.log(data);
-	      toast('申请已提交，最晚1个工作日内完成完成审核');
-	      await sleep(2);
-	    //   wx.redirectTo({
-	    //     url: 'index'
-		//   });
-		wepy.reLaunch({ url: '/pages/index' });
-		
-	    //   wepy.redirectTo({ url: '/pages/index' });
+	      wx.requestSubscribeMessage({
+	        tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
+	        success: async () => {
+	          toast('申请已提交，最晚1个工作日内完成完成审核');
+	          await sleep(2);
+	          wepy.reLaunch({ url: '/pages/index' });
+	        }
+	      });
+
+	      //   wx.redirectTo({
+	      //     url: 'index'
+	      //   });
+
+	      //   wepy.redirectTo({ url: '/pages/index' });
 	    },
 	    goVideo() {
-	      if (!this.wechat) {
-	        toast('微信号不能为空');
-	        return;
-	      }
-	      wepy.navigateTo({ url: `uploadVideo?wechat=${this.wechat}` });
+	      wepy.navigateTo({ url: '/pages/coin/index' });
+	      //   if (!this.wechat) {
+	      //     toast('微信号不能为空');
+	      //     return;
+	      //   }
+	      //   let that = this;
+	      //   wx.requestSubscribeMessage({
+	      //     tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
+	      //     success() {
+	      //       wepy.navigateTo({ url: `uploadVideo?wechat=${that.wechat}` });
+	      //     }
+	      //   });
 	    }
 	  };
 
@@ -88,7 +102,8 @@
 	  async onLoad() {
 	    let data = await get(USER_VERIFY);
 	    // console.error(data);
-	    this.status = data.general;
+		this.status = data.general;
+		this.profile  = wx.getStorageSync('profile');
 	    this.$apply();
 	  }
 

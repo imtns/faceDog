@@ -22,9 +22,9 @@
             <view class="d">
                 <view class="contact">
                     <view>关注微信公众号</view>
-                    <view>facedogclub</view>
+                    <view>颜狗</view>
                 </view>
-                <view class="copy"  @tap="copy('facedogclub')">复制</view>
+                <view class="copy"  @tap="copy('颜狗')">复制</view>
             </view>
             <view class="title m">商务、推广、合作以下方式联系客服：</view>
             <view class="d">

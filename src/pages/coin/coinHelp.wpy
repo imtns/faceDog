@@ -1,0 +1,66 @@
+<!--  -->
+<template>
+	<navbar title="获取颜币"></navbar>
+	<view class='wrapper'>
+		<view class="content">
+			<view class="block">您可以通过以下方式获得颜币：</view>
+			<view class="block">1、认证通过，一次性获得200颜币；</view>
+			<view class="block">2、完成每天20次PK，可以获得100颜币；</view>
+			<view class="block">3、每次被动PK胜利，可以获得20颜币；</view>
+			<view class="block">4、每邀请1位用户注册并通过认证，可以获得300颜币；</view>
+			<view class="block">5、选择“颜币礼包”，可以一次性获得1000颜币，每个账号仅限一次；</view>
+			<view class="block">6、选择“特权认证”，可以一次性获得3000颜币，每个账号仅限一次。</view>
+			<view class="block">
+				<view>颜币可以用来向其他用户发红包索要微信，也可以在未来的版本中兑换礼物和提现现金。</view>
+				<view>更多详细介绍请关注微信服务号“颜狗”了解。</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	export default class LikeHelp extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '累计点击次数',
+	    usingComponents: {
+	      navbar: '../../components/navbar/index'
+	    }
+	  };
+
+	  data = {
+	    time: {}
+	  };
+
+	  components = {};
+
+	  methods = {};
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  async onLoad() {
+	  }
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='less'>
+	.wrapper {
+	  width: 100%;
+	  padding-top: 100rpx;
+	  .block {
+	    .title {
+	      margin-bottom: 10rpx;
+	    }
+	    margin: 0 50rpx;
+	    color: #5a5a5a;
+	    font-size: 26rpx;
+	    margin-bottom: 10rpx;
+	  }
+	}
+</style>

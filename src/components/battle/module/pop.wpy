@@ -2,7 +2,7 @@
 <template>
 	<view class='pop'>
 		<view class="update-tip">
-			<text>距离下次更新 {{countdown}}</text>
+			<text>每天凌晨1点刷新</text>
 		</view>
 		<view class="text">辛苦啦~ {{profile.nick_name}}</view>
 		<view class="text">我们已经帮你送出了你的喜欢
@@ -26,16 +26,18 @@
 
 <script>
 	import wepy from 'wepy';
-	import { countDown } from '@/utils';
+	// import { countDown } from '@/utils';
 	export default class Pop extends wepy.component {
 	  props = {};
 
 	  data = {
 	    profile: null,
-	    countdown: countDown()
+	    // countdown: countDown(),
 	  };
 
-	  components = {};
+	  components = {
+	    
+	  };
 
 	  methods = {
 	    toRecommend() {
@@ -53,12 +55,13 @@
 	  computed = {};
 
 	  onLoad() {
-	    setInterval(() => {
-	      if (wepy.$appConfig.isProd) {
-	        this.countdown = countDown();
-	        this.$apply();
-	      }
-	    }, 1000);
+	    // setInterval(() => {
+	    //   if (wepy.$appConfig.isProd) {
+	    //     this.countdown = countDown();
+	    //     this.$apply();
+	    //   }
+	    // }, 1000);
+
 	    this.profile = wepy.getStorageSync('profile');
 	    this.$apply();
 	  }

@@ -97,7 +97,7 @@ export default class MyCard extends wepy.page {
             this.ready = false;
             this.$apply();
 
-            // await wepy.saveImageToPhotosAlbum({ filePath: path });
+            await wepy.saveImageToPhotosAlbum({ filePath: path });
             // console.error(path);
             wx.previewImage({
                 current: path, // 当前显示图片的http链接

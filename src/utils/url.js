@@ -72,3 +72,15 @@ export const BATTLE_PASS = '/api/face/double_pass';
 export const GET_COIN = '/api/user/coin';
 // 发送微信请求
 export const ASK_WECHAT = '/api/user/ask_wechat';
+// 发送微信请求列表
+export const SEND_WECHAT_LIST = '/api/user/send_wechat_list';
+// 收到的微信请求列表
+export const GET_WECHAT_LIST = '/api/user/get_wechat_list';
+// 同意微信请求
+export const SEND_WECHAT = '/api/user/send_wechat';   
+// 测试页面
+export const TEST_PRIVILEGE = '/api/v1.5/user/edit_privilege';  
+// 测试页面
+export const TEST_CHARGE = '/api/v1.5/user/recharge';  
+// 发送消息定时推送
+export const SEND_UNREAD_MESSAGE = '/api/v1.5/user/send_unread_message';

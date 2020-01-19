@@ -10,47 +10,58 @@
 			</image>
 			<block wx:if="{{type=='coin'}}">
 				<view class="text">
-					<view>喷火的杰尼龟 收到了你的微信号</view>
-					<view>你的颜币数值增加了200</view>
+					<view>{{userName}} 收到了你的微信号</view>
+					<view>你的颜币增加了200，记得去提现哦😢</view>
 				</view>
+				<image class="button iknow" src="https://images.facedog.cn/public/notify/btn-iknow.png" mode="scaleToFill" @tap="closeRefresh">
+				</image>
 			</block>
 			<block wx:if="{{type=='refund'}}">
-				<view class="text">
-					<view>喷火的杰尼龟 超过7天没有处理</view>
-					<view>你的100颜币已被收回</view>
+				<view class="text-wrap refund">
+					<view class="text">{{userName}} 没有及时查看你的请求😢</view>
+					<view class="text">不过还好，消耗的颜币已退回账户里啦😊</view>
 				</view>
 			</block>
 			<block wx:if="{{type=='invite'}}">
-				<view class="text" style="margin-top:10rpx">
-					<view>喷火的杰尼龟 向你发送了200颜币</view>
-					<view>请求与你交换微信</view>
+				<view class="text-wrap" style="margin-top:10rpx">
+					<view class="text">{{userName}} 向你发送了200颜币</view>
+					<view class="text">你愿意给TA你的微信么？（7天后自动退还）</view>
 				</view>
-				<view class="input-box">
-					<input type="text" placeholder="点击输入" value="{{wechat}}" @input="inputChange" class="input">
+				<view class="input-wrapper">
+					<view class="input-box">
+						<input type="text" placeholder="点击输入" value="{{myWechat}}" @input="inputMyWechatChange" class="input">
+					</view>
+					<!-- <view class="button" style="background:{{bgColor[type]}}" @tap="buttonClick"> -->
+					<image class="button" src="https://images.facedog.cn/public/notify/btn-send.png" mode="scaleToFill" @tap="sendWechat">
+					</image>
+					<!-- </view> -->
 				</view>
 			</block>
 			<block wx:if="{{type=='agree'}}">
 				<view class="text" style="margin-top:10rpx">
-					<view>喷火的杰尼龟 同意了你的请求</view>
+					<view>{{userName}} 同意和你交换微信啦✌️</view>
 				</view>
-				<view class="input-box" style="margin-top:20rpx;">
-					<input type="text" value="{{wechat}}" @input="inputChange" placeholder="点击输入" class="input">
+				<view class="input-wrapper">
+					<view class="input-box">
+						<input type="text" placeholder="点击输入" disabled value="{{wechat}}" @input="inputChange" class="input">
+					</view>
+					<!-- <view class="button" style="background:{{bgColor[type]}}" @tap="buttonClick"> -->
+					<image class="button" src="https://images.facedog.cn/public/notify/btn-copy.png" mode="scaleToFill" @tap="copyWechat">
+					</image>
+					<!-- </view> -->
 				</view>
 			</block>
-			<view class="button" style="background:{{bgColor[type]}}" @tap="copy">
-				<image src="https://images.facedog.cn/public/notify/btn-{{type}}.png?1" style="width:{{type=='coin'?'100rpx':'66rpx'}}" mode="scaleToFill" >
-				</image>
-			</view>
 		</view>
 	</view>
 </template> 
 
 <script>
 	import wepy from 'wepy';
+	import { toast } from '@/utils';
+	import { get, post } from '@/utils/request';
+	import { SEND_WECHAT_LIST, GET_WECHAT_LIST, SEND_WECHAT } from '@/utils/url';
 	export default class Notify extends wepy.component {
-	  props = {
-		 
-	  };
+	  props = {};
 
 	  data = {
 	    bgColor: {
@@ -68,23 +79,32 @@
 	    height: {
 	      coin: '445rpx',
 	      invite: '366rpx',
-	      refund: '395rpx', 
+	      refund: '395rpx',
 	      agree: '415rpx'
 	    },
-	    type: "",
-	    wechat: ''
+	    type: '',
+	    wechat: '',
+	    userid: '',
+	    userName: '',
+	    myWechat: ''
 	  };
 
 	  components = {};
 
 	  methods = {
-		close(){
-			this.$emit('closeNotify')
-		},
-	    inputChange({ detail }) { 
+	    close() {
+	      this.$emit('closeNotify',false);
+	    },
+	    closeRefresh() {
+	      this.$emit('closeNotify', true);
+	    },
+	    inputMyWechatChange({ detail }) {
+	      this.myWechat = detail.value;
+	    },
+	    inputChange({ detail }) {
 	      this.wechat = detail.value;
 	    },
-	    copy() {
+	    copyWechat() {
 	      wx.setClipboardData({
 	        data: this.wechat,
 	        success: res => {
@@ -93,15 +113,33 @@
 	          });
 	        }
 	      });
-		},
-		setType(type){
-			this.type = type
-		}
+	    },
+	    buttonClick() {
+	      post(SEND_WECHAT, {
+	        user_id: this.userid,
+	        wechat: this.wechat
+	      });
+	    },
+	    setData(type, user) {
+	      this.type = type;
+	      this.userid = user._id;
+	      this.wechat = user.wechat;
+	      this.userName = user.nick_name;
+	      this.myWechat = user.myWechat;
+	    },
+	    setUserid(userid) {
+	      this.userid = userid;
+	    },
+	    sendWechat() {
+	      post(SEND_WECHAT, {
+	        user_id: this.userid,
+	        wechat: this.myWechat
+	      });
+	      this.type = 'coin';
+	    }
 	  };
 
-	  events = {
-
-	  };
+	  events = {};
 
 	  watch = {};
 
@@ -143,6 +181,7 @@
 	    position: relative;
 	    display: inline-block;
 	    text-align: center;
+
 	    .close {
 	      position: absolute;
 	      width: 54rpx;
@@ -156,39 +195,60 @@
 	      margin-top: 30rpx;
 	    }
 	    .text {
-	      margin-top: 43rpx;
-	      color: #8e8e8e;
-	      font-size: 28rpx;
+	      color: #5f5f5f;
+	      font-size: 30rpx;
+	      margin: 10rpx auto;
 	    }
-	    .input-box {
-	      width: 503rpx;
-	      height: 57rpx;
-	      background: url(https://images.facedog.cn/public/notify/input-frame.png);
-	      background-size: cover;
-	      margin: 30rpx auto;
-	      display: flex;
-	      align-items: center;
-	      .input {
-	        width: 290rpx;
-	        text-align: left;
-	        margin-left: 170rpx;
+	    .text-wrap {
+	      &.refund {
+	        margin-top: 70rpx;
+	        .text {
+	          color: #5f5f5f;
+	          font-size: 30rpx;
+	          margin: 10rpx auto;
+	        }
+	      }
+	      .text {
+	        margin-top: 33rpx;
+	        &:nth-child(2) {
+	          margin-top: 30rpx;
+	        }
+	        color: #8e8e8e;
+	        font-size: 28rpx;
 	      }
 	    }
-	    .button {
-	      position: absolute;
-	      bottom: 38rpx;
+	    .iknow {
+	      margin-top: 10rpx;
+	      width: 154rpx;
+	      height: 75rpx;
+	    }
+	    .input-wrapper {
+	      float: left;
+	      width: 100%;
+	      margin-top: 50rpx;
 	      display: flex;
-	      justify-content: center;
 	      align-items: center;
-	      left: 50%;
-	      transform: translateX(-50%);
-	      padding: 20rpx 25rpx;
-	      box-shadow: 0px 3rpx 10rpx rgba(39, 39, 39, 0.31);
-	      opacity: 1;
-	      border-radius: 28px;
-	      image {
-	        width: 66rpx;
-	        height: 33rpx;
+	      .button {
+	        float: left;
+	        width: 109rpx;
+	        height: 71rpx;
+	      }
+	      .input-box {
+	        width: 332rpx;
+	        height: 53rpx;
+	        margin-left: 120rpx;
+	        margin-right: 17rpx;
+	        background: url(https://images.facedog.cn/public/notify/notify-wechat-frame.png);
+	        background-size: cover;
+	        float: left;
+	        display: flex;
+	        align-items: center;
+	        .input {
+	          width: 290rpx;
+	          text-align: left;
+	          font-size: 22rpx;
+	          margin-left: 80rpx;
+	        }
 	      }
 	    }
 	  }

@@ -4,6 +4,16 @@
 		<empty></empty>
 	</block> -->
 	<view class='wrapper'>
+		<view class="chat-box">
+			<image class="icon" @tap.capture.stop="goProfile('颜币红包')" src="https://images.facedog.cn/public/battle/redpacket.png" mode="aspectFill"></image>
+			<view class="msg" @tap.capture.stop="onClick('颜币红包')">
+				<view class="name">颜币红包</view>
+				<view class="content"></view>
+			</view>
+			<view class="right-part">
+				<view class="time"></view>
+			</view>
+		</view>
 		<repeat for="{{list}}" key="index" index="index" item="item">
 			<van-swipe-cell class="swipe" id="{{item.To_Account}}" async-close data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
 				<view class="chat-box {{index==list.length-1?'last':''}}">
@@ -43,13 +53,7 @@
 	  props = {};
 
 	  data = {
-	    list: [
-	      {
-	        C2cImage: 'https://images.facedog.cn/public/battle/redpacket.png',
-	        To_Account: '颜币红包',
-	        C2cNick: '颜币红包'
-	      }
-	    ],
+	    list: [],
 	    initLength: 0,
 	    unread: 0,
 	    touch: false,
@@ -64,6 +68,10 @@
 	      this.touch = true;
 	    },
 	    goProfile(id) {
+	      if (id == '颜币红包') {
+	        wepy.navigateTo({ url: '/pages/redPacket/list' });
+	        return;
+	      }
 	      if (id === 'administrator') return;
 	      wx.navigateTo({
 	        url: 'battle/profile?dentifier=' + id,
@@ -73,7 +81,7 @@
 	      });
 	    },
 	    async getChatList(data) {
-	      console.log('data', data);
+	      console.log('data:::::::', data);
 	      data.forEach(item => {
 	        item.C2cNick = decodeURIComponent(item.C2cNick);
 	        item.MsgShow = decodeURIComponent(item.MsgShow);
@@ -84,22 +92,19 @@
 	          item.C2cNick = '颜狗客服';
 	        }
 	      });
-	      this.list = [
-	        {
-	          C2cImage: 'https://images.facedog.cn/public/battle/redpacket.png',
-	          To_Account: '颜币红包',
-	          C2cNick: '颜币红包'
-	        }
-	      ];
-		//   this.list.push(...data);
-		  this.list = data;
-	      this.list.sort((x, y) => {
+	      data.sort((x, y) => {
 	        return x.To_Account === 'administrator'
 	          ? -1
 	          : y.To_Account === 'administrator'
 	            ? 1
 	            : 0;
 	      });
+	      //   data.unshift({
+	      //     C2cImage: 'https://images.facedog.cn/public/battle/redpacket.png',
+	      //     To_Account: '颜币红包',
+	      //     C2cNick: '颜币红包'
+	      //   });
+	      this.list = data;
 	      this.initLength = data.length;
 	      this.$apply();
 	    },
@@ -142,18 +147,35 @@
 	                  image = item.Value;
 	                }
 	              });
-	              this.list.unshift({
-	                To_Account: msg.sess.id(),
-	                UnreadMsgCount: msg.sess.unread(),
-	                C2cNick: nick,
-	                C2cImage: image,
-	                MsgShow: decodeURIComponent(
-	                  msg.sess.msgs()[msg.sess.msgs().length - 1].elems[0].content
-	                    .text
-	                ),
-	                showTime: formatDateFromSeconds(msg.sess.time()),
-	                time: msg.sess.time()
-	              });
+	              if (this.list.length) {
+	                this.list.forEach(item => {
+	                  if (item.To_Account == msg.sess.id()) {
+	                    item.To_Account = msg.sess.id();
+	                    item.UnreadMsgCount = msg.sess.unread();
+	                    item.C2cNick = nick;
+	                    item.C2cImage = image;
+	                    item.MsgShow = decodeURIComponent(
+	                      msg.sess.msgs()[msg.sess.msgs().length - 1].elems[0]
+	                        .content.text
+	                    );
+	                    item.showTime = formatDateFromSeconds(msg.sess.time());
+	                    item.time = msg.sess.time();
+	                  }
+	                });
+	              } else {
+	                this.list.unshift({
+	                  To_Account: msg.sess.id(),
+	                  UnreadMsgCount: msg.sess.unread(),
+	                  C2cNick: nick,
+	                  C2cImage: image,
+	                  MsgShow: decodeURIComponent(
+	                    msg.sess.msgs()[msg.sess.msgs().length - 1].elems[0].content
+	                      .text
+	                  ),
+	                  showTime: formatDateFromSeconds(msg.sess.time()),
+	                  time: msg.sess.time()
+	                });
+	              }
 	              this.$apply();
 	            }
 	          );
@@ -180,6 +202,8 @@
 	                ) {
 	                  item.MsgShow = decodeURIComponent(msg.elems[0].content.text);
 	                  item.showTime = formatDateFromSeconds(msg.sess.time());
+	                  item.UnreadMsgCount = item.UnreadMsgCount - 0 + 1;
+	                  this.$emit('unreadSet', item.UnreadMsgCount);
 	                  item.time = msg.sess.time();
 	                }
 	              } else {
@@ -230,17 +254,15 @@
 	        );
 	      }
 
-	      //   console.log('currentPage:', url);
-	      //   if (url != 'pages/chat/chat' && url != 'pages/chat/becomeFriend') {
-	      //     this.$emit('unreadSet', unread);
-	      //   }
+	      console.log('currentPage:', url);
+	      if (url != 'pages/chat/chat' && url != 'pages/chat/becomeFriend') {
+	        this.$emit('unreadSet', unread);
+	      }
 	      this.$apply();
 	    },
 	    onClick(id, name, icon, nickname, unread) {
 	      if (id == '颜币红包') {
-	        wx.navigateTo({
-	          url: `redPacket/list`
-	        });
+	        wepy.navigateTo({ url: '/pages/redPacket/list' });
 	        return;
 	      }
 	      if (unread) {
@@ -312,8 +334,8 @@
 	      this.$emit('unreadSet', unread);
 	      this.$apply();
 	    });
-	    const result = await get(FRIENDS_LIST);
-	    this.friendList = result;
+	    // const result = await get(FRIENDS_LIST);
+	    // this.friendList = result;
 	    this.$apply();
 	  }
 
@@ -371,7 +393,7 @@
 	    .msg {
 	      margin-right: auto;
 	      margin-left: 30rpx;
-	      width: 450rpx;
+	      width: 400rpx;
 	      .name {
 	        font-size: 31rpx;
 	        font-family: PingFang SC;

@@ -63,8 +63,8 @@
 	import webimhandler from '@/utils/handler';
 	import { formatDateFromSeconds, toast, getAge } from '@/utils';
 	import { Event } from '@/utils/event.js';
-	import { PROFILE } from '@/utils/url';
-	import { get } from '@/utils/request';
+	import { PROFILE,SEND_UNREAD_MESSAGE } from '@/utils/url';
+	import { get,post } from '@/utils/request';
 
 	var loading = false;
 	export default class Chat extends wepy.page {
@@ -150,7 +150,9 @@
 	        //     that.msgList.pop();
 	        //     return;
 	        // }
-
+			post(SEND_UNREAD_MESSAGE,{
+				open_id:that.id
+			})
 	        var skey = that.id; // 拼装 skey
 	        var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
 	        var selSess = sessMap[skey]; // 获取 Session 的实例

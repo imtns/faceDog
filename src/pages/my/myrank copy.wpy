@@ -232,7 +232,7 @@ export default class Example extends wepy.page {
     }
     onShareAppMessage() {
 	    let user = wx.getStorageSync('profile') || '';
-		let num = Math.floor(Math.random() * 2) + 1;
+		let num = Math.floor(Math.random() * 4) + 1;
 		
 	    return {
 	      title: num == 1?'你这么美，不来看看吗':'只有好看的人才能收到',

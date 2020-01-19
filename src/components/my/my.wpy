@@ -40,14 +40,16 @@
 					<text class="text value">{{profile.login}}</text>
 					<text class="text label">累计登录</text>
 				</view>
-				<view class="item">
-					<image src="https://images.facedog.cn/public/profile/box-2.png?" mode="scaleToFill" lazy-load="false">
+				<view class="item" @tap="toMyCoin">
+					<image src="https://images.facedog.cn/public/profile/box-2.png?2" mode="scaleToFill" lazy-load="false">
 					</image>
 					<text class="text value">{{profile.coin}}</text>
 					<text class="text label">我的颜币</text>
-					<text class="text unopen">功能未开启</text>
+					<image class="icon-new" src="https://images.facedog.cn/public/my/icon-new.png?2" mode="scaleToFill" lazy-load="false">
+					</image>
+					<!-- <text class="text unopen">功能未开启</text> -->
 				</view>
-				<view class="item">
+				<view class="item" @tap="addDebugCount1">
 					<image src="https://images.facedog.cn/public/profile/box-3.png?" mode="scaleToFill" lazy-load="false">
 					</image>
 					<text class="text value">{{profile.win}}</text>
@@ -79,8 +81,8 @@
             </view>
         </view>
         <view class="line"></view> -->
-		<view class="nav-item {{active[0]?'active':''}}" @touchstart="touchstart(0)" @touchend="touchend(0)" @tap="redirect('propaganda')">
-			<image src="https://images.facedog.cn/public/profile/share.png?1" mode="scaleToFill" lazy-load="false">
+		<view class="nav-item {{active[0]?'active':''}}" @touchstart="touchstart(0)" @touchend="touchend(0)" @tap="redirect('invite')">
+			<image style="height:31rpx;" src="https://images.facedog.cn/public/profile/share2.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
@@ -100,7 +102,13 @@
 				</view>
 			</navigator>
 		</view>
-
+		<view class="nav-item" wx:if="{{debug1 >= 7}}">
+			<navigator url="test/testCharge" open-type="navigate" hover-class="none">
+				<view class="item">
+					<view class="title">充值</view>
+				</view>
+			</navigator>
+		</view>
 		<!-- <view class="line"></view> -->
 		<!-- </navigator> -->
 		<!-- <navigator url="test" open-type="navigate" hover-class="none">
@@ -120,7 +128,7 @@
 	import { Event } from '@/utils/event.js';
 	export default class My extends wepy.component {
 	  data = {
-		active:{},
+	    active: {},
 	    progress: {
 	      profile: '未认证',
 	      certify: '未认证',
@@ -136,6 +144,7 @@
 	      5: '#766AFB'
 	    },
 	    debug: 0,
+	    debug1: 0,
 	    level: 1,
 	    clickCount: 0,
 	    levelPercent: 0,
@@ -145,17 +154,23 @@
 	  components = {};
 
 	  methods = {
-		touchstart(index){
-			this.active[index] = true;
-		},
-		touchend(index){
-			this.active[index] = false;
-		},
+	    touchstart(index) {
+	      this.active[index] = true;
+	    },
+	    touchend(index) {
+	      this.active[index] = false;
+	    },
 	    toRules() {
 	      wepy.navigateTo({ url: 'my/likeHelp' });
 	    },
+	    toMyCoin() {
+	      wepy.navigateTo({ url: '/pages/coin/index' });
+	    },
 	    addDebugCount() {
 	      this.debug++;
+	    },
+	    addDebugCount1() {
+	      this.debug1++;
 	    },
 	    checkVerify(state) {
 	      console.log(state);
@@ -165,10 +180,10 @@
 	      }
 	    },
 	    goProfile() {
-	    //   if (!wepy.getStorageSync('hasProfile')) {
-	    //     Event.trigger('showVerify', true);
-	    //     return;
-	    //   }
+	      //   if (!wepy.getStorageSync('hasProfile')) {
+	      //     Event.trigger('showVerify', true);
+	      //     return;
+	      //   }
 	      wx.navigateTo({
 	        url: 'battle/profile?id=' + this.profile._id,
 	        success: result => {},
@@ -185,10 +200,14 @@
 	      if (name === 'mymoment') {
 	        // wepy.navigateTo({
 	        //   url: `/pages/my/mymoment?id=${this.profile._id}`
-			// });
-			wepy.navigateTo({
+	        // });
+	        wepy.navigateTo({
 	          url: `/pages/chat/friendList`
-			});
+	        });
+	        return;
+	      }
+	      if (name == 'invite') {
+	        wepy.navigateTo({ url: `/pages/invite/index` });
 	        return;
 	      }
 	      wepy.navigateTo({ url: `my/${name}` });
@@ -359,7 +378,14 @@
 	    .item {
 	      width: 204rpx;
 	      height: 204rpx;
-
+	      position: relative;
+	      .icon-new {
+	        width: 50rpx;
+	        position: absolute;
+	        left: 180rpx;
+	        top: 5rpx;
+	        height: 34rpx;
+	      }
 	      position: relative;
 	      margin: 0rpx 10rpx;
 	      background-color: white;
@@ -426,15 +452,15 @@
 	.nav-item {
 	  display: flex;
 	  flex-wrap: wrap;
-	  &.active{
-		  background:rgba(242,242,242,1);
+	  &.active {
+	    background: rgba(242, 242, 242, 1);
 	  }
 	  image {
 	    width: 100%;
 	    height: 40rpx;
 	  }
 	  width: 653rpx;
-	  padding:20rpx 0;
+	  padding: 20rpx 0;
 	  height: 84rpx;
 	  margin: 0rpx auto;
 	  justify-content: center;

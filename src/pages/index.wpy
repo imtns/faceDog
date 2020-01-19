@@ -36,6 +36,9 @@
 	<block wx:if="{{tabbarshow}}">
 		<tabbar :tabIndex.sync="selectedTab" />
 	</block>
+	<van-popup show="{{ showRedpacketLayer}}" bind:close="onClose">
+		<redpacketLayer />
+	</van-popup>
 	<van-toast id="van-toast" />
 	<van-dialog id="van-dialog" />
 </template>
@@ -55,6 +58,7 @@
 	import { getAge } from '@/utils';
 	import { Event } from '@/utils/event.js';
 	import verify from '@/components/battle/module/verify';
+	import redpacketLayer from '@/components/battle/module/redpacket';
 	let tabClicked = false;
 	let optionFrom = false;
 	// import { toast } from '@/utils';
@@ -87,7 +91,8 @@
 	    discover,
 	    chat,
 	    my,
-	    verify
+	    verify,
+	    redpacketLayer
 	  };
 
 	  data = {
@@ -105,7 +110,8 @@
 	    tabSelect: 0,
 	    pageTitle: '',
 	    loaded: false,
-	    showHome: true
+	    showHome: true,
+	    showRedpacketLayer: false
 	  };
 	  computed = {
 	    now() {
@@ -182,6 +188,9 @@
 	    return r;
 	  }
 	  events = {
+	    closeRedPacketLayer() {
+	      this.showRedpacketLayer = false;
+	    },
 	    verifyShow() {
 	      this.verify = true;
 	    },
@@ -281,15 +290,22 @@
 	      this.verify = status;
 	      this.$apply();
 	    });
+	    let showRedpacket = wx.getStorageSync('showRedpacket');
+	    if (showRedpacket != 'ok') {
+	      setTimeout(() => {
+	        this.showRedpacketLayer = true;
+	        this.$apply();
+	      }, 5000);
+	    }
 	  }
 	  onShareAppMessage() {
 	    let user = wx.getStorageSync('profile') || '';
-	    let num = Math.floor(Math.random() * 2) + 1;
+	    let num = Math.floor(Math.random() * 6) + 1;
 
 	    return {
 	      title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
 	      path: `/pages/home?userid=${user ? user.ID : ''}`,
-	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg`,
+	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?1`,
 	      success: res => {
 	        console.log('转发成功', res);
 	      },
@@ -299,7 +315,7 @@
 	    };
 	  }
 	  onShow() {
-	    this.setProfile();
+	    this.setProfile();    
 	    this.$invoke('chat', 'initChat');
 	    if (this.selectedTab === 0) {
 	      //   this.$invoke('chat', 'refreshData');

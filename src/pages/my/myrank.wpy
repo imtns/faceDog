@@ -184,7 +184,7 @@
 	      this.loading = false;
 	      this.ready = false;
 	      this.$apply();
-	      // await wepy.saveImageToPhotosAlbum({ filePath: path });
+	      await wepy.saveImageToPhotosAlbum({ filePath: path });
 	      wx.previewImage({
 	        current: path, // 当前显示图片的http链接
 	        urls: [path] // 需要预览的图片http链接列表
@@ -230,12 +230,12 @@
 	  }
 	  onShareAppMessage() {
 	    let user = wx.getStorageSync('profile') || '';
-		let num = Math.floor(Math.random() * 2) + 1;
+		let num = Math.floor(Math.random() * 6) + 1;
 		
 	    return {
 	      title: num == 1?'你这么美，不来看看吗':'只有好看的人才能收到',
 	      path: `/pages/home?userid=${user ? user.ID : ''}`,
-	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg`,
+	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?1`,
 	      success: res => {
 	        console.log('转发成功', res);
 	      },

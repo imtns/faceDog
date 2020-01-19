@@ -58,7 +58,12 @@
 	      'pages/chat/likeme', //喜欢我的
 	      'pages/chat/friendList',
 		//   'pages/notify/notify',
-		  'pages/redPacket/list' // 红包列表
+		  'pages/redPacket/list', // 红包列表
+		  'pages/invite/index', //邀请奖励
+		  'pages/coin/index', //我的颜币
+		  'pages/coin/coinHelp', //获取颜币说明
+		  'pages/test/testCharge',
+		  'pages/rank/rankHelp'
 	    ],
 	    window: {
 	      backgroundTextStyle: 'light',
