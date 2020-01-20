@@ -230,12 +230,12 @@
 	  }
 	  onShareAppMessage() {
 	    let user = wx.getStorageSync('profile') || '';
-		let num = Math.floor(Math.random() * 6) + 1;
+		let num = Math.floor(Math.random() * 5) + 1;
 		
 	    return {
 	      title: num == 1?'你这么美，不来看看吗':'只有好看的人才能收到',
 	      path: `/pages/home?userid=${user ? user.ID : ''}`,
-	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?1`,
+	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
 	      success: res => {
 	        console.log('转发成功', res);
 	      },

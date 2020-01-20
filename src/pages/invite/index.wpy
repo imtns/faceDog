@@ -18,8 +18,10 @@
 				继续邀请<text style="font-size:50rpx;color:#5572FA;">2</text>位好友可以进红包群
 			</view>
 			<view class="progress-box">
-				<view class="box">
-					<image src="{{list[0].avatar}}" mode="scaleToFill" lazy-load="false">
+				<view class="box {{!list[0]?'grey':''}}">
+					<image wx:if="{{list[0]}}" src="{{list[0].avatar}}" mode="scaleToFill" lazy-load="false">
+					</image>
+					<image wx:else src="https://images.facedog.cn/public/invite/progress-circle.png" mode="scaleToFill" lazy-load="false">
 					</image>
 					<view class="text">恭喜你</view>
 					<view class="text">获得300颜币</view>
@@ -28,14 +30,10 @@
 					<image src="https://images.facedog.cn/public/invite/progress-line.png" mode="scaleToFill" lazy-load="false">
 					</image>
 				</view>
-				<view class="box" wx:if="{{list[1]}}">
-					<image src="{{list[1].avatar}}" mode="scaleToFill" lazy-load="false">
+				<view class="box {{!list[1]?'grey':''}}">
+					<image  wx:if="{{list[1]}}" src="{{list[1].avatar}}" mode="scaleToFill" lazy-load="false">
 					</image>
-					<view class="text">恭喜你</view>
-					<view class="text">获得300颜币</view>
-				</view>
-				<view class="box grey" wx:else>
-					<image src="https://images.facedog.cn/public/invite/progress-circle.png" mode="scaleToFill" lazy-load="false">
+					<image wx:else src="https://images.facedog.cn/public/invite/progress-circle.png" mode="scaleToFill" lazy-load="false">
 					</image>
 					<view class="text">恭喜你</view>
 					<view class="text">获得300颜币</view>
@@ -44,8 +42,8 @@
 					<image src="https://images.facedog.cn/public/invite/progress-line.png" mode="scaleToFill" lazy-load="false">
 					</image>
 				</view>
-				<view class="box {{list[2]?'':'grey'}}">
-					<image @tap="previewCard" src="{{list[2]?'https://images.facedog.cn/public/invite/wechat-card-icon.png':'https://images.facedog.cn/public/invite/qrcode.png?1'}}" mode="scaleToFill" lazy-load="false">
+				<view class="box {{list[1]?'':'grey'}}">
+					<image @tap="previewCard" src="{{list[1]?'https://images.facedog.cn/public/invite/wechat-card-icon.png':'https://images.facedog.cn/public/invite/qrcode.png?1'}}" mode="scaleToFill" lazy-load="false">
 					</image>
 					<view class="text">恭喜你</view>
 					<view class="text">进入红包群</view>
@@ -153,11 +151,11 @@
 	  }
 	  onShareAppMessage() {
 	    let user = wx.getStorageSync('profile') || '';
-	    let num = Math.floor(Math.random() * 6) + 1;
+	    let num = Math.floor(Math.random() * 5) + 1;
 	    return {
 	      title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
 	      path: `/pages/home?userid=${user ? user.ID : ''}`,
-	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?1`,
+	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
 	      success: res => {
 	        console.log('转发成功', res);
 	      },

@@ -555,7 +555,7 @@
 	          console.warn('isIphoneX !!!!!!!');
 	          that.isphoneX = true;
 	          
-	        }else if(res.safeArea.top > 28){
+	        }else if(res.safeArea.top > 24){
 				that.isphoneX = true;
 			}
 			that.$apply();

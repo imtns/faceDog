@@ -16,7 +16,7 @@
 				</swiper-item>
 			</repeat>
 		</swiper>
-		<view class="wechat-icon" @tap="askWechat">
+		<view class="wechat-icon" @tap="askWechat" wx:if="{{!self}}">
 			<image src="https://images.facedog.cn/public/profile/wechat{{profile.ask_wechat?'-disable':''}}.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
