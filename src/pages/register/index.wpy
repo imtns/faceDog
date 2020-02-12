@@ -1,13 +1,14 @@
 <!--  -->
 <template>
 	<view class='container'>
+		<!-- <view class="stopMoveCover" wx:if="{{isSwiperMoving}}"></view> -->
 		<view class="dog-wrap" wx:if="{{!showRegister}}">
 			<image class="wave {{initAnimation == 'init'?'ani':initAnimation=='loaded'?'anied':''}}" src="https://images.facedog.cn/public/register/wave.png" mode="scaleToFill">
 			</image>
 			<image class="dog {{initAnimation =='init' ?'ani':initAnimation=='loaded'?'anied':''}}" src="https://images.facedog.cn/public/register/dog.png" mode="scaleToFill">
 			</image>
 		</view>
-		<swiper class="swiper1" wx:if="{{!showRegister}}" current="{{textCurrent}}">
+		<swiper duration="100" class="swiper1" wx:if="{{!showRegister}}" current="{{textCurrent}}" bindanimationfinish="bindanimationfinish" bindtransition="bindtransition">
 			<swiper-item catchtouchmove='catchTouchMove'>
 				<view class="swiper-item {{initAnimation && textCurrent==0?'ani-1':''}}">
 					<text class="text ani-1">
@@ -56,7 +57,7 @@
 				</view>
 			</swiper-item>
 		</swiper>
-		<swiper class="swiper2" wx:else current="{{current}}">
+		<swiper bindanimationfinish="bindanimationfinish" bindtransition="bindtransition" class="swiper2" wx:else current="{{current}}">
 			<swiper-item catchtouchmove='catchTouchMove'>
 				<view class="register-item">
 					<chooseGender />
@@ -113,7 +114,8 @@
 	    textCurrent: 0,
 	    numObj: {},
 	    initAnimation: false,
-	    timeout: null
+		timeout: null,
+		isSwiperMoving:false
 	  };
 
 	  components = {
@@ -124,6 +126,13 @@
 	  };
 
 	  methods = {
+		bindtransition(){
+			if(this.isSwiperMoving) return;
+			this.isSwiperMoving = true;
+		},
+		bindanimationfinish(){
+			this.isSwiperMoving = false;
+		},
 	    goVerify() {
 	      wepy.redirectTo({ url: 'verify' });
 	    },
@@ -171,7 +180,7 @@
 	      clearTimeout(timeout1);
 	      this.initAnimation = 'init';
 	      this.$apply();
-	    }, 500);
+	    }, 900);
 	    timeout = setTimeout(() => {
 	      clearTimeout(timeout);
 	      this.textCurrent = 1;
@@ -189,6 +198,15 @@
 	  swiper {
 	    height: 100%;
 	    width: 100%;
+	  }
+	  .stopMoveCover{
+		  width:100%;
+		  height: 100%;
+		  position: absolute;
+		  top:0;
+		  left:0;
+		  z-index: 1000;
+		  background: rgba(0, 0, 0,1);
 	  }
 	  width: 100%;
 	  height: 100vh;

@@ -38,20 +38,20 @@
 	        toast('昵称不能为空');
 	        return;
 	      }
-	      contentCheck(this.name).then(res => {
-	        console.log(res);
-	        if (!res) {
-	          toast('内容包含敏感内容，请重新输入');
-	          return;
-	        } else {
-	          this.$emit('changeStep', 2);
-	        }
-	      });
-
 	      wepy.setStorageSync('name', this.name);
-	      await post(SUBMIT_FORMID, {
-	        formId: e.detail.formId
-	      });
+	      //   contentCheck(this.name).then(res => {
+	      //     console.log(res);
+	      //     if (!res) {
+	      //       toast('内容包含敏感内容，请重新输入');
+	      //       return;
+	      //     } else {
+	      this.$emit('changeStep', 2);
+	      //     }
+	      //   });
+
+	      //   await post(SUBMIT_FORMID, {
+	      //     formId: e.detail.formId
+	      //   });
 	      //   let gender = wepy.getStorageSync('gender');
 	      //   let data = await post(USER_REGISTER, {
 	      //     nick_name: this.name,

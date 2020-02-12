@@ -63,7 +63,9 @@
 		  'pages/coin/index', //我的颜币
 		  'pages/coin/coinHelp', //获取颜币说明
 		  'pages/test/testCharge',
-		  'pages/rank/rankHelp'
+		  'pages/rank/rankHelp',
+		  'pages/discover/discover',
+		  'pages/discover/squareMessage'
 	    ],
 	    window: {
 	      backgroundTextStyle: 'light',
@@ -162,5 +164,8 @@
 <style lang="less">
 	.van-popup{
 		background-color: transparent !important;
+	}
+	.van-dialog__message{
+		background:white !important;
 	}
 </style>

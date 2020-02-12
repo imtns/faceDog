@@ -1,0 +1,160 @@
+<!--  -->
+<template>
+	<navbar title="广场消息">
+	</navbar>
+	<block wx:if="{{!list.length}}">
+		<empty></empty>
+	</block>
+	<view class='wrapper' wx:else>
+		<repeat for="{{list}}" key="index" index="index" item="item">
+			<view class="notify-box" @tap="redirect({{item.moment_id}})">
+				<image class="icon" @tap.stop="goProfile({{item.user_id}})" src="{{item.avatar}}" mode="aspectFill"></image>
+				<view class="msg">
+					<view class="name">{{item.nick_name}} {{type[item.type]}} 你的动态</view>
+					<view class="content">{{item.create_time}}</view>
+					<view class="delete" @tap.stop="read({{item._id}},{{item.type}},{{index}})">删除</view>
+				</view>
+				<view class="right-part">
+					<image class="thumb" src="{{item.image}}" mode="aspectFill"></image>
+				</view>
+				<!-- <view class="line" wx:if="{{index!=list.length-1}}"></view> -->
+			</view>
+		</repeat>
+	</view>
+	<van-toast id="van-toast" />
+</template>
+
+<script>
+import wepy from 'wepy';
+import empty from '@/components/empty';
+import { dialog, toast } from '@/utils';
+import { get, post } from '@/utils/request';
+import { USER_MSG_UNREAD, UPDATE_SQUAREMSG_STATUS } from '@/utils/url';
+import Toast from '@/components/vant/toast/toast';
+export default class SquareMessage extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+	  navbar: '../../components/navbar/index',
+	  'van-toast': '../../components/vant/toast/index'
+    }
+  };
+
+  data = {
+    list: [],
+    type: {
+      comment: '评论了',
+      like: '喜欢了',
+      reply: '回复'
+    }
+  };
+
+  components = {
+    empty
+  };
+  async initData() {
+    const result = await get(USER_MSG_UNREAD);
+    this.list = result;
+    this.$apply();
+  }
+  methods = {
+    goProfile(id) {
+      wepy.navigateTo({ url: `/pages/battle/profile?id=${id}` });
+    },
+    async read(id, type, index) {
+      try {
+        await post(USER_MSG_UNREAD, {
+          id,
+          unread_type: type
+        });
+        this.list.splice(index, 1);
+        Toast('删除成功');
+        this.$apply();
+      } catch (e) {}
+    },
+    redirect(id) {
+      wepy.navigateTo({ url: `/pages/ta/momentDetail?momentId=${id}` });
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    this.initData();
+    get(UPDATE_SQUAREMSG_STATUS);
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	page {
+	  background: #f8f6f9;
+	}
+	.wrapper {
+	  width: 750rpx;
+	  .notify-box {
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	    padding: 40rpx 30rpx 40rpx 30rpx;
+	    position: relative;
+	    background: white;
+	    margin: 20rpx;
+	    .line {
+	      width: 564rpx;
+	      height: 0px;
+	      border: 1rpx solid rgba(226, 225, 225, 1);
+	      position: absolute;
+	      bottom: 0rpx;
+	      right: 30rpx;
+	    }
+	    .icon {
+	      width: 100rpx;
+	      height: 100rpx;
+	      border-radius: 50%;
+	    }
+	    .msg {
+	      margin-right: auto;
+	      margin-left: 27rpx;
+	      width: 450rpx;
+	      .name {
+	        font-size: 28rpx;
+	        font-family: PingFang SC;
+	        font-weight: 600;
+	        color: rgba(0, 0, 0, 1);
+	      }
+	      .content {
+	        margin-top: 5rpx;
+	        font-size: 24rpx;
+	        font-family: PingFang SC;
+	        font-weight: 300;
+	        color: rgba(162, 162, 162, 1);
+	        text-overflow: ellipsis;
+	        white-space: nowrap;
+	        overflow: hidden;
+	      }
+	      .delete {
+	        margin-top: 8rpx;
+	        font-size: 24rpx;
+	        font-family: PingFang SC;
+	        font-weight: 300;
+	        color: rgba(229, 0, 17, 1);
+	      }
+	    }
+	    .right-part {
+	      display: flex;
+	      text-align: right;
+	      .thumb {
+	        width: 106rpx;
+	        height: 106rpx;
+	      }
+	    }
+	  }
+	}
+</style>

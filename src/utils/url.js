@@ -58,6 +58,8 @@ export const USER_VERIFY = '/api/user/justify';
 export const MY_FAVORITE = '/api/v1.5/face/favorites' // 收藏夹
 // 删除收藏夹
 export const DELETE_FAVORITE = '/api/v1.5/face/favorites/delete'
+// 删除喜欢我的
+export const DELETE_ENJOY = '/api/face/delete_enjoy'
 // 获取动态的详情
 export const GET_MOMENT_DETAIL = '/api/v1.5/discover'
 // 注册页获取数字
@@ -84,3 +86,10 @@ export const TEST_PRIVILEGE = '/api/v1.5/user/edit_privilege';
 export const TEST_CHARGE = '/api/v1.5/user/recharge';  
 // 发送消息定时推送
 export const SEND_UNREAD_MESSAGE = '/api/v1.5/user/send_unread_message';
+// 获取未读红包和广场消息 
+export const GET_UNREAD_MSG = '/api/v1.5/unread_message';
+// 修改广场未读消息状态
+export const UPDATE_SQUAREMSG_STATUS  = '/api/v1.5/modify_moment_status';
+// 修改红包未读消息状态
+export const UPDATE_REDPACKET_STATUS = '/api/v1.5/modify_ask_wechat_status';
+ 

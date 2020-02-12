@@ -1,0 +1,302 @@
+<!--  -->
+<template>
+	<navbar title="广场动态">
+	</navbar>
+	<view class="content-search">
+		<van-tabs class="tabs" bind:change="onChange">
+			<van-tab title="全部"></van-tab>
+			<van-tab title="同城"></van-tab>
+		</van-tabs>
+		<view class="right-part">
+			<view class="btn" @tap="mkPhoto">
+				<image src="https://images.facedog.cn/public/discover/publish.png" mode="scaleToFill" lazy-load="false">
+				</image> 发布
+			</view>
+			<view class="btn" @tap="sbowshowGender">
+				<image src="https://images.facedog.cn/public/discover/filter.png" mode="scaleToFill" lazy-load="false">
+				</image> 筛选
+			</view>
+		</view>
+	</view>
+	<block wx:if="{{loading}}">
+		<loadingHeart top="-160rpx" />
+	</block>
+	<!-- <scroll-view scroll-y class='discover' bindscrolltolower="pageTuring" bindscrolltoupper="refresh"> -->
+	<!-- <topBanner></topBanner> -->
+	<view class="card" wx:if="{{!loading}}">
+		<block wx:if="{{momentList.length}}">
+			<momentCard></momentCard>
+		</block>
+		<block wx:if="{{momentList.length === 0 && !loading}}">
+			<empty></empty>
+		</block>
+	</view>
+	</block>
+	<!-- <image class="make-photo" src="https://images.facedog.cn/public/discover/discover-add.png" @tap="mkPhoto"></image> -->
+	<!-- </scroll-view> -->
+	<!--筛选的弹窗-->
+	<van-popup class="warn-pop" show="{{ showGender }}" position="bottom" bind:click-overlay="closeshowGender">
+		<view class="warn" @tap="genderBy('')">全部</view>
+		<view class="warn" @tap="genderBy('same')">只看同性</view>
+		<view class="warn" @tap="genderBy('not')">只看异性</view>
+		<view class="warn last" @tap="closeshowGender">取消</view>
+	</van-popup>
+	<block wx:if="{{verify}}">
+		<verify />
+	</block>
+	<van-toast id="van-toast" />
+	<van-dialog id="van-dialog" />
+</template>
+
+<script>
+import { get } from '@/utils/request';
+import { DISCOVER_MOMENT_LIST } from '@/utils/url.js';
+import wepy from 'wepy';
+import { toast } from '@/utils';
+import { Event } from '@/utils/event.js';
+import topBanner from '@/components/discover/topBanner';
+import momentCard from '@/components/discover/momentCard';
+import empty from '@/components/empty';
+import verify from '@/components/battle/module/verify';
+import loadingHeart from '@/components/battle/module/loadingHeart';
+let nomore = false;
+export default class Discover extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    enablePullDownRefresh: true,
+    backgroundTextStyle: 'dark',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-collapse': '../../components/vant/collapse/index',
+      'van-collapse-item': '../../components/vant/collapse-item/index',
+      'van-toast': '../../components/vant/toast/index',
+      'van-dialog': '../../components/vant/dialog/index',
+      'van-popup': '../../components/vant/popup/index',
+      'van-tabs': '../../components/vant/tabs/index',
+      'van-tab': '../../components/vant/tab/index'
+    }
+  };
+  data = {
+    showGender: false,
+    momentList: [],
+    page: 1,
+    same_city: 0,
+    opposite: '',
+    loading: false,
+    verify: false,
+    show: false
+  };
+
+  components = {
+    topBanner,
+    momentCard,
+    empty,
+    verify,
+    loadingHeart
+  };
+  onClose() {
+    this.show = false;
+  }
+
+  watch = {};
+
+  computed = {};
+  onPullDownRefresh() {
+    // 触发下拉刷新时执行
+    console.log(111);
+    this.momentList = [];
+    nomore = false;
+    this.page = 1;
+    this.methods.initList.call(this, {
+      page: 1,
+      same_city: this.same_city,
+      opposite: this.opposite
+    });
+  }
+  onReachBottom() {
+    // 页面触底时执行
+    console.log(222);
+    this.pageTuring();
+  }
+  methods = {
+    genderBy(opposite) {
+      const same_city = this.same_city;
+      nomore = false;
+      this.page = 1;
+      this.opposite = opposite;
+      this.methods.initList.call(this, {
+        page: 1,
+        same_city,
+        opposite
+      });
+      this.showGender = false;
+    },
+    onChange(event) {
+      nomore = false;
+      this.page = 1;
+      console.log('event.detail.index', event.detail.index);
+      const { index } = event.detail;
+      if (+index === 0) {
+        this.same_city = 0;
+        this.methods.initList.call(this, {
+          page: 1,
+          same_city: 0
+        });
+      } else if (+index === 1) {
+        this.same_city = 1;
+        this.methods.initList.call(this, {
+          page: 1,
+          same_city: 1
+        });
+      }
+    },
+    closeshowGender() {
+      this.showGender = false;
+    },
+    sbowshowGender() {
+      this.showGender = true;
+    },
+    mkPhoto() {
+      let profile = wepy.getStorageSync('profile');
+      if (!profile || profile.progress == 'profile') {
+        this.verify = true;
+        return;
+      } else if (profile.progress !== 'finish') {
+        toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
+        return;
+      }
+      wepy.redirectTo({
+        url: '/pages/publish/publish'
+      });
+    },
+    async initList({ page = 1, same_city = 0, opposite = '' }) {
+      if (nomore) return;
+      // 请求动态列表
+      console.log('动态列表', this.momentList);
+      if (page == 1) {
+        this.loading = true;
+        this.momentList = [];
+        this.$apply();
+      }
+      const List = await get(DISCOVER_MOMENT_LIST, {
+        page,
+        same_city,
+        opposite
+      });
+      this.loading = false;
+      if (!List.length && page != 1) {
+        nomore = true;
+        toast('已经没有更多了~');
+      }
+      wx.stopPullDownRefresh();
+      this.momentList = this.momentList.concat(List);
+      console.log('动态列表', this.momentList);
+      this.$invoke('momentCard', 'setMomentList', this.momentList);
+      this.$apply();
+    },
+
+    refresh() {
+      // nomore = false;
+      // setTimeout(() => {
+      //     this.methods.initList.call(this, {
+      //         page: 1,
+      //         same_city: this.same_city,
+      //         opposite: this.opposite,
+      //     });
+      // }, 500);
+    }
+  };
+  pageTuring() {
+    this.methods.initList.call(this, {
+      page: (this.page += 1)
+    });
+    console.log(this.methods.initList);
+  }
+  onLoad() {
+    this.methods.initList.call(this, {
+      page: 1,
+      same_city: this.same_city,
+      opposite: this.opposite
+    });
+    Event.listen('showVerify', status => {
+      this.verify = status;
+      this.$apply();
+    });
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='less'>
+	.warn-pop {
+	  .warn {
+	    height: 120rpx;
+	    text-align: center;
+	    font-size: 32rpx;
+	    font-weight: 600;
+	    line-height: 120rpx;
+	    color: rgba(0, 0, 0, 1);
+	    background: white;
+	    border-bottom: 1px solid rgba(226, 225, 225, 1);
+	  }
+	}
+	// .discover {
+	//   height: 100vh;
+	.make-photo {
+	  display: block;
+	  position: fixed;
+	  width: 110rpx;
+	  height: 110rpx;
+	  bottom: 145rpx;
+	  right: 22rpx;
+	}
+	.card {
+	  padding-bottom: 5vh;
+	}
+	.content-search {
+	  display: flex;
+	  position: relative;
+	  justify-content: space-between;
+	  padding: 0 30rpx;
+	  .tabs {
+	    width: 230rpx;
+	    .van-tab--active {
+	      font-size: 42rpx !important;
+	      font-weight: 600 !important;
+	      z-index: 1;
+	    }
+	    .van-tabs__line {
+	      width: 77rpx !important;
+	      height: 10rpx !important;
+	      bottom: 28% !important;
+	      left: -4% !important;
+	    }
+	  }
+	  .right-part {
+	    position: absolute;
+	    right: 30rpx;
+	    top: 28rpx;
+	    display: flex;
+	    .btn {
+	      font-size: 30rpx;
+	      color: #000;
+	      display: flex;
+	      align-items: center;
+	      font-weight: bold;
+	      margin-left: 25rpx;
+	      image {
+	        width: 37rpx;
+	        height: 37rpx;
+	        margin-right: 5rpx;
+	      }
+	    }
+	  }
+	  // .change {
+	  //   line-height: 44px;
+	  //   color: rgba(158, 157, 157, 1);
+	  //   font-size: 14px;
+	  // }
+	}
+	// }
+</style>

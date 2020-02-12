@@ -18,11 +18,19 @@ Component({
 			// value: '/static/icon/icon_home.png'
 			value:'https://images.facedog.cn/public/battle/filter.png'
 		},
+		squareImage: {
+			type: String,
+			value:'https://images.facedog.cn/public/battle/squareImage.png'
+		},
 		extClass: {
 			type: String,
 			value: ''
 		},
 		showHome: {
+			type: Boolean,
+			value: false
+		},
+		showSquare: {
 			type: Boolean,
 			value: false
 		},
@@ -67,7 +75,8 @@ Component({
 	},
 	data: {
 		displayStyle: '',
-		showBack: false
+		showBack: false,
+		unread:false
 	},
 	attached: function attached() {
 		var _this = this;
@@ -98,6 +107,11 @@ Component({
 		if (pages.length > 1) {
 			this.setData({ showBack: true })
 		}
+		if (wx.getStorageSync('unread_moment') == 'ok') {
+			this.setData({
+				unread:true
+			})
+		}
 	},
 	methods: {
 		_showChange: function _showChange(show) {
@@ -118,6 +132,9 @@ Component({
 			// wx.reLaunch({
 			// 	url: '/pages/index/index'
 			// })
+		},
+		goSquareMessage: function () {
+			wx.navigateTo({ url: 'discover/squareMessage' });
 		},
 		//双击返回顶部
 		doubleClick(e) {

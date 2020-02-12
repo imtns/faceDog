@@ -175,19 +175,19 @@ function pad(num) {
 
 function countDown() {
 	var now = new Date;
-	if (now.getHours() > 12) {
-		start.setHours(23, 59, 59); 
-	} else {
-		start.setHours(12, '00', '00'); 
-	}
+	// if (now.getHours() > 12) {
+		// start.setHours(23, 59, 59); 
+	// } else { 
+		start.setHours(6, '00', '00'); 
+	// }
 	if (now > start) { // too late, go to tomorrow
 		start.setDate(start.getDate() + 1);
 	}
 	var remain = ((start - now) / 1000);
-	var hh = pad((remain / 60 / 60) % 60); 
+	var hh = pad((remain / 60 / 60) % 60);     
 	var mm = pad((remain / 60) % 60);
 	var ss = pad(remain % 60);
-	let time = hh + ":" + mm + ":" + ss;
+	let time = hh + ":" + mm + ":" + ss;   
 	return time;
 }
 function contentCheck(content) {

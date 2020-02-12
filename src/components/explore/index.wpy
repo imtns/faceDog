@@ -92,7 +92,7 @@
 	      });
 	      wx.hideLoading();
 	      Toast('申请成功');
-	      this.fetchData(); 
+	    //   this.fetchData(); 
 	    },
 	    showVerify() {
 	      this.$emit('verifyShow');

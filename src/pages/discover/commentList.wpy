@@ -1,5 +1,6 @@
 <!--  -->
 <template>
+
 	<view class='container'>
 		<view class="list">
 			<repeat for="{{comments}}" key="index" index="index" item="item">
@@ -60,41 +61,41 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import { GET_MOMENT_DETAIL } from '@/utils/url';
-	import { get } from '@/utils/request';
-	export default class CommentList extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '评论'
-	  };
+import wepy from 'wepy';
+import { GET_MOMENT_DETAIL } from '@/utils/url';
+import { get } from '@/utils/request';
+export default class CommentList extends wepy.page {
+  config = {
+    navigationBarTitleText: '评论'
+  };
 
-	  data = {
-	    show: false,
-	    comments: []
-	  };
+  data = {
+    show: false,
+    comments: []
+  };
 
-	  components = {};
+  components = {};
 
-	  methods = {
-	    showMore() {
-	      this.show = !this.show;
-	    }
-	  };
+  methods = {
+    showMore() {
+      this.show = !this.show;
+    }
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  async onLoad(options) {
-	    let { comments } = await get(`${GET_MOMENT_DETAIL}/${options.id}/comments`);
-	    this.comments = comments;
-	    this.$apply();
-	  }
+  async onLoad(options) {
+    let { comments } = await get(`${GET_MOMENT_DETAIL}/${options.id}/comments`);
+    this.comments = comments;
+    this.$apply();
+  }
 
-	  onShow() {}
-	}
+  onShow() {}
+}
 </script>
 
 <style lang='scss' scoped>

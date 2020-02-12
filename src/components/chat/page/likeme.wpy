@@ -72,7 +72,9 @@
 	      wx.navigateTo({
 	        url: `chat/becomeFriend?id=${user.dentifier}&nick=${
 	          user.nick_name
-	        }&icon=${encodeURI(user.avatar)}`
+	        }&icon=${encodeURI(
+	          `${user.avatar}?x-oss-process=image/resize,w_100,h_100/format,jpg`
+	        )}`
 	      });
 	    },
 	    redirect(user) {

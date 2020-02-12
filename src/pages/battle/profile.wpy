@@ -9,6 +9,9 @@
 		<block wx:if="{{verify}}">
 			<verify />
 		</block>
+		<!-- <image class="vip-icon" src="https://images.facedog.cn/public/profile/icon-vip.png" mode="scaleToFill"
+		  lazy-load="false">
+		</image> -->
 		<swiper indicator-dots="{{true}}" autoplay="{{false}}" indicator-color="{{indicatorcolor}}" indicator-active-color="{{indicatoractivecolor}}" duration="300">
 			<repeat for="{{profile.images}}" key="index">
 				<swiper-item>
@@ -38,7 +41,7 @@
 			<view class="battle-profile-signature" wx:if="{{profile.signature}}">
 				个性签名：{{profile.signature}}
 			</view>
-			<view class="battle-profile-moments" @tap="goDiscover" wx:if="{{profile.discover && profile.discover.length}}">
+			<!-- <view class="battle-profile-moments" @tap="goDiscover" wx:if="{{profile.discover && profile.discover.length}}">
 				<view class="tab">
 					<view class="text1">TA的动态</view>
 					<view class="text2">查看全部
@@ -50,8 +53,7 @@
 						<image class="moment" src="{{item.image_url}}" mode="aspectFill"></image>
 					</repeat>
 				</view>
-
-			</view>
+			</view> -->
 		</view>
 		<view class="bottom-box" wx:if="{{!self && loaded}}">
 			<block wx:if="{{!profile.is_friend}}">
@@ -440,6 +442,14 @@
 	}
 	.container {
 	  width: 100%;
+	  .vip-icon{
+		  position: absolute;
+		  width:173rpx;
+		  height: 59rpx;
+		  right:20rpx;
+		  top:130rpx;
+		  z-index: 10;
+	  }
 	  .battle-profile-wrapper {
 	    padding-bottom: 186rpx;
 	    width: 100%;

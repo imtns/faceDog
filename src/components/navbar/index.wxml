@@ -13,6 +13,10 @@
         <view class="btn-home nice-focus" bindtap="goHome" wx:if="{{showHome}}">
           <image src="{{homeImage}}"></image>
         </view>
+		<view class="btn-home nice-focus" bindtap="goSquareMessage" wx:if="{{showSquare}}">
+		  <image style="width:141rpx;" mode="aspectFill" src="{{squareImage}}"></image>
+		   <view wx:if="{{unread}}" class="dot"></view>
+        </view>
       </block>     
     </view>
 

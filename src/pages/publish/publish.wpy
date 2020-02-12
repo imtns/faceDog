@@ -1,5 +1,7 @@
 <!--  -->
 <template>
+	<navbar title="发布动态">
+	</navbar>
 	<view class="fabu-page">
 		<view class="actions">
 			<view class="btn" @tap="prepareToCancle">取消</view>
@@ -25,7 +27,7 @@
                 <van-icon name="plus" size="25px" custom-style="margin-top:50%;transform:translate3d(0, -50%, 0);"/>
             </view>
         </view>
-        <view class="location" @tap="choseLocation">
+        <!-- <view class="location" @tap="choseLocation">
             <view class="flex">
                 <image class="location-icon" src="https://images.facedog.cn/public/fabu/fabu-location.png" ></image>
                 <view class="location-address">{{ region || '您的位置' }}</view>
@@ -33,7 +35,7 @@
             <view class="icon">
                 <van-icon name="arrow" color="#B2B2B2"/>
             </view>
-        </view>
+        </view> -->
 		<view class="loadingLayer" wx:if="{{loading}}">
 			<view class="loading">
 				<view class="icon">
@@ -73,7 +75,8 @@
 	    usingComponents: {
 	      'van-icon': '../../components/vant/icon/index',
 	      'van-loading': '../components/vant/loading/index',
-	      'van-toast': '../components/vant/toast/index'
+		  'van-toast': '../components/vant/toast/index',
+		  navbar: '../components/navbar/index'
 	    }
 	  };
 	  data = {
@@ -115,9 +118,10 @@
 	        content: '确认退出吗',
 	        success(res) {
 	          if (res.confirm) {
-	            wx.navigateBack({
-	              delta: 1
-	            });
+	            // wx.navigateBack({
+	            //   delta: 1
+				// });
+				wepy.redirectTo({url: '/pages/discover/discover' });
 	          } else if (res.cancel) {
 	            console.log('用户点击取消');
 	          }
@@ -234,11 +238,12 @@
 	            Toast.success('发布成功');
 	            await sleep(2);
 	            this.isPublishing = false;
-
+				wepy.redirectTo({url: '/pages/discover/discover' });
+				
 	            // wx.hideLoading();
-	            wx.navigateBack({
-	              delta: 1
-	            });
+	            // wx.navigateBack({
+	            //   delta: 1
+	            // });
 	            this.$apply();
 	          } else {
 	            this.hideLoading();

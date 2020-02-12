@@ -1,5 +1,5 @@
 <template>
-	<navbar center="true" showHome="{{showHome}}" wx:if="{{selectedTab ==1 }}">
+	<navbar center="true" showHome="{{true}}" wx:if="{{selectedTab ==1 }}">
 		<view slot="center">
 			<view class="square">
 				<view class="tab {{tabSelect==0?'active':''}}" @tap="tabClick(0)">PK</view>
@@ -8,6 +8,8 @@
 				<view class="underline" style="left:{{tabSelect==0?'42rpx':'149rpx'}}"></view>
 			</view>
 		</view>
+	</navbar>
+	<navbar center="true" showSquare="{{true}}" wx:elif="{{selectedTab ==0 }}">
 	</navbar>
 	<navbar wx:else title="{{pageTitle}}">
 	</navbar>
@@ -48,7 +50,7 @@
 	import tabbar from '@/components/tabbar';
 	import battle from '@/components/battle/battle';
 	import explore from '@/components/explore/index';
-	import discover from '@/components/discover/discover';
+	// import discover from '@/components/discover/discover';
 	import my from '@/components/my/my';
 	import chat from '@/components/chat/chat';
 	import { sleep } from '@/utils';
@@ -88,7 +90,7 @@
 	    tabbar,
 	    battle,
 	    explore,
-	    discover,
+	    // discover,
 	    chat,
 	    my,
 	    verify,
@@ -207,7 +209,7 @@
 	        //   title: ''
 	        // });
 	        this.$invoke('chat', 'initChat');
-	        this.$invoke('chat', 'initLike');
+	        // this.$invoke('chat', 'initLike');
 	        this.$invoke('chat', 'refreshData');
 	      }
 	      if (this.selectedTab == 1) {
@@ -232,10 +234,10 @@
 	        this.pageTitle = '';
 	        // this.$invoke('my', 'setProfile');
 	      } else if (this.selectedTab == 1) {
-	        wx.setNavigationBarTitle({
-	          title: '发现'
-	        });
-	        this.$invoke('discover', 'initList');
+	        // wx.setNavigationBarTitle({
+	        //   title: '发现'
+	        // });
+	        // this.$invoke('discover', 'initList');
 	      }
 	    },
 	    unreadSet(num) {
@@ -260,7 +262,8 @@
 	      optionFrom = true;
 	      this.selectedTab = options.select;
 	      if (options.select == 0) {
-	        this.pageTitle = '消息';
+			this.pageTitle = '消息';
+	        this.$invoke('chat', 'refreshData');
 	      } else if (options.select == 2) {
 	        this.pageTitle = '我';
 	      }
@@ -279,11 +282,11 @@
 	      this.selectedTab = 1;
 	    }
 	    this.$invoke('battle', 'init');
-	    this.$invoke('discover', 'initList');
+	    // this.$invoke('discover', 'initList');
 	    this.$invoke('chat', 'initChat');
-	    Event.listen('refresh', () => {
-	      this.$invoke('discover', 'initList', { page: 1 });
-	    });
+	    // Event.listen('refresh', () => {
+	    //   this.$invoke('discover', 'initList', { page: 1 });
+	    // });
 	    this.user = wx.getStorageSync('profile');
 	    this.setProfile();
 	    Event.listen('showVerify', status => {
@@ -324,7 +327,7 @@
 	    this.setProfile();
 	    this.$invoke('chat', 'initChat');
 	    if (this.selectedTab === 0) {
-	      //   this.$invoke('chat', 'refreshData');
+	        this.$invoke('chat', 'refreshData');
 	      //   this.$invoke('battle', 'init');
 	    }
 	    if (this.selectedTab === 2) {
@@ -340,6 +343,9 @@
 	}
 </script>
 <style lang="less">
+    .van-popup{
+		background:white;
+	}
 	.guest-button {
 	  position: fixed;
 	  right: 0;

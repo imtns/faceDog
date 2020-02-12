@@ -4,7 +4,7 @@
 		<tutorial @closeTutorial.user="closeTutorial" />
 	</block>
 	<block wx:if="{{!tutorialShow && show}}">
-		<loadingHeart top="-160rpx" />
+		<loadingHeart top="-160rpx;" />
 	</block>
 	<view class='container' wx:if="{{!show && !showPop}}" style="top:{{isphoneX?'100rpx':'0'}};">
 		<view class="blurLayer"></view>
@@ -96,482 +96,485 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import { BATTLE, BATTLE_COMMIT, DAILY_REPORT, BATTLE_PASS } from '@/utils/url';
-	import { get, post } from '@/utils/request';
-	import { Event } from '@/utils/event.js';
-	import { removeDuplicates, throttle, formatDate } from '@/utils';
-	import Toast from '@/components/vant/toast/toast';
+import wepy from 'wepy';
+import { BATTLE, BATTLE_COMMIT, DAILY_REPORT, BATTLE_PASS } from '@/utils/url';
+import { get, post } from '@/utils/request';
+import { Event } from '@/utils/event.js';
+import { removeDuplicates, throttle, formatDate } from '@/utils';
+import Toast from '@/components/vant/toast/toast';
 
-	import popCoin from '@/components/battle/module/popCoin';
-	import tutorial from './module/tutorial';
-	import loadingHeart from './module/loadingHeart';
-	import pop from './module/pop';
-	import Dialog from '@/components/vant/dialog/dialog';
-	export default class Battle extends wepy.component {
-	  data = {
-	    passTouch: false,
-	    passDuaring: false,
-	    haveEnjoy: 0,
-	    show: true,
-	    showPop: false,
-	    isphoneX: false,
-	    tranTopY: {}, // 当前激活元素的 Y轴 偏移量
-	    tranBottomY: {},
-	    draggingTop: false, // 是否在拖拽中
-	    draggingBottom: false,
-	    flyTop: {}, //飞向收藏夹的动画
-	    flyBottom: {}, // 飞向收藏夹的动画
-	    topDragDistance: false, // 上面图片拖拽是否超过高度
-	    bottomDragDistance: false,
-	    bothLike: false, // 是否bothLike
-	    bothLikeRotate: false,
-	    init: false, // 初始化，判断是否执行动画
-	    topWave: false, // 执行完图片飞行后盒子的抖动
-	    bottomWave: false, // 执行完图片飞行后盒子的抖动
-	    bothLikeMove: false,
-	    swiperCurrent: 0, // 当前swiperIndex
-	    tutorialShow: false,
-	    battleList: [],
-	    likeImageId: '',
-	    dislikeImageId: '',
-	    blurTop: false,
-	    blurBottom: false,
-	    fistAnimation: false, // 中间vs的动画
-	    opacityTopPick: 0, // pick的透明度
-	    opacityBottomPick: 0,
-	    noProfile: false,
-	    noProfileCount: 0,
-	    flyTempID: 0, // 当前动画的临时Id
-	    passShow: false,
-	    loaded: false,
-	    showCoinPop: false
-	  };
+import popCoin from '@/components/battle/module/popCoin';
+import tutorial from './module/tutorial';
+import loadingHeart from './module/loadingHeart';
+import pop from './module/pop';
+import Dialog from '@/components/vant/dialog/dialog';
+export default class Battle extends wepy.component {
+  data = {
+    passTouch: false,
+    passDuaring: false,
+    haveEnjoy: 0,
+    show: true,
+    showPop: false,
+    isphoneX: false,
+    tranTopY: {}, // 当前激活元素的 Y轴 偏移量
+    tranBottomY: {},
+    draggingTop: false, // 是否在拖拽中
+    draggingBottom: false,
+    flyTop: {}, //飞向收藏夹的动画
+    flyBottom: {}, // 飞向收藏夹的动画
+    topDragDistance: false, // 上面图片拖拽是否超过高度
+    bottomDragDistance: false,
+    bothLike: false, // 是否bothLike
+    bothLikeRotate: false,
+    init: false, // 初始化，判断是否执行动画
+    topWave: false, // 执行完图片飞行后盒子的抖动
+    bottomWave: false, // 执行完图片飞行后盒子的抖动
+    bothLikeMove: false,
+    swiperCurrent: 0, // 当前swiperIndex
+    tutorialShow: false,
+    battleList: [],
+    likeImageId: '',
+    dislikeImageId: '',
+    blurTop: false,
+    blurBottom: false,
+    fistAnimation: false, // 中间vs的动画
+    opacityTopPick: 0, // pick的透明度
+    opacityBottomPick: 0,
+    noProfile: false,
+    noProfileCount: 0,
+    flyTempID: 0, // 当前动画的临时Id
+    passShow: false,
+    loaded: false,
+    showCoinPop: false
+  };
 
-	  components = {
-	    tutorial,
-	    loadingHeart,
-	    pop,
-	    popCoin
-	  };
-	  verifyMessageSend() {
-	    Dialog.confirm({
-	      confirmButtonText: '确认',
-	      cancelButtonText: '取消',
-	      asyncClose: true,
-	      message: `为了有更好的体验
+  components = {
+    tutorial,
+    loadingHeart,
+    pop,
+    popCoin
+  };
+  verifyMessageSend() {
+    if (!wepy.$appConfig.isProd) return;
+    Dialog.confirm({
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      asyncClose: true,
+      message: `为了有更好的体验
 														请先打开推送哦😘`
-	    })
-	      .then(async () => {
-	        Dialog.close();
-	        wx.requestSubscribeMessage({
-	          tmplIds: [
-	            'DUwNR_XRWFNxXmrInQcUaidSMly8lQb1Q1BrcclhpSo',
-	            'O-0D632nPX5UPtwbsPlJVFMQpLuo--P7nK0YW-JVzmk',
-	            'eVvH4HmtqVeP9nIgkEWCFKKj1v-CRnlKeKcM1xCNcJA'
-	          ],
-	          success(res) {
-	            console.log('订阅消息', res);
-	          }
-	        });
-	      })
-	      .catch(() => {
-	        Dialog.close();
-	      });
-	  }
+    })
+      .then(async () => {
+        Dialog.close();
+        wx.requestSubscribeMessage({
+          tmplIds: [
+            'DUwNR_XRWFNxXmrInQcUaidSMly8lQb1Q1BrcclhpSo',
+            '2D7zZBtte1zBGU-ZaEMrTYOdVbkyaHzmeZiUfBYPGo4',
+            'eVvH4HmtqVeP9nIgkEWCFKKj1v-CRnlKeKcM1xCNcJA'
+          ],
+          success(res) {
+            console.log('订阅消息', res);
+          }
+        });
+      })
+      .catch(() => {
+        Dialog.close();
+      });
+  }
 
-	  setEnjoyCount() {
-	    if (this.haveEnjoy <= 0) {
-	      let name = `commit-${formatDate(new Date())}`;
-	      let isShow = wepy.getStorageSync(name);
-	      if (!isShow) {
-	        this.$invoke('popCoin', 'setType', '1');
-	        setTimeout(() => {
-	          this.showCoinPop = true;
-	          this.$apply();
-	          setTimeout(() => {
-	            this.showCoinPop = false;
-	            this.$apply();
-	          }, 2000);
-	        }, 1000);
-	      }
-	      wepy.setStorageSync(name, true);
-	      this.showPop = true;
-	      this.$emit('enjoySet', 0);
-	      this.$apply();
-	      return;
-	    }
-	    let enjoyCount = this.haveEnjoy - 1;
-	    this.$emit('enjoySet', --this.haveEnjoy);
-	    this.haveEnjoy = enjoyCount;
-	  }
-	  fly(position) {
-	    this.flyTempID = this.swiperCurrent;
-	    if (position == 'top') {
-	      this.flyTop[this.flyTempID] = true; //图片飞走时间
-	      setTimeout(() => {
-	        this.topWave = true; // 飞走后盒子晃动时间
-	        this.switchBattle();
-	        this.$apply();
-	      }, 800);
-	    } else {
-	      this.flyBottom[this.flyTempID] = true;
-	      setTimeout(() => {
-	        this.bottomWave = true;
-	        // 晃动完后切换下一组
-	        this.switchBattle();
-	        this.$apply();
-	      }, 800);
-	    }
-	    setTimeout(() => {
-	      this.tranBottomY[this.swiperCurrent - 1] = 0;
-	      this.tranTopY[this.swiperCurrent - 1] = 0;
-	      this.flyTop = {};
-	      this.flyBottom = {};
-	      this.topWave = false;
-	      this.bottomWave = false;
-	      this.topDragDistance = false;
-	      this.bottomDragDistance = false;
-	      this.$apply();
-	    }, 1800);
-	  }
-	  // 提交喜欢
-	  async battleCommit() {
-	    if (this.noProfile) {
-	      Event.trigger('showVerify', true);
-	      return;
-	    }
-	    try {
-	      const data = await post(BATTLE_COMMIT, {
-	        result: {
-	          win: this.likeImageId,
-	          fail: this.dislikeImageId
-	        }
-	      });
-	      console.log('commit!!!!!!!', data);
-	      Event.trigger('refreshData');
-	      //   this.setEnjoyCount();
+  setEnjoyCount() {
+    if (this.haveEnjoy <= 0) {
+      let name = `commit-${formatDate(new Date())}`;
+      let isShow = wepy.getStorageSync(name);
+      if (!isShow) {
+        this.$invoke('popCoin', 'setType', '1');
+        setTimeout(() => {
+          this.showCoinPop = true;
+          this.$apply();
+          setTimeout(() => {
+            this.showCoinPop = false;
+            this.$apply();
+          }, 2000);
+        }, 1000);
+      }
+      wepy.setStorageSync(name, true);
+      this.showPop = true;
+      this.$emit('enjoySet', 0);
+      this.$apply();
+      return;
+    }
+    let enjoyCount = this.haveEnjoy - 1;
+    this.$emit('enjoySet', --this.haveEnjoy);
+    this.haveEnjoy = enjoyCount;
+  }
+  fly(position) {
+    this.flyTempID = this.swiperCurrent;
+    if (position == 'top') {
+      this.flyTop[this.flyTempID] = true; //图片飞走时间
+      setTimeout(() => {
+        this.topWave = true; // 飞走后盒子晃动时间
+        this.switchBattle();
+        this.$apply();
+      }, 800);
+    } else {
+      this.flyBottom[this.flyTempID] = true;
+      setTimeout(() => {
+        this.bottomWave = true;
+        // 晃动完后切换下一组
+        this.switchBattle();
+        this.$apply();
+      }, 800);
+    }
+    setTimeout(() => {
+      this.tranBottomY[this.swiperCurrent - 1] = 0;
+      this.tranTopY[this.swiperCurrent - 1] = 0;
+      this.flyTop = {};
+      this.flyBottom = {};
+      this.topWave = false;
+      this.bottomWave = false;
+      this.topDragDistance = false;
+      this.bottomDragDistance = false;
+      this.$apply();
+    }, 1800);
+  }
+  // 提交喜欢
+  async battleCommit() {
+    if (this.noProfile) {
+      Event.trigger('showVerify', true);
+      return;
+    }
+    try {
+      const data = await post(BATTLE_COMMIT, {
+        result: {
+          win: this.likeImageId,
+          fail: this.dislikeImageId
+        }
+      });
+      console.log('commit!!!!!!!', data);
+      Event.trigger('refreshData');
+      //   this.setEnjoyCount();
 
-	      console.log(data);
-	      if (data.is_friend) {
-	        wx.setStorageSync('chatIcon', data.enjoy_user_avatar);
-	        wx.navigateTo({
-	          url: `/pages/chat/becomeFriend?id=${data.enjoy_user_dentifier}&nick=${
-	            data.enjoy_user_nick_name
-	          }`
-	        });
-	      }
-	      this.noProfileCount++;
-	    } catch (e) {}
-	  }
-	  // 切换下一组
-	  switchBattle(isPass) {
-	    setTimeout(async () => {
-	      setTimeout(() => {
-	        // battle切换的时候拳头动画还原,200ms正好看不到还原过程
-	        this.fistAnimation = false;
-	        this.$apply();
-	      }, 200);
+      console.log(data);
+      if (data.is_friend) {
+        wx.setStorageSync('chatIcon', data.enjoy_user_avatar);
+        wx.navigateTo({
+          url: `/pages/chat/becomeFriend?id=${data.enjoy_user_dentifier}&nick=${
+            data.enjoy_user_nick_name
+          }`
+        });
+      }
+      this.noProfileCount++;
+    } catch (e) {}
+  }
+  // 切换下一组
+  switchBattle(isPass) {
+    setTimeout(async () => {
+      setTimeout(() => {
+        // battle切换的时候拳头动画还原,200ms正好看不到还原过程
+        this.fistAnimation = false;
+        this.$apply();
+      }, 200);
 
-	      // 晃动完后切换下一组
-	      if (!isPass) this.battleCommit();
+      // 晃动完后切换下一组
+      if (!isPass) this.battleCommit();
 
-	      // 判断如果
-	      console.log(this.battleList.length, this.swiperCurrent);
-	      if (this.battleList.length - 1 == this.swiperCurrent) {
-	        // 如果当前组次数已不足3组，加载下一组
-	        await this.getBattle();
-	      }
-	      this.swiperCurrent++;
-	      this.blurTop = false;
-	      this.blurBottom = false;
-	      this.draggingBottom = false;
-	      this.draggingTop = false;
-	      this.opacityBottomPick = 0;
-	      this.opacityTopPick = 0;
-	      this.setEnjoyCount();
-	      this.$apply();
-	      setTimeout(() => {
-	        this.fistAnimation = true;
-	        this.passDuaring = false;
-	        this.$apply();
-	      }, 400);
-	    }, 800);
-	  }
-	  methods = {
-	    passTouchStart() {
-	      this.passTouch = true;
-	    },
-	    passTouchEnd() {
-	      this.passTouch = false;
-	    },
-	    async passHandler() {
-	      if (this.passDuaring) return;
-	      this.passDuaring = true;
-	      const data = await post(BATTLE_PASS, {
-	        result: {
-	          win: this.battleList[this.swiperCurrent].a._id,
-	          fail: this.battleList[this.swiperCurrent].b._id
-	        }
-	      });
-	      this.passShow = true;
-	      this.$apply();
-	      setTimeout(() => {
-	        this.passShow = false;
-	        this.$apply();
-	      }, 800);
-	      this.switchBattle(true);
-	    },
-	    bindanimationfinish() {
-	      // 防止swiper滑动后，滑块有的时候不还原位置的问题
-	      setTimeout(() => {
-	        this.tranTopY[this.swiperCurrent] = 0;
-	        this.tranBottomY[this.swiperCurrent] = 0;
-	        this.$apply();
-	      }, 100);
-	    },
-	    boxClick(images) {
-	      console.log(images);
-	      wx.previewImage({
-	        current: images[0],
-	        urls: images
-	      });
-	    },
-	    //引导层关闭
-	    closeTutorial() {
-	      this.tutorialShow = false;
-	      wepy.setStorageSync('tutorial', true);
-	      if (!this.loaded) {
-	        this.verifyMessageSend();
-	        this.loaded = true;
-	      }
-	      this.$apply();
-	    },
-	    //阻止swiper可以手动滑动
-	    stopTouchMove() {
-	      return false;
-	    },
-	    //上面的box拖动事件
-	    touchTopMove(id, e) {
-	      if (this.draggingBottom) return;
-	      this.draggingTop = true;
-	      this.blurBottom = true; // 拖动上面的时候下面的背景变blur
-	      let currentTouch = e.changedTouches[0];
-	      this.topDragDistance = this.tranTopY[id] > 50;
-	      //   console.log(currentTouch);
-	      let { clientY } = currentTouch;
-	      // 如果不是同一个触发点则返回
-	      // 通过 当前坐标点, 初始坐标点, 初始偏移量 来计算当前偏移量
-	      let tranY = clientY - 180;
+      // 判断如果
+      console.log(this.battleList.length, this.swiperCurrent);
+      if (this.battleList.length - 1 == this.swiperCurrent) {
+        // 如果当前组次数已不足3组，加载下一组
+        await this.getBattle();
+      }
+      this.swiperCurrent++;
+      this.blurTop = false;
+      this.blurBottom = false;
+      this.draggingBottom = false;
+      this.draggingTop = false;
+      this.opacityBottomPick = 0;
+      this.opacityTopPick = 0;
+      this.setEnjoyCount();
+      this.$apply();
+      setTimeout(() => {
+        this.fistAnimation = true;
+        this.passDuaring = false;
+        this.$apply();
+      }, 400);
+    }, 800);
+  }
+  methods = {
+    passTouchStart() {
+      this.passTouch = true;
+    },
+    passTouchEnd() {
+      this.passTouch = false;
+    },
+    async passHandler() {
+      if (this.passDuaring) return;
+      this.passDuaring = true;
+      const data = await post(BATTLE_PASS, {
+        result: {
+          win: this.battleList[this.swiperCurrent].a._id,
+          fail: this.battleList[this.swiperCurrent].b._id
+        }
+      });
+      this.passShow = true;
+      this.$apply();
+      setTimeout(() => {
+        this.passShow = false;
+        this.$apply();
+      }, 800);
+      this.switchBattle(true);
+    },
+    bindanimationfinish() {
+      // 防止swiper滑动后，滑块有的时候不还原位置的问题
+      setTimeout(() => {
+        this.tranTopY[this.swiperCurrent] = 0;
+        this.tranBottomY[this.swiperCurrent] = 0;
+        this.$apply();
+      }, 100);
+    },
+    boxClick(images) {
+      console.log(images);
+      wx.previewImage({
+        current: images[0],
+        urls: images
+      });
+    },
+    //引导层关闭
+    closeTutorial() {
+      this.tutorialShow = false;
+      wepy.setStorageSync('tutorial', true);
+      if (!this.loaded) {
+        // this.verifyMessageSend();
+        this.loaded = true;
+      }
+      this.$apply();
+    },
+    //阻止swiper可以手动滑动
+    stopTouchMove() {
+      return false;
+    },
+    //上面的box拖动事件
+    touchTopMove(id, e) {
+      if (this.draggingBottom) return;
+      this.draggingTop = true;
+      this.blurBottom = true; // 拖动上面的时候下面的背景变blur
+      let currentTouch = e.changedTouches[0];
+      this.topDragDistance = this.tranTopY[id] > 50;
+      //   console.log(currentTouch);
+      let { clientY } = currentTouch;
+      // 如果不是同一个触发点则返回
+      // 通过 当前坐标点, 初始坐标点, 初始偏移量 来计算当前偏移量
+      let tranY = clientY - 180;
 
-	      if (tranY < 0) {
-	        tranY = 0;
-	      }
-	      if (tranY > 80) {
-	        tranY = 80;
-	      }
-	      throttle(this.setValue(tranY, this.swiperCurrent, 'top'), 500);
-	      this.opacityTopPick = tranY / 80;
-	      //   this.tranTopY[id] = clientY;
-	      //   this.$apply();
-	    },
-	    //下面box拖动事件
-	    touchBottomMove(id, e) {
-	      //   if (this.noProfile && this.noProfileCount >= 2) {
-	      //     Event.trigger('showVerify', true);
-	      //     return;
-	      //   }
-	      if (this.draggingTop) return;
-	      this.draggingBottom = true;
-	      this.blurTop = true; // 拖动下面的时候上面的背景变blur
-	      let currentTouch = e.changedTouches[0];
-	      //   console.log(currentTouch);
-	      this.bottomDragDistance = this.tranBottomY[id] < -190;
-	      let { clientY } = currentTouch;
-	      let tranY = clientY - 600;
+      if (tranY < 0) {
+        tranY = 0;
+      }
+      if (tranY > 80) {
+        tranY = 80;
+      }
+      throttle(this.setValue(tranY, this.swiperCurrent, 'top'), 500);
+      this.opacityTopPick = tranY / 80;
+      //   this.tranTopY[id] = clientY;
+      //   this.$apply();
+    },
+    //下面box拖动事件
+    touchBottomMove(id, e) {
+      //   if (this.noProfile && this.noProfileCount >= 2) {
+      //     Event.trigger('showVerify', true);
+      //     return;
+      //   }
+      if (this.draggingTop) return;
+      this.draggingBottom = true;
+      this.blurTop = true; // 拖动下面的时候上面的背景变blur
+      let currentTouch = e.changedTouches[0];
+      //   console.log(currentTouch);
+      this.bottomDragDistance = this.tranBottomY[id] < -190;
+      let { clientY } = currentTouch;
+      let tranY = clientY - 600;
 
-	      if (tranY < -215) {
-	        tranY = -215;
-	      }
-	      if (tranY > -115) {
-	        tranY = -115;
-	      }
-	      this.opacityBottomPick = (tranY == -115 ? 0 : tranY) / -215;
-	      throttle(this.setValue(tranY, this.swiperCurrent, 'bottom'), 500);
-	      //   this.tranBottomY[this.swiperCurrent] = tranY;
-	      //   console.log(tranY);
-	      //   this.$apply();
-	    },
-	    //bothlike 事件
-	    bothLike() {
-	      return;
-	      this.bothLikeMove = false;
-	      if (!this.bothLike) {
-	        setTimeout(() => {
-	          this.bothLikeMove = true;
-	          this.$apply();
-	          setTimeout(() => {
-	            this.bothLikeMove = false;
-	            this.bothLikeRotate = false;
-	            this.bothLike = false;
-	            this.swiperCurrent = this.swiperCurrent == 1 ? 0 : 1;
-	            this.$apply();
-	            //   this.fly('top');
-	            //   this.fly('bottom');
-	            this.$apply();
-	          }, 1000);
-	        }, 1000);
-	      }
-	      this.bothLike = !this.bothLike;
-	      this.bothLikeRotate = !this.bothLikeRotate;
-	      if (this.bothLike) {
-	        this.init = false;
-	      }
-	    },
-	    //拖动结束后
-	    touchEnd() {
-	      if (this.bottomDragDistance) {
-	        this.fly('bottom');
-	        this.likeImageId = this.battleList[this.swiperCurrent].b._id;
-	        this.dislikeImageId = this.battleList[this.swiperCurrent].a._id;
-	        this.$apply();
-	      } else {
-	        this.blurTop = false;
-	        this.draggingBottom = false;
-	        this.opacityBottomPick = 0;
-	        this.tranBottomY[this.swiperCurrent] = '1';
-	      }
-	      if (this.topDragDistance) {
-	        this.fly('top');
-	        this.likeImageId = this.battleList[this.swiperCurrent].a._id;
-	        this.dislikeImageId = this.battleList[this.swiperCurrent].b._id;
-	        this.$apply();
-	      } else {
-	        this.draggingTop = false;
-	        this.blurBottom = false;
-	        this.opacityTopPick = 0;
-	        this.tranTopY[this.swiperCurrent] = '1';
-	      }
-	      this.$apply();
-	    },
-	    hasProfile(tag) {
-	      this.noProfile = !tag;
-	    },
-	    init() {
-	      this.init = true; // 防止页面切换进来时动画重新执行
-	    }
-	  };
-	  setValue(tranY, id, position) {
-	    if (position == 'top') {
-	      this.tranTopY[id] = tranY;
-	    } else {
-	      this.tranBottomY[id] = tranY;
-	    }
-	    this.$apply();
-	  }
-	  async getBattle() {
-	    this.show = true;
-	    this.swiperCurrent = 0;
-	    this.battleList = [];
-	    let res = await get(BATTLE, { battle: '' });
-	    let result = res.data;
-	    this.haveEnjoy = res.have_enjoy;
-	    if (this.haveEnjoy <= 0) {
-	      let name = `commit-${formatDate(new Date())}`;
-	      wepy.setStorageSync(name, true);
-	      this.showPop = true;
-	      this.show = false;
-	      this.$apply();
-	      return;
-	    }
-	    this.$emit('enjoySet', this.haveEnjoy);
-	    console.warn('result', result);
-	    result.a.forEach((item, index) => {
-	      result.a[index].distance = (result.a[index].distance / 1000).toFixed(2);
-	      result.a[index].gender = result.a[index].gender == 'female' ? '女' : '男';
-	      result.a[index].originalImages = [...result.a[index].images];
-	      result.a[index].images.forEach((image, idx) => {
-	        result.a[index].images[idx] =
-	          image + '?x-oss-process=image/resize,w_600,h_600/format,jpg';
-	      });
+      if (tranY < -215) {
+        tranY = -215;
+      }
+      if (tranY > -115) {
+        tranY = -115;
+      }
+      this.opacityBottomPick = (tranY == -115 ? 0 : tranY) / -215;
+      throttle(this.setValue(tranY, this.swiperCurrent, 'bottom'), 500);
+      //   this.tranBottomY[this.swiperCurrent] = tranY;
+      //   console.log(tranY);
+      //   this.$apply();
+    },
+    //bothlike 事件
+    bothLike() {
+      return;
+      this.bothLikeMove = false;
+      if (!this.bothLike) {
+        setTimeout(() => {
+          this.bothLikeMove = true;
+          this.$apply();
+          setTimeout(() => {
+            this.bothLikeMove = false;
+            this.bothLikeRotate = false;
+            this.bothLike = false;
+            this.swiperCurrent = this.swiperCurrent == 1 ? 0 : 1;
+            this.$apply();
+            //   this.fly('top');
+            //   this.fly('bottom');
+            this.$apply();
+          }, 1000);
+        }, 1000);
+      }
+      this.bothLike = !this.bothLike;
+      this.bothLikeRotate = !this.bothLikeRotate;
+      if (this.bothLike) {
+        this.init = false;
+      }
+    },
+    //拖动结束后
+    touchEnd() {
+      if (this.bottomDragDistance) {
+        this.fly('bottom');
+        this.likeImageId = this.battleList[this.swiperCurrent].b._id;
+        this.dislikeImageId = this.battleList[this.swiperCurrent].a._id;
+        this.$apply();
+      } else {
+        this.blurTop = false;
+        this.draggingBottom = false;
+        this.opacityBottomPick = 0;
+        this.tranBottomY[this.swiperCurrent] = '1';
+      }
+      if (this.topDragDistance) {
+        this.fly('top');
+        this.likeImageId = this.battleList[this.swiperCurrent].a._id;
+        this.dislikeImageId = this.battleList[this.swiperCurrent].b._id;
+        this.$apply();
+      } else {
+        this.draggingTop = false;
+        this.blurBottom = false;
+        this.opacityTopPick = 0;
+        this.tranTopY[this.swiperCurrent] = '1';
+      }
+      this.$apply();
+    },
+    hasProfile(tag) {
+      this.noProfile = !tag;
+    },
+    init() {
+      this.init = true; // 防止页面切换进来时动画重新执行
+    }
+  };
+  setValue(tranY, id, position) {
+    if (position == 'top') {
+      this.tranTopY[id] = tranY;
+    } else {
+      this.tranBottomY[id] = tranY;
+    }
+    this.$apply();
+  }
+  async getBattle() {
+    this.show = true;
+    this.swiperCurrent = 0;
+    this.battleList = [];
+    let res = await get(BATTLE, { battle: '' });
+    let result = res.data;
+    this.haveEnjoy = res.have_enjoy;
+    if (this.haveEnjoy <= 0) {
+      let name = `commit-${formatDate(new Date())}`;
+      wepy.setStorageSync(name, true);
+      this.showPop = true;
+      this.show = false;
+      this.$apply();
+      return;
+    }
+    this.$emit('enjoySet', this.haveEnjoy);
+    console.warn('result', result);
+    result.a.forEach((item, index) => {
+      result.a[index].distance = (result.a[index].distance / 1000).toFixed(2);
+      result.a[index].gender = result.a[index].gender == 'female' ? '女' : '男';
+      result.a[index].originalImages = [...result.a[index].images];
+      result.a[index].images.forEach((image, idx) => {
+        result.a[index].images[idx] =
+          image + '?x-oss-process=image/resize,w_600,h_600/format,jpg';
+      });
 
-	      result.b[index].originalImages = [...result.b[index].images];
-	      result.b[index].images.forEach((image, idx) => {
-	        result.b[index].images[idx] =
-	          image + '?x-oss-process=image/resize,w_600,h_600/format,jpg';
-	      });
-	      result.b[index].distance = (result.b[index].distance / 1000).toFixed(2);
-	      result.b[index].gender = result.b[index].gender == 'female' ? '女' : '男';
-	      this.battleList.push({
-	        a: result.a[index],
-	        b: result.b[index]
-	      });
-	      setTimeout(() => {
-	        this.show = false;
-	        if (wepy.getStorageSync('tutorial')) {
-	          setTimeout(() => {
-	            if (!this.loaded) {
-	              this.verifyMessageSend();
-	              this.loaded = true;
-	              this.$apply();
-	            }
-	          }, 1000);
-	        }
-	        if (!wepy.getStorageSync('tutorial')) {
-	          this.tutorialShow = true;
-	          this.$apply();
-	        }
-	        this.$apply();
-	      }, 1500);
-	      this.$apply();
-	    });
-	    // this.battleList = result;
-	  }
-	  events = {};
+      result.b[index].originalImages = [...result.b[index].images];
+      result.b[index].images.forEach((image, idx) => {
+        result.b[index].images[idx] =
+          image + '?x-oss-process=image/resize,w_600,h_600/format,jpg';
+      });
+      result.b[index].distance = (result.b[index].distance / 1000).toFixed(2);
+      result.b[index].gender = result.b[index].gender == 'female' ? '女' : '男';
+      this.battleList.push({
+        a: result.a[index],
+        b: result.b[index]
+      });
+      setTimeout(() => {
+        this.show = false;
+        if (wepy.getStorageSync('tutorial')) {
+          setTimeout(() => {
+            if (!this.loaded) {
+              this.verifyMessageSend();
+              this.loaded = true;
+              this.$apply();
+            }
+          }, 1000);
+        }
+        if (!wepy.getStorageSync('tutorial')) {
+          this.tutorialShow = true;
+          this.$apply();
+        }
+        this.$apply();
+      }, 1500);
+      this.$apply();
+    });
+    // this.battleList = result;
+  }
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {
-	    if (!wepy.getStorageSync('hasProfile')) {
-	      this.noProfile = true;
-	      this.$apply();
-	    }
-	    let name = `commit-${formatDate(new Date())}`;
-	    if (wepy.getStorageSync(name)) {
-	      this.showPop = true;
-	      this.$apply();
-	    }
-	    let that = this;
-	    wx.getSystemInfo({
-	      success(res) {
-	        var name = 'iPhone X';
-	        if (
-	          res.model.indexOf('iPhone 11') > -1 ||
-	          res.model.indexOf('iPhone X') > -1 ||
-	          res.model.indexOf('unknown<iPhone') > -1
-	        ) {
-	          console.warn('isIphoneX !!!!!!!');
-	          that.isphoneX = true;
-	          
-	        }else if(res.safeArea.top > 24){
-				that.isphoneX = true;
-			}
-			that.$apply();
-	      }
-	    });
-	    this.getBattle();
-	    Event.listen('battleFresh', () => {
-	      this.getBattle();
-	    });
-	    setTimeout(() => {
-	      this.fistAnimation = true;
-	      this.$apply();
-	    }, 900);
-	  }
-	  onShow() {}
-	}
+  onLoad() {
+    if (!wepy.getStorageSync('hasProfile')) {
+      this.noProfile = true;
+      this.$apply();
+    }
+    let name = `commit-${formatDate(new Date())}`;
+    if (wepy.getStorageSync(name)) {
+      this.showPop = true;
+      this.$apply();
+    }
+    let that = this;
+    wx.getSystemInfo({
+      success(res) {
+        var name = 'iPhone X';
+        if (
+          res.model.indexOf('iPhone 11') > -1 ||
+          res.model.indexOf('iPhone X') > -1 ||
+          res.model.indexOf('unknown<iPhone') > -1
+        ) {
+          console.warn('isIphoneX !!!!!!!');
+          that.isphoneX = true;
+        } else if (res.safeArea.top > 24) {
+          that.isphoneX = true;
+        }
+        that.$apply();
+      }
+    });
+    this.getBattle();
+    Event.listen('battleFresh', () => {
+      this.getBattle();
+    });
+    if (!wepy.getStorageSync('tutorial')) {
+      this.verifyMessageSend();
+    }
+    setTimeout(() => {
+      this.fistAnimation = true;
+      this.$apply();
+    }, 900);
+  }
+  onShow() {}
+}
 </script>
 <style lang="scss">
 	.van-dialog__message {
@@ -583,6 +586,7 @@
 	.swiper {
 	  width: 100%;
 	  height: 90vh;
+	  overflow-x: hidden;
 	}
 	@keyframes fadeIn {
 	  0% {
@@ -887,6 +891,7 @@
 	  align-items: center;
 	  justify-content: space-between;
 	  box-sizing: border-box;
+	  overflow-x: hidden;
 	  width: 100%;
 	  image {
 	    width: 100%;
@@ -1288,6 +1293,7 @@
 	    width: 226rpx;
 	    height: 78rpx;
 	    display: flex;
+	    overflow: hidden;
 	    justify-content: center;
 	    align-items: center;
 	    background: black;

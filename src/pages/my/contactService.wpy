@@ -7,18 +7,18 @@
             <view class="title">审核及使用问题请通过以下方式联系客服：</view>
             <view class="d">
                 <view class="contact">
-                    <view>子澈(小哥哥)</view>
+                    <view>小客服</view>
                     <view>微信号：yanzc1023</view>
                 </view>
                 <view class="copy"  @tap="copy('yanzc1023')">复制</view>
             </view>
-            <view class="d">
+            <!-- <view class="d">
                 <view class="contact">
                     <view>静香(小姐姐)</view>
                     <view>微信号：facedog001</view>
                 </view>
                 <view class="copy"  @tap="copy('P526034465')">复制</view>
-            </view>
+            </view> -->
             <view class="d">
                 <view class="contact">
                     <view>关注微信公众号</view>

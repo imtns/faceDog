@@ -14,95 +14,118 @@
 						<view class="name">{{item.nick_name}} {{item.age}}</view>
 						<view class="city">{{item.province}} {{item.city}}</view>
 					</view>
-					<form report-submit='true' bindsubmit='agree'>
+					<form report-submit='true' bindsubmit='agree' data-user="{{item}}">
 						<button form-type='submit' hover-class="hover-heart" class="icon">
 						</button>
 						<!-- </view> -->
 					</form>
+					<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
+					</image>
 					<!-- <image class="icon" @touchstart="touchstart({{item._id}})" @touchend="touchend" src="{{likemeIcon}}" src="https://images.facedog.cn/public/likeme/heart.png" @tap="agree({{item}})" mode="scaleToFill" lazy-load="false">
 					</image> -->
 				</view>
 			</view>
 		</repeat>
 	</view>
+	<van-toast id="van-toast" />
 </template>
 
 <script>
-	import wepy from 'wepy';
+import wepy from 'wepy';
 
-	import { getAge } from '@/utils';
-	import { get, post } from '@/utils/request';
-	import empty from '@/components/empty';
-	import { LIKE_ME, AGREE_FRIEND, MAKEFRIEND } from '@/utils/url';
-	export default class LikeMe extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '',
-	    usingComponents: {
-	      navbar: '../../components/navbar/index'
-	    }
-	  };
+import { getAge } from '@/utils';
+import { get, post } from '@/utils/request';
+import empty from '@/components/empty';
+import Toast from '@/components/vant/toast/toast';
+import { LIKE_ME, AGREE_FRIEND, MAKEFRIEND, DELETE_ENJOY } from '@/utils/url';
+export default class LikeMe extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-toast': '../../components/vant/toast/index'
+    }
+  };
 
-	  data = {
-	    list: []
-	  };
+  data = {
+    list: []
+  };
 
-	  components = {
-	    empty
-	  };
+  components = {
+    empty
+  };
 
-	  methods = {
-	    async agree(user) {
-	      //   await get(AGREE_FRIEND, {
-	      //     user_id: user._id
-	      //   });
-	      //   await post(MAKEFRIEND, {
-	      //     to_be: 'friend',
-	      //     user_id: user._id,
-	      //   });
-	      wx.navigateTo({
-	        url: `/pages/chat/becomeFriend?id=${user.dentifier}&nick=${
-	          user.nick_name
-	        }&icon=${encodeURI(
-	          `${user.avatar}?x-oss-process=image/resize,w_100,h_100/format,jpg`
-	        )}`
-	      });
-	    },
-	    goProfile(id) {
-	      console.log(id);
-	      wx.navigateTo({
-	        url: `../battle/profile?id=${id}`,
-	        success: result => {},
-	        fail: () => {},
-	        complete: () => {}
-	      });
-	    }
-	  };
+  methods = {
+    async clearFavorites(id) {
+      wepy.showLoading({
+        title: '', //提示的内容,
+        mask: true, //显示透明蒙层，防止触摸穿透,
+        success: res => {}
+      });
+      await post(DELETE_ENJOY, { user_id: id });
+      Toast('删除成功');
+      wepy.hideLoading();
+      this.initData();
+    },
+    async agree(e) {
+      let user = e.currentTarget.dataset.user;
+      //   await get(AGREE_FRIEND, {
+      //     user_id: user._id
+      //   });
+      await post(MAKEFRIEND, {
+        to_be: 'friend',
+        user_id: user._id
+      });
+      wepy.setStorageSync(
+        'chatIcon',
+        `${user.avatar}?x-oss-process=image/resize,w_100,h_100/format,jpg`
+      );
 
-	  events = {};
+      wx.navigateTo({
+        url: `/pages/chat/becomeFriend?id=${user.dentifier}&nick=${
+          user.nick_name
+        }&icon=${encodeURI(
+          `${user.avatar}?x-oss-process=image/resize,w_100,h_100/format,jpg`
+        )}`
+      });
+    },
+    goProfile(id) {
+      console.log(id);
+      wx.navigateTo({
+        url: `../battle/profile?id=${id}`,
+        success: result => {},
+        fail: () => {},
+        complete: () => {}
+      });
+    }
+  };
 
-	  watch = {};
+  events = {};
 
-	  computed = {};
+  watch = {};
 
-	  onLoad() {
-	    this.initData();
-	  }
-	  async initData() {
-	    const result = await get(LIKE_ME);
-	    // this.list = result;
-	    // console.warn(this.list);
-	    result.forEach(item => {
-	      this.list.push(...item.users);
-	      //   item.day = item.date_time.split('-')[2];
-	      //   item.month = new Date(item.date_time).toDateString().split(' ')[1];
-	      //   item.users.forEach(t => {
-	      //     t.age = getAge(t.birthday);
-	      //   });
-	    });
-	    this.$apply();
-	  }
-	  onShow() {}
-	}
+  computed = {};
+
+  onShow() {
+    this.initData();
+  }
+  async initData() {
+    const result = await get(LIKE_ME);
+    // this.list = result;
+    // console.warn(this.list);
+    this.list = [];
+    result.forEach(item => {
+      this.list.push(...item.users);
+      //   item.day = item.date_time.split('-')[2];
+      //   item.month = new Date(item.date_time).toDateString().split(' ')[1];
+      //   item.users.forEach(t => {
+      //     t.age = getAge(t.birthday);
+      //   });
+    });
+    this.$apply();
+  }
+//   onShow() {}
+}
 </script>
 
 <style lang='scss'>
@@ -145,7 +168,8 @@
 	    }
 	    .info {
 	      margin-right: auto;
-	      margin-left: 20rpx;
+		  margin-left: 20rpx;
+		  width:240rpx;
 	      .name {
 	        font-size: 31rpx;
 	        color: #000;
@@ -156,20 +180,20 @@
 	      }
 	    }
 	    .icon {
-		  &::after{
-			  content:"";
-			  border:none;
-		  }
-		  border:none;
+	      &::after {
+	        content: '';
+	        border: none;
+	      }
+	      border: none;
 	      background: url('https://images.facedog.cn/public/likeme/heart.png');
 	      background-size: contain;
 	      background-repeat: no-repeat;
 	      margin-left: auto;
 	      margin-right: 30rpx;
 	      width: 149rpx;
-	      height: 149rpx; 
+	      height: 149rpx;
 	    }
-		.hover-heart{
+	    .hover-heart {
 	      background: url('https://images.facedog.cn/public/likeme/heart-hover.png');
 	      background-size: contain;
 	      background-repeat: no-repeat;
@@ -177,7 +201,12 @@
 	      margin-right: 30rpx;
 	      width: 149rpx;
 	      height: 149rpx;
-		}
+	    }
+	  }
+	  .delete {
+	    width: 43rpx;
+	    height: 43rpx;
+	    margin-right: 60rpx;
 	  }
 	}
 </style>

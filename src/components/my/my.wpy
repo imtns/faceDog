@@ -86,23 +86,29 @@
 			</image>
 		</view>
 		<view class="line"></view>
-		<view class="nav-item {{active[1]?'active':''}}" @touchstart="touchstart(1)" @touchend="touchend(1)" @tap="redirect('contactService')">
+		<view class="nav-item {{active[1]?'active':''}}" @touchstart="touchstart(1)" @touchend="touchend(1)" @tap="redirect('myCard')">
+			<image style="height:28rpx;" src="https://images.facedog.cn/public/index/yg-share.png?2" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view>
+
+		<view class="line"></view>
+		<view class="nav-item {{active[2]?'active':''}}" @touchstart="touchstart(2)" @touchend="touchend(2)" @tap="redirect('contactService')">
 			<image src="https://images.facedog.cn/public/profile/service.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
-		<view class="nav-item {{active[2]?'active':''}}" @touchstart="touchstart(2)" @touchend="touchend(2)" @tap="redirect('setting')">
+		<view class="nav-item {{active[3]?'active':''}}" @touchstart="touchstart(3)" @touchend="touchend(3)" @tap="redirect('setting')">
 			<image src="https://images.facedog.cn/public/profile/setting.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
-		<view class="nav-item" wx:if="{{debug >= 7}}">
+		<!-- <view class="nav-item" wx:if="{{debug >= 7}}">
 			<navigator url="test" open-type="navigate" hover-class="none">
 				<view class="item">
 					<view class="title">切换</view>
 				</view>
 			</navigator>
-		</view>
-		<view class="nav-item" wx:if="{{debug1 >= 7}}">
+		</view> -->
+		<view class="nav-item" wx:if="{{debug1 >= 12}}">
 			<navigator url="test/testCharge" open-type="navigate" hover-class="none">
 				<view class="item">
 					<view class="title">充值</view>
@@ -124,133 +130,152 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import { Event } from '@/utils/event.js';
-	export default class My extends wepy.component {
-	  data = {
-	    active: {},
-	    progress: {
-	      profile: '未认证',
-	      certify: '未认证',
-	      audit: '审核中',
-	      finish: '已通过',
-	      refuse: '认证失败'
-	    },
-	    levelColor: {
-	      1: '#8D8D8D',
-	      2: '#22C8C7',
-	      3: '#FDBB5B',
-	      4: '#F87725',
-	      5: '#766AFB'
-	    },
-	    debug: 0,
-	    debug1: 0,
-	    level: 1,
-	    clickCount: 0,
-	    levelPercent: 0,
-	    profile: {},
-	    tempName: ''
-	  };
-	  components = {};
+import wepy from 'wepy';
+import { Event } from '@/utils/event.js';
+import Dialog from '@/components/vant/dialog/dialog';
+export default class My extends wepy.component {
+  data = {
+    active: {},
+    progress: {
+      profile: '未认证',
+      certify: '未认证',
+      audit: '审核中',
+      finish: '已通过',
+      refuse: '认证失败'
+    },
+    levelColor: {
+      1: '#8D8D8D',
+      2: '#22C8C7',
+      3: '#FDBB5B',
+      4: '#F87725',
+      5: '#766AFB'
+    },
+    debug: 0,
+    debug1: 0,
+    level: 1,
+    clickCount: 0,
+    levelPercent: 0,
+    profile: {},
+    tempName: ''
+  };
+  components = {};
 
-	  methods = {
-	    touchstart(index) {
-	      this.active[index] = true;
-	    },
-	    touchend(index) {
-	      this.active[index] = false;
-	    },
-	    toRules() {
-	      wepy.navigateTo({ url: 'my/likeHelp' });
-	    },
-	    toMyCoin() {
-	      wepy.navigateTo({ url: '/pages/coin/index' });
-	    },
-	    addDebugCount() {
-	      this.debug++;
-	    },
-	    addDebugCount1() {
-	      this.debug1++;
-	    },
-	    checkVerify(state) {
-	      console.log(state);
-	      let userid = wepy.getStorageSync('inviteCode');
-	      if (state == 'refuse' || state == 'certify' || state == 'profile') {
-	        wepy.navigateTo({ url: `register/verify` });
-	      }
-	    },
-	    goProfile() {
-	      //   if (!wepy.getStorageSync('hasProfile')) {
-	      //     Event.trigger('showVerify', true);
-	      //     return;
-	      //   }
-	      wx.navigateTo({
-	        url: 'battle/profile?id=' + this.profile._id,
-	        success: result => {},
-	        fail: () => {},
-	        complete: () => {}
-	      });
-	    },
-	    redirect(name) {
-	      if (!wepy.getStorageSync('hasProfile') && name == 'propaganda') {
-	        Event.trigger('showVerify', true);
-	        return;
-	      }
-	      // 跳转到我的动态页面需要带参数
-	      if (name === 'mymoment') {
-	        // wepy.navigateTo({
-	        //   url: `/pages/my/mymoment?id=${this.profile._id}`
-	        // });
-	        wepy.navigateTo({
-	          url: `/pages/chat/friendList`
-	        });
-	        return;
-	      }
-	      if (name == 'invite') {
-	        wepy.navigateTo({ url: `/pages/invite/index` });
-	        return;
-	      }
-	      wepy.navigateTo({ url: `my/${name}` });
-	    },
-	    setProfile(profile) {
-	      // console.error(profile);
-	      this.tempName = wepy.getStorageSync('tempName');
-	      this.profile = profile;
-	      this.clickCount = profile.play;
-	      this.getLevel();
-	      this.$apply();
-	    }
-	  };
-	  getLevel() {
-	    if (this.clickCount >= 0 && this.clickCount < 10) {
-	      this.level = 1;
-	      this.levelPercent = this.clickCount / 10;
-	    } else if (this.clickCount >= 10 && this.clickCount < 30) {
-	      this.level = 2;
-	      this.levelPercent = this.clickCount / 30;
-	    } else if (this.clickCount >= 30 && this.clickCount < 99) {
-	      this.level = 3;
-	      this.levelPercent = this.clickCount / 99;
-	    } else if (this.clickCount >= 100 && this.clickCount < 999) {
-	      this.level = 4;
-	      this.levelPercent = this.clickCount / 999;
-	    } else {
-	      this.level = 5;
-	      if (this.clickCount > 9999) this.clickCount = 9999;
-	      this.levelPercent = this.levelPercent / 9999;
-	    }
-	    this.levelPercent = this.levelPercent * 100;
-	  }
-	  events = {};
+  methods = {
+    touchstart(index) {
+      this.active[index] = true;
+    },
+    touchend(index) {
+      this.active[index] = false;
+    },
+    toRules() {
+      wepy.navigateTo({ url: 'my/likeHelp' });
+    },
+    toMyCoin() {
+      wepy.navigateTo({ url: '/pages/coin/index' });
+    },
+    addDebugCount() {
+      this.debug++;
+    },
+    addDebugCount1() {
+      this.debug1++;
+    },
+    checkVerify(state) {
+      console.log(state);
+      let userid = wepy.getStorageSync('inviteCode');
+      if (state == 'refuse' || state == 'certify' || state == 'profile') {
+        wepy.navigateTo({ url: `register/verify` });
+      }
+    },
+    goProfile() {
+      //   if (!wepy.getStorageSync('hasProfile')) {
+      //     Event.trigger('showVerify', true);
+      //     return;
+      //   }
+      wx.navigateTo({
+        url: 'battle/profile?id=' + this.profile._id,
+        success: result => {},
+        fail: () => {},
+        complete: () => {}
+      });
+    },
+    redirect(name) {
+      if (!wepy.getStorageSync('hasProfile') && name == 'propaganda') {
+        Event.trigger('showVerify', true);
+        return;
+      }
+      // 跳转到我的动态页面需要带参数
+      if (name === 'mymoment') {
+        // wepy.navigateTo({
+        //   url: `/pages/my/mymoment?id=${this.profile._id}`
+        // });
+        wepy.navigateTo({
+          url: `/pages/chat/friendList`
+        });
+        return;
+      }
+      if (name == 'invite') {
+        wepy.navigateTo({ url: `/pages/invite/index` });
+        return;
+      }
+      if (name == 'editfile') {
+        Dialog.confirm({
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          asyncClose: true,
+          message: `最后上传的一张照片将作为PK页封面展示，请谨慎选择`
+        })
+          .then(async () => {
+            setTimeout(() => {
+              Dialog.close();
+            }, 1000);
+            wepy.navigateTo({ url: `my/${name}` });
+          })
+          .catch(() => {
+            Dialog.close();
+          });
+        return;
+      }
+      wepy.navigateTo({ url: `my/${name}` });
+    },
+    setProfile(profile) {
+      // console.error(profile);
+      this.tempName = wepy.getStorageSync('tempName');
+      this.profile = profile;
+      this.clickCount = profile.play;
+      this.getLevel();
+      this.$apply();
+    }
+  };
+  getLevel() {
+    if (this.clickCount >= 0 && this.clickCount < 10) {
+      this.level = 1;
+      this.levelPercent = this.clickCount / 10;
+    } else if (this.clickCount >= 10 && this.clickCount < 30) {
+      this.level = 2;
+      this.levelPercent = this.clickCount / 30;
+    } else if (this.clickCount >= 30 && this.clickCount < 99) {
+      this.level = 3;
+      this.levelPercent = this.clickCount / 99;
+    } else if (this.clickCount >= 100 && this.clickCount < 999) {
+      this.level = 4;
+      this.levelPercent = this.clickCount / 999;
+    } else {
+      this.level = 5;
+      if (this.clickCount > 9999) this.clickCount = 9999;
+      this.levelPercent = this.levelPercent / 9999;
+    }
+    this.levelPercent = this.levelPercent * 100;
+  }
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {}
+  onLoad() {}
 
-	  onShow() {}
-	}
+  onShow() {}
+}
 </script>
 
 <style lang='less' scoped>
