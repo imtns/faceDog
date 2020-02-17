@@ -19,99 +19,82 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import Config from '@/utils/config';
-	import {
-	  onMsgNotify,
-	  onMsgNotifyChat,
-	  init,
-	  sdkLogin
-	} from '@/utils/handler.js'; // 这个是所有事件的腾讯js，这个页面需要用到登录
-	import webim from '@/utils/webim.js'; // 腾讯云im包
-	import webimhandler from '@/utils/handler';
-	export default class BecomeFriend extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '成为朋友'
-	  };
+import wepy from 'wepy';
+import Config from '@/utils/config';
+export default class BecomeFriend extends wepy.page {
+  config = {
+    navigationBarTitleText: '成为朋友'
+  };
 
-	  data = {
-	    friendIcon: '',
-	    nick: '',
-	    id: '',
-	    icon: '',
-	    dentifier: '',
-		me: {},
-		isphoneX:false
-	  };
+  data = {
+    friendIcon: '',
+    nick: '',
+    id: '',
+    icon: '',
+    dentifier: '',
+    me: {},
+    isphoneX: false
+  };
 
-	  components = {};
+  components = {};
 
-	  methods = {
-	    redirect() {
-	      wx.setStorageSync('chatIcon', this.friendIcon);
-	      wx.redirectTo({
-	        url: `chat?id=${this.id}&nick=${this.nick}&icon=${encodeURI(
-	          this.friendIcon
-	        )}`
-	      });
-	    },
-	    back() {
-	      wx.navigateBack({
-	        delta: -1
-	      });
-	    }
-	  };
+  methods = {
+    redirect() {
+      wx.redirectTo({
+        url: `chatRoom?id=${this.id}&conversationID=C2C${this.id}`
+      });
+    },
+    back() {
+      wx.navigateBack({
+        delta: -1
+      });
+    }
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad(options) {
-	    this.id = options.id;
-	    this.title = options.nick;
-	    this.nick = options.nick;
-	    this.me = wx.getStorageSync('profile');
-	    if (this.me.icon.indexOf('oss') == -1) {
-	      this.me.icon =
-	        this.me.icon + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
-	    }
-	    this.friendIcon = wx.getStorageSync('chatIcon');
+  onLoad(options) {
+    this.id = options.id;
+    this.title = options.nick;
+    this.nick = options.nick;
+    this.me = wx.getStorageSync('profile');
+    if (this.me.icon.indexOf('oss') == -1) {
+      this.me.icon =
+        this.me.icon + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
+    }
+    this.friendIcon = wx.getStorageSync('chatIcon');
 
-		 this.initChat();
-		let that = this;
-		wx.getSystemInfo({
-	      success(res) {
-	        var name = 'iPhone X';
-	        if (
-	          res.model.indexOf('iPhone 11') > -1 ||
-	          res.model.indexOf('iPhone X') > -1 ||
-	          res.model.indexOf('unknown<iPhone') > -1
-	        ) {
-	          console.warn('isIphoneX !!!!!!!');
-	          that.isphoneX = true;
-	          that.$apply();
-	        }
-	      }
-	    });
-	  }
-	  initChat() {
-	    webimhandler.init({
-	      selToID: this.id,
-	      selType: webim.SESSION_TYPE.C2C,
-	      selSessHeadUrl: this.friendIcon
-	    });
-	    if (webim.checkLogin()) {
-	      // 检查是否登录返回true和false,不登录则重新登录
-	      console.log('匹配好友,已登录', this.id);
-	      setTimeout(() => {
-	        webimhandler.onSendMsg(encodeURIComponent('你们已经可以进行会话了'));
-	      }, 500);
-	    }
-	  }
-	  onShow() {}
-	}
+    this.initChat();
+    let that = this;
+    wx.getSystemInfo({
+      success(res) {
+        var name = 'iPhone X';
+        if (
+          res.model.indexOf('iPhone 11') > -1 ||
+          res.model.indexOf('iPhone X') > -1 ||
+          res.model.indexOf('unknown<iPhone') > -1
+        ) {
+          console.warn('isIphoneX !!!!!!!');
+          that.isphoneX = true;
+          that.$apply();
+        }
+      }
+    });
+  }
+  initChat() {
+    const message = wx.$app.createTextMessage({
+      to: this.id,
+      conversationType: 'C2C',
+      payload: { text: '你们已经可以进行会话了' }
+    });
+    wx.$app.sendMessage(message);
+  }
+  onShow() {}
+}
 </script>
 
 <style lang='less'>

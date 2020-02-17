@@ -20,7 +20,8 @@ const CONFIG = {
             userSig: 'eJxlj1FPgzAUhd-5FYTXGVPKimxvCyzZHFMMzE1fCLZ329Ws7Wghbsb-rqJGEu-r9*Wcc98c13W9Is0vK85VI21pTxo8d*x6xLv4g1qjKCtbBrX4B*FVYw1ltbVQd9BnjFFC*g4KkBa3*GPU6knZoMeNeCm7ku*AISHUH9KgH2Fw18Hl9CGe3yURhpv754LOqjZdFdy-FvEK80EeZlkmG7Y8PYJULafBYjLfT25iqiVqMwjhSDY7xW9TszdJe2wgWyQwmwp5WLdBdL469yotHuD3o9EoYjTqb26hNqhkJ1DiM-9z79d5zrvzAaBQXhU_'
         }
     ],
-    avChatRoomId: '20190201' // 群ID, 必选,这里为了快速演示，固定了群ID，可以由您指定。
+	// avChatRoomId: '@TGS#3JCCOPFG4' // 群ID, 必选,这里为了快速演示，固定了群ID，可以由您指定。
+	avChatRoomId:'@TGS#3GXC3QFGT'
 };
 
 module.exports = CONFIG;

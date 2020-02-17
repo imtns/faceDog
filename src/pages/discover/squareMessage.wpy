@@ -8,7 +8,7 @@
 	<view class='wrapper' wx:else>
 		<repeat for="{{list}}" key="index" index="index" item="item">
 			<view class="notify-box" @tap="redirect({{item.moment_id}})">
-				<image class="icon" @tap.stop="goProfile({{item.user_id}})" src="{{item.avatar}}" mode="aspectFill"></image>
+				<image class="icon" @tap.stop="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_180,h_180/format,jpg" mode="aspectFill"></image>
 				<view class="msg">
 					<view class="name">{{item.nick_name}} {{type[item.type]}} 你的动态</view>
 					<view class="content">{{item.create_time}}</view>

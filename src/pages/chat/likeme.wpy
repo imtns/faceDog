@@ -89,7 +89,7 @@ export default class LikeMe extends wepy.page {
         )}`
       });
     },
-    goProfile(id) {
+    goProfile(id) { 
       console.log(id);
       wx.navigateTo({
         url: `../battle/profile?id=${id}`,

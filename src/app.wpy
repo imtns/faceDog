@@ -11,161 +11,212 @@
 </style>
 
 <script>
-	import wepy from 'wepy';
-	import 'wepy-async-function';
-	import '@/utils/dsp_sdk.js';
-	export default class extends wepy.app {
-	  config = {
-	    pages: [
-	      'pages/blank',
-	      'pages/home',
-	      'pages/test', // 切换
-	      'pages/register/index',
-	      'pages/index',
-	      'pages/battle/profile',
-	      'pages/publish/publish', // 发布页面
-	      'pages/my/setting',
-	      'pages/my/editname',
-	      'pages/my/editdesc',
-	      'pages/my/editfile',
-	      'pages/chat/chat',
-	      'pages/rank/rank', // 排行榜页面
-	      'pages/chat/like',
-	      'pages/my/mytime',
-	      'pages/my/myrank', // 我的排名
-	      'pages/chat/becomeFriend',
-	      'pages/ta/taMomentList', // TA的动态
-	      'pages/ta/momentDetail', // 动态详情页面
-	      'pages/my/mymoment', // 我的动态
-	      'pages/my/propaganda', // 我的推广
-	      'pages/my/withdraw', // 红包提现
-	      'pages/my/activityRule', // 活动规则
-	      'pages/my/contactService', // 联系客服
-	      'pages/my/myCard', // 生成美图
-	      'pages/activity/activity',
-	      'pages/activity/webview', // webview页面
-	      'pages/register/chooseName',
-	      'pages/register/chooseGender',
-	      'pages/register/chooseBirth',
-	      'pages/register/uploadAvatar', // 上传头像
-	      'pages/register/verify',
-	      'pages/register/uploadVideo',
-	      //   'pages/discover/likeList', // 点赞列表
-	      //   'pages/discover/commentList', // 评论列表
-	      'pages/my/likeHelp', // 点击说明
-	      'pages/test/testBattle',
-	      'pages/chat/ilike', //我喜欢的
-	      'pages/chat/likeme', //喜欢我的
-	      'pages/chat/friendList',
-		//   'pages/notify/notify',
-		  'pages/redPacket/list', // 红包列表
-		  'pages/invite/index', //邀请奖励
-		  'pages/coin/index', //我的颜币
-		  'pages/coin/coinHelp', //获取颜币说明
-		  'pages/test/testCharge',
-		  'pages/rank/rankHelp',
-		  'pages/discover/discover',
-		  'pages/discover/squareMessage'
-	    ],
-	    window: {
-	      backgroundTextStyle: 'light',
-	      navigationBarBackgroundColor: '#fff',
-	      navigationBarTitleText: '颜狗',
-	      navigationBarTextStyle: 'black',
-	      onReachBottomDistance: 200,
-	      navigationStyle: 'custom'
-	    },
-	    permission: {
-	      'scope.userLocation': {
-	        desc: '你的位置信息将用于小程序位置接口的效果展示'
-	      }
-	    }
-	  };
+import wepy from 'wepy';
+import 'wepy-async-function';
+import '@/utils/dsp_sdk.js';
+import TIM from 'tim-wx-sdk';
+import COS from 'cos-wx-sdk-v5';
+import { Event } from '@/utils/event.js';
+const tim = TIM.create({
+  SDKAppID: 1400214230
+});
+tim.setLogLevel(0);
+wx.$app = tim;
+wx.$app.registerPlugin({ 'cos-wx-sdk': COS });
+wx.TIM = TIM;
+tim.on(TIM.EVENT.SDK_READY, onReadyStateUpdate, this);
+tim.on(TIM.EVENT.CONVERSATION_LIST_UPDATED, function(event) {
+  Event.trigger('conversationListUpdate', event.data);
+});
+tim.on(TIM.EVENT.MESSAGE_RECEIVED, function(event) {
+  console.log(event);
+  if (event.data[0].conversationType === 'GROUP') {
+    Event.trigger('receiveMessageGroup', event.data[0]);
+  }
+});
+function onReadyStateUpdate({ name }) {
+  const isSDKReady = name === TIM.EVENT.SDK_READY;
+  if (isSDKReady) {
+    let profile = wepy.getStorageSync('profile');
+    tim
+      .updateMyProfile({
+        nick: profile.nick_name,
+        avatar: profile.icon,
+        gender:
+          profile.gender == 'male'
+            ? TIM.TYPES.GENDER_MALE
+            : TIM.TYPES.GENDER_FEMALE, 
+        selfSignature: '',
+        allowType: TIM.TYPES.ALLOW_TYPE_ALLOW_ANY
+      })
+      .then(function(imResponse) {
+        console.log('imResponse.data',imResponse.data); // 存储用户资料的数组 - [Profile]
+      });
+    // wx.$app.getMyProfile().then(res => {
+    //   store.commit('updateMyInfo', res.data);
+    // });
+    // wx.$app.getBlacklist().then(res => {
+    //   store.commit('setBlacklist', res.data);
+    // });
+    console.log('SDKReady::::', isSDKReady);
+  }
+  //   store.commit('setSdkReady', isSDKReady);
+}
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/blank',
+      'pages/home',
+      'pages/test', // 切换
+      'pages/register/index',
+      'pages/index',
+      'pages/battle/profile',
+      'pages/publish/publish', // 发布页面
+      'pages/my/setting',
+      'pages/my/editname',
+      'pages/my/editdesc',
+      'pages/my/editfile',
+      'pages/chat/chatRoom', // 聊天
+      'pages/rank/rank', // 排行榜页面
+      'pages/chat/like',
+      'pages/my/mytime',
+      'pages/my/myrank', // 我的排名
+      'pages/chat/becomeFriend',
+      'pages/ta/taMomentList', // TA的动态
+      'pages/ta/momentDetail', // 动态详情页面
+      'pages/my/mymoment', // 我的动态
+      'pages/my/propaganda', // 我的推广
+      'pages/my/withdraw', // 红包提现
+      'pages/my/activityRule', // 活动规则
+      'pages/my/contactService', // 联系客服
+      'pages/my/myCard', // 生成美图
+      'pages/activity/activity',
+      'pages/activity/webview', // webview页面
+      'pages/register/chooseName',
+      'pages/register/chooseGender',
+      'pages/register/chooseBirth',
+      'pages/register/uploadAvatar', // 上传头像
+      'pages/register/verify',
+      'pages/register/uploadVideo',
+      //   'pages/discover/likeList', // 点赞列表
+      //   'pages/discover/commentList', // 评论列表
+      'pages/my/likeHelp', // 点击说明
+      'pages/test/testBattle',
+      'pages/chat/ilike', //我喜欢的
+      'pages/chat/likeme', //喜欢我的
+      'pages/chat/friendList',
+      //   'pages/notify/notify',
+      'pages/redPacket/list', // 红包列表
+      'pages/invite/index', //邀请奖励
+      'pages/coin/index', //我的颜币
+      'pages/coin/coinHelp', //获取颜币说明
+      'pages/test/testCharge',
+      'pages/rank/rankHelp',
+      'pages/discover/discover', // 广场
+      'pages/discover/squareMessage', // 广场消息
+      'pages/vip/superVip', // 会员界面
+      'pages/vip/vipBuy', // 会员购买
+      'pages/vip/coinBuy' // 颜币购买
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: '颜狗',
+      navigationBarTextStyle: 'black',
+      onReachBottomDistance: 200,
+      navigationStyle: 'custom'
+    },
+    permission: {
+      'scope.userLocation': {
+        desc: '你的位置信息将用于小程序位置接口的效果展示'
+      }
+    }
+  };
 
-	  globalData = {
-	    userInfo: {},
-	    location: {},
-	    welcome: false,
-	    inviteCode: '',
-	    isphoneX: false,
-	    navHeight: 0
-	  };
+  globalData = {
+    userInfo: {},
+    location: {},
+    welcome: false,
+    inviteCode: '',
+    isphoneX: false,
+    navHeight: 0
+  };
 
-	  constructor() {
-	    super();
-	    this.use('requestfix');
-	    this.use('promisify');
-	  }
+  constructor() {
+    super();
+    this.use('requestfix');
+    this.use('promisify');
+  }
 
-	  onLaunch() {
-	    const baseUrl = wepy.$appConfig.baseUrl;
-	    console.log('baseUrl', baseUrl);
-	    var that = this;
+  onLaunch() {
+    const baseUrl = wepy.$appConfig.baseUrl;
+    console.log('baseUrl', baseUrl);
+    var that = this;
 
-	    wx.getSystemInfo({
-	      success(res) {
-	        wx.setStorageSync('navHeight', res.statusBarHeight + 46);
-	        var name = 'iPhone X';
-	        if (res.model.indexOf(name) > -1) {
-	          that.globalData.isphoneX = true;
-	        }
-	        console.warn(res);
-	      }
-	    });
-	    console.log('on launch');
-	    if (!wx.cloud) {
-	      // console.error('请使用 2.2.3 或以上的基础库以使用云能力');
-	    } else {
-	      wx.cloud.init({
-	        traceUser: true
-	      });
-	      setTimeout(() => {
-	        wx.cloud
-	          .callFunction({
-	            name: 'getOpenID'
-	          })
-	          .then(res => {
-	            console.log(res.result.userInfo.openId);
-	            wx.dsp.setOpenid(res.result.userInfo.openId);
-	            console.log('call sdk!!!!!!');
-	          });
-	      }, 500);
-	    }
-	  }
-	  onHide() {
-	    wx.cloud
-	      .callFunction({
-	        name: 'getOpenID'
-	      })
-	      .then(res => {
-	        wx.dsp.setOpenid(res.result.userInfo.openId);
-	      });
-	  }
-	  onShow() {}
-	  async testAsync() {
-	    const data = await this.sleep(3);
-	    console.log(data);
-	  }
+    wx.getSystemInfo({
+      success(res) {
+        wx.setStorageSync('navHeight', res.statusBarHeight + 46);
+        var name = 'iPhone X';
+        if (res.model.indexOf(name) > -1) {
+          that.globalData.isphoneX = true;
+        }
+        console.warn(res);
+      }
+    });
+    console.log('on launch');
+    if (!wx.cloud) {
+      // console.error('请使用 2.2.3 或以上的基础库以使用云能力');
+    } else {
+      wx.cloud.init({
+        traceUser: true
+      });
+      setTimeout(() => {
+        wx.cloud
+          .callFunction({
+            name: 'getOpenID'
+          })
+          .then(res => {
+            console.log(res.result.userInfo.openId);
+            wx.dsp.setOpenid(res.result.userInfo.openId);
+            console.log('call sdk!!!!!!');
+          });
+      }, 500);
+    }
+  }
+  onHide() {
+    wx.cloud
+      .callFunction({
+        name: 'getOpenID'
+      })
+      .then(res => {
+        wx.dsp.setOpenid(res.result.userInfo.openId);
+      });
+  }
+  onShow() {}
+  async testAsync() {
+    const data = await this.sleep(3);
+    console.log(data);
+  }
 
-	  getUserInfo(cb) {
-	    const that = this;
-	    if (this.globalData.userInfo) {
-	      return this.globalData.userInfo;
-	    }
-	    wepy.getUserInfo({
-	      success(res) {
-	        that.globalData.userInfo = res.userInfo;
-	        cb && cb(res.userInfo);
-	      }
-	    });
-	  }
-	}
+  getUserInfo(cb) {
+    const that = this;
+    if (this.globalData.userInfo) {
+      return this.globalData.userInfo;
+    }
+    wepy.getUserInfo({
+      success(res) {
+        that.globalData.userInfo = res.userInfo;
+        cb && cb(res.userInfo);
+      }
+    });
+  }
+}
 </script>
 <style lang="less">
-	.van-popup{
-		background-color: transparent !important;
+	.van-popup {
+	  background-color: transparent !important;
 	}
-	.van-dialog__message{
-		background:white !important;
+	.van-dialog__message {
+	  background: white !important;
 	}
 </style>

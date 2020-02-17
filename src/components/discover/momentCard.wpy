@@ -41,7 +41,7 @@
                                     <image class="img" src="{{pic.avatar}}" data-id="{{pic.user_id}}" mode="aspectFill" wx:if="{{pic.avatar}}" mode="aspectFill"></image>
                                 </view>
                             </repeat>
-                            <view class="like-num"><text wx:if="{{item.likes.length>3}}">等</text>{{item.likes.length}}次赞</view>
+                            <view class="like-num" style="{{item.likes.length?'margin-left: 15rpx;':'margin-left: 0rpx;'}}"><text wx:if="{{item.likes.length>3}}">等</text>{{item.likes.length}}次赞</view>
                         </view>
                         <view class="action">
                             <view class="box  {{item.liked?'red':''}}" @tap="zan" data-id="{{item._id}}" data-index="{{index}}" data-liked="{{item.liked}}">
@@ -525,8 +525,19 @@
       onShow() {}
     }
 </script>
-
 <style lang='less' scoped>
+	.warn-pop {
+	  .warn {
+	    height: 120rpx;
+	    text-align: center;
+	    font-size: 32rpx;
+	    font-weight: 600;
+	    line-height: 120rpx;
+	    color: rgba(0, 0, 0, 1);
+	    background: white;
+	    border-bottom: 1px solid rgba(226, 225, 225, 1);
+	  }
+	}
     .moment-mask {
       position: fixed;
       width: 100vw;
@@ -556,7 +567,7 @@
       }
     }
     .momentCard {
-      margin-top: 47rpx;
+      margin-top: 27rpx;
       .top-part {
         display: flex;
         padding: 0 30rpx;
@@ -609,12 +620,12 @@
         width: 100%;
         .moment {
           padding: 0 30rpx;
-          margin-top: 33rpx;
+          margin-top: 20rpx;
           font-size: 30rpx;
           font-weight: bold;
           color: rgba(0, 0, 0, 1);
           position: relative;
-          padding-bottom: 12rpx;
+        //   padding-bottom: 12rpx;
           &::after {
             content: '';
             position: absolute;
@@ -671,7 +682,6 @@
               .like-num {
                 float: left;
                 width: 100rpx;
-                margin-left: 20rpx;
                 font-size: 24rpx;
                 color: #000;
                 line-height: 24rpx;

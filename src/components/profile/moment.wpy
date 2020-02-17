@@ -1,0 +1,131 @@
+<!--  -->
+<template>
+	<view class='container-moment' wx:if="{{list.length}}">
+		<view class="line"></view>
+		<view class="tabs">
+			<view @tap="tabClick('big')" class="tab {{big?'active':''}}">
+				<image wx:if="{{big}}" src="https://images.facedog.cn/public/profile/icon-big-active.png" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image wx:else src="https://images.facedog.cn/public/profile/icon-big.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+			<view @tap="tabClick('small')" class="tab {{!big?'active':''}}">
+				<image wx:if="{{!big}}" src="https://images.facedog.cn/public/profile/icon-small-active.png" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image wx:else src="https://images.facedog.cn/public/profile/icon-small.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+		</view>
+		<view class="ta-moment-list-page" wx:if="{{big}}">
+			<momentCard></momentCard>
+		</view>
+		<view class="small-list" wx:else>
+			<repeat for="{{imgList}}" key="index" index="index" item="item">
+				<image @tap="preview({{index}})" src="{{item}}?x-oss-process=image/resize,w_180,h_180/format,jpg" mode="aspectFill" lazy-load="false">
+				</image>
+			</repeat>
+
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { get } from '@/utils/request';
+import momentCard from '@/components/discover/momentCard';
+export default class Moment extends wepy.component {
+  props = {};
+
+  data = {
+    big: true,
+	imgList: [],
+	list:[]
+  };
+
+  components = {
+    momentCard
+  };
+
+  methods = {
+    getId(id) {
+      this.id = id;
+      this.init();
+    },
+    tabClick(name) {
+      this.big = name == 'big';
+    },
+    preview(index) {
+      wx.previewImage({
+        current: this.imgList[index],
+        urls: this.imgList
+      });
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+  async init() {
+    const list = await get(`/api/discover/${this.id}/moment`, {
+      user_id: this.id
+    });
+    list.length &&
+      list.forEach(item => {
+        item.images.length &&
+          item.images.forEach(x => this.imgList.push(x.image_url));
+	  });
+	this.list = list;
+    this.$apply();
+    console.log('TA的动态', list);
+    this.$invoke('momentCard', 'setMomentList', list);
+  }
+  onShow() {}
+}
+</script>
+
+<style lang='scss' scoped>
+	.container-moment {
+	  position: relative;
+	  width: 100%;
+	  overflow: hidden;
+	  .line {
+	    width: 665rpx;
+	    height: 2rpx;
+	    background: #8d8d8d;
+	    position: relative;
+	    margin: 20rpx auto 0;
+	  }
+	  .tabs {
+	    display: flex;
+	    justify-content: center;
+	    width: 100%;
+	    .tab {
+	      width: 32rpx;
+	      height: 32rpx;
+	      margin: 0rpx 100rpx;
+	      border: 60rpx solid transparent;
+		  border-top: 30rpx solid transparent;
+		  border-bottom:30rpx solid transparent;
+	      image {
+	        width: 100%;
+	        height: 100%;
+	      }
+	    }
+	  }
+	  .small-list {
+	    width: 100%;
+	    margin: 20rpx 44rpx;
+	    display: flex;
+	    flex-wrap: wrap;
+	    image {
+	      width: 217rpx;
+	      height: 217rpx;
+	      margin: 3rpx;
+	    }
+	  }
+	}
+</style>

@@ -35,10 +35,17 @@
 		<view class="box">
 			<view class="box-item">
 				<view class="item" @tap="addDebugCount">
+					<view class="login-bubble">
+						<block wx:if="{{n == 1}}">再登陆1天，出场率提升50%</block>
+						<block wx:elif="{{n == 2}}">再登陆3天，出场率翻倍</block>
+						<block wx:elif="{{n == 3}}">再登陆2天，出场率翻倍</block>
+						<block wx:elif="{{n == 4}}">再登陆1天，出场率翻倍</block>
+						<block wx:elif="{{n >= 1}}">继续登陆，维持最高出场率</block>
+						</view>
 					<image src="https://images.facedog.cn/public/profile/box-1.png?" mode="scaleToFill" lazy-load="false">
 					</image>
 					<text class="text value">{{profile.login}}</text>
-					<text class="text label">累计登录</text>
+					<text class="text label">连续登录</text>
 				</view>
 				<view class="item" @tap="toMyCoin">
 					<image src="https://images.facedog.cn/public/profile/box-2.png?2" mode="scaleToFill" lazy-load="false">
@@ -57,8 +64,11 @@
 				</view>
 			</view>
 			<view class="vip-bar">
-				<image src="https://images.facedog.cn/public/profile/vip-bar.png" mode="aspectFill" lazy-load="false">
+				<image src="https://images.facedog.cn/public/my/vip-bar.png?2" mode="aspectFill" lazy-load="false">
 				</image>
+				<image class="icon" src="https://images.facedog.cn/public/my/icon-kangyi.png?" mode="aspectFill" lazy-load="false">
+				</image>
+				<text>有效期至 2020.5.4</text>
 			</view>
 		</view>
 		<!-- <view class="hr"></view> -->
@@ -142,7 +152,8 @@ export default class My extends wepy.component {
       audit: '审核中',
       finish: '已通过',
       refuse: '认证失败'
-    },
+	},
+	n:2,
     levelColor: {
       1: '#8D8D8D',
       2: '#22C8C7',
@@ -399,7 +410,22 @@ export default class My extends wepy.component {
 	    justify-content: space-around;
 	    flex-wrap: nowrap;
 	    margin: 0 auto;
-	    padding-top: 37rpx;
+		padding-top: 37rpx;
+		.login-bubble{
+			background:url(https://images.facedog.cn/public/profile/icon-bubble.png);
+			width:205rpx;
+			height:50rpx;
+			background-size:contain;
+			font-size:15rpx;
+			color:#FCD174;
+			position:absolute;
+			background-repeat: no-repeat;
+			top:-15rpx; 
+			left:2rpx;
+			z-index: 10;
+			text-align: center;
+			padding-top:10rpx;
+		}
 	    .item {
 	      width: 204rpx;
 	      height: 204rpx;
@@ -459,13 +485,28 @@ export default class My extends wepy.component {
 	    }
 	  }
 	  .vip-bar {
-	    width: 700rpx;
-	    margin: 0 auto;
-	    height: 156rpx;
+	    width: 671rpx;
+	    margin: 20rpx auto 0;
+		height: 133rpx;
+		position: relative;
 	    image {
 	      width: 100%;
 	      height: 100%;
-	    }
+		}
+		.icon{
+			width:47rpx;
+			height:47rpx;
+			position:absolute;
+			top:4rpx;
+			right:24rpx;
+		}
+		text{
+			position:absolute;
+			right:90rpx;
+			top:44rpx;
+			color:#FCD154;
+			font-size:24rpx;
+		}
 	  }
 	}
 	.hr {

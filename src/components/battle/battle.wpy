@@ -41,7 +41,7 @@
 								<view class="distance "><text class="{{blurTop?'blur':''}}">{{item.a.distance}}km</text> <text class="{{blurTop?'blur':''}}"> {{item.a.city}}</text></view>
 							</view>
 							<view class="pass-box {{passShow?'show':''}}">
-								<image src="https://images.facedog.cn/public/battle/pass-box.png" mode="scaleToFill" lazy-load="false">
+								<image src="https://images.facedog.cn/public/battle/pass-box.png?3" mode="scaleToFill" lazy-load="false">
 								</image>
 							</view>
 						</view>
@@ -74,7 +74,7 @@
 								<view class="distance"><text class="{{blurBottom?'blur':''}}">{{item.b.distance}}km</text> <text class="{{blurBottom?'blur':''}}"> {{item.b.city}}</text></view>
 							</view>
 							<view class="pass-box {{passShow?'show':'' }}">
-								<image src="https://images.facedog.cn/public/battle/pass-box.png" mode="scaleToFill" lazy-load="false">
+								<image src="https://images.facedog.cn/public/battle/pass-box.png?2" mode="scaleToFill" lazy-load="false">
 								</image>
 							</view>
 						</view>
@@ -84,7 +84,11 @@
 		</swiper>
 		<view class="PASS {{passTouch?'hover':''}}" style="bottom:{{isphoneX?'450rpx':'300rpx'}};" @tap="passHandler" @touchstart="passTouchStart" @touchend="passTouchEnd">
 			<!-- 换一组 -->
-			<image src="https://images.facedog.cn/public/battle/pass-new.png?8" mode="aspectFill"></image>
+			<image src="https://images.facedog.cn/public/battle/pass-new1.png?2" mode="aspectFill"></image>
+		</view>
+		<view class="BOTH-LIKE {{passTouch?'hover':''}}" style="bottom:{{isphoneX?'450rpx':'300rpx'}};" @tap="bothLike" @touchstart="passTouchStart" @touchend="passTouchEnd">
+			<!-- 换一组 -->
+			<image src="https://images.facedog.cn/public/battle/both-like.png?8" mode="aspectFill"></image>
 		</view>
 	</view>
 	<block wx:if="{{showPop}}">
@@ -97,7 +101,13 @@
 
 <script>
 import wepy from 'wepy';
-import { BATTLE, BATTLE_COMMIT, DAILY_REPORT, BATTLE_PASS } from '@/utils/url';
+import {
+  BATTLE,
+  BATTLE_COMMIT,
+  DAILY_REPORT,
+  BATTLE_PASS,
+  BOTH_LIKE
+} from '@/utils/url';
 import { get, post } from '@/utils/request';
 import { Event } from '@/utils/event.js';
 import { removeDuplicates, throttle, formatDate } from '@/utils';
@@ -206,21 +216,37 @@ export default class Battle extends wepy.component {
     this.$emit('enjoySet', --this.haveEnjoy);
     this.haveEnjoy = enjoyCount;
   }
-  fly(position) {
+  async fly(position, both) {
     this.flyTempID = this.swiperCurrent;
-    if (position == 'top') {
-      this.flyTop[this.flyTempID] = true; //图片飞走时间
-      setTimeout(() => {
-        this.topWave = true; // 飞走后盒子晃动时间
-        this.switchBattle();
-        this.$apply();
-      }, 800);
+    if (!both) {
+      if (position == 'top') {
+        this.flyTop[this.flyTempID] = true; //图片飞走时间
+        setTimeout(() => {
+          this.topWave = true; // 飞走后盒子晃动时间
+          this.switchBattle();
+          this.$apply();
+        }, 800);
+      } else {
+        this.flyBottom[this.flyTempID] = true;
+        setTimeout(() => {
+          this.bottomWave = true;
+          // 晃动完后切换下一组
+          this.switchBattle();
+          this.$apply();
+        }, 800);
+      }
     } else {
+      const data = await post(BOTH_LIKE, {
+        user_a_id: this.battleList[this.swiperCurrent].a._id,
+        user_b_id: this.battleList[this.swiperCurrent].b._id
+      });
+      this.flyTop[this.flyTempID] = true;
       this.flyBottom[this.flyTempID] = true;
       setTimeout(() => {
+        this.topWave = true;
         this.bottomWave = true;
-        // 晃动完后切换下一组
-        this.switchBattle();
+        console.log('both-like:::::');
+        this.switchBattle(true);
         this.$apply();
       }, 800);
     }
@@ -405,29 +431,11 @@ export default class Battle extends wepy.component {
     },
     //bothlike 事件
     bothLike() {
-      return;
-      this.bothLikeMove = false;
-      if (!this.bothLike) {
-        setTimeout(() => {
-          this.bothLikeMove = true;
-          this.$apply();
-          setTimeout(() => {
-            this.bothLikeMove = false;
-            this.bothLikeRotate = false;
-            this.bothLike = false;
-            this.swiperCurrent = this.swiperCurrent == 1 ? 0 : 1;
-            this.$apply();
-            //   this.fly('top');
-            //   this.fly('bottom');
-            this.$apply();
-          }, 1000);
-        }, 1000);
-      }
-      this.bothLike = !this.bothLike;
-      this.bothLikeRotate = !this.bothLikeRotate;
-      if (this.bothLike) {
-        this.init = false;
-      }
+      this.bottomDragDistance = true;
+      this.topDragDistance = true;
+      this.draggingBottom = true;
+      this.draggingTop = true;
+      this.fly('both', true);
     },
     //拖动结束后
     touchEnd() {
@@ -1268,6 +1276,23 @@ export default class Battle extends wepy.component {
 	          opacity: 1;
 	        }
 	      }
+	      .both-like {
+	        width: 429rpx;
+	        height: 317rpx;
+	        position: absolute;
+	        left: 50%;
+	        top: 50%;
+	        transform: translate(-50%, -50%);
+	        image {
+	          width: 100%;
+	          height: 100%;
+	        }
+	        transition: all 0.3s;
+	        opacity: 0;
+	        &.show {
+	          opacity: 1;
+	        }
+	      }
 	      &.top {
 	        border-radius: 36rpx 36rpx 0rpx 0rpx;
 	        z-index: 10;
@@ -1287,33 +1312,26 @@ export default class Battle extends wepy.component {
 	  }
 	  .PASS {
 	    position: absolute;
-	    right: -100rpx;
+	    right: 0;
 	    bottom: 200rpx;
 	    z-index: 101;
-	    width: 226rpx;
+	    width: 113rpx;
 	    height: 78rpx;
-	    display: flex;
-	    overflow: hidden;
-	    justify-content: center;
-	    align-items: center;
-	    background: black;
-	    color: white;
-	    font-size: 24rpx;
-	    opacity: 1;
-	    border-radius: 48rpx 0 0 48rpx;
-	    text-align: center;
-	    &.hover {
-	      background: rgb(49, 49, 49);
-	    }
 	    image {
 	      width: 100%;
 	      height: 100%;
 	    }
-	    .text {
-	      color: #f5a77e;
-	      font-size: 17rpx;
-	      position: relative;
-	      top: 11rpx;
+	  }
+	  .BOTH-LIKE {
+	    position: absolute;
+	    left: 0;
+	    bottom: 200rpx;
+	    z-index: 101;
+	    width: 132rpx;
+	    height: 100rpx;
+	    image {
+	      width: 100%;
+	      height: 100%;
 	    }
 	  }
 	}

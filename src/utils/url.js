@@ -92,4 +92,5 @@ export const GET_UNREAD_MSG = '/api/v1.5/unread_message';
 export const UPDATE_SQUAREMSG_STATUS  = '/api/v1.5/modify_moment_status';
 // 修改红包未读消息状态
 export const UPDATE_REDPACKET_STATUS = '/api/v1.5/modify_ask_wechat_status';
- 
+// 我都要接口
+export const BOTH_LIKE = '/api/face/both_like';

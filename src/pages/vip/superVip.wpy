@@ -1,0 +1,132 @@
+<!--  -->
+<template>
+	<navbar title="超级会员">
+	</navbar>
+	<view class='container'>
+		<swiper class="swiper" indicator-dots="{{false}}" autoplay="{{false}}" duration="{{200}}">
+			<swiper-item catchtouchmove="stopTouchMove">
+				<image src="https://images.facedog.cn/public/vip/vip-swiper.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item>
+		</swiper>
+
+		<view class="middle-content vip">
+			<block wx:if="{{!isVip}}">
+				<text class="text1">您还为获得超级会员</text>
+				<text class="text2">*66天特权会员赠送认证</text>
+			</block>
+			<block wx:else>
+				<text class="text1">有效期至 2020-04-21</text>
+			</block>
+		</view>
+		<!-- <view class="grey-bg"></view> -->
+		<view class="btns">
+			<navigator url="coinBuy" open-type="navigate" hover-class="none">
+				<image src="https://images.facedog.cn/public/vip/btn-black.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</navigator>
+			<navigator url="vipBuy" open-type="navigate" hover-class="none">
+				<image src="https://images.facedog.cn/public/vip/btn-gree.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</navigator>
+
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class SuperVip extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index'
+    }
+  };
+
+  data = {
+    isVip: true
+  };
+
+  components = {};
+
+  methods = {};
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+</script>
+
+<style lang='less'>
+	.container {
+	  swiper {
+	    width: 100%;
+	    height: 359rpx;
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
+	  }
+	  .middle-content {
+	    width: 655rpx;
+	    height: 447rpx;
+	    background: url(https://images.facedog.cn/public/vip/vip-info.png);
+	    background-size: cover;
+	    &.vip {
+	      background: url(https://images.facedog.cn/public/vip/vip-info1.png);
+	      background-size: cover;
+	      .text1 {
+	        color: #f37c61;
+	        font-size: 19rpx;
+	        left: 310rpx;
+	      }
+	    }
+	    margin-top: 60rpx;
+	    position: relative;
+	    z-index: 2;
+	    .text1 {
+	      font-size: 19rpx;
+	      color: #f8f4ea;
+	      position: absolute;
+	      top: 200rpx;
+	      left: 320rpx;
+	    }
+	    .text2 {
+	      font-size: 20rpx;
+	      color: #fcd154;
+	      position: absolute;
+	      top: 450rpx;
+	      left: 295rpx;
+	    }
+	  }
+	  .grey-bg {
+	    width: 105%;
+	    margin: 0 auto;
+	    height: 135rpx;
+	    background: url(https://images.facedog.cn/public/vip/grey-bg.png);
+	    background-size: cover;
+	    position: relative;
+	    top: -55rpx;
+	    left: -10rpx;
+	    z-index: 1;
+	  }
+	  .btns {
+	    width: 100%;
+	    margin-top: 100rpx;
+	    display: flex;
+	    justify-content: center;
+	    image {
+	      width: 285rpx;
+	      height: 91rpx;
+	      margin: 0 30rpx;
+	    }
+	  }
+	}
+</style>

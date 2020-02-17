@@ -1,0 +1,67 @@
+<!--  -->
+<template>
+	<navbar title="颜币兑换">
+	</navbar>
+	<view class='container'>
+		<view class="bg">
+			<image src="https://images.facedog.cn/public/vip/coin-1.png" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image src="https://images.facedog.cn/public/vip/coin-2.png" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image src="https://images.facedog.cn/public/vip/coin-3.png" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class CoinBuy extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index'
+    }
+  };
+
+  data = {};
+
+  components = {};
+
+  methods = {};
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+</script>
+
+<style lang='less'>
+	page {
+	  background: #2e2b2e;
+	}
+	.container {
+	  position: relative;
+	  .bg {
+	    background: url(https://images.facedog.cn/public/vip/coin-bg.png);
+	    background-size: cover;
+	    width: 730rpx;
+	    height: 642rpx;
+	    margin: 200rpx auto;
+	    display: flex;
+	    justify-content: space-around;
+
+	    image {
+	      width: 209rpx;
+	      height: 228rpx;
+	      margin-top: 300rpx;
+	    }
+	  }
+	}
+</style>

@@ -9,9 +9,8 @@
 		<block wx:if="{{verify}}">
 			<verify />
 		</block>
-		<!-- <image class="vip-icon" src="https://images.facedog.cn/public/profile/icon-vip.png" mode="scaleToFill"
-		  lazy-load="false">
-		</image> -->
+		<image class="vip-icon" src="https://images.facedog.cn/public/profile/icon-vip.png" mode="scaleToFill" lazy-load="false">
+		</image>
 		<swiper indicator-dots="{{true}}" autoplay="{{false}}" indicator-color="{{indicatorcolor}}" indicator-active-color="{{indicatoractivecolor}}" duration="300">
 			<repeat for="{{profile.images}}" key="index">
 				<swiper-item>
@@ -23,25 +22,27 @@
 			<image src="https://images.facedog.cn/public/profile/wechat{{profile.ask_wechat?'-disable':''}}.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
-		<view class="battle-profile-wrapper">
+		<view class="battle-profile-wrapper" style="{{self?'padding-bottom:40rpx':'padding-bottom:180rpx'}}">
 			<view class="battle-profile-left flex">
 				<view class="name">{{profile.nick_name}}</view>
-				<view class="info">{{profile.gender =='female'?'女':'男'}} / {{profile.age}} / {{profile.constellation}}</view>
-				<view class="distance"><text>{{profile.distance}}km</text> </view>
-				<view class="area">{{profile.province}} {{profile.city}}</view>
+				<view class="info">{{profile.gender =='female'?'女':'男'}} / {{profile.age}} / 距你 <text style="color:#FFA200;">{{profile.distance}}km</text> </view>
+				<view class="info-wrap">
+					<view class="content xingzuo">{{profile.constellation}}</view>
+					<view class="content area">{{profile.province}} {{profile.city}}</view>
+				</view>
+
 			</view>
 			<view class="battle-profile-right flex">
-				<view class="face-rank">{{profile.gender=='female'?'她':'他'}}的颜值在全国排名前 <text> {{profile.face}}%</text></view>
-				<view class="profile-tags">
-					<view class="tag red">Top100</view>
-					<view class="tag green">颜值杀手</view>
-					<view class="tag blue">性感担当</view>
+				<view class="face-rank">
+					<view class="text1">{{profile.gender=='female'?'她':'他'}}的颜值在全国排名前</view>
+					<view class="text2">{{profile.face}}%</view>
 				</view>
 			</view>
 			<view class="battle-profile-signature" wx:if="{{profile.signature}}">
 				个性签名：{{profile.signature}}
 			</view>
-			<!-- <view class="battle-profile-moments" @tap="goDiscover" wx:if="{{profile.discover && profile.discover.length}}">
+			<moment />
+			<!-- <view class="battle-profile-moments" @tap="goDiscover" wx:if="{{profile.discover && profile.discover.length}}">  
 				<view class="tab">
 					<view class="text1">TA的动态</view>
 					<view class="text2">查看全部
@@ -54,289 +55,297 @@
 					</repeat>
 				</view>
 			</view> -->
-		</view>
-		<view class="bottom-box" wx:if="{{!self && loaded}}">
-			<block wx:if="{{!profile.is_friend}}">
-				<button class="close" hover-class="hover" @tap="close"></button>
-				<!-- <image  mode="aspectFill" @tap="close" src=""></image> -->
-				<!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="https://images.facedog.cn/public/profile/menu.png"></image> -->
-				<image wx:if="{{!profile.is_like}}" src="https://images.facedog.cn/public/profile/apply-tip.png" mode="aspectFill" class="apply-tip"></image>
-				<form report-submit='true' wx:if="{{!profile.is_like}}" bindsubmit='applyFriend'>
-					<button form-type='submit' class="menu apply-button" hover-class="button-hover"></button>
-				</form>
-				<!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="makeFriend('friend')" src="https://images.facedog.cn/public/profile/friend.png?44"></image> -->
-				<button class="menu" wx:if="{{profile.is_like}}" @tap="toastTip">
+			<view class="bottom-box" wx:if="{{!self && loaded}}">
+				<block wx:if="{{!profile.is_friend}}">
+					<button class="close" hover-class="hover" @tap="close"></button>
+					<!-- <image  mode="aspectFill" @tap="close" src=""></image> -->
+					<!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="showOrHide" src="https://images.facedog.cn/public/profile/menu.png"></image> -->
+					<image wx:if="{{!profile.is_like}}" src="https://images.facedog.cn/public/profile/apply-tip.png" mode="aspectFill" class="apply-tip"></image>
+					<form report-submit='true' wx:if="{{!profile.is_like}}" bindsubmit='applyFriend'>
+						<button form-type='submit' class="menu apply-button" hover-class="button-hover"></button>
+					</form>
+					<!-- <image class="menu" wx:if="{{!profile.is_like}}" mode="aspectFill" @tap="makeFriend('friend')" src="https://images.facedog.cn/public/profile/friend.png?44"></image> -->
+					<button class="menu" wx:if="{{profile.is_like}}" @tap="toastTip"></button>
 					<!-- <image class="menu" wx:if="{{profile.is_like}}" mode="aspectFill" @tap="toastTip" src="https://images.facedog.cn/public/profile/icon-clock.png"></image> -->
-			</block>
-			<block wx:else>
-				<image class="close" mode="aspectFill" @tap="gochat" src="https://images.facedog.cn/public/profile/icon-chat.png"></image>
-			</block>
-		</view>
-		<view class="drawer_screen" bindtap="showOrHide" wx:if="{{isShow}}" catchtouchmove="myCatchTouch">
-			<view class="drawer-btn" @tap="makeFriend('close')">
-				<image src="https://images.facedog.cn/public/profile/close.png" mode="aspectFill" class="btn"></image>
-				<view class="textWrap">
-					<view class="lip">真爱降临</view>
-					<view>剩余{{timeLeft.close}}次</view>
-				</view>
+				</block>
+				<block wx:else>
+					<image class="close" mode="aspectFill" @tap="gochat" src="https://images.facedog.cn/public/profile/icon-chat.png"></image>
+				</block>
+			</view>
+			<view class="drawer_screen" bindtap="showOrHide" wx:if="{{isShow}}" catchtouchmove="myCatchTouch">
+				<view class="drawer-btn" @tap="makeFriend('close')">
+					<image src="https://images.facedog.cn/public/profile/close.png" mode="aspectFill" class="btn"></image>
+					<view class="textWrap">
+						<view class="lip">真爱降临</view>
+						<view>剩余{{timeLeft.close}}次</view>
+					</view>
 
-			</view>
-			<view class="drawer-btn" @tap="makeFriend('lover')">
-				<image src="https://images.facedog.cn/public/profile/lover.png" mode="aspectFill" class="btn"></image>
-				<view class="textWrap">
-					<view class="lover">一见钟情</view>
-					<view>剩余{{timeLeft.lover}}次</view>
 				</view>
-			</view>
-			<view class="drawer-btn" @tap="makeFriend('friend')">
-				<image src="https://images.facedog.cn/public/profile/friend.png" mode="aspectFill" class="btn"></image>
-				<view class="textWrap">
-					<view class="friend">有好感</view>
-					<view>剩余{{timeLeft.friend}}次</view>
+				<view class="drawer-btn" @tap="makeFriend('lover')">
+					<image src="https://images.facedog.cn/public/profile/lover.png" mode="aspectFill" class="btn"></image>
+					<view class="textWrap">
+						<view class="lover">一见钟情</view>
+						<view>剩余{{timeLeft.lover}}次</view>
+					</view>
 				</view>
+				<view class="drawer-btn" @tap="makeFriend('friend')">
+					<image src="https://images.facedog.cn/public/profile/friend.png" mode="aspectFill" class="btn"></image>
+					<view class="textWrap">
+						<view class="friend">有好感</view>
+						<view>剩余{{timeLeft.friend}}次</view>
+					</view>
+				</view>
+				<image src="https://images.facedog.cn/public/profile/close1.png" mode="aspectFill" class="layer-close" @tap.stop="showOrHide"></image>
 			</view>
-			<image src="https://images.facedog.cn/public/profile/close1.png" mode="aspectFill" class="layer-close" @tap.stop="showOrHide"></image>
 		</view>
 	</view>
 	<van-toast id="van-toast" />
 	<van-dialog id="van-dialog" />
-</template>
+</template> 
 
 <script>
-	import wepy from 'wepy';
-	import { PROFILE, MAKEFRIEND, USER_LIKE_TIME, ASK_WECHAT } from '@/utils/url';
-	import Toast from '@/components/vant/toast/toast';
-	import { get, post } from '@/utils/request';
-	import { getAge, toast } from '@/utils';
-	import { Event } from '@/utils/event.js';
-	import loadingHeart from '@/components/battle/module/loadingHeart';
-	import verify from '@/components/battle/module/verify';
-	import Dialog from '@/components/vant/dialog/dialog';
-	var index = 0;
-	var position = '';
-	var systemInfo = wx.getSystemInfoSync();
-	export default class Profile extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '',
-	    usingComponents: {
-	      navbar: '../../components/navbar/index',
-	      'van-icon': '../../components/vant/icon/index',
-	      'van-toast': '../components/vant/toast/index',
-	      'van-dialog': '../components/vant/dialog/index'
-	    }
-	  };
+import wepy from 'wepy';
+import { PROFILE, MAKEFRIEND, USER_LIKE_TIME, ASK_WECHAT } from '@/utils/url';
+import Toast from '@/components/vant/toast/toast';
+import { get, post } from '@/utils/request';
+import { getAge, toast } from '@/utils';
+import { Event } from '@/utils/event.js';
+import loadingHeart from '@/components/battle/module/loadingHeart';
+import verify from '@/components/battle/module/verify';
+import Dialog from '@/components/vant/dialog/dialog';
+import moment from '@/components/profile/moment';
+var index = 0;
+var position = '';
+var systemInfo = wx.getSystemInfoSync();
+export default class Profile extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-icon': '../../components/vant/icon/index',
+      'van-collapse': '../../components/vant/collapse/index',
+      'van-collapse-item': '../../components/vant/collapse-item/index',
+      'van-toast': '../../components/vant/toast/index',
+      'van-dialog': '../../components/vant/dialog/index',
+      'van-popup': '../../components/vant/popup/index',
+      'van-tabs': '../../components/vant/tabs/index',
+      'van-tab': '../../components/vant/tab/index'
+    }
+  };
 
-	  data = {
-	    show: false,
-	    indicatoractivecolor: '#fff',
-	    indicatorcolor: 'rgba(255,255,255,.3)',
-	    isShow: false,
-	    animMain: {},
-	    animAdd: {},
-	    animDelLots: {},
-	    id: '',
-	    dentifier: '',
-	    profile: {},
-	    timeLeft: {},
-	    status: 1,
-	    likeType: {
-	      friend: '有好感',
-	      close: '真爱降临',
-	      lover: '一见钟情'
-	    },
-	    self: false,
-	    verify: false,
-	    title: '',
-	    loaded: false,
-	    me: {}
-	  };
-	  events = {};
-	  components = {
-	    verify,
-	    loadingHeart
-	  };
+  data = {
+    show: false,
+    indicatoractivecolor: '#fff',
+    indicatorcolor: 'rgba(255,255,255,.3)',
+    isShow: false,
+    animMain: {},
+    animAdd: {},
+    animDelLots: {},
+    id: '',
+    dentifier: '',
+    profile: {},
+    timeLeft: {},
+    status: 1,
+    likeType: {
+      friend: '有好感',
+      close: '真爱降临',
+      lover: '一见钟情'
+    },
+    self: false,
+    verify: false,
+    title: '',
+    loaded: false,
+    me: {}
+  };
+  events = {};
+  components = {
+    verify,
+    loadingHeart,
+    moment
+  };
 
-	  methods = {
-	    async askWechat() {
-		  if(this.profile.ask_wechat) return;
-	      let message = '';
-	      Dialog.confirm({
-	        confirmButtonText: this.me.coin >= 200 ? '确认' : '如何获得?',
-	        cancelButtonText: '取消',
-	        asyncClose: true,
-	        message: `向 ${this.title}申请微信号?
+  methods = {
+    async askWechat() {
+      if (this.profile.ask_wechat) return;
+      let message = '';
+      Dialog.confirm({
+        confirmButtonText: this.me.coin >= 200 ? '确认' : '如何获得?',
+        cancelButtonText: '取消',
+        asyncClose: true,
+        message: `向 ${this.title}申请微信号?
 								需要扣除200颜币
 								你当前的颜币为${this.me.coin}
 								如果没同意，3天后自动返还`
-	      })
-	        .then(async () => {
-	          if (this.me.coin >= 200) {
-				await post(ASK_WECHAT,{user_id:this.profile._id})
-	            setTimeout(() => {
-				  this.me.coin = this.me.coin - 200;
-				  this.profile.ask_wechat = true;
-				  this.$apply();
-	              Dialog.close();
-	              Dialog.alert({
-	                message: '已发送，请到消息页红包消息处查看进度'
-	              }).then(() => {
-	                // on close
-	              });
-	            }, 1000);
-	          } else {
-				Dialog.close();
-				wepy.navigateTo({ url: '/pages/coin/coinHelp' });
-				
-	            console.log('如何获得');
-	          }
-	        })
-	        .catch(() => {
-	          Dialog.close();
-	          // this.methods.uploadVideo.bind(this)();
-	        });
-	      
-	    },
-	    showOrHide() {
-	      if (this.isShow) {
-	        this.isShow = false;
-	      } else {
-	        this.isShow = true;
-	      }
-	    },
-	    async applyFriend(e) {
-	      console.log(e);
-	      let data = null;
-	      try {
-	        data = await post(MAKEFRIEND, {
-	          to_be: 'friend',
-	          user_id: this.id,
-	          formId: e.detail.formId
-	        });
-	      } catch (e) {
-	        if (e == '用户未完善资料') {
-	          this.verify = true;
-	          this.$apply();
-	        }
-	        return;
-	      }
-	      if (data.friend) {
-	        this.profile.is_friend = true;
-	        wx.setStorageSync('chatIcon', this.profile.avartar);
-	        wx.navigateTo({
-	          url: `../chat/becomeFriend?id=${this.profile.dentifier}&nick=${
-	            this.profile.nick_name
-	          }`
-	        });
-	      } else {
-	        Toast('已发送好友申请');
-	        this.profile.is_like = true;
-	      }
+      })
+        .then(async () => {
+          if (this.me.coin >= 200) {
+            await post(ASK_WECHAT, { user_id: this.profile._id });
+            setTimeout(() => {
+              this.me.coin = this.me.coin - 200;
+              this.profile.ask_wechat = true;
+              this.$apply();
+              Dialog.close();
+              Dialog.alert({
+                message: '已发送，请到消息页红包消息处查看进度'
+              }).then(() => {
+                // on close
+              });
+            }, 1000);
+          } else {
+            Dialog.close();
+            wepy.navigateTo({ url: '/pages/coin/coinHelp' });
 
-	      this.$apply();
-	    },
-	    async makeFriend(type) {
-	      // const data = await post(MAKEFRIEND, {
-	      //     to_be: type,
-	      //     user_id: this.id
-	      // });
-	      // if (data.friend) {
-	      //     this.profile.is_friend = true;
-	      //     wx.navigateTo({
-	      //         url: `../chat/becomeFriend?id=${
-	      //             this.profile.dentifier
-	      //         }&nick=${this.profile.nick_name}&icon=${encodeURI(
-	      //             this.profile.avartar
-	      //         )}`
-	      //     });
-	      // } else {
-	      //     Toast(this.likeType[type] + '发送成功');
-	      //     this.profile.is_like = true;
-	      // }
-	      // this.$apply();
-	    },
-	    goDiscover() {
-	      wepy.navigateTo({
-	        url: `/pages/ta/taMomentList?id=${this.profile._id}`
-	      });
-	    },
-	    gochat() {
-	      wx.setStorageSync('chatIcon', this.profile.avartar);
-	      wepy.navigateTo({
-	        url: `/pages/chat/chat?id=${this.profile.dentifier}&nick=${
-	          this.profile.nick_name
-	        }`
-	      });
-	    },
-	    toastTip() {
-	      Toast('已发送过好友申请');
-	    },
-	    close() {
-	      // if (position) { Event.trigger('changeBattle', index, position); }
-	      wepy.navigateBack({
-	        delta: 1 // 返回的页面数，如果 delta 大于现有页面数，则返回到首页,
-	      });
+            console.log('如何获得');
+          }
+        })
+        .catch(() => {
+          Dialog.close();
+          // this.methods.uploadVideo.bind(this)();
+        });
+    },
+    showOrHide() {
+      if (this.isShow) {
+        this.isShow = false;
+      } else {
+        this.isShow = true;
+      }
+    },
+    async applyFriend(e) {
+      console.log(e);
+      let data = null;
+      try {
+        data = await post(MAKEFRIEND, {
+          to_be: 'friend',
+          user_id: this.id,
+          formId: e.detail.formId
+        });
+      } catch (e) {
+        if (e == '用户未完善资料') {
+          this.verify = true;
+          this.$apply();
+        }
+        return;
+      }
+      if (data.friend) {
+        this.profile.is_friend = true;
+        wx.setStorageSync('chatIcon', this.profile.avartar);
+        wx.navigateTo({
+          url: `../chat/becomeFriend?id=${this.profile.dentifier}&nick=${
+            this.profile.nick_name
+          }`
+        });
+      } else {
+        Toast('已发送好友申请');
+        this.profile.is_like = true;
+      }
 
-	      // wepy.navigateBack({
-	      //     delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
-	      // });
-	    }
-	  };
-	  myCatchTouch() {}
+      this.$apply();
+    },
+    async makeFriend(type) {
+      // const data = await post(MAKEFRIEND, {
+      //     to_be: type,
+      //     user_id: this.id
+      // });
+      // if (data.friend) {
+      //     this.profile.is_friend = true;
+      //     wx.navigateTo({
+      //         url: `../chat/becomeFriend?id=${
+      //             this.profile.dentifier
+      //         }&nick=${this.profile.nick_name}&icon=${encodeURI(
+      //             this.profile.avartar
+      //         )}`
+      //     });
+      // } else {
+      //     Toast(this.likeType[type] + '发送成功');
+      //     this.profile.is_like = true;
+      // }
+      // this.$apply();
+    },
+    goDiscover() {
+      wepy.navigateTo({
+        url: `/pages/ta/taMomentList?id=${this.profile._id}`
+      });
+    },
+    gochat() {
+      wx.setStorageSync('chatIcon', this.profile.avartar);
+      wepy.navigateTo({
+        url: `/pages/chat/chatRoom?id=${this.profile.dentifier}&conversationID=C2C${
+          this.profile.dentifier
+        }`
+      });
+    },
+    toastTip() {
+      Toast('已发送过好友申请');
+    },
+    close() {
+      // if (position) { Event.trigger('changeBattle', index, position); }
+      wepy.navigateBack({
+        delta: 1 // 返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+      });
 
-	  watch = {};
+      // wepy.navigateBack({
+      //     delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+      // });
+    }
+  };
+  myCatchTouch() {}
 
-	  computed = {};
-	  onUnload() {
-	    if (position) {
-	      Event.trigger('changeBattle', index, position);
-	    }
-	  }
-	  async onLoad(options) {
-	    this.id = options.id;
-	    index = options.index;
-	    position = options.position;
-	    Event.listen('showVerify', (status, step) => {
-	      this.verify = status;
-	      this.status = step;
-	      this.$apply();
-	    });
-	    try {
-	      this.timeLeft = await get(MAKEFRIEND);
-	      this.dentifier = options.dentifier;
-	    } catch (e) {}
-	    var data = this.id ? { user_id: this.id } : { dentifier: this.dentifier };
+  watch = {};
 
-	    const result = await get(PROFILE, data);
-	    await get(USER_LIKE_TIME);
-	    this.profile = result;
-	    if (result.dentifier === wepy.getStorageSync('identifier')) {
-	      this.self = true;
-	    }
-	    this.profile.age = getAge(result.birthday);
-	    this.profile.face = result.face !== 0 ? (result.face * 100).toFixed(1) : 0;
-	    this.profile.distance = (this.profile.distance / 1000).toFixed(2);
-	    this.profile.images.forEach(item => {
-	      item.image =
-	        item.image + '?x-oss-process=image/resize,w_900,h_900/format,jpg';
-	      if (item.is_avatar) {
-	        this.profile.avartar = item.image;
-	      }
-	    });
-	    wx.setNavigationBarTitle({
-	      title: result.nick_name,
-	      success: result => {},
-	      fail: () => {},
-	      complete: () => {}
-	    });
-	    this.title = result.nick_name;
-	    this.loaded = true;
-	    this.show = true;
-	    this.me = wepy.getStorageSync('profile');
-	    this.$apply();
-	  }
+  computed = {};
+  onUnload() {
+    if (position) {
+      Event.trigger('changeBattle', index, position);
+    }
+  }
+  async onLoad(options) {
+    this.id = options.id;
 
-	  onShow() {}
-	}
+    index = options.index;
+    position = options.position;
+    Event.listen('showVerify', (status, step) => {
+      this.verify = status;
+      this.status = step;
+      this.$apply();
+    });
+    try {
+      this.timeLeft = await get(MAKEFRIEND);
+      this.dentifier = options.dentifier;
+    } catch (e) {}
+    var data = this.id ? { user_id: this.id } : { dentifier: this.dentifier };
+
+    const result = await get(PROFILE, data);
+    await get(USER_LIKE_TIME);
+    this.profile = result;
+    if (result.dentifier === wepy.getStorageSync('identifier')) {
+      this.self = true;
+    }
+    this.profile.age = getAge(result.birthday);
+    this.profile.face = result.face !== 0 ? (result.face * 100).toFixed(1) : 0;
+	this.profile.distance = (this.profile.distance / 1000).toFixed(2);
+	this.$invoke('moment', 'getId', this.profile._id);
+    this.profile.images.forEach(item => {
+      item.image =
+        item.image + '?x-oss-process=image/resize,w_900,h_900/format,jpg';
+      if (item.is_avatar) {
+        this.profile.avartar = item.image;
+      }
+    });
+    wx.setNavigationBarTitle({
+      title: result.nick_name,
+      success: result => {},
+      fail: () => {},
+      complete: () => {}
+    });
+    this.title = result.nick_name;
+    this.loaded = true;
+    this.show = true;
+    this.me = wepy.getStorageSync('profile');
+    this.$apply();
+  }
+
+  onShow() {}
+}
 </script>
 <style lang="less">
 	.van-dialog__message {
@@ -442,16 +451,15 @@
 	}
 	.container {
 	  width: 100%;
-	  .vip-icon{
-		  position: absolute;
-		  width:173rpx;
-		  height: 59rpx;
-		  right:20rpx;
-		  top:130rpx;
-		  z-index: 10;
+	  .vip-icon {
+	    position: absolute;
+	    width: 173rpx;
+	    height: 59rpx;
+	    right: 20rpx;
+	    top: 135rpx;
+	    z-index: 10;
 	  }
 	  .battle-profile-wrapper {
-	    padding-bottom: 186rpx;
 	    width: 100%;
 	    position: relative;
 	    display: flex;
@@ -459,7 +467,7 @@
 	    flex-wrap: wrap;
 	    .battle-profile-left {
 	      padding-left: 40rpx;
-	      padding-top: 28rpx;
+	      padding-top: 20rpx;
 	      font-weight: 800;
 	      width: 40%;
 	      .name {
@@ -468,31 +476,67 @@
 	      }
 	      .info {
 	        color: #000;
-	        margin-top: 13rpx;
 	        font-size: 24rpx;
-	      }
-	      .distance {
-	        font-size: 24rpx;
-	        margin-top: 6rpx;
-	        text {
-	          color: #ffc125;
-	        }
 	      }
 	      .area {
 	        color: #000;
 	        margin-top: 13rpx;
 	        font-size: 24rpx;
 	      }
+	      .info-wrap {
+	        margin-top: 35rpx;
+	        color: #0c0c0c;
+	        margin-left: 15rpx;
+	        font-size: 24rpx;
+	        .content {
+	          position: relative;
+	          padding-left: 20rpx;
+	          &::before {
+	            content: '';
+	            width: 21rpx;
+	            height: 21rpx;
+	            position: absolute;
+	            left: -10rpx;
+	            top: 7rpx;
+	          }
+	        }
+	        .xingzuo {
+	          &::before {
+	            background: url(https://images.facedog.cn/public/profile/icon-star.png);
+	            background-size: contain;
+	            background-repeat: no-repeat;
+	          }
+	        }
+	        .area {
+	          &::before {
+	            background: url(https://images.facedog.cn/public/profile/icon-path.png);
+	            background-size: contain;
+	            background-repeat: no-repeat;
+	          }
+	        }
+	      }
 	    }
 	    .battle-profile-right {
-	      width: 54%;
-	      margin-top: 31rpx;
+	      width: 30%;
+	      margin-top: 10rpx;
 	      .face-rank {
-	        font-size: 24rpx;
-	        font-weight: 600;
-	        color: #0c0c0c;
-	        text {
-	          color: #e60012;
+	        width: 201rpx;
+	        text-align: center;
+	        height: 102rpx;
+	        background: url(https://images.facedog.cn/public/profile/rank-frame.png);
+	        background-size: contain;
+	        background-repeat: no-repeat;
+	        color: white;
+	        padding-top: 36rpx;
+	        .text1 {
+	          font-size: 18rpx;
+			  line-height: 18rpx;
+			  margin-top:4rpx;
+	        }
+	        .text2 {
+	          font-size: 29rpx;
+			  line-height: 29rpx;
+			  margin-top:7rpx;
 	        }
 	      }
 	      .profile-tags {
@@ -543,17 +587,17 @@
 	    .menu {
 	      width: 174rpx;
 	      height: 174rpx;
-		  margin: 0 15rpx;
-		  &.apply-button{
-			  background:url('https://images.facedog.cn/public/profile/friend.png?44');
-			  background-size:cover;
-			  border:0;
-			  &.button-hover{
-				  background:url('https://images.facedog.cn/public/profile/friend-hover.png?44');
-			  background-size:cover;
-			  border:0;
-			  }
-		  }
+	      margin: 0 15rpx;
+	      &.apply-button {
+	        background: url('https://images.facedog.cn/public/profile/friend.png?44');
+	        background-size: cover;
+	        border: 0;
+	        &.button-hover {
+	          background: url('https://images.facedog.cn/public/profile/friend-hover.png?44');
+	          background-size: cover;
+	          border: 0;
+	        }
+	      }
 	      &.apply-button::after {
 	        border: 0;
 	      }

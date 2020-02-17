@@ -16,21 +16,16 @@
 			</view>
 		</view>
 		<repeat for="{{list}}" key="index" index="index" item="item">
-			<van-swipe-cell class="swipe" id="{{item.To_Account}}" async-close data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.UnreadMsgCount}}" async-close bind:close="onDelete">
+			<van-swipe-cell class="swipe" id="{{item.id}}" async-close data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.unreadCount}}" async-close bind:close="onDelete">
 				<view class="chat-box {{index==list.length-1?'last':''}}">
-					<image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" src="{{item.C2cImage}}?x-oss-process=image/resize,w_200,h_200/format,jpg" mode="aspectFill"></image>
-					<view class="msg" @tap.capture.stop="onClick({{item.To_Account}},{{item.C2cNick}},{{item.C2cImage}},{{item.C2cNick}},{{item.UnreadMsgCount}})">
-						<view class="name">{{item.C2cNick}}</view>
-						<view class="content">{{item.MsgShow}}</view>
+					<image class="icon" @tap.capture.stop="goProfile({{item.id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_200,h_200/format,jpg" mode="aspectFill"></image>
+					<view class="msg" @tap.capture.stop="onClick({{item.id}},{{item.conversationID}},{{item.unreadCount}})">
+						<view class="name">{{item.nick}}</view>
+						<view class="content">{{item.message}}</view>
 					</view>
-					<!-- <image class="icon" @tap.capture.stop="goProfile({{item.To_Account}})" slot="left" src="{{item.C2cImage}}" mode="aspectFill"></image>
-                    <view class="msg">
-                        <view class="name">{{item.C2cNick}}</view>
-                        <view class="content">{{item.MsgShow}}</view>
-                    </view> -->
 					<view class="right-part">
 						<view class="time">{{item.showTime}}</view>
-						<view class="unread" wx:if="{{item.UnreadMsgCount>0}}">{{item.UnreadMsgCount}}</view>
+						<view class="unread" wx:if="{{item.unreadCount>0}}">{{item.unreadCount}}</view>
 					</view>
 				</view>
 				<view class="delete" slot="right">解除匹配</view>
@@ -45,8 +40,8 @@ import wepy from 'wepy';
 import { formatDateFromSeconds } from '@/utils';
 import { get, deltemp } from '@/utils/request';
 import { FRIENDS_LIST } from '@/utils/url';
-import webimhandler from '@/utils/handler';
-import webim from '@/utils/webim.js'; // 腾讯云im包
+// import webimhandler from '@/utils/handler';
+// import webim from '@/utils/webim.js'; // 腾讯云im包
 import empty from '@/components/empty';
 import { Event } from '@/utils/event.js';
 var unread = 0;
@@ -55,7 +50,6 @@ export default class Chatlist extends wepy.component {
 
   data = {
     list: [],
-    initLength: 0,
     unread: 0,
     touch: false,
     friendList: [],
@@ -83,208 +77,81 @@ export default class Chatlist extends wepy.component {
       });
     },
     async getChatList(data) {
-      console.log('data:::::::', data);
+      const friendList = await get(FRIENDS_LIST);
+      this.list = [];
+      this.unread = 0;
+      this.$apply();
       if (wepy.getStorageSync('unread_ask_wechat') == 'ok') {
         this.unreadRedPacket = true;
       } else {
         this.unreadRedPacket = false;
       }
-      this.$apply();
+      data = data.filter(x => x.type == 'C2C' || x.type == 'TIMTextElem');
+      console.log('DATA:::::', data);
       data.forEach(item => {
-        item.C2cNick = decodeURIComponent(item.C2cNick);
-        item.MsgShow = decodeURIComponent(item.MsgShow);
-        item.showTime = formatDateFromSeconds(item.MsgTimeStamp);
-        item.time = item.MsgTimeStamp;
-        if (item.To_Account == 'administrator') {
-          item.C2cImage = 'https://images.facedog.cn/public/chat/chatIcon.png';
-          item.C2cNick = '颜狗客服';
+        item.nick = decodeURIComponent(item.userProfile.nick);
+        item.id = item.userProfile.userID;
+        item.message = decodeURIComponent(item.lastMessage.messageForShow);
+        item.showTime = formatDateFromSeconds(item.lastMessage.lastTime);
+        item.avatar = item.userProfile.avatar;
+        item.type = 'C2C';
+        if (item.conversationID == 'C2Cadministrator') {
+          item.avatar = 'https://images.facedog.cn/public/chat/chatIcon.png';
+          item.nick = '颜狗客服';
+        }
+        if (!item.nick) {
+          friendList.forEach(friend => {
+            if (item.id == friend.dentifier) {
+              item.nick = friend.nick_name;
+              item.avatar = friend.avatar;
+            }
+          });
         }
       });
       data.sort((x, y) => {
-        return x.To_Account === 'administrator'
+        return x.conversationID === 'C2Cadministrator'
           ? -1
-          : y.To_Account === 'administrator'
+          : y.conversationID === 'C2Cadministrator'
             ? 1
             : 0;
       });
-      //   data.unshift({
-      //     C2cImage: 'https://images.facedog.cn/public/battle/redpacket.png',
-      //     To_Account: '颜币红包',
-      //     C2cNick: '颜币红包'
-      //   });
-      this.list = data;
-      this.initLength = data.length;
+
+      const r = data.filter(elem =>
+        friendList.find(
+          ({ dentifier }) => elem.id === dentifier || elem.id == 'administrator'
+        )
+      );
+      r.forEach(x => {
+        this.unread += x.unreadCount;
+      });
+      this.$emit('unreadSet', this.unread);
+      this.list = r;
       this.$apply();
     },
-
-    receivingMsg(sessMap, msg, init) {
-      var sess = null;
-      unread = 0;
-      wx.hideLoading();
-      var pages = getCurrentPages(); //获取加载的页面
-
-      var currentPage = pages[pages.length - 1]; //获取当前页面的对象
-
-      var url = currentPage.route;
-      console.warn('msg', msg);
-      for (var i in sessMap) {
-        sess = sessMap[i];
-        console.warn('sess', sess);
-        var isnew = true;
-        this.list &&
-          this.list.forEach(item => {
-            if (item.To_Account == sess.id()) {
-              isnew = false;
-            }
-          });
-        console.warn('isnew', isnew);
-        if (isnew && Object.keys(msg).length !== 0) {
-          console.log('no!!!!!!');
-          webim.getProfilePortrait(
-            {
-              To_Account: [msg.sess.id()],
-              TagList: ['Tag_Profile_IM_Image', 'Tag_Profile_IM_Nick']
-            },
-            response => {
-              let nick = '';
-              let image = '';
-              response.UserProfileItem[0].ProfileItem.forEach(item => {
-                if (item.Tag == 'Tag_Profile_IM_Nick') {
-                  nick = item.Value;
-                } else {
-                  image = item.Value;
-                }
-              });
-              if (this.list.length) {
-                this.list.forEach(item => {
-                  if (item.To_Account == msg.sess.id()) {
-                    item.To_Account = msg.sess.id();
-                    item.UnreadMsgCount = msg.sess.unread();
-                    item.C2cNick = nick;
-                    item.C2cImage = image;
-                    item.MsgShow = decodeURIComponent(
-                      msg.sess.msgs()[msg.sess.msgs().length - 1].elems[0]
-                        .content.text
-                    );
-                    item.showTime = formatDateFromSeconds(msg.sess.time());
-                    item.time = msg.sess.time();
-                  }
-                });
-              } else {
-                this.list.unshift({
-                  To_Account: msg.sess.id(),
-                  UnreadMsgCount: msg.sess.unread(),
-                  C2cNick: nick,
-                  C2cImage: image,
-                  MsgShow: decodeURIComponent(
-                    msg.sess.msgs()[msg.sess.msgs().length - 1].elems[0].content
-                      .text
-                  ),
-                  showTime: formatDateFromSeconds(msg.sess.time()),
-                  time: msg.sess.time()
-                });
-              }
-              this.$apply();
-            }
-          );
-        } else {
-          this.list &&
-            this.list.forEach(item => {
-              if (item.To_Account === 'administrator') {
-                item.C2cImage =
-                  'https://images.facedog.cn/public/chat/chatIcon.png';
-                item.C2cNick = '颜狗客服';
-              }
-              if (item.To_Account == sess.id()) {
-                item.UnreadMsgCount = sess.unread();
-              }
-              if (item.To_Account == sess.id() && msg.fromAccount) {
-                console.log('init', init);
-                console.log(Object.keys(msg).length);
-                console.log('item.To_Account', item.To_Account);
-                console.log('msg', msg);
-                if (
-                  !init &&
-                  Object.keys(msg).length !== 0 &&
-                  item.To_Account == msg.fromAccount
-                ) {
-                  item.MsgShow = decodeURIComponent(msg.elems[0].content.text);
-                  item.showTime = formatDateFromSeconds(msg.sess.time());
-                  item.UnreadMsgCount = item.UnreadMsgCount - 0 + 1;
-                  this.$emit('unreadSet', item.UnreadMsgCount);
-                  item.time = msg.sess.time();
-                }
-              } else {
-                console.log('22222', sess.msgs());
-                if (
-                  !init &&
-                  Object.keys(msg).length !== 0 &&
-                  item.To_Account == sess.id()
-                ) {
-                  item.MsgShow = decodeURIComponent(
-                    sess.msgs()[sess.msgs().length - 1].elems[0].content.text
-                  );
-                  item.showTime = formatDateFromSeconds(sess.time());
-                  item.time = sess.time();
-                }
-              }
-            });
-        }
-        this.list.sort((a, b) => {
-          return b.time - a.time;
-        });
-        this.list.sort((x, y) => {
-          return x.To_Account == 'administrator'
-            ? -1
-            : y.To_Account == 'administrator'
-              ? 1
-              : 0;
-        });
-
-        console.log('currentPage:', url);
-        if (
-          url != 'pages/chat/chat' &&
-          url != 'pages/chat/becomeFriend' &&
-          sess.msgs() != '你们已经可以进行会话了'
-        ) {
-          unread += sess.unread();
-        }
-
-        this.$apply();
-        this.unread = unread;
-        console.log('unrenad:', unread);
-        console.log('sess.unread()', sess.unread());
-        console.log('sess.id', sess.id());
-        console.log('sess.msg', sess.msgs());
-        console.log(
-          'sess.msg',
-          decodeURIComponent(sess.msgs()[0].elems[0].content.text)
-        );
-      }
-
-      console.log('currentPage:', url);
-      if (url != 'pages/chat/chat' && url != 'pages/chat/becomeFriend') {
-        this.$emit('unreadSet', unread);
-      }
-      this.$apply();
-    },
-    onClick(id, name, icon, nickname, unread) {
+    onClick(id, conversationID, unread) {
+      let that = this;
       if (id == '颜币红包') {
         wepy.navigateTo({ url: '/pages/redPacket/list' });
         return;
       }
       if (unread) {
         this.unread = this.unread - unread;
-        this.$emit('unreadSet', this.unread);
+        if (this.unread > 0) {
+          this.$emit('unreadSet', this.unread);
+        }
       }
-      1;
-      wx.setStorageSync('chatIcon', icon);
-      wx.navigateTo({
-        url: `chat/chat?id=${id}&name=${name}&nick=${nickname}`
+      let list = JSON.parse(JSON.stringify(that.list));
+      list.forEach(item => {
+        if (item.conversationID == conversationID) {
+          item.unreadCount = 0;
+        }
       });
-      //   wx.navigateTo({
-      //     url: `chat/becomeFriend?id=${id}&name=${name}&nick=${nickname}`
-      //   });
+      that.list = list;
+      that.$apply();
+      wx.$app.setMessageRead({ conversationID });
+      wx.navigateTo({
+        url: `chat/chatRoom?id=${id}&conversationID=${conversationID}`
+      });
     },
     async onDelete(event) {
       // console.error(event.detail);
@@ -298,23 +165,20 @@ export default class Chatlist extends wepy.component {
         case 'right':
           console.log('delete', instance);
           instance.close();
-          var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
-          var skey = 'C2C' + instance.id; // 拼装 skey
-          var selSess = sessMap[skey]; // 获取 Session 的实例
-          webim.setAutoRead(selSess, true, false);
-          setTimeout(() => {
-            webim.setAutoRead(selSess, false, false);
-          }, 2000);
           console.log(instance.id);
+          wx.$app
+            .deleteConversation(`C2C${instance.id}`)
+            .then(function(imResponse) {
+              console.log('删除成功,', imResponse);
+            });
           if (instance.id != 'administrator') {
             await deltemp(FRIENDS_LIST, {
               user_id: instance.id
             });
           }
-          webimhandler.delChat(instance.id);
           this.list.splice(instance.dataset.index, 1);
-          unread = unread - instance.dataset.unread;
-          this.$emit('unreadSet', unread);
+          this.unread = this.unread - instance.dataset.unread;
+          this.$emit('unreadSet', this.unread);
           this.$apply();
           break;
       }
@@ -326,26 +190,7 @@ export default class Chatlist extends wepy.component {
 
   computed = {};
 
-  async onLoad() {
-    Event.listen('chatDelete', id => {
-      var sessMap = webim.MsgStore.sessMap(); // 获取 sessMap
-      var skey = 'C2C' + id; // 拼装 skey
-      var selSess = sessMap[skey]; // 获取 Session 的实例
-      webim.setAutoRead(selSess, true, false);
-      setTimeout(() => {
-        webim.setAutoRead(selSess, false, false);
-      }, 2000);
-      webimhandler.delChat(id);
-      let index = this.findIndex(x => x.To_Account == 'id');
-      this.list.splice(index, 1);
-      unread = unread - this.list[index].UnreadMsgCount;
-      this.$emit('unreadSet', unread);
-      this.$apply();
-    });
-    // const result = await get(FRIENDS_LIST);
-    // this.friendList = result;
-    this.$apply();
-  }
+  async onLoad() {}
 
   onShow() {}
 }

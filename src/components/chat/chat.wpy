@@ -36,40 +36,20 @@
 				</scroll-view>
 			</van-collapse-item>
 		</van-collapse>
-		<!-- <scroll-view scroll-y class="scroll" style="height:{{scrollHeight}}px"> -->
 		<chatlist />
-		<!-- </scroll-view> -->
-		<!-- <view class="tabs">
-			<image class="tab" @tap="tabClick(1)" src="{{tabIndex == 1?'https://images.facedog.cn/public/chat/ilike-active.png?4':'https://images.facedog.cn/public/chat/ilike.png?4'}}" mode="aspectFill"></image>
-			<image class="tab" @tap="tabClick(2)" src="{{tabIndex == 2?'https://images.facedog.cn/public/chat/likeme-active.png?4':'https://images.facedog.cn/public/chat/likeme.png?4'}}" mode="aspectFill"></image>
-			<image class="tab" @tap="tabClick(3)" src="{{tabIndex == 3?'https://images.facedog.cn/public/chat/friends-active.png?4':'https://images.facedog.cn/public/chat/friends.png?4'}}" mode="aspectFill"></image>
-			<image class="tab" @tap="tabClick(4)" src="{{tabIndex == 4?'https://images.facedog.cn/public/chat/notify-active.png?4':'https://images.facedog.cn/public/chat/notify.png?4'}}" mode="aspectFill"></image>
-		</view> -->
-		<!-- <scroll-view scroll-y style="height:{{scrollHeight}}px" class="scroll" wx:if="{{tabIndex == 1}}">
-			<ilike />
-		</scroll-view>
-		<scroll-view scroll-y class="scroll" style="height:{{scrollHeight}}px" wx:if="{{tabIndex == 2}}">
-			<likeme />
-		</scroll-view>
-		<scroll-view scroll-y class="scroll" style="height:{{scrollHeight}}px" wx:if="{{tabIndex == 3}}">
-			<chatTab />
-		</scroll-view>
-		<scroll-view scroll-y class="scroll" style="height:{{scrollHeight}}px" wx:if="{{tabIndex == 4}}">
-			<notify />
-		</scroll-view> -->
 	</scroll-view>
 </template>
 
 <script>
 import util from '@/utils/util.js'; // 转换时间插件
-import webim from '@/utils/webim.js'; // 腾讯云im包
-import webimhandler from '@/utils/handler';
-import {
-  onMsgNotify,
-  onMsgNotifyChat,
-  init,
-  sdkLogin
-} from '@/utils/handler.js'; // 这个是所有事件的腾讯js，这个页面需要用到登录
+// import webim from '@/utils/webim.js'; // 腾讯云im包
+// import webimhandler from '@/utils/handler';
+// import {
+//   onMsgNotify,
+//   onMsgNotifyChat,
+//   init,
+//   sdkLogin
+// } from '@/utils/handler.js'; // 这个是所有事件的腾讯js，这个页面需要用到登录
 import Config from '@/utils/config';
 import likeme from './page/likeme';
 import ilike from './page/ilike';
@@ -96,7 +76,6 @@ export default class Chat extends wepy.component {
     activeNames: ['1', '2'],
     ilikeList: [],
     likemeList: [],
-    friendList: [],
     ilikeTotal: 0,
     likeMeTotal: 0,
     likemeIcon: 'https://images.facedog.cn/public/chat/like-me-all.png',
@@ -110,9 +89,6 @@ export default class Chat extends wepy.component {
   };
 
   methods = {
-    // getChatList(data) {
-    //   this.$invoke('chatlist', 'getChatList', data);
-    // },
     touchstart(type) {
       if (type == 'likeme') {
         this.likemeIcon =
@@ -141,6 +117,7 @@ export default class Chat extends wepy.component {
       wepy.navigateTo({ url: '/pages/chat/ilike' });
     },
     receivingMsg(data) {
+      console.log('receivingMsg!!!', data);
       this.$invoke('chatlist', 'receivingMsg', data);
     },
     onChange(event) {
@@ -158,74 +135,6 @@ export default class Chat extends wepy.component {
       } else if (index == 4) {
         this.$invoke('notify', 'initData');
       }
-    },
-    // refreshData() {
-    //   this.fetchData();
-    // },
-    initLike() {
-      //   this.$invoke('ilike', 'initData');
-    },
-    initChat() {
-      var selToID = ''; // 会话列表不设置对方私聊账号
-      webimhandler.init({
-        // 初始化的方法
-        accountMode: 0,
-        accountType: Config.accountType,
-        sdkAppID: Config.sdkappid,
-        selType: webim.SESSION_TYPE.C2C // 私聊
-      });
-      if (webim.checkLogin()) {
-        // 检查是否登录返回true和false,不登录则重新登录
-        console.log('已登录');
-        this.initRecentContactList();
-      } else {
-        console.log('登录成功');
-        // 当前用户身份
-        var loginInfo = {
-          sdkAppID: Config.sdkappid, // 用户所属应用id,必填
-          accountType: Config.accountType, // 用户所属应用帐号类型，必填
-          identifier: wx.getStorageSync('identifier'), // 当前用户ID,必须是否字符串类型，选填
-          identifierNick: wx.getStorageSync('profile').nick_name, // 当前用户昵称，选填
-          userSig: wx.getStorageSync('tencent_token'), // 当前用户身份凭证，必须是字符串类型，选填
-          headurl: wx.getStorageSync('profile').icon
-        };
-        // 监听连接状态回调变化事件
-        var onConnNotify = function(resp) {
-          switch (resp.ErrorCode) {
-            case webim.CONNECTION_STATUS.ON:
-              webim.Log.warn('连接状态正常...');
-              break;
-            case webim.CONNECTION_STATUS.OFF:
-              webim.Log.warn(
-                '连接已断开，无法收到新消息，请检查下你的网络是否正常'
-              );
-              break;
-            default:
-              webim.Log.error('未知连接状态,status=' + resp.ErrorCode);
-              break;
-          }
-        };
-
-        // 监听事件
-        var listeners = {
-          onConnNotify, // 监听连接状态回调变化事件,必填
-          onMsgNotify
-        };
-        var options = {
-          isAccessFormalEnv: true, // 是否访问正式环境，默认访问正式，选填
-          isLogOn: true // 是否开启控制台打印日志,默认开启，选填
-        };
-        Event.listen('msgDetect', msg => {
-          this.initUnreadMsgCount(this, msg);
-        });
-        Event.listen('refreshData', () => {
-          this.refreshData();
-        });
-        webimhandler.sdkLogin(loginInfo, listeners, options, () => {
-          this.initRecentContactList();
-          webim.syncMsgs(onMsgNotify);
-        });
-      }
     }
   };
   refreshData() {
@@ -239,8 +148,12 @@ export default class Chat extends wepy.component {
 
   onLoad() {
     this.scrollHeight = wx.getSystemInfoSync().windowHeight - 84;
-    Event.listen('send', () => {
-      this.initRecentContactList();
+    // Event.listen('send', () => {
+    //   this.initRecentContactList();
+    // });
+    Event.listen('conversationListUpdate', list => {
+      console.log('收到的联系列表', list);
+      this.$invoke('chatlist', 'getChatList', list);
     });
     Event.listen('tab', tab => {
       this.tabIndex = tab;
@@ -248,25 +161,19 @@ export default class Chat extends wepy.component {
       if (tab == 1) {
         this.$invoke('ilike', 'initData');
       }
-      //   if (tab == 2) {
-      //       this.$invoke('like', 'initData');
-      //   }
       this.$apply();
     });
-    // this.$invoke('ilike', 'initData');
     this.$apply();
-    // this.fetchData();
   }
   async fetchData() {
     this.getIlikeList();
     this.getLikeMeList();
-    this.getFriendList();
     this.getUnread();
   }
   async getUnread() {
     let { unread_ask_wechat, unread_moment } = await get(GET_UNREAD_MSG);
-    wepy.setStorageSync('unread_moment', unread_moment?'ok':'');
-    wepy.setStorageSync('unread_ask_wechat', unread_ask_wechat?'ok':'');
+    wepy.setStorageSync('unread_moment', unread_moment ? 'ok' : '');
+    wepy.setStorageSync('unread_ask_wechat', unread_ask_wechat ? 'ok' : '');
   }
   async getLikeMeList() {
     this.likemeList = [];
@@ -285,16 +192,7 @@ export default class Chat extends wepy.component {
     this.ilikeList = ilike.favorites.slice(0, 5);
     this.$apply();
   }
-  async getFriendList() {
-    this.friendList = [];
-    const result = await get(FRIENDS_LIST);
-    this.friendList = result;
-    // this.friendList.forEach(item => {
-    //   item.month = item.create_time.split(' ')[0].split('-')[1];
-    //   item.day = item.create_time.split(' ')[0].split('-')[2];
-    // });
-    this.$apply();
-  }
+
   // 初始化聊天界面最近会话列表
   initRecentContactList() {
     var that = this;
@@ -329,7 +227,11 @@ export default class Chat extends wepy.component {
     var sessMap = webim.MsgStore.sessMap();
     console.log(sessMap);
     var sess = null;
-    that.$invoke('chatlist', 'receivingMsg', sessMap, msg || {}, init);
+    for (var s in sessMap) {
+      if (sessMap[s].type() != 'GROUP') {
+        that.$invoke('chatlist', 'receivingMsg', sessMap, msg || {}, init);
+      }
+    }
   }
 }
 </script>

@@ -37,7 +37,11 @@ export default class topBanner extends wepy.component {
         url: 'discover/discover'
       });
     },
-    toChatroom() {}
+    toChatroom() {
+		wepy.navigateTo({
+        url: '/pages/chat/chatRoom'
+      });
+	}
   };
 
   events = {};

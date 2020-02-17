@@ -1,0 +1,97 @@
+<!--  -->
+<template>
+	<navbar title="颜币兑换">
+	</navbar>
+	<view class='container'>
+		<view class="bg">
+			<view class="box">
+				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip1.png" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image class="icon" src="https://images.facedog.cn/public/vip/vip-1.png?1" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+			<view class="box">
+				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip2.png" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image class="icon" src="https://images.facedog.cn/public/vip/vip-2.png?1" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+			<view class="box">
+				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip3.png" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image class="icon" src="https://images.facedog.cn/public/vip/vip-3.png?1" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image class="vip-icon" src="https://images.facedog.cn/public/vip/vip-icon.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class VipBuy extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index'
+    }
+  };
+
+  data = {};
+
+  components = {};
+
+  methods = {};
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+</script>
+
+<style lang='less'>
+	page {
+	  background: #2e2b2e;
+	}
+	.container {
+	  position: relative;
+	  .bg {
+	    background: url(https://images.facedog.cn/public/vip/coin-bg.png);
+	    background-size: cover;
+	    width: 730rpx;
+	    height: 642rpx;
+	    margin: 200rpx auto;
+	    display: flex;
+	    justify-content: space-around;
+	    .box {
+	      position: relative;
+	      .tip {
+	        width: 171rpx;
+	        height: 100rpx;
+	        position: absolute;
+	        top: 235rpx;
+	        left: 20rpx;
+	      }
+	      .icon {
+	        width: 209rpx;
+	        height: 228rpx;
+	        margin-top: 300rpx;
+	      }
+	      .vip-icon {
+	        width: 104rpx;
+			height: 104rpx;
+			top:294rpx;
+	        position: absolute;
+	        right: -20rpx;
+	      }
+	    }
+	  }
+	}
+</style>
