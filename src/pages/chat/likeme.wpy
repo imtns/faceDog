@@ -2,7 +2,10 @@
 <template>
 	<navbar title="喜欢我的">
 	</navbar>
-	<block wx:if="{{!list.length}}">
+	<block wx:if="{{!show}}">
+		<loadingHeart top="-160rpx" />
+	</block>
+	<block wx:if="{{!list.lengt && show}}">
 		<empty></empty>
 	</block>
 	<view class='container' wx:else>
@@ -37,6 +40,7 @@ import { getAge } from '@/utils';
 import { get, post } from '@/utils/request';
 import empty from '@/components/empty';
 import Toast from '@/components/vant/toast/toast';
+import loadingHeart from '@/components/battle/module/loadingHeart';
 import { LIKE_ME, AGREE_FRIEND, MAKEFRIEND, DELETE_ENJOY } from '@/utils/url';
 export default class LikeMe extends wepy.page {
   config = {
@@ -48,11 +52,13 @@ export default class LikeMe extends wepy.page {
   };
 
   data = {
-    list: []
+	list: [],
+	show:false
   };
 
   components = {
-    empty
+	empty,
+	loadingHeart
   };
 
   methods = {
@@ -89,7 +95,7 @@ export default class LikeMe extends wepy.page {
         )}`
       });
     },
-    goProfile(id) { 
+    goProfile(id) {
       console.log(id);
       wx.navigateTo({
         url: `../battle/profile?id=${id}`,
@@ -121,10 +127,11 @@ export default class LikeMe extends wepy.page {
       //   item.users.forEach(t => {
       //     t.age = getAge(t.birthday);
       //   });
-    });
+	});
+	this.show = true;
     this.$apply();
   }
-//   onShow() {}
+  //   onShow() {}
 }
 </script>
 
@@ -168,8 +175,8 @@ export default class LikeMe extends wepy.page {
 	    }
 	    .info {
 	      margin-right: auto;
-		  margin-left: 20rpx;
-		  width:240rpx;
+	      margin-left: 20rpx;
+	      width: 240rpx;
 	      .name {
 	        font-size: 31rpx;
 	        color: #000;

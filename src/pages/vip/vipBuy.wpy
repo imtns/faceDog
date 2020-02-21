@@ -4,19 +4,19 @@
 	</navbar>
 	<view class='container'>
 		<view class="bg">
-			<view class="box">
+			<view class="box" @tap="pay(1)">
 				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip1.png" mode="scaleToFill" lazy-load="false">
 				</image>
 				<image class="icon" src="https://images.facedog.cn/public/vip/vip-1.png?1" mode="scaleToFill" lazy-load="false">
 				</image>
 			</view>
-			<view class="box">
+			<view class="box" @tap="pay(4800)">
 				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip2.png" mode="scaleToFill" lazy-load="false">
 				</image>
 				<image class="icon" src="https://images.facedog.cn/public/vip/vip-2.png?1" mode="scaleToFill" lazy-load="false">
 				</image>
 			</view>
-			<view class="box">
+			<view class="box" @tap="pay(9600)">
 				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip3.png" mode="scaleToFill" lazy-load="false">
 				</image>
 				<image class="icon" src="https://images.facedog.cn/public/vip/vip-3.png?1" mode="scaleToFill" lazy-load="false">
@@ -26,15 +26,22 @@
 			</view>
 		</view>
 	</view>
+	<van-dialog id="van-dialog" />
 </template>
 
 <script>
 import wepy from 'wepy';
+
+import { post } from '@/utils/request';
+import { PAY } from '@/utils/url';
+import Dialog from '@/components/vant/dialog/dialog';
 export default class VipBuy extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
-      navbar: '../../components/navbar/index'
+      navbar: '../../components/navbar/index',
+      navbar: '../../components/navbar/index',
+      'van-dialog': '../../components/vant/dialog/index'
     }
   };
 
@@ -42,7 +49,43 @@ export default class VipBuy extends wepy.page {
 
   components = {};
 
-  methods = {};
+  methods = {
+    async pay() {
+      let { nonceStr, package: _package, paySign, timeStamp } = await post(
+        PAY,
+        {
+          price: 1
+        }
+      );
+      wx.requestPayment({
+        timeStamp,
+        nonceStr,
+        package: _package,
+        signType: 'MD5',
+        paySign,
+        success: function(res) {
+          if (res.errMsg === 'requestPayment:ok') {
+            console.log('支付成功');
+            Dialog.alert({
+              title: '',
+              message: '支付成功',
+              asyncClose: true
+            }).then(() => {
+              setTimeout(() => {
+                wepy.navigateBack({
+                  delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+                });
+              }, 1000);
+            });
+          }
+        },
+        fail: function(res) {
+          console.log('fail:', res);
+        },
+        complete: function(res) {}
+      });
+    }
+  };
 
   events = {};
 
@@ -86,8 +129,8 @@ export default class VipBuy extends wepy.page {
 	      }
 	      .vip-icon {
 	        width: 104rpx;
-			height: 104rpx;
-			top:294rpx;
+	        height: 104rpx;
+	        top: 294rpx;
 	        position: absolute;
 	        right: -20rpx;
 	      }

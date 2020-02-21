@@ -136,7 +136,7 @@ export default class Chatlist extends wepy.component {
       }
       if (unread) {
         this.unread = this.unread - unread;
-        if (this.unread > 0) {
+        if (this.unread >= 0) {
           this.$emit('unreadSet', this.unread);
         }
       }

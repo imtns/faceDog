@@ -56,7 +56,15 @@
 	  computed = {};
 
 	  onLoad() {
-
+	    wx.getSetting({
+	      success: res => {
+	        if (res.authSetting['scope.userLocation'] == undefined || !wepy.getStorageSync('latitude')) {
+	          wepy.redirectTo({ url: 'home' });
+	        } else {
+	          this.getLocation(this);
+	        }
+	      }
+	    });
 	  }
 	  getLocation(t) {
 	    wx.getLocation({
@@ -78,16 +86,7 @@
 	    });
 	  }
 	  onShow() {
-	    wx.getSetting({
-	      success: res => {
-	        console.log('1111', res.authSetting['scope.userLocation']);
-	        if (res.authSetting['scope.userLocation'] == undefined || !wepy.getStorageSync('latitude')) {
-	          wepy.redirectTo({ url: 'home' });
-	        } else {
-	          this.getLocation(this);
-	        }
-	      }
-	    });
+
 	  }
 	}
 </script>

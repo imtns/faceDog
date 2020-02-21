@@ -1,43 +1,46 @@
 <!--  -->
 <template>
-	<scroll-view scroll-y class="container">
-		<van-collapse value="{{ activeNames }}" bind:change="onChange">
-			<van-collapse-item title="喜欢我的({{likemeList.length}})" name="1">
-				<scroll-view scroll-x class="scroll-x" style="width:100%;">
-					<image @tap="checkAllLikeMe" @touchstart="touchstart('likeme')" @touchend="touchend" src="{{likemeIcon}}" mode="scaleToFill" lazy-load="false">
-					</image>
-					<block wx:if="{{likemeList.length}}">
-						<repeat for="{{likemeList}}" key="index" index="index" item="item">
-							<image class="icon" @tap="goProfile({{item._id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
-						</repeat>
-					</block>
-					<block wx:else>
-						<repeat for="{{[0,1,2,3]}}" key="index" index="index" item="item">
-							<view class="icon-empty"></view>
-						</repeat>
-					</block>
-				</scroll-view>
+	<view class="{{!scroll?'scroll-lock':''}}">
+		<scroll-view scroll-y class="container ">
+			<van-collapse value="{{ activeNames }}" bind:change="onChange">
+				<van-collapse-item title="喜欢我的({{likemeList.length}})" name="1">
+					<scroll-view scroll-x class="scroll-x" style="width:100%;">
+						<image @tap="checkAllLikeMe" @touchstart="touchstart('likeme')" @touchend="touchend" src="{{likemeIcon}}" mode="scaleToFill" lazy-load="false">
+						</image>
+						<block wx:if="{{likemeList.length}}">
+							<repeat for="{{likemeList}}" key="index" index="index" item="item">
+								<image class="icon" @tap="goProfile({{item._id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
+							</repeat>
+						</block>
+						<block wx:else>
+							<repeat for="{{[0,1,2,3]}}" key="index" index="index" item="item">
+								<view class="icon-empty"></view>
+							</repeat>
+						</block>
+					</scroll-view>
 
-			</van-collapse-item>
-			<van-collapse-item title="我喜欢的({{ilikeTotal}})" name="2">
-				<scroll-view scroll-x class="scroll-x" style="width:100%;">
-					<image @tap="checkAllIlike" @touchstart="touchstart('melike')" @touchend="touchend" src="{{meLikeIcon}}" mode="scaleToFill" lazy-load="false">
-					</image>
-					<block wx:if="{{ilikeList.length}}">
-						<repeat for="{{ilikeList}}" key="index" index="index" item="item">
-							<image class="icon blue" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
-						</repeat>
-					</block>
-					<block wx:else>
-						<repeat for="{{[0,1,2,3]}}" key="index" index="index" item="item">
-							<view class="icon-empty"></view>
-						</repeat>
-					</block>
-				</scroll-view>
-			</van-collapse-item>
-		</van-collapse>
-		<chatlist />
-	</scroll-view>
+				</van-collapse-item>
+				<van-collapse-item title="我喜欢的({{ilikeTotal}})" name="2">
+					<scroll-view scroll-x class="scroll-x" style="width:100%;">
+						<image @tap="checkAllIlike" @touchstart="touchstart('melike')" @touchend="touchend" src="{{meLikeIcon}}" mode="scaleToFill" lazy-load="false">
+						</image>
+						<block wx:if="{{ilikeList.length}}">
+							<repeat for="{{ilikeList}}" key="index" index="index" item="item">
+								<image class="icon blue" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
+							</repeat>
+						</block>
+						<block wx:else>
+							<repeat for="{{[0,1,2,3]}}" key="index" index="index" item="item">
+								<view class="icon-empty"></view>
+							</repeat>
+						</block>
+					</scroll-view>
+				</van-collapse-item>
+			</van-collapse>
+			<chatlist />
+			<tutorial wx:if="{{!scroll}}" @setScroll="setScroll" />
+		</scroll-view>
+	</view>
 </template>
 
 <script>
@@ -57,6 +60,7 @@ import chatTab from './page/chatTab';
 import chatlist from './page/chatlist';
 import notify from './page/notify';
 import { Event } from '@/utils/event.js';
+import tutorial from './page/tutorial';
 import wepy from 'wepy';
 import { get, post } from '@/utils/request';
 import {
@@ -68,6 +72,7 @@ import {
 
 export default class Chat extends wepy.component {
   data = {
+    scroll: false,
     isNoData: true,
     noData: '/no-msg.png', // 无数据的图片
     contactList: [], // 会话列表
@@ -85,7 +90,8 @@ export default class Chat extends wepy.component {
     likeme,
     ilike,
     chatlist,
-    notify
+    notify,
+    tutorial
   };
 
   methods = {
@@ -140,7 +146,11 @@ export default class Chat extends wepy.component {
   refreshData() {
     this.fetchData();
   }
-  events = {};
+  events = {
+    setScroll() {
+      this.scroll = true;
+    }
+  };
 
   watch = {};
 
@@ -249,9 +259,14 @@ export default class Chat extends wepy.component {
 </style>
 
 <style lang='less' scoped>
+	.scroll-lock {
+	  height: 90vh;
+	  overflow-y: hidden;
+	}
 	.container {
 	  width: 100%;
 	  overflow: scroll;
+
 	  .tabs {
 	    width: 690rpx;
 	    display: flex;

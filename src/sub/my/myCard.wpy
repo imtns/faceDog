@@ -45,10 +45,10 @@ export default class MyCard extends wepy.page {
         disableScroll: true,
         usingComponents: {
 			navbar: '../../components/navbar/index',
-            drawimage: './miniprogram_npm/miniprogram-drawimage/index',
+            drawimage: './miniprogram-drawimage/index',
             'van-loading': '../../components/vant/loading/index'
         }
-    };
+    }; 
 
     data = {
         profile: {},
@@ -133,7 +133,7 @@ export default class MyCard extends wepy.page {
 
     onShow() {}
     async initStyleList() {
-        this.background.imageResource = '../../../../images/my/background.png';
+        this.background.imageResource = '/images/my/background.png';
         this.headImg = await getTmpFilePath(this.profile.icon);
         let name = this.profile.nick_name;
         const path = await base64src(this.qrcode);

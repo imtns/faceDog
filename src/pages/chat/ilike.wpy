@@ -2,7 +2,10 @@
 <template>
 	<navbar title="我喜欢的">
 	</navbar>
-	<block wx:if="{{!list.length}}">
+	<block wx:if="{{!show}}">
+		<loadingHeart top="-160rpx" />
+	</block>
+	<block wx:if="{{!list.length && show}}">
 		<empty></empty>
 	</block>
 	<view class='container'>
@@ -26,80 +29,83 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import { get, post } from '@/utils/request';
+import wepy from 'wepy';
+import { get, post } from '@/utils/request';
 
-	import empty from '@/components/empty';
-	import Toast from '@/components/vant/toast/toast';
-	import { MAKEFRIEND, MY_FAVORITE, DELETE_FAVORITE } from '@/utils/url';
-	export default class ILIKE extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '',
-	    usingComponents: {
-	      navbar: '../../components/navbar/index',
-	      'van-toast': '../components/vant/toast/index'
-	    }
-	  };
+import empty from '@/components/empty';
+import Toast from '@/components/vant/toast/toast';
+import loadingHeart from '@/components/battle/module/loadingHeart';
+import { MAKEFRIEND, MY_FAVORITE, DELETE_FAVORITE } from '@/utils/url';
+export default class ILIKE extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-toast': '../components/vant/toast/index'
+    }
+  };
 
-	  data = {
-	    list: [],
-	    init: false,
-	    nomore: false,
-	    show: false
-	  };
+  data = {
+    list: [],
+    init: false,
+    nomore: false,
+    show: false,
+  };
 
-	  components = {
-		  empty
-	  };
+  components = {
+	empty,
+	loadingHeart
+  };
 
-	  methods = {
-	    goProfile(id) {
-	      console.log(id);
-	      wx.navigateTo({
-	        url: `../battle/profile?id=${id}`,
-	        success: result => {},
-	        fail: () => {},
-	        complete: () => {}
-	      });
-	    },
-	    async clearFavorites(id) {
-	      wepy.showLoading({
-	        title: '', //提示的内容,
-	        mask: true, //显示透明蒙层，防止触摸穿透,
-	        success: res => {}
-	      });
+  methods = {
+    goProfile(id) {
+      console.log(id);
+      wx.navigateTo({
+        url: `../battle/profile?id=${id}`,
+        success: result => {},
+        fail: () => {},
+        complete: () => {}
+      });
+    },
+    async clearFavorites(id) {
+      wepy.showLoading({
+        title: '', //提示的内容,
+        mask: true, //显示透明蒙层，防止触摸穿透,
+        success: res => {}
+      });
 
-	      if (id == 'all') {
-	        id = [];
-	        this.list.forEach(item => {
-	          id.push(item._id);
-	        });
-	      }
-	      await post(DELETE_FAVORITE, { id });
-	      Toast('删除成功');
-	      wepy.hideLoading();
-	      this.fetchData();
-	    }
-	  };
-	  onReachBottom() {}
-	  events = {};
+      if (id == 'all') {
+        id = [];
+        this.list.forEach(item => {
+          id.push(item._id);
+        });
+      }
+      await post(DELETE_FAVORITE, { id });
+      Toast('删除成功');
+      wepy.hideLoading();
+      this.fetchData();
+    }
+  };
+  onReachBottom() {}
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {
-	    this.fetchData();
-	  }
-	  async fetchData() {
-	    this.list = [];
-	    const result = await get(MY_FAVORITE, { page: 1 });
-	    this.list.push(...result.favorites);
-	    this.init = true;
-	    this.$apply();
-	  }
-	  onShow() {}
-	}
+  onLoad() {
+    this.fetchData();
+  }
+  async fetchData() {
+    this.list = [];
+    const result = await get(MY_FAVORITE, { page: 1 });
+    this.list.push(...result.favorites);
+	this.init = true;
+	this.show = true;
+    this.$apply();
+  }
+  onShow() {}
+}
 </script>
 
 <style lang='scss'>

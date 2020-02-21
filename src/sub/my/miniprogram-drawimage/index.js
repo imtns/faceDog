@@ -7,7 +7,7 @@ const px = (n) => {
     if (typeof n === 'undefined') return void 0;
     if (!n) return 0;
     return parseInt(n, 10) / 750 * windowWidth;
-};
+}; 
 
 /**
     shape Radial/Linear

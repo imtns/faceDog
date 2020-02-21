@@ -45,12 +45,12 @@ function onReadyStateUpdate({ name }) {
         gender:
           profile.gender == 'male'
             ? TIM.TYPES.GENDER_MALE
-            : TIM.TYPES.GENDER_FEMALE, 
+            : TIM.TYPES.GENDER_FEMALE,
         selfSignature: '',
         allowType: TIM.TYPES.ALLOW_TYPE_ALLOW_ANY
       })
       .then(function(imResponse) {
-        console.log('imResponse.data',imResponse.data); // 存储用户资料的数组 - [Profile]
+        console.log('imResponse.data', imResponse.data); // 存储用户资料的数组 - [Profile]
       });
     // wx.$app.getMyProfile().then(res => {
     //   store.commit('updateMyInfo', res.data);
@@ -67,31 +67,25 @@ export default class extends wepy.app {
     pages: [
       'pages/blank',
       'pages/home',
-      'pages/test', // 切换
+      //   'pages/test', // 切换
       'pages/register/index',
       'pages/index',
       'pages/battle/profile',
       'pages/publish/publish', // 发布页面
-      'pages/my/setting',
-      'pages/my/editname',
-      'pages/my/editdesc',
-      'pages/my/editfile',
+
       'pages/chat/chatRoom', // 聊天
       'pages/rank/rank', // 排行榜页面
       'pages/chat/like',
-      'pages/my/mytime',
-      'pages/my/myrank', // 我的排名
+      //   'pages/my/mytime',
+       // 我的排名
       'pages/chat/becomeFriend',
       'pages/ta/taMomentList', // TA的动态
       'pages/ta/momentDetail', // 动态详情页面
-      'pages/my/mymoment', // 我的动态
-      'pages/my/propaganda', // 我的推广
-      'pages/my/withdraw', // 红包提现
-      'pages/my/activityRule', // 活动规则
-      'pages/my/contactService', // 联系客服
-      'pages/my/myCard', // 生成美图
-      'pages/activity/activity',
-      'pages/activity/webview', // webview页面
+      //   'pages/my/mymoment', // 我的动态
+      //   'pages/my/propaganda', // 我的推广
+
+      //   'pages/activity/activity',
+      //   'pages/activity/webview', // webview页面
       'pages/register/chooseName',
       'pages/register/chooseGender',
       'pages/register/chooseBirth',
@@ -100,8 +94,8 @@ export default class extends wepy.app {
       'pages/register/uploadVideo',
       //   'pages/discover/likeList', // 点赞列表
       //   'pages/discover/commentList', // 评论列表
-      'pages/my/likeHelp', // 点击说明
-      'pages/test/testBattle',
+
+      //   'pages/test/testBattle',
       'pages/chat/ilike', //我喜欢的
       'pages/chat/likeme', //喜欢我的
       'pages/chat/friendList',
@@ -117,6 +111,24 @@ export default class extends wepy.app {
       'pages/vip/superVip', // 会员界面
       'pages/vip/vipBuy', // 会员购买
       'pages/vip/coinBuy' // 颜币购买
+    ],
+    subPackages: [
+      {
+        root: 'sub/',
+        pages: [
+		  'test',
+          'my/setting',
+          'my/editname',
+          'my/editdesc',
+          'my/editfile',
+          'my/withdraw', // 红包提现
+          'my/activityRule', // 活动规则
+          'my/contactService', // 联系客服
+          'my/myCard', // 生成美图]
+		  'my/likeHelp',
+		  'my/myrank',
+        ] // 点击说明
+      }
     ],
     window: {
       backgroundTextStyle: 'light',

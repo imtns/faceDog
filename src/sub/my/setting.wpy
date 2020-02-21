@@ -17,7 +17,7 @@
             <view class="detail2">
                 <van-switch checked="{{ in_city }}" @change="onChange('in_city')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
             </view>
-        </view>
+        </view> 
         <view class="line"></view>
         <view class='item'>
             <view class="title">不参加颜值battle</view>

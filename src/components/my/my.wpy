@@ -1,6 +1,7 @@
 <!--  -->
 <template>
 	<view class="wrapper">
+		<notify />
 		<view class="head">
 			<view class="profile">
 				<view class="headIcon" @tap="goProfile">
@@ -41,7 +42,7 @@
 						<block wx:elif="{{n == 3}}">再登陆2天，出场率翻倍</block>
 						<block wx:elif="{{n == 4}}">再登陆1天，出场率翻倍</block>
 						<block wx:elif="{{n >= 1}}">继续登陆，维持最高出场率</block>
-						</view>
+					</view>
 					<image src="https://images.facedog.cn/public/profile/box-1.png?" mode="scaleToFill" lazy-load="false">
 					</image>
 					<text class="text value">{{profile.login}}</text>
@@ -63,12 +64,12 @@
 					<text class="text label">获胜次数</text>
 				</view>
 			</view>
-			<view class="vip-bar">
+			<view class="vip-bar" @tap="goVip">
 				<image src="https://images.facedog.cn/public/my/vip-bar.png?2" mode="aspectFill" lazy-load="false">
 				</image>
 				<image class="icon" src="https://images.facedog.cn/public/my/icon-kangyi.png?" mode="aspectFill" lazy-load="false">
 				</image>
-				<text>有效期至 2020.5.4</text>
+				<text>{{profile.vip?'有效期至 '+profile.vip_expire:'点击获取超级会员'}}</text>
 			</view>
 		</view>
 		<!-- <view class="hr"></view> -->
@@ -142,6 +143,8 @@
 <script>
 import wepy from 'wepy';
 import { Event } from '@/utils/event.js';
+import notify from './notify';
+import { formatTimeShort } from '@/utils';
 import Dialog from '@/components/vant/dialog/dialog';
 export default class My extends wepy.component {
   data = {
@@ -152,8 +155,8 @@ export default class My extends wepy.component {
       audit: '审核中',
       finish: '已通过',
       refuse: '认证失败'
-	},
-	n:2,
+    },
+    n: 2,
     levelColor: {
       1: '#8D8D8D',
       2: '#22C8C7',
@@ -169,7 +172,9 @@ export default class My extends wepy.component {
     profile: {},
     tempName: ''
   };
-  components = {};
+  components = {
+	  notify
+  };
 
   methods = {
     touchstart(index) {
@@ -178,8 +183,11 @@ export default class My extends wepy.component {
     touchend(index) {
       this.active[index] = false;
     },
+    goVip() {
+      wepy.navigateTo({ url: 'vip/superVip' });
+    },
     toRules() {
-      wepy.navigateTo({ url: 'my/likeHelp' });
+      wepy.navigateTo({ url: '/sub/my/likeHelp' });
     },
     toMyCoin() {
       wepy.navigateTo({ url: '/pages/coin/index' });
@@ -239,19 +247,22 @@ export default class My extends wepy.component {
             setTimeout(() => {
               Dialog.close();
             }, 1000);
-            wepy.navigateTo({ url: `my/${name}` });
+            wepy.navigateTo({ url: `../../../sub/my/${name}` });
           })
           .catch(() => {
             Dialog.close();
           });
         return;
       }
-      wepy.navigateTo({ url: `my/${name}` });
+      wepy.navigateTo({ url: `../../../sub/my/${name}` });
     },
     setProfile(profile) {
       // console.error(profile);
       this.tempName = wepy.getStorageSync('tempName');
-      this.profile = profile;
+	  this.profile = profile;
+	  if(this.profile.vip){
+		  this.profile.vip_expire = formatTimeShort(this.profile.vip_expire);
+	  }
       this.clickCount = profile.play;
       this.getLevel();
       this.$apply();
@@ -292,6 +303,7 @@ export default class My extends wepy.component {
 <style lang='less' scoped>
 	.wrapper {
 	  padding-bottom: 140rpx;
+	  position: relative;
 	}
 	.head {
 	  width: 100%;
@@ -410,22 +422,22 @@ export default class My extends wepy.component {
 	    justify-content: space-around;
 	    flex-wrap: nowrap;
 	    margin: 0 auto;
-		padding-top: 37rpx;
-		.login-bubble{
-			background:url(https://images.facedog.cn/public/profile/icon-bubble.png);
-			width:205rpx;
-			height:50rpx;
-			background-size:contain;
-			font-size:15rpx;
-			color:#FCD174;
-			position:absolute;
-			background-repeat: no-repeat;
-			top:-15rpx; 
-			left:2rpx;
-			z-index: 10;
-			text-align: center;
-			padding-top:10rpx;
-		}
+	    padding-top: 37rpx;
+	    .login-bubble {
+	      background: url(https://images.facedog.cn/public/profile/icon-bubble.png);
+	      width: 205rpx;
+	      height: 50rpx;
+	      background-size: contain;
+	      font-size: 15rpx;
+	      color: #fcd174;
+	      position: absolute;
+	      background-repeat: no-repeat;
+	      top: -15rpx;
+	      left: 2rpx;
+	      z-index: 10;
+	      text-align: center;
+	      padding-top: 10rpx;
+	    }
 	    .item {
 	      width: 204rpx;
 	      height: 204rpx;
@@ -487,26 +499,26 @@ export default class My extends wepy.component {
 	  .vip-bar {
 	    width: 671rpx;
 	    margin: 20rpx auto 0;
-		height: 133rpx;
-		position: relative;
+	    height: 133rpx;
+	    position: relative;
 	    image {
 	      width: 100%;
 	      height: 100%;
-		}
-		.icon{
-			width:47rpx;
-			height:47rpx;
-			position:absolute;
-			top:4rpx;
-			right:24rpx;
-		}
-		text{
-			position:absolute;
-			right:90rpx;
-			top:44rpx;
-			color:#FCD154;
-			font-size:24rpx;
-		}
+	    }
+	    .icon {
+	      width: 47rpx;
+	      height: 47rpx;
+	      position: absolute;
+	      top: 4rpx;
+	      right: 24rpx;
+	    }
+	    text {
+	      position: absolute;
+	      right: 90rpx;
+	      top: 44rpx;
+	      color: #fcd154;
+	      font-size: 24rpx;
+	    }
 	  }
 	}
 	.hr {

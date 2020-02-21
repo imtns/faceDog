@@ -11,24 +11,21 @@
 		</swiper>
 
 		<view class="middle-content vip">
-			<block wx:if="{{!isVip}}">
-				<text class="text1">您还为获得超级会员</text>
+			<block wx:if="{{!profile.vip}}">
+				<text class="text1" style="left:320rpx;color:white;">您还为获得超级会员</text>
 				<text class="text2">*66天特权会员赠送认证</text>
 			</block>
 			<block wx:else>
-				<text class="text1">有效期至 2020-04-21</text>
+				<text class="text1">有效期至 {{profile.vip_expire}}</text>
 			</block>
 		</view>
 		<!-- <view class="grey-bg"></view> -->
 		<view class="btns">
-			<navigator url="coinBuy" open-type="navigate" hover-class="none">
-				<image src="https://images.facedog.cn/public/vip/btn-black.png" mode="scaleToFill" lazy-load="false">
-				</image>
-			</navigator>
-			<navigator url="vipBuy" open-type="navigate" hover-class="none">
-				<image src="https://images.facedog.cn/public/vip/btn-gree.png" mode="scaleToFill" lazy-load="false">
-				</image>
-			</navigator>
+			<image @tap="goCoinBuy" src="https://images.facedog.cn/public/vip/btn-black.png" mode="scaleToFill" lazy-load="false">
+			</image>
+
+			<image @tap="goVipBuy" src="https://images.facedog.cn/public/vip/btn-gree.png" mode="scaleToFill" lazy-load="false">
+			</image>
 
 		</view>
 	</view>
@@ -36,6 +33,9 @@
 
 <script>
 import wepy from 'wepy';
+import { NEW_PROFILE } from '@/utils/url';
+import { get } from '@/utils/request';
+import { formatTimeShort } from '@/utils';
 export default class SuperVip extends wepy.page {
   config = {
     navigationBarTitleText: '',
@@ -45,12 +45,22 @@ export default class SuperVip extends wepy.page {
   };
 
   data = {
-    isVip: true
+    isVip: true,
+    profile: {}
   };
 
   components = {};
 
-  methods = {};
+  methods = {
+    goCoinBuy() {
+      if (this.profile.vip) return;
+      wepy.navigateTo({ url: 'coinBuy' });
+    },
+    goVipBuy() {
+      if (this.profile.vip) return;
+      wepy.navigateTo({ url: 'vipBuy' });
+    }
+  };
 
   events = {};
 
@@ -60,7 +70,13 @@ export default class SuperVip extends wepy.page {
 
   onLoad() {}
 
-  onShow() {}
+  async onShow() {
+    this.profile = await get(NEW_PROFILE, { loading: false });
+    if (this.profile.vip) {
+      this.profile.vip_expire = formatTimeShort(this.profile.vip_expire);
+    }
+    this.$apply();
+  }
 }
 </script>
 

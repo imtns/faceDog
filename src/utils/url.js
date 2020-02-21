@@ -94,3 +94,7 @@ export const UPDATE_SQUAREMSG_STATUS  = '/api/v1.5/modify_moment_status';
 export const UPDATE_REDPACKET_STATUS = '/api/v1.5/modify_ask_wechat_status';
 // 我都要接口
 export const BOTH_LIKE = '/api/face/both_like';
+// 获取支付签名
+export const PAY = '/api/v1.5/pay';
+// 颜币支付
+export const COIN_PAY = '/api/v1.5/coin_pay';

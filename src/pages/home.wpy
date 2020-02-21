@@ -90,7 +90,8 @@
 	      }
 	    },
 	    async onGetPosition(e) {
-	      this.getLocationAuth();
+		  this.getLocationAuth();
+		
 	    },
 
 	    onGetUserInfo(e) {

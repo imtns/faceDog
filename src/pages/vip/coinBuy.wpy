@@ -4,23 +4,30 @@
 	</navbar>
 	<view class='container'>
 		<view class="bg">
-			<image src="https://images.facedog.cn/public/vip/coin-1.png" mode="scaleToFill" lazy-load="false">
+			<image @tap="pay(1000)" src="https://images.facedog.cn/public/vip/coin-1.png" mode="scaleToFill" lazy-load="false">
 			</image>
-			<image src="https://images.facedog.cn/public/vip/coin-2.png" mode="scaleToFill" lazy-load="false">
+			<image @tap="pay(2000)" src="https://images.facedog.cn/public/vip/coin-2.png" mode="scaleToFill" lazy-load="false">
 			</image>
-			<image src="https://images.facedog.cn/public/vip/coin-3.png" mode="scaleToFill" lazy-load="false">
+			<image @tap="pay(5000)" src="https://images.facedog.cn/public/vip/coin-3.png" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 	</view>
+	<van-dialog id="van-dialog" />
 </template>
 
 <script>
 import wepy from 'wepy';
+import { post } from '@/utils/request';
+import { COIN_PAY } from '@/utils/url';
+import { toast } from '@/utils';
+import Dialog from '@/components/vant/dialog/dialog';
 export default class CoinBuy extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
-      navbar: '../../components/navbar/index'
+      navbar: '../../components/navbar/index',
+      navbar: '../../components/navbar/index',
+      'van-dialog': '../../components/vant/dialog/index'
     }
   };
 
@@ -28,7 +35,29 @@ export default class CoinBuy extends wepy.page {
 
   components = {};
 
-  methods = {};
+  methods = {
+    async pay(coin) {
+      let result = await post(COIN_PAY, {
+        price: coin
+      });
+      if (result && result.error_msg) {
+        toast('颜币不足');
+        return;
+      }
+      Dialog.alert({
+        title: '',
+        message: '支付成功',
+        asyncClose: true
+      }).then(() => {
+        setTimeout(() => {
+          wepy.navigateBack({
+            delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+          });
+        }, 1000);
+      });
+      console.log(result);
+    }
+  };
 
   events = {};
 

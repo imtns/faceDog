@@ -23,7 +23,7 @@ export default class topBanner extends wepy.component {
         Event.trigger('showVerify', true);
       } else {
         wepy.navigateTo({
-          url: 'my/myrank'
+          url: '/sub/my/myrank'
         });
       }
     },

@@ -9,9 +9,9 @@
 			<view class="word">正在保存...</view>
 		</view>
 
-	</view>
+	</view> 
 	<view class='wrapper'>
-		<view class="header">
+		<view class="header"> 
 			<view class="header-text"></view>
 			<view class="face">{{face}}%</view>
 			<view class="city" style="font-size:{{position.length==3?'39rpx':'33rpx'}};top:{{position.length==3?'140rpx':'144rpx'}};left:{{position.length==3?'298rpx':'288rpx'}}">{{position}}</view>
@@ -67,14 +67,14 @@
 	    navigationBarBackgroundColor: '#000',
 	    navigationBarTextStyle: 'white',
 	    usingComponents: {
-	      drawimage: 'miniprogram_npm/miniprogram-drawimage/index',
+	      drawimage: './miniprogram-drawimage/index',
 	      'van-loading': '../../components/vant/loading/index',
 	      navbar: '../../components/navbar/index'
 	    }
 	  };
 
 	  data = {
-	    charData: {
+	    charData: { 
 	      male: {},
 	      female: {}
 	    },
@@ -339,8 +339,8 @@
 	    return arr[Math.floor(Math.random() * arr.length)];
 	  }
 	  async initStyleList() {
-	    this.background.imageResource = '../../../../images/my/rank/shareBG.png';
-	    const bg = '../../../../images/my/myrank-bg.png';
+	    this.background.imageResource = '/images/my/rank/shareBG.png';
+	    const bg = '/images/my/myrank-bg.png';
 	    this.headImg = await getTmpFilePath(this.images[0].image);
 	    const path = await base64src(this.qrcode);
 	    let qrcode = '';

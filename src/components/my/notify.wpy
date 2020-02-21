@@ -1,0 +1,67 @@
+<!--  -->
+<template>
+	<view class='notify'>
+		<view class="wrap" @tap="go" wx:if="{{profile.progress ==='profile' || profile.progress ==='certify' || profile.progress === 'refuse'}}">
+			<image src="https://images.facedog.cn/public/my/notify-unverify.png" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view>
+		<view class="wrap" @tap="go" wx:if="{{profile.progress ==='audit'}}">
+			<image src="https://images.facedog.cn/public/my/notify-verifying.png" mode="scaleToFill" lazy-load="false">
+		</view>
+		<!-- <view class="wrap" @tap="close" wx:if="{{profile.progress === 'finish'}}">
+			<image src="https://images.facedog.cn/public/my/notify-verified.png" mode="scaleToFill" lazy-load="false">
+		</view> -->
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Notify extends wepy.component {
+  props = {};
+
+  data = {
+    profile: {}
+  };
+
+  components = {};
+
+  methods = {
+    close() {
+      this.profile = {};
+    },
+    go() {
+      wepy.navigateTo({ url: `register/verify` });
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    this.profile = wepy.getStorageSync('profile');
+    this.$apply();
+    console.log(this.profile.progress);
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+	.notify {
+	  .wrap {
+	    width: 100%;
+	    height: 84rpx;
+	    position: absolute;
+	    top: 0;
+	    z-index: 99;
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
+	  }
+	}
+</style>
