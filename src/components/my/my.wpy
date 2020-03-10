@@ -5,12 +5,14 @@
 		<view class="head">
 			<view class="profile">
 				<view class="headIcon" @tap="goProfile">
+					<image wx:if="{{profile.vip}}" class="vip-icon" src="https://images.facedog.cn/public/vip/vip-profile.png?6" mode="scaleToFill" lazy-load="false">
+					</image>
 					<image src="{{profile.icon || 'https://images.facedog.cn/public/discover/default-avatar.png'}}" style="width:172rpx;height:172rpx;"></image>
 					<view class="edit-profile" @tap.stop="redirect('editfile')"></view>
 				</view>
 				<view class="info">
 					<view class="name">{{profile.nick_name || tempName}}</view>
-					<view class="desc">{{profile.age || '未知'}}岁 · {{profile.city || ''}}</view>
+					<view class="desc">{{profile.age || '未知'}}岁 · {{profile.city || '城市已隐藏'}}</view>
 				</view>
 				<view class="verify" @tap="checkVerify({{profile.progress}})">
 					<image src="https://images.facedog.cn/public/profile/{{profile.progress || 'profile'}}.png?2" mode="scaleToFill" lazy-load="false">
@@ -37,15 +39,15 @@
 			<view class="box-item">
 				<view class="item" @tap="addDebugCount">
 					<view class="login-bubble">
-						<block wx:if="{{n == 1}}">再登陆1天，出场率提升50%</block>
-						<block wx:elif="{{n == 2}}">再登陆3天，出场率翻倍</block>
-						<block wx:elif="{{n == 3}}">再登陆2天，出场率翻倍</block>
-						<block wx:elif="{{n == 4}}">再登陆1天，出场率翻倍</block>
-						<block wx:elif="{{n >= 1}}">继续登陆，维持最高出场率</block>
+						<block wx:if="{{profile.continuous_login == 1}}">再登陆1天，出场率提升50%</block>
+						<block wx:elif="{{profile.continuous_login == 2}}">再登陆3天，出场率翻倍</block>
+						<block wx:elif="{{profile.continuous_login == 3}}">再登陆2天，出场率翻倍</block>
+						<block wx:elif="{{profile.continuous_login == 4}}">再登陆1天，出场率翻倍</block>
+						<block wx:elif="{{profile.continuous_login >= 5}}">继续登陆，维持最高出场率</block>
 					</view>
 					<image src="https://images.facedog.cn/public/profile/box-1.png?" mode="scaleToFill" lazy-load="false">
 					</image>
-					<text class="text value">{{profile.login}}</text>
+					<text class="text value">{{profile.continuous_login}}</text>
 					<text class="text label">连续登录</text>
 				</view>
 				<view class="item" @tap="toMyCoin">
@@ -69,7 +71,8 @@
 				</image>
 				<image class="icon" src="https://images.facedog.cn/public/my/icon-kangyi.png?" mode="aspectFill" lazy-load="false">
 				</image>
-				<text>{{profile.vip?'有效期至 '+profile.vip_expire:'点击获取超级会员'}}</text>
+				<text wx:if="{{profile.vip}}">{{profile.vip_expire}}</text>
+				<text wx:else style="color:white;">点击获取超级会员</text>
 			</view>
 		</view>
 		<!-- <view class="hr"></view> -->
@@ -156,7 +159,6 @@ export default class My extends wepy.component {
       finish: '已通过',
       refuse: '认证失败'
     },
-    n: 2,
     levelColor: {
       1: '#8D8D8D',
       2: '#22C8C7',
@@ -173,7 +175,7 @@ export default class My extends wepy.component {
     tempName: ''
   };
   components = {
-	  notify
+    notify
   };
 
   methods = {
@@ -259,10 +261,11 @@ export default class My extends wepy.component {
     setProfile(profile) {
       // console.error(profile);
       this.tempName = wepy.getStorageSync('tempName');
-	  this.profile = profile;
-	  if(this.profile.vip){
-		  this.profile.vip_expire = formatTimeShort(this.profile.vip_expire);
-	  }
+      this.profile = profile;
+      if (this.profile.vip) {
+        this.profile.vip_expire = formatTimeShort(this.profile.vip_expire);
+      }
+      this.$invoke('notify', 'setProfile', profile);
       this.clickCount = profile.play;
       this.getLevel();
       this.$apply();
@@ -318,18 +321,28 @@ export default class My extends wepy.component {
 
 	  // flex-direction: column;
 	}
+
 	.profile {
 	  display: flex;
 	  justify-content: center;
 	  flex-direction: column;
 	  align-items: center;
 	  position: relative;
+
 	  .headIcon {
 	    margin: 0 auto;
 	    // margin-right: 43rpx;
 	    width: 186rpx;
 	    height: 186rpx;
-
+	    position: relative;
+	    .vip-icon {
+	      width: 75rpx;
+	      height: 77rpx;
+	      position: absolute;
+	      top: -25rpx;
+	      right: -28rpx;
+	      border: none;
+	    }
 	    image {
 	      border-radius: 50%;
 	      width: 100%;
@@ -460,7 +473,7 @@ export default class My extends wepy.component {
 	        left: 37rpx;
 	        &.label {
 	          top: 159rpx;
-	          font-size: 20rpx;
+	          font-size: 22rpx;
 	        }
 	        &.value {
 	          top: 111rpx;

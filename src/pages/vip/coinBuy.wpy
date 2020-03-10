@@ -19,13 +19,13 @@
 import wepy from 'wepy';
 import { post } from '@/utils/request';
 import { COIN_PAY } from '@/utils/url';
+import { Event } from '@/utils/event.js';
 import { toast } from '@/utils';
 import Dialog from '@/components/vant/dialog/dialog';
 export default class CoinBuy extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
-      navbar: '../../components/navbar/index',
       navbar: '../../components/navbar/index',
       'van-dialog': '../../components/vant/dialog/index'
     }
@@ -37,25 +37,62 @@ export default class CoinBuy extends wepy.page {
 
   methods = {
     async pay(coin) {
-      let result = await post(COIN_PAY, {
-        price: coin
-      });
-      if (result && result.error_msg) {
-        toast('颜币不足');
-        return;
-      }
-      Dialog.alert({
-        title: '',
-        message: '支付成功',
-        asyncClose: true
-      }).then(() => {
-        setTimeout(() => {
-          wepy.navigateBack({
-            delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+      let days = coin == 1000 ? 3 : coin == 2000 ? 7 : 30;
+      Dialog.confirm({
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        asyncClose: true,
+        message: `确定使用${coin}颜币兑换${days}天会员吗?`
+      })
+        .then(async () => {
+          // on close
+          Dialog.close();
+          let result = await post(COIN_PAY, {
+            price: coin
           });
-        }, 1000);
-      });
-      console.log(result);
+          if (result && result.error_msg) {
+            Dialog.confirm({
+              confirmButtonText: '如何获取',
+              cancelButtonText: '取消',
+              asyncClose: true,
+              message: `抱歉，您的颜币不够`
+            })
+              .then(async () => {
+                Dialog.close();
+                wepy.navigateTo({ url: '/pages/coin/coinHelp' });
+              })
+              .catch(() => {
+                Dialog.close();
+              });
+          } else {
+            Event.trigger('battleFresh');
+            Dialog.close();
+            Dialog.alert({
+              message: '恭喜您，兑换成功'
+            }).then(() => {
+              // on close
+              wepy.navigateBack({
+                delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+              });
+            });
+          }
+        })
+        .catch(() => {
+          Dialog.close();
+        });
+
+      //   Dialog.alert({
+      //     title: '',
+      //     message: '支付成功',
+      //     asyncClose: true
+      //   }).then(() => {
+      //     setTimeout(() => {
+      //       wepy.navigateBack({
+      //         delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+      //       });
+      //     }, 1000);
+      //   });
+      //   console.log(result);
     }
   };
 

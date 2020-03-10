@@ -5,7 +5,7 @@
 	<block wx:if="{{!show}}">
 		<loadingHeart top="-160rpx" />
 	</block>
-	<block wx:if="{{!list.lengt && show}}">
+	<block wx:if="{{!list.length && show}}">
 		<empty></empty>
 	</block>
 	<view class='container' wx:else>
@@ -45,6 +45,7 @@ import { LIKE_ME, AGREE_FRIEND, MAKEFRIEND, DELETE_ENJOY } from '@/utils/url';
 export default class LikeMe extends wepy.page {
   config = {
     navigationBarTitleText: '',
+    enablePullDownRefresh: true,
     usingComponents: {
       navbar: '../../components/navbar/index',
       'van-toast': '../../components/vant/toast/index'
@@ -52,13 +53,13 @@ export default class LikeMe extends wepy.page {
   };
 
   data = {
-	list: [],
-	show:false
+    list: [],
+    show: false
   };
 
   components = {
-	empty,
-	loadingHeart
+    empty,
+    loadingHeart
   };
 
   methods = {
@@ -105,7 +106,9 @@ export default class LikeMe extends wepy.page {
       });
     }
   };
-
+  onPullDownRefresh() {
+    this.initData();
+  }
   events = {};
 
   watch = {};
@@ -127,8 +130,9 @@ export default class LikeMe extends wepy.page {
       //   item.users.forEach(t => {
       //     t.age = getAge(t.birthday);
       //   });
-	});
-	this.show = true;
+    });
+    this.show = true;
+    wx.stopPullDownRefresh();
     this.$apply();
   }
   //   onShow() {}

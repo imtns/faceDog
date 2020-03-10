@@ -6,89 +6,100 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
+import wepy from 'wepy';
 
-	import { post } from '@/utils/request';
-	import { LOGIN, SUBMIT_FORMID } from '@/utils/url';
-	import loadingHeart from '@/components/battle/module/loadingHeart';
-	export default class Example extends wepy.page {
-	  config = {
-	    navigationBarTitleText: ''
-	  };
+import { post } from '@/utils/request';
+import { LOGIN, SUBMIT_FORMID } from '@/utils/url';
+import loadingHeart from '@/components/battle/module/loadingHeart';
+export default class Example extends wepy.page {
+  config = {
+    navigationBarTitleText: ''
+  };
 
-	  data = {
-	  };
+  data = {
+    select: ''
+  };
 
-	  components = {
-	    loadingHeart
-	  };
+  components = {
+    loadingHeart
+  };
 
-	  methods = {
-	    async goLogin(latitude, longitude) {
-	      const result = await post(
-	        LOGIN,
-	        { code: wepy.getStorageSync('code') },
-	        {
-	          latitude,
-	          longitude
-	        }
-	      );
-	      wepy.setStorageSync('welcome', result.welcome);
-	      wepy.setStorageSync('token', result.access_token);
-	      wepy.setStorageSync('tencent_token', result.tencent_token);
-	      wepy.setStorageSync('identifier', result.identifier);
-	      if (result.welcome) {
-	        wx.redirectTo({
-	          url: `register/index`
-	        });
-	      } else {
-	        wx.redirectTo({
-	          url: 'index'
-	        });
-	      }
-	    }
-	  };
+  methods = {
+    async goLogin(latitude, longitude, that) {
+      const result = await post(
+        LOGIN,
+        { code: wepy.getStorageSync('code') },
+        {
+          latitude,
+          longitude
+        }
+      );
+      wepy.setStorageSync('welcome', result.welcome);
+      wepy.setStorageSync('token', result.access_token);
+      wepy.setStorageSync('tencent_token', result.tencent_token);
+      wepy.setStorageSync('identifier', result.identifier);
+      if (result.welcome) {
+        wx.redirectTo({
+          url: `register/index`
+        });
+      } else {
+        let url = 'index';
+        if (that.select) url += '?select=' + that.select;
+        wx.redirectTo({
+          url
+        });
+      }
+    }
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {
-	    wx.getSetting({
-	      success: res => {
-	        if (res.authSetting['scope.userLocation'] == undefined || !wepy.getStorageSync('latitude')) {
-	          wepy.redirectTo({ url: 'home' });
-	        } else {
-	          this.getLocation(this);
-	        }
-	      }
-	    });
-	  }
-	  getLocation(t) {
-	    wx.getLocation({
-	      type: 'wgs84',
-	      success: res => {
-	        wepy.setStorageSync('latitude', res.latitude);
-	        wepy.setStorageSync('longitude', res.longitude);
-	        wx.login({
-	          success: ress => {
-	            wepy.setStorageSync('code', ress.code);
-	            t.methods.goLogin(res.latitude, res.longitude);
-	          }
-	        });
-	      },
-	      fail: err => {
-	        // console.log(err);
-	        // t.authorizeLocation();
-	      }
-	    });
-	  }
-	  onShow() {
-
-	  }
-	}
+  onLoad(options) {
+    if (options.select) {
+      this.select = options.select;
+      this.$apply();
+    }
+    let that = this;
+    wx.getSetting({
+      success: res => {
+        if (
+          res.authSetting['scope.userLocation'] == undefined ||
+          !wepy.getStorageSync('latitude')
+        ) {
+          let url = 'home';
+          if (that.select) url += '?select=' + that.select;
+          wepy.redirectTo({ url });
+        } else {
+          this.getLocation(this);
+        }
+      }
+    });
+  }
+  getLocation(t) {
+    wx.getLocation({
+      type: 'wgs84',
+      success: res => {
+        wepy.setStorageSync('latitude', res.latitude);
+        wepy.setStorageSync('longitude', res.longitude);
+        wx.login({
+          success: ress => {
+            wepy.setStorageSync('code', ress.code);
+            t.methods.goLogin(res.latitude, res.longitude, t);
+          }
+        });
+      },
+      fail: err => {
+        // console.log(err);
+        // t.authorizeLocation();
+      }
+    });
+  }
+  onShow() {}
+}
 </script>
 
 <style lang='scss'>

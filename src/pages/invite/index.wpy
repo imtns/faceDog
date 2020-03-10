@@ -31,7 +31,7 @@
 					</image>
 				</view>
 				<view class="box {{!list[1]?'grey':''}}">
-					<image  wx:if="{{list[1]}}" src="{{list[1].avatar}}" mode="scaleToFill" lazy-load="false">
+					<image wx:if="{{list[1]}}" src="{{list[1].avatar}}" mode="scaleToFill" lazy-load="false">
 					</image>
 					<image wx:else src="https://images.facedog.cn/public/invite/progress-circle.png" mode="scaleToFill" lazy-load="false">
 					</image>
@@ -94,78 +94,80 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import { INVATATION } from '@/utils/url';
-	import Toast from '@/components/vant/toast/toast';
-	import { get, post } from '@/utils/request';
-	export default class Invite extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '',
-	    usingComponents: {
-	      navbar: '../../components/navbar/index',
-	      'van-toast': '../../components/vant/toast/index'
-	    }
-	  };
+import wepy from 'wepy';
+import { INVATATION } from '@/utils/url';
+import Toast from '@/components/vant/toast/toast';
+import { get, post } from '@/utils/request';
+export default class Invite extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-toast': '../../components/vant/toast/index'
+    }
+  };
 
-	  data = {
-		list: [],
-		successNum:0
-	  };
+  data = {
+    list: [],
+    successNum: 0
+  };
 
-	  components = {};
+  components = {};
 
-	  methods = {
-	    goWechatGroup() {
-	      if (this.list[2]) {
-	      }
-	    },
-	    toMyCard() {
-	      wepy.navigateTo({ url: '/pages/my/myCard' });
-	    },
-	    previewCard() {
-		  if(this.list.length <2) return;
-	      wx.previewImage({
-	        current: 'https:images.facedog.cn/public/invite/wechat-card.png?1',
-	        urls: ['https:images.facedog.cn/public/invite/wechat-card.png?1']
-	      });
-	    }
-	  };
+  methods = {
+    goWechatGroup() {
+      if (this.list[2]) {
+      }
+    },
+    toMyCard() {
+      wepy.navigateTo({ url: '/sub/my/myCard' });
+    },
+    previewCard() {
+      if (this.list.length < 2) return;
+      wx.previewImage({
+        current: 'https:images.facedog.cn/public/invite/wechat-card.png?1',
+        urls: ['https:images.facedog.cn/public/invite/wechat-card.png?1']
+      });
+    }
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  async onLoad() {
-	    let { invitation } = await get(INVATATION);
-	    this.list = invitation;
-	    this.list.forEach(item => {
-	      if (item.avatar.indexOf('x-oss') == -1) {
-	        item.avatar =
-	          item.avatar + '?x-oss-process=image/resize,w_100,h_100/format,jpg';
-	      }
-		});
-		this.successNum = this.list.filter(item=>item.progress=='finish').length
-	    this.$apply();
-	  }
-	  onShareAppMessage() {
-	    let user = wx.getStorageSync('profile') || '';
-	    let num = Math.floor(Math.random() * 5) + 1;
-	    return {
-	      title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
-	      path: `/pages/home?userid=${user ? user.ID : ''}`,
-	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
-	      success: res => {
-	        console.log('转发成功', res);
-	      },
-	      fail: res => {
-	        console.log('转发失败', res);
-	      }
-	    };
-	  }
-	  onShow() {}
-	}
+  async onLoad() {
+    let { invitation } = await get(INVATATION);
+    this.list = invitation;
+    this.list.forEach(item => {
+      if (item.avatar.indexOf('x-oss') == -1) {
+        item.avatar =
+          item.avatar + '?x-oss-process=image/resize,w_100,h_100/format,jpg';
+      }
+    });
+    this.successNum = this.list.filter(
+      item => item.progress == 'finish'
+    ).length;
+    this.$apply();
+  }
+  onShareAppMessage() {
+    let user = wx.getStorageSync('profile') || '';
+    let num = Math.floor(Math.random() * 5) + 1;
+    return {
+      title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
+      path: `/pages/home?userid=${user ? user.ID : ''}`,
+      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
+      success: res => {
+        console.log('转发成功', res);
+      },
+      fail: res => {
+        console.log('转发失败', res);
+      }
+    };
+  }
+  onShow() {}
+}
 </script>
 
 <style lang='scss'>

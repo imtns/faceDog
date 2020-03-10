@@ -3,30 +3,55 @@
 	<navbar title="超级会员">
 	</navbar>
 	<view class='container'>
-		<swiper class="swiper" indicator-dots="{{false}}" autoplay="{{false}}" duration="{{200}}">
-			<swiper-item catchtouchmove="stopTouchMove">
-				<image src="https://images.facedog.cn/public/vip/vip-swiper.png" mode="scaleToFill" lazy-load="false">
+		<swiper class="swiper" indicator-color="#959396" indicator-active-color="white" indicator-dots="{{true}}" autoplay="{{false}}" duration="{{300}}">
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner1.png" mode="scaleToFill" lazy-load="false">
 				</image>
 			</swiper-item>
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner2.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item>
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner3.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item>
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner4.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item>
+			<!-- <swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner5.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item> -->
 		</swiper>
 
-		<view class="middle-content vip">
+		<view class="middle-content {{profile.vip?'vip':''}}">
+			<image class="icon" wx:if="{{profile.vip}}" src="https://images.facedog.cn/public/vip/vip-info-icon.png" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image class="icon" wx:if="{{!profile.vip}}" src="https://images.facedog.cn/public/vip/vip-info-icon1.png" mode="scaleToFill" lazy-load="false">
+			</image>
 			<block wx:if="{{!profile.vip}}">
-				<text class="text1" style="left:320rpx;color:white;">您还为获得超级会员</text>
-				<text class="text2">*66天特权会员赠送认证</text>
+				<text class="text1">您还未获得超级会员</text>
+				<!-- <text class="text2">*66天特权会员赠送认证</text> -->
 			</block>
 			<block wx:else>
 				<text class="text1">有效期至 {{profile.vip_expire}}</text>
 			</block>
+
 		</view>
-		<!-- <view class="grey-bg"></view> -->
+		<view class="tag">
+			<image style="width:254rpx;height:38rpx" src="https://images.facedog.cn/public/vip/tag.png" mode="scaleToFill" lazy-load="false" />
+		</view>
+		</image>
+		<view class="grey-bg"></view>
+
 		<view class="btns">
 			<image @tap="goCoinBuy" src="https://images.facedog.cn/public/vip/btn-black.png" mode="scaleToFill" lazy-load="false">
 			</image>
 
 			<image @tap="goVipBuy" src="https://images.facedog.cn/public/vip/btn-gree.png" mode="scaleToFill" lazy-load="false">
 			</image>
-
 		</view>
 	</view>
 </template>
@@ -35,7 +60,7 @@
 import wepy from 'wepy';
 import { NEW_PROFILE } from '@/utils/url';
 import { get } from '@/utils/request';
-import { formatTimeShort } from '@/utils';
+import { formatTimeShort, toast } from '@/utils';
 export default class SuperVip extends wepy.page {
   config = {
     navigationBarTitleText: '',
@@ -46,18 +71,32 @@ export default class SuperVip extends wepy.page {
 
   data = {
     isVip: true,
-    profile: {}
+    profile: {},
+    isPhone: false
   };
 
   components = {};
 
   methods = {
     goCoinBuy() {
-      if (this.profile.vip) return;
+      if (this.profile.progress != 'finish') {
+        toast('你还未通过认证，暂时不能购买');
+        return;
+      }
+      if (this.profile.vip) {
+        toast('你已经是会员了');
+        return;
+      }
       wepy.navigateTo({ url: 'coinBuy' });
     },
     goVipBuy() {
-      if (this.profile.vip) return;
+      if (this.profile.vip) {
+        toast('你已经是会员了');
+        return;
+      } else if (this.profile.mp_status != 'online' && this.isPhone) {
+        toast('iOS系统暂时不可用');
+        return;
+      }
       wepy.navigateTo({ url: 'vipBuy' });
     }
   };
@@ -75,6 +114,18 @@ export default class SuperVip extends wepy.page {
     if (this.profile.vip) {
       this.profile.vip_expire = formatTimeShort(this.profile.vip_expire);
     }
+    let that = this;
+    wx.getSystemInfo({
+      success(res) {
+        var name = 'iPhone X';
+        if (res.model.indexOf('iPhone') > -1) {
+          that.isPhone = true;
+          that.$apply();
+        }
+      }
+    });
+    // this.profile.vip = true;
+    // this.profile.vip_expire = '2020-20-20';
     this.$apply();
   }
 }
@@ -82,6 +133,7 @@ export default class SuperVip extends wepy.page {
 
 <style lang='less'>
 	.container {
+	  position: relative;
 	  swiper {
 	    width: 100%;
 	    height: 359rpx;
@@ -91,57 +143,78 @@ export default class SuperVip extends wepy.page {
 	    }
 	  }
 	  .middle-content {
-	    width: 655rpx;
-	    height: 447rpx;
-	    background: url(https://images.facedog.cn/public/vip/vip-info.png);
-	    background-size: cover;
+	    width: 630rpx;
+	    height: 459rpx;
+	    margin-left: 20rpx;
+	    position: relative;
+	    background: url(https://images.facedog.cn/public/vip/vip-info.png?5);
+	    background-size: contain;
+	    background-repeat: no-repeat;
 	    &.vip {
-	      background: url(https://images.facedog.cn/public/vip/vip-info1.png);
-	      background-size: cover;
 	      .text1 {
-	        color: #f37c61;
+	        color: #fbdf78;
+	        font-weight: 600;
 	        font-size: 19rpx;
-	        left: 310rpx;
+	        left: 290rpx;
 	      }
 	    }
 	    margin-top: 60rpx;
 	    position: relative;
 	    z-index: 2;
+	    .icon {
+	      width: 94rpx;
+	      height: 31rpx;
+	      position: absolute;
+	      left: 330rpx;
+	      top: 155rpx;
+	    }
 	    .text1 {
 	      font-size: 19rpx;
 	      color: #f8f4ea;
 	      position: absolute;
 	      top: 200rpx;
-	      left: 320rpx;
+	      left: 300rpx;
 	    }
-	    .text2 {
-	      font-size: 20rpx;
-	      color: #fcd154;
-	      position: absolute;
-	      top: 450rpx;
-	      left: 295rpx;
-	    }
+	    // .text2 {
+	    //   font-size: 20rpx;
+	    //   color: #fcd154;
+	    //   position: absolute;
+	    //   top: 450rpx;
+	    //   left: 260rpx;
+	    // }
 	  }
 	  .grey-bg {
-	    width: 105%;
+	    width: 100%;
 	    margin: 0 auto;
-	    height: 135rpx;
-	    background: url(https://images.facedog.cn/public/vip/grey-bg.png);
+	    height: 240rpx;
+	    background: linear-gradient(
+	      to bottom,
+	      rgb(196, 196, 196),
+	      rgba(255, 255, 255, 1)
+	    );
 	    background-size: cover;
 	    position: relative;
-	    top: -55rpx;
-	    left: -10rpx;
+	    top: -140rpx;
 	    z-index: 1;
+	  }
+	  .tag {
+	    position: relative;
+	    z-index: 111;
+	    display: flex;
+	    justify-content: center;
 	  }
 	  .btns {
 	    width: 100%;
-	    margin-top: 100rpx;
 	    display: flex;
+	    position: relative;
+	    z-index: 100;
+	    top: -120rpx;
 	    justify-content: center;
 	    image {
 	      width: 285rpx;
 	      height: 91rpx;
 	      margin: 0 30rpx;
+	      position: relative;
 	    }
 	  }
 	}

@@ -30,9 +30,7 @@ tim.on(TIM.EVENT.CONVERSATION_LIST_UPDATED, function(event) {
 });
 tim.on(TIM.EVENT.MESSAGE_RECEIVED, function(event) {
   console.log(event);
-  if (event.data[0].conversationType === 'GROUP') {
-    Event.trigger('receiveMessageGroup', event.data[0]);
-  }
+  Event.trigger('receiveMessage', event.data[0]);
 });
 function onReadyStateUpdate({ name }) {
   const isSDKReady = name === TIM.EVENT.SDK_READY;
@@ -62,6 +60,7 @@ function onReadyStateUpdate({ name }) {
   }
   //   store.commit('setSdkReady', isSDKReady);
 }
+
 export default class extends wepy.app {
   config = {
     pages: [
@@ -77,7 +76,7 @@ export default class extends wepy.app {
       'pages/rank/rank', // 排行榜页面
       'pages/chat/like',
       //   'pages/my/mytime',
-       // 我的排名
+      // 我的排名
       'pages/chat/becomeFriend',
       'pages/ta/taMomentList', // TA的动态
       'pages/ta/momentDetail', // 动态详情页面
@@ -110,13 +109,13 @@ export default class extends wepy.app {
       'pages/discover/squareMessage', // 广场消息
       'pages/vip/superVip', // 会员界面
       'pages/vip/vipBuy', // 会员购买
-      'pages/vip/coinBuy' // 颜币购买
+      'pages/vip/coinBuy', // 颜币购买
+      'pages/vip/vipBuySuccess'
     ],
     subPackages: [
       {
         root: 'sub/',
         pages: [
-		  'test',
           'my/setting',
           'my/editname',
           'my/editdesc',
@@ -125,8 +124,8 @@ export default class extends wepy.app {
           'my/activityRule', // 活动规则
           'my/contactService', // 联系客服
           'my/myCard', // 生成美图]
-		  'my/likeHelp',
-		  'my/myrank',
+          'my/likeHelp',
+          'my/myrank'
         ] // 点击说明
       }
     ],
@@ -188,21 +187,21 @@ export default class extends wepy.app {
             name: 'getOpenID'
           })
           .then(res => {
-            console.log(res.result.userInfo.openId);
+            // console.log(res.result.userInfo.openId);
             wx.dsp.setOpenid(res.result.userInfo.openId);
-            console.log('call sdk!!!!!!');
+            // console.log('call sdk!!!!!!');
           });
       }, 500);
     }
   }
   onHide() {
-    wx.cloud
-      .callFunction({
-        name: 'getOpenID'
-      })
-      .then(res => {
-        wx.dsp.setOpenid(res.result.userInfo.openId);
-      });
+    // wx.cloud
+    //   .callFunction({
+    //     name: 'getOpenID'
+    //   })
+    //   .then(res => {
+    //     wx.dsp.setOpenid(res.result.userInfo.openId);
+    //   });
   }
   onShow() {}
   async testAsync() {

@@ -14,7 +14,7 @@
 			<form report-submit='true' bindsubmit='submitForm'>
 				<button class='verify2' form-type='submit' @tap='verify'>直接认证</button>
 				<button class="verify1" disabled="{{profile.progress != 'refuse'}}" form-type='submit' @tap='goVideo'>尊享认证</button>
-			</form> 
+			</form>
 			<!-- <view class='text' style='margin-bottom:0'>直接认证：客服可能会加你的微信核实</view> -->
 			<view class='text' style='margin-top:0'>尊享认证：认证失败后可以选择此方式，或者直接前往“我的颜币”页选择</view>
 		</view>
@@ -22,93 +22,96 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import { get, post } from '@/utils/request';
-	import { USER_VERIFY, VERIFY, SUBMIT_FORMID } from '@/utils/url';
-	import { toast, sleep } from '@/utils';
-	export default class Verify extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '4/4',
-	    usingComponents: {
-	      navbar: '../../components/navbar/index'
-	    }
-	  };
+import wepy from 'wepy';
+import { get, post } from '@/utils/request';
+import { USER_VERIFY, VERIFY, SUBMIT_FORMID } from '@/utils/url';
+import { toast, sleep } from '@/utils';
+export default class Verify extends wepy.page {
+  config = {
+    navigationBarTitleText: '4/4',
+    usingComponents: {
+      navbar: '../../components/navbar/index'
+    }
+  };
 
-	  data = {
-	    wechat: '',
-		status: false,
-		profile:{}
-	  };
+  data = {
+    wechat: '',
+    status: false,
+    profile: {}
+  };
 
-	  components = {};
+  components = {};
 
-	  methods = {
-	    async submitForm(e) {
-	      console.warn(this.currentDate);
-	      wepy.setStorageSync('birthday', this.currentDate);
-	      await post(SUBMIT_FORMID, {
-	        formId: e.detail.formId
-	      });
-	    },
-	    onName(event) {
-	      this.wechat = event.detail.value;
-	    },
-	    async verify() {
-	      if (!this.wechat) {
-	        toast('微信号不能为空');
-	        return;
-	      }
-	      const data = await post(VERIFY, {
-	        wechat: this.wechat
-	      });
-	      console.log(data);
-	      wx.requestSubscribeMessage({
-	        tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
-	        success: async () => {
-	          toast('申请已提交，最晚1个工作日内完成完成审核');
-	          await sleep(2);
-	          wepy.reLaunch({ url: '/pages/index' });
-	        }
-	      });
+  methods = {
+    async submitForm(e) {
+      console.warn(this.currentDate);
+      wepy.setStorageSync('birthday', this.currentDate);
+      await post(SUBMIT_FORMID, {
+        formId: e.detail.formId
+      });
+    },
+    onName(event) {
+      this.wechat = event.detail.value;
+    },
+    async verify() {
+      if (!this.wechat) {
+        toast('微信号不能为空');
+        return;
+      }
+      const data = await post(VERIFY, {
+        wechat: this.wechat
+      });
+      console.log(data);
+      wx.requestSubscribeMessage({
+        tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
+        success: async () => {
+          toast('申请已提交，最晚1个工作日内完成完成审核');
+          await sleep(2);
+          wepy.reLaunch({ url: '/pages/index' });
+        },
+        complete() {
+          console.log('订阅complete');
+        }
+      });
 
-	      //   wx.redirectTo({
-	      //     url: 'index'
-	      //   });
+      //   wx.redirectTo({
+      //     url: 'index'
+      //   });
 
-	      //   wepy.redirectTo({ url: '/pages/index' });
-	    },
-	    goVideo() {
-	      wepy.navigateTo({ url: '/pages/coin/index' });
-	      //   if (!this.wechat) {
-	      //     toast('微信号不能为空');
-	      //     return;
-	      //   }
-	      //   let that = this;
-	      //   wx.requestSubscribeMessage({
-	      //     tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
-	      //     success() {
-	      //       wepy.navigateTo({ url: `uploadVideo?wechat=${that.wechat}` });
-	      //     }
-	      //   });
-	    }
-	  };
+      //   wepy.redirectTo({ url: '/pages/index' });
+    },
+    goVideo() {
+      wepy.navigateTo({ url: '/pages/coin/index' });
+      //   if (!this.wechat) {
+      //     toast('微信号不能为空');
+      //     return;
+      //   }
+      //   let that = this;
+      //   wx.requestSubscribeMessage({
+      //     tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
+      //     success() {
+      //       wepy.navigateTo({ url: `uploadVideo?wechat=${that.wechat}` });
+      //     }
+      //   });
+    }
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  async onLoad() {
-	    let data = await get(USER_VERIFY);
-	    // console.error(data);
-		this.status = data.general;
-		this.profile  = wx.getStorageSync('profile');
-	    this.$apply();
-	  }
+  async onLoad() {
+    let data = await get(USER_VERIFY);
+    // console.error(data);
+    this.status = data.general;
+    this.profile = wx.getStorageSync('profile');
+    this.$apply();
+  }
 
-	  onShow() {}
-	}
+  onShow() {}
+}
 </script>
 
 <style lang='scss'>

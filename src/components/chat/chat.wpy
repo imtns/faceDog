@@ -181,26 +181,36 @@ export default class Chat extends wepy.component {
     this.getUnread();
   }
   async getUnread() {
-    let { unread_ask_wechat, unread_moment } = await get(GET_UNREAD_MSG);
-    wepy.setStorageSync('unread_moment', unread_moment ? 'ok' : '');
-    wepy.setStorageSync('unread_ask_wechat', unread_ask_wechat ? 'ok' : '');
+    let data = await get(GET_UNREAD_MSG);
+    console.log('unreadMsg:::', data);
+    // let { unread_ask_wechat, unread_moment } = await get(GET_UNREAD_MSG);
+    wepy.setStorageSync(
+      'unread_moment',
+      data && data.unread_moment ? 'ok' : ''
+    );
+    wepy.setStorageSync(
+      'unread_ask_wechat',
+      data && data.unread_ask_wechat ? 'ok' : ''
+    );
   }
   async getLikeMeList() {
     this.likemeList = [];
-    const likeme = await get(LIKE_ME);
-    likeme.forEach(item => {
-      this.likemeList.push(...item.users);
+    get(LIKE_ME).then(likeme => {
+      likeme.forEach(item => {
+        this.likemeList.push(...item.users);
+      });
+      // this.likemeList = this.likemeList.slice(0,5);
+      this.$apply();
     });
-    // this.likemeList = this.likemeList.slice(0,5);
-    this.$apply();
   }
   async getIlikeList() {
     this.ilikeList = [];
-    const ilike = await get(MY_FAVORITE);
-    console.log(ilike.length);
-    this.ilikeTotal = ilike.total;
-    this.ilikeList = ilike.favorites.slice(0, 5);
-    this.$apply();
+    get(MY_FAVORITE).then(ilike => {
+      console.log(ilike.length);
+      this.ilikeTotal = ilike.total;
+      this.ilikeList = ilike.favorites.slice(0, 5);
+      this.$apply();
+    });
   }
 
   // 初始化聊天界面最近会话列表
@@ -210,7 +220,7 @@ export default class Chat extends wepy.component {
     webim.getRecentContactList(
       {
         // 获取会话列表的方法
-        Count: 100 // 最近的会话数 ,最大为 100
+        Count: 200 // 最近的会话数 ,最大为 100
       },
       function(resp) {
         wx.hideLoading();
@@ -266,7 +276,7 @@ export default class Chat extends wepy.component {
 	.container {
 	  width: 100%;
 	  overflow: scroll;
-
+	  height: 100%;
 	  .tabs {
 	    width: 690rpx;
 	    display: flex;

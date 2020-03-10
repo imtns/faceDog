@@ -25,8 +25,7 @@
 							</view>
 						</view>
 						<view @tap="boxClick({{item.a.originalImages}})" class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[swiperCurrent]?'flyTop':''}}" style="transform: translate3d(0px, {{tranTopY[index] || 0}}px, 0px)!important;" catch:touchmove="touchTopMove({{swiperCurrent}})" catch:touchend="touchEnd">
-							<!-- <view @tap="boxClick({{item.a.originalImages}})" class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[currentMovingID]?'flyTop':''}}" style="transform: translate3d(0px, 90px, 0px)!important;" catch:touchmove="touchTopMove('1')" catch:touchend="touchEnd"> -->
-							<image class="vip-icon" src="https://images.facedog.cn/public/profile/icon-vip.png" mode="scaleToFill" lazy-load="false"></image>
+							<view class="image-count">共{{item.a.images.length}}张</view>
 							<image src="{{item.a.images[0]}}" class="{{blurTop?'blur':''}}" mode="aspectFill"></image>
 							<image src="https://images.facedog.cn/public/battle/pick.png" style="opacity:{{opacityTopPick}}" class="pick" mode="aspectFill" />
 							<view class="info" wx:if="{{draggingTop}}">
@@ -37,7 +36,10 @@
 								<!-- <view class="desc">{{item.a.gender}}/{{item.a.age}}/{{item.a.constellation}}</view> -->
 							</view>
 							<view class="info" wx:else>
-								<view class="name {{blurTop?'blur':''}}">{{item.a.nick_name}}<text> {{item.a.age}}</text></view>
+
+								<view class="name {{blurTop?'blur':''}}">{{item.a.nick_name}}<text> {{item.a.age}}</text>
+									<image wx:if="{{item.a.vip}}" class="vip-icon" src="https://images.facedog.cn/public/profile/vip-icon.png?2" mode="scaleToFill" lazy-load="false"></image>
+								</view>
 								<!-- <view class="desc {{draggingBottom?'blur':''}}">{{item.a.gender}} / {{item.a.age}} / {{item.a.constellation}}</view> -->
 								<view class="distance "><text class="{{blurTop?'blur':''}}">{{item.a.distance}}km</text> <text class="{{blurTop?'blur':''}}"> {{item.a.city}}</text></view>
 							</view>
@@ -46,7 +48,7 @@
 								</image>
 							</view>
 						</view>
-						<view class="divider {{bothLike?'rotated':''}}" style="top:532rpx" @tap="bothLike">
+						<view class="divider {{bothLike?'rotated':''}}" style="top:532rpx">
 							<view class="vs-pic front {{bothLikeRotate ?'rotated':''}} {{!bothLike && !init?'notRotate':''}}">
 								<image src="https://images.facedog.cn/public/battle/fist-left.png?2" class="left {{fistAnimation?'ani':''}}" mode="scaleToFill"></image>
 								<image src="https://images.facedog.cn/public/battle/vs.png?7" class="vs {{fistAnimation?'ani':''}} " mode="aspectFill"></image>
@@ -58,7 +60,7 @@
 							</view> -->
 						</view>
 						<view @tap="boxClick({{item.b.originalImages}})" class="battle-box bottom {{bothLikeMove ?'bothLikeMove':''}} {{draggingBottom?'frame':''}} {{flyBottom[swiperCurrent]?'flyBottom':''}}" style="transform: translate3d(0px, {{tranBottomY[index] || 0}}px, 0px);" catch:touchmove="touchBottomMove({{swiperCurrent}})" catch:touchend="touchEnd">
-							<image class="vip-icon" src="https://images.facedog.cn/public/profile/icon-vip.png" mode="scaleToFill" lazy-load="false"></image>
+							<view class="image-count">共{{item.b.images.length}}张</view>
 							<image src="{{item.b.images[0]}}" class="{{blurBottom?'blur':''}}" mode="aspectFill"></image>
 							<image src="https://images.facedog.cn/public/battle/pick.png" style="opacity:{{opacityBottomPick}}" class="pick" mode="aspectFill" />
 							<view class="info" wx:if="{{draggingBottom}}">
@@ -71,7 +73,9 @@
 								<!-- <view class="desc">{{item.b.gender}}/{{item.b.age}}/{{item.b.constellation}}</view> -->
 							</view>
 							<view class="info" wx:else>
-								<view class="name {{blurBottom?'blur':''}}">{{item.b.nick_name}}<text> {{item.b.age}}</text></view>
+								<view class="name {{blurBottom?'blur':''}}">{{item.b.nick_name}}<text> {{item.b.age}}</text>
+									<image wx:if="{{item.b.vip}}" class="vip-icon" src="https://images.facedog.cn/public/profile/vip-icon.png?2" mode="scaleToFill" lazy-load="false"></image>
+								</view>
 								<!-- <view class="desc {{draggingTop?'blur':''}}">{{item.b.gender}} / {{item.b.age}} / {{item.b.constellation}}</view> -->
 								<view class="distance"><text class="{{blurBottom?'blur':''}}">{{item.b.distance}}km</text> <text class="{{blurBottom?'blur':''}}"> {{item.b.city}}</text></view>
 							</view>
@@ -86,11 +90,12 @@
 		</swiper>
 		<view class="PASS {{passTouch?'hover':''}}" style="bottom:{{isphoneX?'450rpx':'300rpx'}};" @tap="passHandler" @touchstart="passTouchStart" @touchend="passTouchEnd">
 			<!-- 换一组 -->
-			<image src="https://images.facedog.cn/public/battle/pass-new1.png?2" mode="aspectFill"></image>
+			<image src="https://images.facedog.cn/public/battle/pass-new2.png?2" mode="scaleToFill"></image>
 		</view>
 		<view class="BOTH-LIKE {{passTouch?'hover':''}}" style="bottom:{{isphoneX?'450rpx':'300rpx'}};" @tap="bothLike" @touchstart="passTouchStart" @touchend="passTouchEnd">
 			<!-- 换一组 -->
-			<image src="https://images.facedog.cn/public/battle/both-like.png?8" mode="aspectFill"></image>
+			<image class="icon" src="https://images.facedog.cn/public/battle/both-like-vip.png?8" mode="scaleToFill"></image>
+			<image src="https://images.facedog.cn/public/battle/both-like1.png?8" mode="scaleToFill"></image>
 		</view>
 	</view>
 	<block wx:if="{{showPop}}">
@@ -157,7 +162,9 @@ export default class Battle extends wepy.component {
     flyTempID: 0, // 当前动画的临时Id
     passShow: false,
     loaded: false,
-    showCoinPop: false
+    showCoinPop: false,
+    profile: {},
+    isPhone: false
   };
 
   components = {
@@ -185,6 +192,9 @@ export default class Battle extends wepy.component {
           ],
           success(res) {
             console.log('订阅消息', res);
+          },
+          complete() {
+            console.log('订阅complete');
           }
         });
       })
@@ -246,13 +256,13 @@ export default class Battle extends wepy.component {
       } catch (e) {}
       this.flyTop[this.flyTempID] = true;
       this.flyBottom[this.flyTempID] = true;
-      //   setTimeout(() => {
-      this.topWave = true;
-      this.bottomWave = true;
-      console.log('both-like:::::');
-      this.switchBattle(true);
-      this.$apply();
-      //   }, 800);
+      setTimeout(() => {
+        this.topWave = true;
+        this.bottomWave = true;
+        console.log('both-like:::::');
+        this.switchBattle(true);
+        this.$apply();
+      }, 100);
     }
     setTimeout(() => {
       this.tranBottomY[this.swiperCurrent - 1] = 0;
@@ -435,6 +445,18 @@ export default class Battle extends wepy.component {
     },
     //bothlike 事件
     bothLike() {
+      if (
+        this.isPhone &&
+        this.profile.mp_status != 'online' &&
+        !this.profile.vip
+      ) {
+        Toast('此为VIP特权，请先兑换');
+        return;
+      }
+      if (!this.profile.vip) {
+        this.$emit('showVipPop');
+        return;
+      }
       this.bottomDragDistance = true;
       this.topDragDistance = true;
       this.draggingBottom = true;
@@ -470,8 +492,10 @@ export default class Battle extends wepy.component {
     hasProfile(tag) {
       this.noProfile = !tag;
     },
-    init() {
+    init(profile) {
       this.init = true; // 防止页面切换进来时动画重新执行
+      this.profile = profile;
+      this.$apply();
     }
   };
   setValue(tranY, id, position) {
@@ -485,6 +509,7 @@ export default class Battle extends wepy.component {
   async getBattle() {
     this.show = true;
     this.swiperCurrent = 0;
+    this.profile = wepy.getStorageSync('profile');
     this.battleList = [];
     let res = await get(BATTLE, { battle: '' });
     let result = res.data;
@@ -528,7 +553,7 @@ export default class Battle extends wepy.component {
               this.loaded = true;
               this.$apply();
             }
-          }, 1000);
+          }, 1500);
         }
         if (!wepy.getStorageSync('tutorial')) {
           this.tutorialShow = true;
@@ -551,6 +576,10 @@ export default class Battle extends wepy.component {
       this.noProfile = true;
       this.$apply();
     }
+    setTimeout(() => {
+      this.profile = wepy.getStorageSync('profile');
+      this.$apply();
+    }, 1000);
     let name = `commit-${formatDate(new Date())}`;
     if (wepy.getStorageSync(name)) {
       this.showPop = true;
@@ -560,6 +589,9 @@ export default class Battle extends wepy.component {
     wx.getSystemInfo({
       success(res) {
         var name = 'iPhone X';
+        if (res.model.indexOf('iPhone') > -1) {
+          that.isPhone = true;
+        }
         if (
           res.model.indexOf('iPhone 11') > -1 ||
           res.model.indexOf('iPhone X') > -1 ||
@@ -1048,12 +1080,24 @@ export default class Battle extends wepy.component {
 	      position: absolute;
 	      z-index: 8;
 	      transition: all 0.2s;
-	      .vip-icon {
+	      .image-count {
+	        background: rgba(0, 0, 0, 0.5);
+	        display: inline-flex;
+	        padding: 4rpx 14rpx;
 	        position: absolute;
-	        top: 10rpx;
-	        right: 10rpx;
-	        width: 129rpx !important;
-	        height: 44rpx !important;
+	        top: 20rpx;
+	        right: 20rpx;
+	        border-radius: 5px;
+	        justify-content: center;
+	        align-items: center;
+	        color: white;
+	        font-size: 26rpx;
+	      }
+	      .vip-icon {
+	        position: relative;
+	        width: 72rpx;
+	        margin-left: 5rpx;
+	        height: 24rpx !important;
 	      }
 	      &.top {
 	        &.bothLikeMove {
@@ -1323,10 +1367,10 @@ export default class Battle extends wepy.component {
 	  }
 	  .PASS {
 	    position: absolute;
-	    right: 0;
+	    right: -2rpx;
 	    bottom: 200rpx;
 	    z-index: 101;
-	    width: 113rpx;
+	    width: 126rpx;
 	    height: 78rpx;
 	    image {
 	      width: 100%;
@@ -1335,11 +1379,18 @@ export default class Battle extends wepy.component {
 	  }
 	  .BOTH-LIKE {
 	    position: absolute;
-	    left: 0;
+	    left: -2rpx;
 	    bottom: 200rpx;
 	    z-index: 101;
-	    width: 132rpx;
-	    height: 100rpx;
+	    width: 126rpx;
+	    height: 78rpx;
+	    .icon {
+	      width: 64rpx;
+	      height: 34rpx;
+	      position: absolute;
+	      top: -12rpx;
+	      left: 30rpx;
+	    }
 	    image {
 	      width: 100%;
 	      height: 100%;

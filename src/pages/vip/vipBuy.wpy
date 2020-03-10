@@ -1,25 +1,25 @@
 <!--  -->
 <template>
-	<navbar title="颜币兑换">
+	<navbar title="直接获取">
 	</navbar>
 	<view class='container'>
 		<view class="bg">
-			<view class="box" @tap="pay(1)">
-				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip1.png" mode="scaleToFill" lazy-load="false">
+			<view class="box" @tap="pay(3000)">
+				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip1.png?2" mode="scaleToFill" lazy-load="false">
 				</image>
-				<image class="icon" src="https://images.facedog.cn/public/vip/vip-1.png?1" mode="scaleToFill" lazy-load="false">
-				</image>
-			</view>
-			<view class="box" @tap="pay(4800)">
-				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip2.png" mode="scaleToFill" lazy-load="false">
-				</image>
-				<image class="icon" src="https://images.facedog.cn/public/vip/vip-2.png?1" mode="scaleToFill" lazy-load="false">
+				<image class="icon" src="https://images.facedog.cn/public/vip/vip-1.png?2" mode="scaleToFill" lazy-load="false">
 				</image>
 			</view>
-			<view class="box" @tap="pay(9600)">
-				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip3.png" mode="scaleToFill" lazy-load="false">
+			<view class="box" @tap="pay(6800)">
+				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip2.png?2" mode="scaleToFill" lazy-load="false">
 				</image>
-				<image class="icon" src="https://images.facedog.cn/public/vip/vip-3.png?1" mode="scaleToFill" lazy-load="false">
+				<image class="icon" src="https://images.facedog.cn/public/vip/vip-2.png?2" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+			<view class="box" @tap="pay(15800)">
+				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip3.png?2" mode="scaleToFill" lazy-load="false">
+				</image>
+				<image class="icon" src="https://images.facedog.cn/public/vip/vip-3.png?2" mode="scaleToFill" lazy-load="false">
 				</image>
 				<image class="vip-icon" src="https://images.facedog.cn/public/vip/vip-icon.png" mode="scaleToFill" lazy-load="false">
 				</image>
@@ -33,28 +33,33 @@
 import wepy from 'wepy';
 
 import { post } from '@/utils/request';
-import { PAY } from '@/utils/url';
+import { toast } from '@/utils';
+import { PAY, PAY_CALLBACK } from '@/utils/url';
 import Dialog from '@/components/vant/dialog/dialog';
 export default class VipBuy extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
-      navbar: '../../components/navbar/index',
-      navbar: '../../components/navbar/index',
-      'van-dialog': '../../components/vant/dialog/index'
+      navbar: '../../components/navbar/index'
     }
   };
 
-  data = {};
+  data = {
+    profile: {}
+  };
 
   components = {};
 
   methods = {
-    async pay() {
+    async pay(price) {
+      if (this.profile.progress != 'finish' && price != 15800) {
+        toast('未认证用户只能购买1年会员');
+        return;
+      }
       let { nonceStr, package: _package, paySign, timeStamp } = await post(
         PAY,
         {
-          price: 1
+          price
         }
       );
       wx.requestPayment({
@@ -63,20 +68,23 @@ export default class VipBuy extends wepy.page {
         package: _package,
         signType: 'MD5',
         paySign,
-        success: function(res) {
+        success: async function(res) {
           if (res.errMsg === 'requestPayment:ok') {
-            console.log('支付成功');
-            Dialog.alert({
-              title: '',
-              message: '支付成功',
-              asyncClose: true
-            }).then(() => {
-              setTimeout(() => {
-                wepy.navigateBack({
-                  delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
-                });
-              }, 1000);
-            });
+            await post(PAY_CALLBACK, { price });
+            wepy.navigateTo({ url: 'vipBuySuccess' });
+
+            // console.log('支付成功');
+            // Dialog.alert({
+            //   title: '',
+            //   message: '支付成功',
+            //   asyncClose: true
+            // }).then(() => {
+            //   setTimeout(() => {
+            //     wepy.navigateBack({
+            //       delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+            //     });
+            //   }, 1000);
+            // });
           }
         },
         fail: function(res) {
@@ -93,7 +101,10 @@ export default class VipBuy extends wepy.page {
 
   computed = {};
 
-  onLoad() {}
+  onLoad() {
+    this.profile = wepy.getStorageSync('profile');
+    this.$apply();
+  }
 
   onShow() {}
 }

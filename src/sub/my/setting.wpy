@@ -2,187 +2,264 @@
 <template>
 	<navbar title="设置">
 	</navbar>
-    <view class='wrapper'>
-        <view class='item'>
-            <view class="title">只看</view>
-            <view class="detail3">
-                <view @tap="genderChange(1)" class="sex-btn {{gender==1?'active':''}}">异性</view>
-                <view @tap="genderChange(2)" class="sex-btn {{gender==2?'active':''}}">同性</view>
-                <!-- <van-switch checked="{{ opposite_sex }}" @change="onChange('opposite_sex')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" /> -->
-            </view>
-        </view>
-        <view class="line"></view>
-        <view class='item'>
-            <view class="title">只看同城</view>
-            <view class="detail2">
-                <van-switch checked="{{ in_city }}" @change="onChange('in_city')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
-            </view>
-        </view> 
-        <view class="line"></view>
-        <view class='item'>
-            <view class="title">不参加颜值battle</view>
-            <view class="detail2">
-                <van-switch checked="{{ no_battle }}" @change="onChange('no_battle')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
-            </view>
-        </view>
-        <view class="line"></view>
-        <!-- <view class="item">
-            <view class="title">加入我们</view>
-            <view class="detail2">
-                <van-icon name="arrow" />
-            </view>
-        </view>
-        <view class="line"></view> -->
-        <!-- <view class="item">
-            <view class="title">修改密码</view>
-            <view class="detail2">
-                <van-icon name="arrow" />
-            </view>
-        </view>
-        <view class="line"></view> -->
-    </view>
-    <!-- <view class="logout" @tap="logout">退出登录</view> -->
+	<view class='wrapper'>
+		<view class='item'>
+			<view class="title">只看</view>
+			<view class="detail3">
+				<view @tap="genderChange(1)" class="sex-btn {{gender==1?'active':''}}">异性</view>
+				<view @tap="genderChange(2)" class="sex-btn {{gender==2?'active':''}}">同性</view>
+				<!-- <van-switch checked="{{ opposite_sex }}" @change="onChange('opposite_sex')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" /> -->
+			</view>
+		</view>
+		<view class="line"></view>
+		<view class='item'>
+			<view class="title">距离优先（只显示500km范围）</view>
+			<view class="detail2">
+				<van-switch checked="{{ setting.in_city }}" @change="onChange('in_city')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+			</view>
+		</view>
+		<view class="line"></view>
+		<view class='item'>
+			<view class="title">隐身模式（不参与PK与排行榜）</view>
+			<view class="detail2">
+				<van-switch checked="{{ setting.no_battle }}" @change="onChange('no_battle')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+			</view>
+		</view>
+		<view class="line"></view>
+		<view class='item'>
+			<view class="title">隐藏地理城市信息<text>VIP</text></view>
+			<view class="detail2">
+				<van-switch checked="{{ setting.no_location }}" data-tag="vip" @change="onChange('no_location')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+			</view>
+		</view>
+		<view class="line"></view>
+		<view class='item'>
+			<view class="title">开启位置漫游功能<text>VIP</text></view>
+			<view class="detail2">
+				<van-switch checked="{{ setting.location }}" data-tag="vip" @change="onChange('location')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" />
+			</view>
+		</view>
+
+		<view class="line"></view>
+		<view class="item" wx:if="{{setting.location}}" @tap="showArea">
+			<view class="title">漫游至（删除小程序重置）</view>
+			<view class="detail2">
+				<text style="color:black">{{selectCity || '请选择'}}</text>
+				<van-icon name="arrow" />
+			</view>
+		</view>
+		<view class="line"></view>
+	</view>
+	<van-popup position="bottom" show="{{ show }}" bind:close="onClose">
+		<van-area area-list="{{ areaList }}" columns-num="2" @confirm="confirm" @cancel="cancel" />
+	</van-popup>
+	<!-- <view class="logout" @tap="logout">退出登录</view> -->
 </template>
 
 <script>
 import wepy from 'wepy';
-import { USER_SETTING } from '@/utils/url';
-import { get, put } from '@/utils/request';
+import { USER_SETTING, SETTING_LOCATION } from '@/utils/url';
+import { get, put, post } from '@/utils/request';
 import { Event } from '@/utils/event.js';
+import { toast } from '@/utils';
+const area = require('@/utils/area');
 export default class Setting extends wepy.page {
-    config = {
-        navigationBarTitleText: '设置',
-        disableScroll: true,
-        usingComponents: {
-			 navbar: '../../components/navbar/index',
-            'van-button': '../../components/vant/button/index',
-            'van-icon': '../../components/vant/icon/index',
-            'van-switch': '../../components/vant/switch/index'
-        }
-    };
-
-    data = {
-        opposite_sex: false,
-        in_city: false,
-        no_battle: false,
-        gender: 1
-    };
-
-    components = {
-	};
-
-    methods = {
-        async onChange(name, { detail }) {
-            console.log(detail);
-            console.log(name);
-            // 需要手动对 checked 状态进行更新
-            this[name] = detail;
-            this.opposite_sex = this.gender == 1;
-            this.$apply();
-            await put(USER_SETTING, this.data);
-            Event.trigger('battleFresh');
-        },
-        async genderChange(status) {
-            this.gender = status;
-            this.opposite_sex = status == 1;
-            this.$apply();
-            await put(USER_SETTING, this.data);
-            Event.trigger('battleFresh');
-            this.$apply();
-            console.log(status);
-        }
-    };
-
-    events = {};
-
-    watch = {};
-
-    computed = {};
-
-    async onLoad() {
-        const result = await get(USER_SETTING);
-        Object.assign(this, result);
-        this.gender = result.opposite_sex ? 1 : 2;
-        this.$apply();
+  config = {
+    navigationBarTitleText: '设置',
+    disableScroll: true,
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-popup': '../../components/vant/popup/index',
+      'van-button': '../../components/vant/button/index',
+      'van-icon': '../../components/vant/icon/index',
+      'van-switch': '../../components/vant/switch/index',
+      'van-area': '../../components/vant/area/index'
     }
+  };
 
-    onShow() {}
+  data = {
+    setting: {
+      opposite_sex: false,
+      in_city: false,
+      no_battle: false,
+      no_location: false,
+      location: false
+    },
+    areaList: [],
+    show: false,
+    selectCity: '',
+    gender: 1,
+    profile: {}
+  };
+
+  components = {};
+
+  methods = {
+    confirm({ detail }) {
+      console.log(detail);
+      let province = detail.values[0].name;
+      let city = detail.values[1].name;
+      this.selectCity = province + ' ' + city;
+      wepy.setStorageSync('selectCity', this.selectCity);
+
+      post(SETTING_LOCATION, {
+        province,
+        city
+      });
+      this.show = false;
+    },
+    cancel() {
+      this.show = false;
+    },
+    showArea() {
+      console.log(this.areaList);
+      this.show = true;
+    },
+    async onChange(name, e) {
+      console.log(e);
+      console.log(name);
+      // 需要手动对 checked 状态进行更新
+      if (
+        (name == 'location' || name == 'no_location') &&
+        e.target.dataset.tag == 'vip' &&
+        e.detail &&
+        !this.profile.vip
+      ) {
+        toast('你还不是vip');
+        return;
+      }
+      if (name == 'location') {
+        wepy.setStorageSync('setting_location', e.detail);
+      }
+      this.setting[name] = e.detail;
+      this.opposite_sex = this.gender == 1;
+      this.$apply();
+      await put(USER_SETTING, this.setting);
+      Event.trigger('battleFresh');
+    },
+    async genderChange(status) {
+      this.gender = status;
+      this.setting.opposite_sex = status == 1;
+      this.$apply();
+      await put(USER_SETTING, this.setting);
+      Event.trigger('battleFresh');
+      this.$apply();
+      console.log(status);
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  async onLoad() {
+    this.profile = wepy.getStorageSync('profile');
+    this.selectCity = wepy.getStorageSync('selectCity');
+    this.setting['location'] = wepy.getStorageSync('setting_location');
+    const result = await get(USER_SETTING);
+    Object.assign(this.setting, result);
+    this.gender = result.opposite_sex ? 1 : 2;
+    this.areaList = area;
+    this.$apply();
+  }
+
+  onShow() {}
 }
 </script>
 
 <style lang='less'>
-.van-switch {
-    width: 91rpx !important;
-    height: 19rpx !important;
-}
-.van-switch__node {
-    width: 40rpx !important;
-    height: 40rpx !important;
-    top: 50% !important;
-    transform: translateY(-50%);
-    left: -10rpx !important;
-}
-.van-switch--on .van-switch__node {
-    transform: translate(160%, -50%) !important;
-}
-.hr {
-    width: 100%;
-    height: 18rpx;
-    background: rgba(246, 246, 246, 1);
-}
+	.van-icon,
+	.van-icon::before {
+	  position: relative;
+	  top: 3rpx;
+	}
+	.van-switch {
+	  width: 91rpx !important;
+	  height: 19rpx !important;
+	}
+	.van-switch__node {
+	  width: 40rpx !important;
+	  height: 40rpx !important;
+	  top: 50% !important;
+	  transform: translateY(-50%);
+	  left: -10rpx !important;
+	}
+	.van-switch--on .van-switch__node {
+	  transform: translate(160%, -50%) !important;
+	}
+	.hr {
+	  width: 100%;
+	  height: 18rpx;
+	  background: rgba(246, 246, 246, 1);
+	}
 
-.item {
-    display: flex;
-    flex-direction: row;
-    height: 120rpx;
-    align-items: center;
-    padding: 0 60rpx;
-    .title {
-        font-size: 28rpx;
-        font-family: PingFang SC;
-        font-weight: 600;
-        color: rgba(0, 0, 0, 1);
-    }
-}
+	.item {
+	  display: flex;
+	  flex-direction: row;
+	  height: 120rpx;
+	  align-items: center;
+	  padding: 0 60rpx;
+	  .title {
+	    font-size: 28rpx;
+	    font-family: PingFang SC;
+	    font-weight: 600;
+	    color: rgba(0, 0, 0, 1);
+	    text {
+	      background: #fbbc6d;
+	      color: #f05458;
+	      font-size: 20rpx;
+	      font-weight: 600;
+	      margin-left: 10rpx;
+	      position: relative;
+	      top: -3rpx;
+	      border-radius: 5rpx;
+	      padding: 2rpx 6rpx;
+	      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+	      opacity: 1;
+	    }
+	  }
+	}
 
-.detail2 {
-    font-size: 30rpx;
-    position: absolute;
-    right: 60rpx;
-    color: rgba(178, 178, 178, 1);
-}
-.detail3{
-    position:absolute;
-    right:60rpx;
-    width:300rpx;
-    display:flex;
-    justify-content: space-around;
-        .sex-btn{
-        width:105rpx;
-        height:56rpx;
-        background:#cecece;
-        color:#2a2a2a;
-        font-size:24rpx;
-        margin-left:35rpx;
-        text-align: center;
-        line-height: 56rpx;
-        font-weight:bold;
-        &.active {
-            color:white;
-            background:#000;
-        }
-    }
-}
-.line {
-    width: 630rpx;
-    margin: 0 auto;
-    border: 1rpx solid rgba(226, 225, 225, 0.5);
-}
-.logout {
-    margin-top: 66rpx;
-    color: #df0010;
-    font-size: 28rpx;
-    text-align: center;
-    width: 100%;
-}
+	.detail2 {
+	  font-size: 30rpx;
+	  position: absolute;
+	  right: 60rpx;
+	  color: rgba(178, 178, 178, 1);
+	}
+	.detail3 {
+	  position: absolute;
+	  right: 60rpx;
+	  width: 300rpx;
+	  display: flex;
+	  justify-content: space-around;
+	  .sex-btn {
+	    width: 105rpx;
+	    height: 56rpx;
+	    background: #cecece;
+	    color: #2a2a2a;
+	    font-size: 24rpx;
+	    margin-left: 35rpx;
+	    text-align: center;
+	    line-height: 56rpx;
+	    font-weight: bold;
+	    &.active {
+	      color: white;
+	      background: #000;
+	    }
+	  }
+	}
+	.line {
+	  width: 630rpx;
+	  margin: 0 auto;
+	  border: 1rpx solid rgba(226, 225, 225, 0.5);
+	}
+	.logout {
+	  margin-top: 66rpx;
+	  color: #df0010;
+	  font-size: 28rpx;
+	  text-align: center;
+	  width: 100%;
+	}
 </style>

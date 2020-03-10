@@ -50,10 +50,10 @@
 						<text style="font-size:34rpx;color:#000">才可以和别人匹配，最快只需要5分钟</text>
 					</text>
 
-					<button class="btn btn-1" open-type="getUserInfo" bindgetuserinfo="goVerify">现在认证</button>
-					<button class="btn btn-2" open-type="getUserInfo" bindgetuserinfo="goGuest">我先看看</button>
-					<!-- <button class="btn btn-1" @tap="goVerify">现在认证</button>
-					<button class="btn btn-2" @tap="goGuest">我先看看</button> -->
+					<!-- <button class="btn btn-1" open-type="getUserInfo" bindgetuserinfo="goVerify">现在认证</button>
+					<button class="btn btn-2" open-type="getUserInfo" bindgetuserinfo="goGuest">我先看看</button> -->
+					<button class="btn btn-1" @tap="goVerify">现在认证</button>
+					<button class="btn btn-2" @tap="goGuest">我先看看</button>
 				</view>
 			</swiper-item>
 		</swiper>
@@ -65,7 +65,7 @@
 			</swiper-item>
 			<swiper-item catchtouchmove='catchTouchMove'>
 				<view class="register-item">
-					<chooseName  />
+					<chooseName />
 				</view>
 			</swiper-item>
 			<swiper-item catchtouchmove='catchTouchMove'>
@@ -75,7 +75,7 @@
 			</swiper-item>
 			<swiper-item catchtouchmove='catchTouchMove'>
 				<view class="register-item">
-					<uploadAvatar :number.sync="number"/>
+					<uploadAvatar :number.sync="number" />
 				</view>
 			</swiper-item>
 		</swiper>
@@ -86,111 +86,125 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import chooseGender from '@/components/register/chooseGender';
-	import chooseName from '@/components/register/chooseName';
-	import chooseBirth from '@/components/register/chooseBirth';
-	import uploadAvatar from '@/components/register/uploadAvatar';
+import wepy from 'wepy';
+import chooseGender from '@/components/register/chooseGender';
+import chooseName from '@/components/register/chooseName';
+import chooseBirth from '@/components/register/chooseBirth';
+import uploadAvatar from '@/components/register/uploadAvatar';
 
-	import { get, post } from '@/utils/request';
-	import { GET_REGISTER_NUMBER } from '@/utils/url';
-	let timeout = null;
-	let timeout1 = null;
-	export default class Example extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '',
-	    usingComponents: {
-	      'van-toast': '../../components/vant/toast/index',
-	      'van-dialog': '../../components/vant/dialog/index',
-	      'van-loading': '../../components/vant/loading/index'
-	    }
-	  };
+import { get, post } from '@/utils/request';
+import { GET_REGISTER_NUMBER } from '@/utils/url';
+import { toast, sleep } from '@/utils';
+let timeout = null;
+let timeout1 = null;
+export default class Example extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      'van-toast': '../../components/vant/toast/index',
+      'van-dialog': '../../components/vant/dialog/index',
+      'van-loading': '../../components/vant/loading/index'
+    }
+  };
 
-	  data = {
-	    number: '',
-	    current: 0,
-	    showRegister: false,
-	    wechat: '',
-	    textCurrent: 0,
-	    numObj: {},
-	    initAnimation: false,
-		timeout: null,
-		isSwiperMoving:false
-	  };
+  data = {
+    number: '',
+    current: 0,
+    showRegister: false,
+    wechat: '',
+    textCurrent: 0,
+    numObj: {},
+    initAnimation: false,
+    timeout: null,
+    isSwiperMoving: false
+  };
 
-	  components = {
-	    chooseGender,
-	    chooseName,
-	    chooseBirth,
-	    uploadAvatar
-	  };
+  components = {
+    chooseGender,
+    chooseName,
+    chooseBirth,
+    uploadAvatar
+  };
 
-	  methods = {
-		bindtransition(){
-			if(this.isSwiperMoving) return;
-			this.isSwiperMoving = true;
-		},
-		bindanimationfinish(){
-			this.isSwiperMoving = false;
-		},
-	    goVerify() {
-	      wepy.redirectTo({ url: 'verify' });
-	    },
-	    goGuest() {
-	      wx.redirectTo({
-	        url: '/pages/index'
-	      });
-	    },
-	    clickShowRegister() {
-	      this.showRegister = true;
-	      this.current = 0;
-	    },
-	    catchTouchMove() {
-	      return false;
-	    }
-	  };
+  methods = {
+    bindtransition() {
+      if (this.isSwiperMoving) return;
+      this.isSwiperMoving = true;
+    },
+    bindanimationfinish() {
+      this.isSwiperMoving = false;
+    },
+    goVerify() {
+      wx.requestSubscribeMessage({
+        tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
+        success: async () => {},
+        complete() {
+          wepy.redirectTo({ url: 'verify' });
+        }
+      });
+    },
+    goGuest() {
+      wx.requestSubscribeMessage({
+        tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
+        success: async () => {},
+        complete() {
+          console.log('订阅complete');
+          wx.redirectTo({
+            url: '/pages/index'
+          });
+        }
+      });
+    },
+    clickShowRegister() {
+      this.showRegister = true;
+      this.current = 0;
+    },
+    catchTouchMove() {
+      return false;
+    }
+  };
 
-	  events = {
-	    changeStep(step) {
-	      if (step == 4) {
-	        this.initAnimation = 'loaded';
-	        this.showRegister = false;
-	        this.textCurrent = 2;
-	      }
-	      this.current = step;
-	    }
-	  };
+  events = {
+    changeStep(step) {
+      if (step == 4) {
+        this.initAnimation = 'loaded';
+        this.showRegister = false;
+        this.textCurrent = 2;
+      }
+      this.current = step;
+    }
+  };
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
-	  async GetNumber() {
-	    this.numObj = await get(GET_REGISTER_NUMBER);
-	    this.$apply();
-	  }
-	  async onLoad(options) {
-	    this.initAnimation = false;
-	    this.current = 0;
-		this.number = options.userid || '';
-	    this.showRegister = false;
-	    this.textCurrent = 0;
-	    this.numObj = {};
-	    this.$apply();
-	    timeout1 = setTimeout(() => {
-	      clearTimeout(timeout1);
-	      this.initAnimation = 'init';
-	      this.$apply();
-	    }, 900);
-	    timeout = setTimeout(() => {
-	      clearTimeout(timeout);
-	      this.textCurrent = 1;
-	      this.$apply();
-	    }, 7700);
-	    this.GetNumber();
-	  }
-	  onHide() {}
-	  onShow() {}
-	}
+  computed = {};
+  async GetNumber() {
+    this.numObj = await get(GET_REGISTER_NUMBER);
+    this.$apply();
+  }
+  async onLoad(options) {
+    this.initAnimation = false;
+    this.current = 0;
+    this.number = options.userid || '';
+    this.showRegister = false;
+    this.textCurrent = 0;
+    this.numObj = {};
+    this.$apply();
+    timeout1 = setTimeout(() => {
+      clearTimeout(timeout1);
+      this.initAnimation = 'init';
+      this.$apply();
+    }, 900);
+    timeout = setTimeout(() => {
+      clearTimeout(timeout);
+      this.textCurrent = 1;
+      this.$apply();
+    }, 7700);
+    this.GetNumber();
+  }
+  onHide() {}
+  onShow() {}
+}
 </script>
 
 <style lang='scss'>
@@ -199,14 +213,14 @@
 	    height: 100%;
 	    width: 100%;
 	  }
-	  .stopMoveCover{
-		  width:100%;
-		  height: 100%;
-		  position: absolute;
-		  top:0;
-		  left:0;
-		  z-index: 1000;
-		  background: rgba(0, 0, 0,1);
+	  .stopMoveCover {
+	    width: 100%;
+	    height: 100%;
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    z-index: 1000;
+	    background: rgba(0, 0, 0, 1);
 	  }
 	  width: 100%;
 	  height: 100vh;

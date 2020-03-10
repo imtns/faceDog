@@ -89,7 +89,7 @@ export default class BecomeFriend extends wepy.page {
     const message = wx.$app.createTextMessage({
       to: this.id,
       conversationType: 'C2C',
-      payload: { text: '你们已经可以进行会话了' }
+      payload: { text: '你们可以开始对话啦（7天内无互动列表自动删除）' }
     });
     wx.$app.sendMessage(message);
   }

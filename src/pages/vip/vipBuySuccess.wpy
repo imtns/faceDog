@@ -1,0 +1,87 @@
+<!--  -->
+<template>
+	<navbar title="直接获取">
+	</navbar>
+	<view class='container'>
+		<view class="bg">
+			<view class="box">
+				<image class="icon" @tap="go" src="https://images.facedog.cn/public/vip/success-btn.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+		</view>
+	</view>
+	<van-dialog id="van-dialog" />
+</template>
+
+<script>
+import wepy from 'wepy';
+import { Event } from '@/utils/event.js';
+import { post } from '@/utils/request';
+import { PAY } from '@/utils/url';
+import Dialog from '@/components/vant/dialog/dialog';
+export default class VipBuy extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index'
+    }
+  };
+
+  data = {};
+
+  components = {};
+
+  methods = {
+    go() {
+      wepy.navigateBack({
+        delta: 2 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+      });
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    Event.trigger('battleFresh')
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='less'>
+	page {
+	  background: #2e2b2e;
+	}
+	.container {
+	  position: relative;
+	  .bg {
+	    background: url(https://images.facedog.cn/public/vip/pay-success.png?2);
+	    background-size: cover;
+	    width: 730rpx;
+	    height: 642rpx;
+	    margin: 200rpx auto;
+	    display: flex;
+	    justify-content: space-around;
+	    .box {
+	      position: relative;
+	      .tip {
+	        width: 171rpx;
+	        height: 100rpx;
+	        position: absolute;
+	        top: 235rpx;
+	        left: 20rpx;
+	      }
+	      .icon {
+	        width: 241rpx;
+	        height: 71rpx;
+	        margin-top: 500rpx;
+	      }
+	    }
+	  }
+	}
+</style>

@@ -3,14 +3,15 @@
 	<view class="top">
 		<image class="banner" src="https://images.facedog.cn/public/discover/my-rank.png?1" @tap="toMyRank"></image>
 		<image class="banner" src="https://images.facedog.cn/public/discover/rank-list.png?1" @tap="toRank"></image>
-		<image class="banner" src="https://images.facedog.cn/public/discover/square.png?2" @tap="toSquare"></image>
-		<image class="banner" src="https://images.facedog.cn/public/discover/chatroom.png?2" @tap="toChatroom"></image>
+		<image class="banner" src="https://images.facedog.cn/public/discover/square.png?3" @tap="toSquare"></image>
+		<image class="banner" src="https://images.facedog.cn/public/discover/chat-room.png?3" @tap="toChatroom"></image>
 	</view>
 </template>
 <script>
 import wepy from 'wepy';
 
 import { Event } from '@/utils/event.js';
+import { toast } from '@/utils';
 export default class topBanner extends wepy.component {
   data = {};
 
@@ -18,14 +19,17 @@ export default class topBanner extends wepy.component {
 
   methods = {
     toMyRank() {
-      let hasProfile = wepy.getStorageSync('hasProfile');
-      if (!hasProfile) {
-        Event.trigger('showVerify', true);
-      } else {
-        wepy.navigateTo({
-          url: '/sub/my/myrank'
-        });
+      let profile = wepy.getStorageSync('profile');
+      if (!profile || profile.progress == 'profile') {
+        Event.trigger('showVerify', true, 2);
+        return;
+      } else if (profile.progress !== 'finish') {
+        toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
+        return;
       }
+      wepy.navigateTo({
+        url: '/sub/my/myrank'
+      });
     },
     toRank() {
       wepy.navigateTo({
@@ -38,10 +42,18 @@ export default class topBanner extends wepy.component {
       });
     },
     toChatroom() {
-		wepy.navigateTo({
+      let profile = wepy.getStorageSync('profile');
+      if (!profile || profile.progress == 'profile') {
+        Event.trigger('showVerify', true, 2);
+        return;
+      } else if (profile.progress !== 'finish') {
+        toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
+        return;
+      }
+      wepy.navigateTo({
         url: '/pages/chat/chatRoom'
       });
-	}
+    }
   };
 
   events = {};
@@ -66,8 +78,8 @@ export default class topBanner extends wepy.component {
 	  margin: 0 30rpx;
 	  .banner {
 	    width: 335rpx;
-		height: 130rpx;
-		margin-bottom:19rpx;
+	    height: 130rpx;
+	    margin-bottom: 19rpx;
 	    &:first-child {
 	      margin-right: 10rpx;
 	    }

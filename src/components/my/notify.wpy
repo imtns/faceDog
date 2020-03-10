@@ -1,12 +1,12 @@
 <!--  -->
 <template>
 	<view class='notify'>
-		<view class="wrap" @tap="go" wx:if="{{profile.progress ==='profile' || profile.progress ==='certify' || profile.progress === 'refuse'}}">
+		<view class="wrap" @tap="go" wx:if="{{profile.progress =='certify' || profile.progress == 'refuse'|| profile.progress =='profile'}}">
 			<image src="https://images.facedog.cn/public/my/notify-unverify.png" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
-		<view class="wrap" @tap="go" wx:if="{{profile.progress ==='audit'}}">
-			<image src="https://images.facedog.cn/public/my/notify-verifying.png" mode="scaleToFill" lazy-load="false">
+		<view class="wrap" wx:if="{{profile.progress =='audit'}}">
+			<image src="https://images.facedog.cn/public/my/notify-verifying.png" mode="scaleToFill" lazy-load="false" />
 		</view>
 		<!-- <view class="wrap" @tap="close" wx:if="{{profile.progress === 'finish'}}">
 			<image src="https://images.facedog.cn/public/my/notify-verified.png" mode="scaleToFill" lazy-load="false">
@@ -31,6 +31,11 @@ export default class Notify extends wepy.component {
     },
     go() {
       wepy.navigateTo({ url: `register/verify` });
+    },
+    setProfile(profile) {
+      this.profile = profile;
+      console.log('PROGRESS:::', this.profile.progress);
+      this.$apply();
     }
   };
 
@@ -40,13 +45,11 @@ export default class Notify extends wepy.component {
 
   computed = {};
 
-  onLoad() {
-    this.profile = wepy.getStorageSync('profile');
-    this.$apply();
-    console.log(this.profile.progress);
-  }
+  onLoad() {}
 
-  onShow() {}
+  onShow() {
+    console.log(this.profile);
+  }
 }
 </script>
 

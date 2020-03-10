@@ -79,22 +79,27 @@ export const SEND_WECHAT_LIST = '/api/user/send_wechat_list';
 // 收到的微信请求列表
 export const GET_WECHAT_LIST = '/api/user/get_wechat_list';
 // 同意微信请求
-export const SEND_WECHAT = '/api/user/send_wechat';   
+export const SEND_WECHAT = '/api/user/send_wechat';
 // 测试页面
-export const TEST_PRIVILEGE = '/api/v1.5/user/edit_privilege';  
+export const TEST_PRIVILEGE = '/api/v1.5/user/edit_privilege';
 // 测试页面
-export const TEST_CHARGE = '/api/v1.5/user/recharge';  
+export const TEST_CHARGE = '/api/v1.5/user/recharge';
 // 发送消息定时推送
 export const SEND_UNREAD_MESSAGE = '/api/v1.5/user/send_unread_message';
 // 获取未读红包和广场消息 
 export const GET_UNREAD_MSG = '/api/v1.5/unread_message';
 // 修改广场未读消息状态
-export const UPDATE_SQUAREMSG_STATUS  = '/api/v1.5/modify_moment_status';
+export const UPDATE_SQUAREMSG_STATUS = '/api/v1.5/modify_moment_status';
 // 修改红包未读消息状态
 export const UPDATE_REDPACKET_STATUS = '/api/v1.5/modify_ask_wechat_status';
 // 我都要接口
 export const BOTH_LIKE = '/api/face/both_like';
 // 获取支付签名
 export const PAY = '/api/v1.5/pay';
+// 支付成功回调
+export const PAY_CALLBACK = '/api/v1.5/pay/callback';
+
 // 颜币支付
 export const COIN_PAY = '/api/v1.5/coin_pay';
+// 设置里设置省市
+export const SETTING_LOCATION = '/api/v1.5/user/modify_location'

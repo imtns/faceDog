@@ -17,8 +17,8 @@
 						<view class="name">{{item.nick_name}} {{item.age}}</view>
 						<view class="city">{{item.province}} {{item.city}}</view>
 					</view>
-					<!-- <image class="icon" src="https://images.facedog.cn/public/likeme/heart.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
-					</image> -->
+					<image @tap="askWechat({{item.user_id}},{{item.nick_name}},{{item.ask_wechat}},{{index}})" class="icon" src="https://images.facedog.cn/public/profile/wechat{{item.ask_wechat?'-disable':''}}.png" mode="scaleToFill" lazy-load="false">
+					</image>
 					<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
 					</image>
 				</view>
@@ -26,6 +26,7 @@
 		</repeat>
 	</view>
 	<van-toast id="van-toast" />
+	<van-dialog id="van-dialog" />
 </template>
 
 <script>
@@ -35,13 +36,20 @@ import { get, post } from '@/utils/request';
 import empty from '@/components/empty';
 import Toast from '@/components/vant/toast/toast';
 import loadingHeart from '@/components/battle/module/loadingHeart';
-import { MAKEFRIEND, MY_FAVORITE, DELETE_FAVORITE } from '@/utils/url';
+import Dialog from '@/components/vant/dialog/dialog';
+import {
+  MAKEFRIEND,
+  MY_FAVORITE,
+  DELETE_FAVORITE,
+  ASK_WECHAT
+} from '@/utils/url';
 export default class ILIKE extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
       navbar: '../../components/navbar/index',
-      'van-toast': '../components/vant/toast/index'
+      'van-toast': '../components/vant/toast/index',
+      'van-dialog': '../components/vant/dialog/index'
     }
   };
 
@@ -50,14 +58,53 @@ export default class ILIKE extends wepy.page {
     init: false,
     nomore: false,
     show: false,
+    me: {}
   };
 
   components = {
-	empty,
-	loadingHeart
+    empty,
+    loadingHeart
   };
 
   methods = {
+    async askWechat(id, name, ask, index) {
+      if (ask) return;
+      let message = '';
+      Dialog.confirm({
+        confirmButtonText: this.me.coin >= 200 ? '确认' : '如何获得?',
+        cancelButtonText: '取消',
+        asyncClose: true,
+        message: `向 ${name}申请微信号?
+								Ta会收到你赠送的200颜币
+								你当前的颜币为${this.me.coin}
+								如果没同意，3天后自动返还`
+      })
+        .then(async () => {
+          if (this.me.coin >= 200) {
+            await post(ASK_WECHAT, { user_id: id });
+            setTimeout(() => {
+              this.me.coin = this.me.coin - 200;
+              this.list[index].ask_wechat = true;
+              this.$apply();
+              Dialog.close();
+              Dialog.alert({
+                message: '已发送，请到消息页颜币红包处查看进度'
+              }).then(() => {
+                // on close
+              });
+            }, 1000);
+          } else {
+            Dialog.close();
+            wepy.navigateTo({ url: '/pages/coin/coinHelp' });
+
+            console.log('如何获得');
+          }
+        })
+        .catch(() => {
+          Dialog.close();
+          // this.methods.uploadVideo.bind(this)();
+        });
+    },
     goProfile(id) {
       console.log(id);
       wx.navigateTo({
@@ -100,8 +147,9 @@ export default class ILIKE extends wepy.page {
     this.list = [];
     const result = await get(MY_FAVORITE, { page: 1 });
     this.list.push(...result.favorites);
-	this.init = true;
-	this.show = true;
+    this.init = true;
+    this.show = true;
+    this.me = wepy.getStorageSync('profile');
     this.$apply();
   }
   onShow() {}
@@ -160,9 +208,9 @@ export default class ILIKE extends wepy.page {
 	    }
 
 	    .icon {
-	      width: 119rpx;
-	      height: 119rpx;
-	      margin-right: 20rpx;
+	      width: 60rpx;
+	      height: 60rpx;
+	      margin-right: 60rpx;
 	    }
 	    .delete {
 	      width: 43rpx;

@@ -12,9 +12,13 @@
 					<view class="box" @tap="goProfile({{item._id}})">
 						<!-- <image class="guess-like" src="https://images.facedog.cn/public/explore/guess-like.png" mode="scaleToFill" lazy-load="false">
 						</image> -->
+						<image class="vip-icon" wx:if="{{item.type == 'vip_user'}}" src="https://images.facedog.cn/public/explore/vip-icon.png" mode="scaleToFill" lazy-load="false">
+						</image>
 						<image class="guess-like" wx:if="{{item.type == 'high_score_user'}}" src="https://images.facedog.cn/public/explore/high-face.png" mode="scaleToFill" lazy-load="false">
 						</image>
-						<image class="guess-like" wx:else src="https://images.facedog.cn/public/explore/best-rookie.png" mode="scaleToFill" lazy-load="false">
+						<image class="guess-like" wx:if="{{item.type == 'vip_user'}}" src="https://images.facedog.cn/public/explore/vip.png" mode="scaleToFill" lazy-load="false">
+						</image>
+						<image class="guess-like" wx:if="{{item.type=='new_user'}}" src="https://images.facedog.cn/public/explore/best-rookie.png" mode="scaleToFill" lazy-load="false">
 						</image>
 						<image class="pic" src="{{item.avatar+'?x-oss-process=image/resize,w_600,h_600/format,jpg'}}" mode="aspectFill" lazy-load="false">
 						</image>
@@ -36,99 +40,99 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
+import wepy from 'wepy';
 
-	import topBanner from '@/components/discover/topBanner';
-	import { get, post } from '@/utils/request';
-	import { GET_RECOMMENT_LIST } from '@/utils/url';
-	import { countDown } from '@/utils';
-	import Toast from '@/components/vant/toast/toast';
-	import { MAKEFRIEND } from '@/utils/url';
-	export default class Explore extends wepy.component {
-	  props = {
-	    verify: {
-	      type: Boolean,
-	      value: false
-	    }
-	  };
+import topBanner from '@/components/discover/topBanner';
+import { get, post } from '@/utils/request';
+import { GET_RECOMMENT_LIST } from '@/utils/url';
+import { countDown } from '@/utils';
+import Toast from '@/components/vant/toast/toast';
+import { MAKEFRIEND } from '@/utils/url';
+export default class Explore extends wepy.component {
+  props = {
+    verify: {
+      type: Boolean,
+      value: false
+    }
+  };
 
-	  data = {
-	    list: [],
-	    countdown: countDown(),
-		show:false,
-	  };
+  data = {
+    list: [],
+    countdown: countDown(),
+    show: false
+  };
 
-	  components = {
-	    topBanner
-	  };
+  components = {
+    topBanner
+  };
 
-	  methods = {
-		fetch(){
-			this.fetchData()
-		},
-	    clockClick() {
-	      Toast('已发送过好友申请');
-	    },
-	    goProfile(id) {
-	      if (!this.verify) {
-	        this.$emit('verifyShow');
-	        return;
-	      }
-	      wepy.navigateTo({ url: `battle/profile?id=${id}` });
-	    },
-	    async makeFriend(id) {
-	      if (!this.verify) {
-	        this.$emit('verifyShow');
-	        return;
-	      }
-	      wepy.showLoading({
-	        title: '', //提示的内容,
-	        mask: true, //显示透明蒙层，防止触摸穿透,
-	        success: res => {}
-	      });
-	      await post(MAKEFRIEND, {
-	        to_be: 'friend',
-	        user_id: id
-	      });
-	      wx.hideLoading();
-	      Toast('申请成功');
-	    //   this.fetchData(); 
-	    },
-	    showVerify() {
-	      this.$emit('verifyShow');
-	    },
-	    bindscrolltolower() {
-	      console.log(1111);
-	    }
-	  };
+  methods = {
+    fetch() {
+      this.fetchData();
+    },
+    clockClick() {
+      Toast('已发送过好友申请');
+    },
+    goProfile(id) {
+      if (!this.verify) {
+        this.$emit('verifyShow');
+        return;
+      }
+      wepy.navigateTo({ url: `battle/profile?id=${id}` });
+    },
+    async makeFriend(id) {
+      if (!this.verify) {
+        this.$emit('verifyShow');
+        return;
+      }
+      wepy.showLoading({
+        title: '', //提示的内容,
+        mask: true, //显示透明蒙层，防止触摸穿透,
+        success: res => {}
+      });
+      await post(MAKEFRIEND, {
+        to_be: 'friend',
+        user_id: id
+      });
+      wx.hideLoading();
+      Toast('申请成功');
+      //   this.fetchData();
+    },
+    showVerify() {
+      this.$emit('verifyShow');
+    },
+    bindscrolltolower() {
+      console.log(1111);
+    }
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {
-	    this.fetchData();
-	  }
-	  async fetchData() {
-		this.show = true;
-	    setInterval(() => {
-	      if (wepy.$appConfig.isProd) {
-	        this.countdown = countDown();
-	        this.$apply();
-	      }
-	    }, 1000);
-	    this.list = [];
-	    let result = await get(GET_RECOMMENT_LIST);
-	    result.forEach(item => {
-	      item.distance = (item.distance / 1000).toFixed(2);
-	    });
-	    this.list = result;
-	    this.$apply();
-	  }
-	  onShow() {}
-	}
+  onLoad() {
+    this.fetchData();
+  }
+  async fetchData() {
+    this.show = true;
+    setInterval(() => {
+      if (wepy.$appConfig.isProd) {
+        this.countdown = countDown();
+        this.$apply();
+      }
+    }, 1000);
+    this.list = [];
+    let result = await get(GET_RECOMMENT_LIST);
+    result.forEach(item => {
+      item.distance = (item.distance / 1000).toFixed(2);
+    });
+    this.list = result;
+    this.$apply();
+  }
+  onShow() {}
+}
 </script>
 
 <style lang='scss' scoped>
@@ -171,14 +175,14 @@
 	      font-size: 23rpx;
 	    }
 	  }
-	  .test-btn{
-		  width:200rpx;
-		  height:80rpx;
-		  background:brown;
-		  color:white;
-		  justify-content: center;
-		  align-items: center;
-		  margin:100rpx auto;
+	  .test-btn {
+	    width: 200rpx;
+	    height: 80rpx;
+	    background: brown;
+	    color: white;
+	    justify-content: center;
+	    align-items: center;
+	    margin: 100rpx auto;
 	  }
 	  .explore {
 	    width: 700rpx;
@@ -188,6 +192,14 @@
 	      height: 820rpx;
 	      margin-bottom: 20rpx;
 	      position: relative;
+	      .vip-icon {
+	        width: 145rpx;
+	        height: 48rpx;
+	        position: absolute;
+	        right: 20rpx;
+	        top: 10rpx;
+	        z-index: 99;
+	      }
 	      .guess-like {
 	        position: absolute;
 	        left: 0;

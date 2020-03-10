@@ -41,6 +41,9 @@
 	<van-popup show="{{ showRedpacketLayer}}" bind:close="onClose">
 		<redpacketLayer />
 	</van-popup>
+	<van-popup show="{{ showVipBuy}}" bind:close="onClose">
+		<VipBuyPop />
+	</van-popup>
 	<van-toast id="van-toast" />
 	<van-dialog id="van-dialog" />
 </template>
@@ -61,6 +64,7 @@ import { getAge } from '@/utils';
 import { Event } from '@/utils/event.js';
 import verify from '@/components/battle/module/verify';
 import redpacketLayer from '@/components/battle/module/redpacket';
+import VipBuyPop from '@/components/battle/module/vipBuy';
 let tabClicked = false;
 let optionFrom = false;
 // import { toast } from '@/utils';
@@ -94,7 +98,8 @@ export default class Index extends wepy.page {
     chat,
     my,
     verify,
-    redpacketLayer
+    redpacketLayer,
+    VipBuyPop
   };
 
   data = {
@@ -113,7 +118,8 @@ export default class Index extends wepy.page {
     pageTitle: '',
     loaded: false,
     showHome: true,
-    showRedpacketLayer: false
+    showRedpacketLayer: false,
+    showVipBuy: false
   };
   computed = {
     now() {
@@ -164,6 +170,7 @@ export default class Index extends wepy.page {
       this.$invoke('battle', 'hasProfile', this.hasProfile);
       this.profile.images = this.switchOrder(this.profile.images);
       wepy.setStorageSync('profile', this.profile);
+      this.$invoke('battle', 'init', this.profile);
       this.$invoke('my', 'setProfile', this.profile);
       this.loaded = true;
       this.$apply();
@@ -190,6 +197,12 @@ export default class Index extends wepy.page {
     return r;
   }
   events = {
+    showVipPop() {
+      this.showVipBuy = true;
+    },
+    closeVipPop() {
+      this.showVipBuy = false;
+    },
     closeRedPacketLayer() {
       this.showRedpacketLayer = false;
     },
@@ -204,8 +217,8 @@ export default class Index extends wepy.page {
       this.selectedTab = $event.source.tabIndex;
       this.showHome = false;
       if (this.selectedTab == 0) {
-		this.pageTitle = '消息';
-		this.$invoke('chat', 'refreshData');
+        this.pageTitle = '消息';
+        this.$invoke('chat', 'refreshData');
       }
       if (this.selectedTab == 1) {
         // wx.setNavigationBarTitle({
@@ -258,6 +271,7 @@ export default class Index extends wepy.page {
       this.selectedTab = options.select;
       if (options.select == 0) {
         this.pageTitle = '消息';
+        this.$invoke('chat', 'refreshData');
       } else if (options.select == 2) {
         this.pageTitle = '我';
       }
@@ -270,7 +284,7 @@ export default class Index extends wepy.page {
     } else {
       this.selectedTab = 1;
     }
-    this.$invoke('battle', 'init'); 
+
     this.user = wx.getStorageSync('profile');
     this.setProfile();
     Event.listen('showVerify', status => {
@@ -286,10 +300,31 @@ export default class Index extends wepy.page {
         }
       }, 5000);
     }
-    wx.$app.login({
-      userID: wx.getStorageSync('identifier'),
-      userSig: wx.getStorageSync('tencent_token')
-    });
+    wx.$app
+      .login({
+        userID: wx.getStorageSync('identifier'),
+        userSig: wx.getStorageSync('tencent_token')
+      })
+      .then(function(imResponse) {
+        console.log('im登录日志::::::', imResponse.data); // 登录成功
+        if (imResponse.data.errorInfo) {
+          wx.$app.logout().then(function(imResponse) {
+            console.log('重复登录，先登出:::', imResponse);
+            wx.$app
+              .login({
+                userID: wx.getStorageSync('identifier'),
+                userSig: wx.getStorageSync('tencent_token')
+              })
+              .then(function(imResponse1) {
+                console.log('再次登录！！！！', imResponse1);
+              });
+          });
+        }
+        if (imResponse.data.repeatLogin === true) {
+          // 标识账号已登录，本次登录操作为重复登录。v2.5.1 起支持
+          console.log(imResponse.data.errorInfo);
+        }
+      });
   }
   redpacketLayer() {
     this.showRedpacketLayer = true;

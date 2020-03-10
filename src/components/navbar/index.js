@@ -16,11 +16,11 @@ Component({
 		homeImage: {
 			type: String,
 			// value: '/static/icon/icon_home.png'
-			value:'https://images.facedog.cn/public/battle/filter.png'
+			value: 'https://images.facedog.cn/public/battle/filter.png'
 		},
 		squareImage: {
 			type: String,
-			value:'https://images.facedog.cn/public/battle/squareImage.png'
+			value: 'https://images.facedog.cn/public/battle/squareImage.png'
 		},
 		extClass: {
 			type: String,
@@ -76,7 +76,7 @@ Component({
 	data: {
 		displayStyle: '',
 		showBack: false,
-		unread:false
+		unread: false
 	},
 	attached: function attached() {
 		var _this = this;
@@ -109,7 +109,7 @@ Component({
 		}
 		if (wx.getStorageSync('unread_moment') == 'ok') {
 			this.setData({
-				unread:true
+				unread: true
 			})
 		}
 	},
@@ -127,8 +127,8 @@ Component({
 		},
 		//返回首页
 		goHome: function () {
-			wx.navigateTo({ url: 'my/setting' });
-			
+			wx.navigateTo({ url: '/sub/my/setting' });
+
 			// wx.reLaunch({
 			// 	url: '/pages/index/index'
 			// })

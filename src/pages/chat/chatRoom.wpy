@@ -1,10 +1,10 @@
 <!--  -->
 <template>
-	<navbar title="{{id?user.nick_name:'聊天室'}}"></navbar>
+	<navbar title="{{id?user.nick_name:'Cpdd聊天室 （'+groupMemberNumber + '人)'}}"></navbar>
 	<view class="chat" @longpress="handleLongPress" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
-		<scroll-view class="scrollView" scroll-y scroll-with-animation="{{false}}" bindscrolltoupper="getMoreData" upper-threshold="300" style="height:{{scrollHeight - inputHeight}}px;" scroll-into-view="{{toview}}">
+		<scroll-view class="scrollView" scroll-y scroll-with-animation="{{false}}" bindscrolltoupper="getMoreData" upper-threshold="300" style="height:{{scrollHeight - inputHeight - (showEmoji?'180':0)}}px;" scroll-into-view="{{toview}}">
 			<view class="chatBox-content-demo" @tap="hideEmoji" wx:for="{{msgList}}" id="chat{{index}}" wx:key="index">
-				<view class="clearfloat" wx:if="{{!item.isSend}}" style="margin-bottom:{{index == msgList.length-1 && isphoneX?'270rpx':''}}">
+				<view class="clearfloat" wx:if="{{!item.isSend}}" style="margin-bottom:{{index == msgList.length-1 && isphoneX?'170rpx':''}}">
 					<view class="author-name" wx:if="{{item.showtime}}">
 						<text class="chat-date">{{item.sendTime}}</text>
 					</view>
@@ -25,7 +25,7 @@
 							</view>
 						</view>
 					</view>
-					<view wx:else class="{{item.flow == 'in'?'left':'right'}}">
+					<view class="{{item.flow == 'in'?'left':'right'}}">
 						<view class="chat-avatars">
 							<image wx:if="{{item.flow == 'in'}}" src="{{user.avatar || item.avatar}}" class="avatar" data-id="{{user.dentifier ||item.from}}" mode="aspectFill" bindtap="goProfile"></image>
 						</view>
@@ -40,7 +40,7 @@
 								<block wx:if="{{item.type == 'TIMTextElem'}}">
 									<repeat for="{{item.virtualDom}}" key="index1" index="index1" item="item1">
 										<block wx:if="{{item1.name == 'span'}}">
-											<text>{{item1.text}}</text>
+											<text selectable='true'>{{item1.text}}</text>
 										</block>
 										<block wx:if="{{item1.name == 'img'}}">
 											<image src="{{item1.src}}" style="width:50rpx;height:50rpx;margin:0 2rpx;" mode="scaleToFill" lazy-load="false">
@@ -60,7 +60,7 @@
 							<block wx:if="{{item.type == 'TIMTextElem'}}">
 								<repeat for="{{item.virtualDom}}" key="index1" index="index1" item="item1">
 									<block wx:if="{{item1.name == 'span'}}">
-										<text>{{item1.text}}</text>
+										<text selectable='true'>{{item1.text}}</text>
 									</block>
 									<block wx:if="{{item1.name == 'img'}}">
 										<image src="{{item1.src}}" style="width:50rpx;height:50rpx;margin:0 2rpx;" mode="scaleToFill" lazy-load="false">
@@ -79,7 +79,7 @@
 				</view>
 			</view>
 		</scroll-view>
-		<view class="chatInput" style="height:82rpx;bottom:{{isFocus?inputHeight*2:23}}rpx">
+		<view class="chatInput" style="height:82rpx;bottom:{{isFocus?inputHeight*2+10:showEmoji?350:23}}rpx">
 			<view class="input">
 				<image style="margin-right:14rpx;" wx:if="{{!recordShow}}" @tap="audioRecordClick" src="https://images.facedog.cn/public/chat/audio.png" mode="scaleToFill" lazy-load="false"></image>
 				<image style="margin-right:14rpx;" wx:if="{{recordShow}}" @tap="audioRecordClick" src="https://images.facedog.cn/public/chat/keyboard-icon.png?1" mode="scaleToFill" lazy-load="false">
@@ -93,11 +93,15 @@
 				</image>
 			</view>
 			<view class="emojis" wx:if="{{showEmoji}}">
-				<scroll-view class="scrollView" scroll-y style="height:340rpx">
+				<scroll-view class="scrollView" scroll-y style="height:325rpx">
 					<repeat for="{{emojiName}}" key="index" index="index" item="item">
 						<image src="{{emojiUrl + emojiMap[item]}}" @tap="chooseEmoji({{item}})" style="width:52rpx;height:52rpx;padding:14rpx;" />
 					</repeat>
 				</scroll-view>
+				<view class="emoji-btn">
+					<image src="https://images.facedog.cn/public/chat/delete-emoji.png" @tap="deleteInput" mode="scaleToFill" />
+					<image src="https://images.facedog.cn/public/chat/send.png" @tap="bindConfirm" mode="scaleToFill" />
+				</view>
 			</view>
 		</view>
 		<view hidden="{{!isRecording}}" class="record-modal">
@@ -116,7 +120,7 @@ import wepy from 'wepy';
 // import webim from '@/utils/webim.js'; // 腾讯云im包
 // import webimhandler from '@/utils/handler';
 import Config from '@/utils/config';
-import { formatDateFromSeconds, toast, getAge } from '@/utils';
+import { formatDateFromSeconds, toast, getAge, contentCheck } from '@/utils';
 import { Event } from '@/utils/event.js';
 import { PROFILE, SEND_UNREAD_MESSAGE } from '@/utils/url';
 import { get, post } from '@/utils/request';
@@ -169,14 +173,16 @@ export default class ChatRoom extends wepy.page {
     startPoint: 0,
     title: '正在录音',
     recordShow: false,
-	inputHeight: 0,
-	isFocus:false
+    inputHeight: 0,
+    isFocus: false,
+    groupMemberNumber: 0
   };
 
   components = {};
   getMessageList(loadMore) {
     let that = this;
     let conversationID = this.conversationID || 'GROUP' + Config.avChatRoomId;
+
     wx.$app
       .getMessageList({
         conversationID,
@@ -188,19 +194,22 @@ export default class ChatRoom extends wepy.page {
         let msgLength = that.msgList.length;
         that.Complete = res.data.isCompleted;
         that.msgList.unshift(...res.data.messageList);
-        that.msgList.forEach((item, index) => {
-          item.virtualDom = decodeElement(item);
-          if (!that.id) {
-            item.avatar =
-              item.avatar.indexOf('facedog') > -1
-                ? item.avatar +
-                  '?x-oss-process=image/resize,w_200,h_200/format,jpg'
-                : item.avatar;
-          }
-          item.sendTime = formatDateFromSeconds(item.time);
-          item.showtime =
-            index > 0 && item.time - that.msgList[index - 1].time > 60;
-        });
+        try {
+          that.msgList.forEach((item, index) => {
+            item.virtualDom = decodeElement(item);
+            if (!that.id) {
+              item.avatar =
+                item.avatar.indexOf('facedog') > -1 &&
+                item.avatar.indexOf('resize') == -1
+                  ? item.avatar +
+                    '?x-oss-process=image/resize,w_200,h_200/format,jpg'
+                  : item.avatar;
+            }
+            item.sendTime = formatDateFromSeconds(item.time);
+            item.showtime =
+              index > 0 && item.time - that.msgList[index - 1].time > 60;
+          });
+        } catch (e) {}
         that.nextReqMessageID = res.data.nextReqMessageID;
         loading = false;
         that.toview = `chat${
@@ -275,13 +284,17 @@ export default class ChatRoom extends wepy.page {
     },
     showEmojiHandler() {
       this.showEmoji = !this.showEmoji;
+      setTimeout(() => {
+        this.toview = `chat${this.msgList.length - 1}`;
+        this.$apply();
+      }, 1000);
     },
 
     bindInput(e) {
       this.msgContent = e.detail.value;
     },
     bindFocus(e) {
-	  this.isFocus = true;
+      this.isFocus = true;
       this.showEmoji = false;
       console.log(e, '键盘弹起');
       if (e.detail.height) {
@@ -293,10 +306,10 @@ export default class ChatRoom extends wepy.page {
       }
     },
     bindBlur(e) {
-	  this.isFocus = false;
-	  this.inputHeight = 0;
-	  this.toview = `chat${this.msgList.length - 1}`;
-	  this.$apply();
+      this.isFocus = false;
+      this.inputHeight = 0;
+      this.toview = `chat${this.msgList.length - 1}`;
+      this.$apply();
     },
     hideEmoji() {
       this.showEmoji = false;
@@ -309,45 +322,60 @@ export default class ChatRoom extends wepy.page {
         url: `../battle/profile?dentifier=${e.currentTarget.dataset.id}`
       });
     },
-
+    deleteInput() {
+      if (!this.msgContent) return;
+      this.msgContent = this.msgContent.substr(0, this.msgContent.length - 1);
+    },
     bindConfirm(e) {
       var that = this;
-      var content = e.detail.value;
+      var content = e.detail.value || this.msgContent;
       if (!content.replace(/^\s*|\s*$/g, '')) return;
-      const message = wx.$app.createTextMessage({
-        to: that.id || Config.avChatRoomId,
-        conversationType: that.id ? 'C2C' : 'GROUP',
-        payload: { text: content }
-      });
-      message.sendTime = formatDateFromSeconds(
-        parseInt(new Date().getTime() / 1000)
-      );
-      message.showtime =
-        that.msgList.length > 0
-          ? parseInt(new Date().getTime() / 1000) -
-              that.msgList[that.msgList.length - 1].time / 1000 >
-            60
-          : parseInt(new Date().getTime() / 1000);
-      message.virtualDom = decodeElement(message);
-      that.msgList.push(message);
-      that.$apply();
-      wx.$app.sendMessage(message).then(res => {
-        console.log('!!!!', res);
-        that.msgList.forEach((item, index) => {
-          if (index == that.msgList.length - 1) {
-            item.status = 'ok';
-          }
-        });
-        that.setData({
-          msgList: that.msgList
-        });
-      });
-      that.toview = `chat${that.msgList.length - 1}`;
-      that.msgContent = '';
-      that.showEmoji = false;
-      that.$apply();
+      //   contentCheck(content).then(res => {
+      //     console.log(res);
+      //     if (!res) {
+      //       toast('内容包含敏感内容，请重新输入');
+      //       return;
+      //     } else {
+      this.messageSend(content);
+      //     }
+      //   });
     }
   };
+  messageSend(content) {
+    var that = this;
+    const message = wx.$app.createTextMessage({
+      to: that.id || Config.avChatRoomId,
+      conversationType: that.id ? 'C2C' : 'GROUP',
+      payload: { text: content }
+    });
+    message.sendTime = formatDateFromSeconds(
+      parseInt(new Date().getTime() / 1000)
+    );
+    message.showtime =
+      that.msgList.length > 0
+        ? parseInt(new Date().getTime() / 1000) -
+            that.msgList[that.msgList.length - 1].time / 1000 >
+          60
+        : parseInt(new Date().getTime() / 1000);
+    message.virtualDom = decodeElement(message);
+    that.msgList.push(message);
+    that.$apply();
+    wx.$app.sendMessage(message).then(res => {
+      console.log('!!!!', res);
+      that.msgList.forEach((item, index) => {
+        if (index == that.msgList.length - 1) {
+          item.status = 'ok';
+        }
+      });
+      that.setData({
+        msgList: that.msgList
+      });
+    });
+    that.toview = `chat${that.msgList.length - 1}`;
+    that.msgContent = '';
+    that.showEmoji = false;
+    that.$apply();
+  }
   startRecording() {
     wx.getSetting({
       success: res => {
@@ -419,6 +447,7 @@ export default class ChatRoom extends wepy.page {
         try {
           const result = await get(PROFILE, { dentifier: this.id });
           this.user = result;
+          this.user.face = Math.floor(this.user.face * 100);
           this.user.age = getAge(this.user.birthday);
           this.user.images.forEach(item => {
             if (item.is_avatar) {
@@ -432,7 +461,43 @@ export default class ChatRoom extends wepy.page {
       }
       this.getMessageList();
     } else {
-      this.getMessageList();
+      wx.$app
+        .getGroupMemberList({
+          groupID: Config.avChatRoomId,
+          count: 500,
+          offset: 0
+        })
+        .then(member => {
+          this.groupMemberNumber = member.data.memberList.length;
+          this.$apply();
+          console.log('member:::', member.data.memberList); // 群成员列表
+        })
+        .catch(function(imError) {
+          console.warn('getGroupMemberList error:', imError);
+        });
+      let promise = wx.$app.joinGroup({
+        groupID: Config.avChatRoomId,
+        type: wx.TIM.TYPES.GRP_PUBLIC
+      });
+      promise
+        .then(imResponse => {
+          switch (imResponse.data.status) {
+            case wx.TIM.TYPES.JOIN_STATUS_WAIT_APPROVAL: // 等待管理员同意
+              break;
+            case wx.TIM.TYPES.JOIN_STATUS_SUCCESS: // 加群成功
+              console.log(imResponse.data.group); // 加入的群组资料
+              this.getMessageList();
+              break;
+            case wx.TIM.TYPES.JOIN_STATUS_ALREADY_IN_GROUP: // 已经在群中
+              this.getMessageList();
+              break;
+            default:
+              break;
+          }
+        })
+        .catch(function(imError) {
+          console.warn('joinGroup error:', imError); // 申请加群失败的相关信息
+        });
     }
 
     recorderManager.onStart(() => {
@@ -506,7 +571,8 @@ export default class ChatRoom extends wepy.page {
     this.$apply();
   }
   onShow() {
-    Event.listen('receiveMessageGroup', message => {
+    Event.listen('receiveMessage', message => {
+      if (this.id && message.conversationType === 'GROUP') return;
       if (message.type == 'TIMTextElem') {
         message.virtualDom = decodeElement(message);
       }
@@ -516,7 +582,7 @@ export default class ChatRoom extends wepy.page {
     });
   }
   onUnload() {
-    Event.remove('receiveMessageGroup');
+    Event.remove('receiveMessage');
     if (this.id)
       wx.$app
         .setMessageRead({ conversationID: this.conversationID })
@@ -536,6 +602,7 @@ export default class ChatRoom extends wepy.page {
     this.groupInfo = null;
     this.profile = {};
     this.Complete = false;
+    console.log('chatpage unload');
     this.$apply();
   }
 }
@@ -756,7 +823,8 @@ export default class ChatRoom extends wepy.page {
 	  display: flex;
 	  bottom: 23rpx;
 	  position: fixed;
-	  transform: all .4s;
+	  transform: all 0.4s;
+	  flex-wrap: wrap;
 	  //   padding: 26rpx 32rpx 0;
 	  align-items: center;
 	  //   justify-content: center;
@@ -791,14 +859,29 @@ export default class ChatRoom extends wepy.page {
 	    justify-content: center;
 	    background: white;
 	    border-radius: 4rpx;
-	    position: absolute;
-	    top: -352rpx;
+	    margin-top: 15rpx;
+
+	    // position: absolute;
+	    position: relative;
+	    // top: -352rpx;
 	    .scrollView {
 	      display: flex;
 	      justify-content: center;
-	      padding: 10rpx 13rpx 0 15rpx;
+	      padding: 10rpx 13rpx 20rpx 15rpx;
 	      image {
 	        margin: 2rpx;
+	      }
+	    }
+	    .emoji-btn {
+	      position: absolute;
+	      right: 30rpx;
+	      bottom: 40rpx;
+	      display: flex;
+	      justify-content: center;
+	      image {
+	        width: 90rpx;
+	        height: 54rpx;
+	        margin: 0 10rpx;
 	      }
 	    }
 	  }

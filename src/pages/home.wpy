@@ -26,242 +26,248 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import { post } from '@/utils/request';
-	import { LOGIN, SUBMIT_FORMID } from '@/utils/url';
-	let inviteUserId = '';
-	export default class Home extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '颜狗',
-	    usingComponents: {
-	      'van-loading': '../../components/vant/loading/index'
-	    }
-	  };
+import wepy from 'wepy';
+import { post } from '@/utils/request';
+import { LOGIN, SUBMIT_FORMID } from '@/utils/url';
+let inviteUserId = '';
+export default class Home extends wepy.page {
+  config = {
+    navigationBarTitleText: '颜狗',
+    usingComponents: {
+      'van-loading': '../../components/vant/loading/index'
+    }
+  };
 
-	  data = {
-	    show: false,
-	    code: '',
-	    disabled: false,
-	    verify: false,
-	    certify: false,
-	    name: '',
-	    isphoneX: false,
-	    showPositionButton: true,
-	    // showUserInfoButton: false,
-	    loading: false,
-	    buttonText: ''
-	  };
+  data = {
+    show: false,
+    code: '',
+    disabled: false,
+    verify: false,
+    certify: false,
+    name: '',
+    isphoneX: false,
+    showPositionButton: true,
+    // showUserInfoButton: false,
+    loading: false,
+    buttonText: '',
+    select: ''
+  };
 
-	  components = {};
+  components = {};
 
-	  methods = {
-	    async submitForm(e) {
-	      await post(SUBMIT_FORMID, {
-	        formId: e.detail.formId
-	      });
-	    },
-	    redirect() {
-	      wepy.navigateTo({ url: `activity/webview` });
-	    },
-	    async goLogin(latitude, longitude, t) {
-	      t.loading = true;
-	      t.$apply();
-	      const result = await post(
-	        LOGIN,
-	        { code: wepy.getStorageSync('code') },
-	        {
-	          latitude,
-	          longitude
-	        }
-	      );
-	      wepy.setStorageSync('welcome', result.welcome);
-	      wepy.setStorageSync('token', result.access_token);
-	      //    wepy.setStorageSync('token', 'eyJhbGciOiJIUzI1NiJ9.WyJib3RmbTE3NCIsIjA5MTU3MSJd.NiUVCVyhv9yj_H_Q12WVSnYiQ8NgsPeXwoPk33QSSGo');
-	      wepy.setStorageSync('tencent_token', result.tencent_token);
-	      wepy.setStorageSync('identifier', result.identifier);
-	      if (result.welcome) {
-	        wx.redirectTo({
-	          url: `register/index?userid=${inviteUserId}`
-	        });
-	      } else {
-	        wx.redirectTo({
-	          url: 'index'
-	        });
-	      }
-	    },
-	    async onGetPosition(e) {
-		  this.getLocationAuth();
-		
-	    },
+  methods = {
+    async submitForm(e) {
+      await post(SUBMIT_FORMID, {
+        formId: e.detail.formId
+      });
+    },
+    redirect() {
+      wepy.navigateTo({ url: `activity/webview` });
+    },
+    async goLogin(latitude, longitude, t) {
+      t.loading = true;
+      t.$apply();
+      const result = await post(
+        LOGIN,
+        { code: wepy.getStorageSync('code') },
+        {
+          latitude,
+          longitude
+        }
+      );
+      wepy.setStorageSync('welcome', result.welcome);
+      wepy.setStorageSync('token', result.access_token);
+      //    wepy.setStorageSync('token', 'eyJhbGciOiJIUzI1NiJ9.WyJib3RmbTE3NCIsIjA5MTU3MSJd.NiUVCVyhv9yj_H_Q12WVSnYiQ8NgsPeXwoPk33QSSGo');
+      wepy.setStorageSync('tencent_token', result.tencent_token);
+      wepy.setStorageSync('identifier', result.identifier);
+      if (result.welcome) {
+        wx.redirectTo({
+          url: `register/index?userid=${inviteUserId}`
+        });
+      } else {
+        let url = 'index';
+        if (t.select) url += '?select=' + t.select;
+        wx.redirectTo({
+          url
+        });
+      }
+    },
+    async onGetPosition(e) {
+      this.getLocationAuth();
+    },
 
-	    onGetUserInfo(e) {
-	      console.log(e.detail.userInfo);
-	      if (e.detail.errMsg != 'getUserInfo:ok') {
-	        return;
-	      }
-	      wepy.setStorageSync('wx_profile', e.detail.userInfo);
+    onGetUserInfo(e) {
+      console.log(e.detail.userInfo);
+      if (e.detail.errMsg != 'getUserInfo:ok') {
+        return;
+      }
+      wepy.setStorageSync('wx_profile', e.detail.userInfo);
 
-	      this.showPositionButton = true;
-	      this.showUserInfoButton = false;
-	      // this.getUserInfoAuth();
-	    }
-	  };
+      this.showPositionButton = true;
+      this.showUserInfoButton = false;
+      // this.getUserInfoAuth();
+    }
+  };
 
-	  authorizeLocation() {
-	    wx.showModal({
-	      title: '是否授权当前位置',
-	      content: '需要获取您的地理位置，请确认授权，否则无法使用',
-	      success: res => {
-	        if (res.cancel) {
-	        } else if (res.confirm) {
-	          wx.openSetting({
-	            success: data => {
-	              console.log(data);
-	              if (data.authSetting['scope.userLocation']) {
-	                this.events.getLocation(this);
-	              }
-	            }
-	          });
-	        }
-	      }
-	    });
-	  }
-	  onShareAppMessage() {
-	    let user = wx.getStorageSync('profile') || '';
-	    let num = Math.floor(Math.random() * 5) + 1;
+  authorizeLocation() {
+    wx.showModal({
+      title: '是否授权当前位置',
+      content: '需要获取您的地理位置，请确认授权，否则无法使用',
+      success: res => {
+        if (res.cancel) {
+        } else if (res.confirm) {
+          wx.openSetting({
+            success: data => {
+              console.log(data);
+              if (data.authSetting['scope.userLocation']) {
+                this.events.getLocation(this);
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+  onShareAppMessage() {
+    let user = wx.getStorageSync('profile') || '';
+    let num = Math.floor(Math.random() * 5) + 1;
 
-	    return {
-	      title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
-	      path: `/pages/home?userid=${user ? user.ID : ''}`,
-	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
-	      success: res => {
-	        console.log('转发成功', res); 
-	      },
-	      fail: res => {
-	        console.log('转发失败', res);
-	      }
-	    };
-	  }
-	  getLocationAuth() {
-	    wx.getSetting({
-	      success: res => {
-	        console.log(res.authSetting['scope.userLocation']);
-	        if (
-	          res.authSetting['scope.userLocation'] !== undefined &&
-	          res.authSetting['scope.userLocation'] !== true
-	        ) {
-	          this.authorizeLocation();
-	        } else {
-	          this.events.getLocation(this);
-	        }
-	      }
-	    });
-	  }
-	  events = {
-	    changeStep(step) {
-	      this.step = step;
-	    },
-	    getLocation(t) {
-	      wx.getLocation({
-	        type: 'wgs84',
-	        success: res => {
-	          wepy.setStorageSync('latitude', res.latitude);
-	          wepy.setStorageSync('longitude', res.longitude);
-	          // wepy.redirectTo({
-	          //     url: `register?verify=${t.verify}&certify=${t.certify}&name=${t.name}&userid=${t.code}`
-	          // });
-	          // console.log(t);
-	          wx.login({
-	            success: ress => {
-	              wepy.setStorageSync('code', ress.code);
-	              t.methods.goLogin(res.latitude, res.longitude, t);
-	            }
-	          });
-	        },
-	        fail: err => {
-	          console.log(err);
-	          t.authorizeLocation();
-	        }
-	      });
-	    }
-	  };
+    return {
+      title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
+      path: `/pages/home?userid=${user ? user.ID : ''}`,
+      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
+      success: res => {
+        console.log('转发成功', res);
+      },
+      fail: res => {
+        console.log('转发失败', res);
+      }
+    };
+  }
+  getLocationAuth() {
+    wx.getSetting({
+      success: res => {
+        console.log(res.authSetting['scope.userLocation']);
+        if (
+          res.authSetting['scope.userLocation'] !== undefined &&
+          res.authSetting['scope.userLocation'] !== true
+        ) {
+          this.authorizeLocation();
+        } else {
+          this.events.getLocation(this);
+        }
+      }
+    });
+  }
+  events = {
+    changeStep(step) {
+      this.step = step;
+    },
+    getLocation(t) {
+      wx.getLocation({
+        type: 'wgs84',
+        success: res => {
+          wepy.setStorageSync('latitude', res.latitude);
+          wepy.setStorageSync('longitude', res.longitude);
+          // wepy.redirectTo({
+          //     url: `register?verify=${t.verify}&certify=${t.certify}&name=${t.name}&userid=${t.code}`
+          // });
+          // console.log(t);
+          wx.login({
+            success: ress => {
+              wepy.setStorageSync('code', ress.code);
+              t.methods.goLogin(res.latitude, res.longitude, t);
+            }
+          });
+        },
+        fail: err => {
+          console.log(err);
+          t.authorizeLocation();
+        }
+      });
+    }
+  };
 
-	  watch = {};
-	  computed = {};
+  watch = {};
+  computed = {};
 
-	  onLoad(options) {
-	    console.log(options);
-	    // this.getLocationAuth();
-	    var that = this;
-	    // wx.getSetting({
-	    //     success(res) {
-	    //         if (res.authSetting['scope.userInfo']) {
-	    //             // 已经授权，可以直接调用 getUserInfo 获取头像昵称
-	    //             wx.getUserInfo({
-	    //                 success(res) {
-	    //                     console.log(res.userInfo);
-	    //                     wepy.setStorageSync(
-	    //                         'nickName',
-	    //                         res.userInfo.nickName
-	    //                     );
-	    //                     that.showPositionButton = true;
-	    //                     that.showUserInfoButton = false;
-	    //                     that.$apply();
-	    //                 }
-	    //             });
-	    //         } else {
-	    //             that.showUserInfoButton = true;
-	    //             that.$apply();
-	    //         }
-	    //     }
-	    // });
-	    if (options.scene) {
-	      inviteUserId = options.scene;
-	    }
-	    if (options.userid) {
-	      inviteUserId = options.userid;
-	    }
-	    if (options.verify) {
-	      this.verify = true;
-	      return;
-	    }
-	    if (options.certify) {
-	      this.certify = true;
-	      return;
-	    }
-	    if (options.name === 'reg') {
-	      this.name = 'reg';
-	    }
-	    // wx.login({
-	    //     success: res => {
-	    //         console.log(res);
-	    //         wepy.setStorageSync('code', res.code);
-	    //     }
-	    // });
-	    var that = this;
-	    wx.getSystemInfo({
-	      success(res) {
-	        var name = 'iPhone X';
-	        if (res.model.indexOf(name) > -1) {
-	          that.isphoneX = true;
-	        }
-	      }
-	    });
-	    // if (wepy.getStorageSync('latitude')) {
-	    //     wepy.redirectTo({
-	    //         url: `register?verify=${this.verify}&certify=${this.certify}&name=${this.name}&userid=${this.code}`
-	    //     });
-	    // } else {
-	    this.show = true;
-	    this.buttonText = wepy.getStorageSync('latitude') ? '进入颜狗' : '快速登入';
+  onLoad(options) {
+    console.log(options);
+    // this.getLocationAuth();
+    var that = this;
+    // wx.getSetting({
+    //     success(res) {
+    //         if (res.authSetting['scope.userInfo']) {
+    //             // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+    //             wx.getUserInfo({
+    //                 success(res) {
+    //                     console.log(res.userInfo);
+    //                     wepy.setStorageSync(
+    //                         'nickName',
+    //                         res.userInfo.nickName
+    //                     );
+    //                     that.showPositionButton = true;
+    //                     that.showUserInfoButton = false;
+    //                     that.$apply();
+    //                 }
+    //             });
+    //         } else {
+    //             that.showUserInfoButton = true;
+    //             that.$apply();
+    //         }
+    //     }
+    // });
+    if (options.select) {
+      this.select = options.select;
+    }
+    if (options.scene) {
+      inviteUserId = options.scene;
+    }
+    if (options.userid) {
+      inviteUserId = options.userid;
+    }
+    if (options.verify) {
+      this.verify = true;
+      return;
+    }
+    if (options.certify) {
+      this.certify = true;
+      return;
+    }
 
-	    // }
-	  }
+    if (options.name === 'reg') {
+      this.name = 'reg';
+    }
+    // wx.login({
+    //     success: res => {
+    //         console.log(res);
+    //         wepy.setStorageSync('code', res.code);
+    //     }
+    // });
+    var that = this;
+    wx.getSystemInfo({
+      success(res) {
+        var name = 'iPhone X';
+        if (res.model.indexOf(name) > -1) {
+          that.isphoneX = true;
+        }
+      }
+    });
+    // if (wepy.getStorageSync('latitude')) {
+    //     wepy.redirectTo({
+    //         url: `register?verify=${this.verify}&certify=${this.certify}&name=${this.name}&userid=${this.code}`
+    //     });
+    // } else {
+    this.show = true;
+    this.buttonText = wepy.getStorageSync('latitude') ? '进入颜狗' : '快速登入';
 
-	  onShow() {
-	    console.log(1);
-	  }
-	}
+    // }
+  }
+
+  onShow() {
+    console.log(1);
+  }
+}
 </script>
 
 <style lang='less' scoped>

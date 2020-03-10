@@ -3,9 +3,9 @@
 	<view class='tutorial'>
 		<image class="t1" wx:if="{{show1}}" src="https://images.facedog.cn/public/tutorial/t-likeme.png" @tap="close1" mode="scaleToFill" lazy-load="false">
 		</image>
-		<image class="t2" wx:if="{{show2}}" src="https://images.facedog.cn/public/tutorial/t-ilike.png" @tap="close2" mode="scaleToFill" lazy-load="false">
+		<image class="t2" wx:if="{{show2}}" src="https://images.facedog.cn/public/tutorial/t-ilike.png?1" @tap="close2" mode="scaleToFill" lazy-load="false">
 		</image>
-		<image class="t3" wx:if="{{show3}}" src="https://images.facedog.cn/public/tutorial/t-hongbao.png" @tap="close3" mode="scaleToFill" lazy-load="false">
+		<image class="t3" wx:if="{{show3}}" src="https://images.facedog.cn/public/tutorial/t-hongbao.png?1" @tap="close3" mode="scaleToFill" lazy-load="false">
 		</image>
 	</view>
 </template>
@@ -27,22 +27,22 @@ export default class Tutorial extends wepy.component {
     close1() {
       this.show1 = false;
       if (!this.show2 && !this.show3) {
-		wepy.setStorageSync('showNotice', 'ok');
-		this.$emit('setScroll');
+        wepy.setStorageSync('showNotice', 'ok');
+        this.$emit('setScroll');
       }
     },
     close2() {
       this.show2 = false;
       if (!this.show1 && !this.show3) {
-		wepy.setStorageSync('showNotice', 'ok');
-		this.$emit('setScroll');
+        wepy.setStorageSync('showNotice', 'ok');
+        this.$emit('setScroll');
       }
     },
     close3() {
       this.show3 = false;
       if (!this.show1 && !this.show2) {
-		wepy.setStorageSync('showNotice', 'ok');
-		this.$emit('setScroll');
+        wepy.setStorageSync('showNotice', 'ok');
+        this.$emit('setScroll');
       }
     }
   };
@@ -81,10 +81,10 @@ export default class Tutorial extends wepy.component {
 	    &.t1 {
 	      top: 200rpx;
 	    }
-	    &.t2  {
+	    &.t2 {
 	      top: 460rpx;
 	    }
-	    &.t3  {
+	    &.t3 {
 	      top: 655rpx;
 	    }
 	  }

@@ -208,7 +208,9 @@ export default class Discover extends wepy.page {
   };
   pageTuring() {
     this.methods.initList.call(this, {
-      page: (this.page += 1)
+      page: (this.page += 1),
+      same_city: this.same_city,
+      opposite: this.opposite
     });
     console.log(this.methods.initList);
   }

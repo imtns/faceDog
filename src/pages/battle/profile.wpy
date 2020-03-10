@@ -9,8 +9,6 @@
 		<block wx:if="{{verify}}">
 			<verify />
 		</block>
-		<image class="vip-icon" src="https://images.facedog.cn/public/profile/icon-vip.png" mode="scaleToFill" lazy-load="false">
-		</image>
 		<swiper indicator-dots="{{true}}" autoplay="{{false}}" indicator-color="{{indicatorcolor}}" indicator-active-color="{{indicatoractivecolor}}" duration="300">
 			<repeat for="{{profile.images}}" key="index">
 				<swiper-item>
@@ -24,11 +22,15 @@
 		</view>
 		<view class="battle-profile-wrapper" style="{{self?'padding-bottom:40rpx':'padding-bottom:180rpx'}}">
 			<view class="battle-profile-left flex">
-				<view class="name">{{profile.nick_name}}</view>
-				<view class="info">{{profile.gender =='female'?'女':'男'}} / {{profile.age}} / 距你 <text style="color:#FFA200;">{{profile.distance}}km</text> </view>
+				<view class="name">{{profile.nick_name}}<image wx:if="{{profile.vip}}" class="vip-icon" src="https://images.facedog.cn/public/profile/vip-icon.png" mode="scaleToFill" lazy-load="false">
+					</image>
+				</view>
+				<view class="info">{{profile.gender =='female'?'女':'男'}} / {{profile.age}} / <block wx:if="{{!profile.city}}">城市已隐藏</block>
+					<block wx:else>距你 <text style="color:#FFA200;">{{profile.distance}}km</text></block>
+				</view>
 				<view class="info-wrap">
 					<view class="content xingzuo">{{profile.constellation}}</view>
-					<view class="content area">{{profile.province}} {{profile.city}}</view>
+					<view class="content area" wx:if="{{profile.city}}">{{profile.province}} {{profile.city}}</view>
 				</view>
 
 			</view>
@@ -173,7 +175,7 @@ export default class Profile extends wepy.page {
         cancelButtonText: '取消',
         asyncClose: true,
         message: `向 ${this.title}申请微信号?
-								需要扣除200颜币
+								Ta会收到你赠送的200颜币
 								你当前的颜币为${this.me.coin}
 								如果没同意，3天后自动返还`
       })
@@ -186,7 +188,7 @@ export default class Profile extends wepy.page {
               this.$apply();
               Dialog.close();
               Dialog.alert({
-                message: '已发送，请到消息页红包消息处查看进度'
+                message: '已发送，请到消息页颜币红包处查看进度'
               }).then(() => {
                 // on close
               });
@@ -216,7 +218,7 @@ export default class Profile extends wepy.page {
       try {
         data = await post(MAKEFRIEND, {
           to_be: 'friend',
-          user_id: this.id,
+          user_id: this.profile._id,
           formId: e.detail.formId
         });
       } catch (e) {
@@ -269,9 +271,9 @@ export default class Profile extends wepy.page {
     gochat() {
       wx.setStorageSync('chatIcon', this.profile.avartar);
       wepy.navigateTo({
-        url: `/pages/chat/chatRoom?id=${this.profile.dentifier}&conversationID=C2C${
+        url: `/pages/chat/chatRoom?id=${
           this.profile.dentifier
-        }`
+        }&conversationID=C2C${this.profile.dentifier}`
       });
     },
     toastTip() {
@@ -300,7 +302,6 @@ export default class Profile extends wepy.page {
   }
   async onLoad(options) {
     this.id = options.id;
-
     index = options.index;
     position = options.position;
     Event.listen('showVerify', (status, step) => {
@@ -322,8 +323,8 @@ export default class Profile extends wepy.page {
     }
     this.profile.age = getAge(result.birthday);
     this.profile.face = result.face !== 0 ? (result.face * 100).toFixed(1) : 0;
-	this.profile.distance = (this.profile.distance / 1000).toFixed(2);
-	this.$invoke('moment', 'getId', this.profile._id);
+    this.profile.distance = (this.profile.distance / 1000).toFixed(2);
+    this.$invoke('moment', 'getId', this.profile._id);
     this.profile.images.forEach(item => {
       item.image =
         item.image + '?x-oss-process=image/resize,w_900,h_900/format,jpg';
@@ -451,14 +452,6 @@ export default class Profile extends wepy.page {
 	}
 	.container {
 	  width: 100%;
-	  .vip-icon {
-	    position: absolute;
-	    width: 173rpx;
-	    height: 59rpx;
-	    right: 20rpx;
-	    top: 135rpx;
-	    z-index: 10;
-	  }
 	  .battle-profile-wrapper {
 	    width: 100%;
 	    position: relative;
@@ -469,10 +462,14 @@ export default class Profile extends wepy.page {
 	      padding-left: 40rpx;
 	      padding-top: 20rpx;
 	      font-weight: 800;
-	      width: 40%;
+	      width: 58%;
 	      .name {
 	        color: #0c0c0c;
 	        font-size: 48rpx;
+	        .vip-icon {
+	          width: 94rpx;
+	          height: 31rpx;
+	        }
 	      }
 	      .info {
 	        color: #000;
@@ -517,26 +514,30 @@ export default class Profile extends wepy.page {
 	      }
 	    }
 	    .battle-profile-right {
-	      width: 30%;
+	      width: 36%;
 	      margin-top: 10rpx;
 	      .face-rank {
-	        width: 201rpx;
+	        width: 253rpx;
 	        text-align: center;
-	        height: 102rpx;
-	        background: url(https://images.facedog.cn/public/profile/rank-frame.png);
+	        height: 128rpx;
+	        background: url(https://images.facedog.cn/public/profile/rank-frame.png?2);
 	        background-size: contain;
 	        background-repeat: no-repeat;
-	        color: white;
+	        color: #000;
 	        padding-top: 36rpx;
+	        position: relative;
 	        .text1 {
-	          font-size: 18rpx;
-			  line-height: 18rpx;
-			  margin-top:4rpx;
+	          font-size: 17rpx;
+	          line-height: 18rpx;
+	          right: 13rpx;
+	          top: 38rpx;
+	          position: absolute;
 	        }
 	        .text2 {
-	          font-size: 29rpx;
-			  line-height: 29rpx;
-			  margin-top:7rpx;
+	          font-size: 30rpx;
+	          right: 34rpx;
+	          top: 60rpx;
+	          position: absolute;
 	        }
 	      }
 	      .profile-tags {

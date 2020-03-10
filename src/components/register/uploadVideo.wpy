@@ -3,7 +3,7 @@
 	<view>
 		<view class='wrapper-video'>
 			<view class="thumb">
-				<image src="https://images.facedog.cn/public/profile/model.jpg" mode="aspectFill"></image>
+				<!-- <image src="https://images.facedog.cn/public/profile/model.jpg" mode="aspectFill"></image> -->
 			</view>
 			<view class="text">请对着摄像头读出：</view>
 			<view class="word">“颜狗认证，{{number}}”</view>
