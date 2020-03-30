@@ -122,7 +122,7 @@ import wepy from 'wepy';
 import Config from '@/utils/config';
 import { formatDateFromSeconds, toast, getAge, contentCheck } from '@/utils';
 import { Event } from '@/utils/event.js';
-import { PROFILE, SEND_UNREAD_MESSAGE } from '@/utils/url';
+import { PROFILE, SEND_UNREAD_MESSAGE, GET_CHATROOM_MEMBER } from '@/utils/url';
 import { get, post } from '@/utils/request';
 import { emojiMap, emojiName, emojiUrl } from '@/utils/emojiMap';
 import { decodeElement } from '@/utils/decodeElement';
@@ -439,6 +439,9 @@ export default class ChatRoom extends wepy.page {
     this.id = options.id;
     this.conversationID = options.conversationID;
     this.profile = wx.getStorageSync('profile');
+    this.groupMemberNumber = 150 + await post(GET_CHATROOM_MEMBER, {
+      dentifier: this.profile.dentifier
+    });
     if (this.id) {
       if (this.id == 'administrator') {
         this.user.nick_name = '颜狗客服';
@@ -461,20 +464,6 @@ export default class ChatRoom extends wepy.page {
       }
       this.getMessageList();
     } else {
-      wx.$app
-        .getGroupMemberList({
-          groupID: Config.avChatRoomId,
-          count: 500,
-          offset: 0
-        })
-        .then(member => {
-          this.groupMemberNumber = member.data.memberList.length;
-          this.$apply();
-          console.log('member:::', member.data.memberList); // 群成员列表
-        })
-        .catch(function(imError) {
-          console.warn('getGroupMemberList error:', imError);
-        });
       let promise = wx.$app.joinGroup({
         groupID: Config.avChatRoomId,
         type: wx.TIM.TYPES.GRP_PUBLIC

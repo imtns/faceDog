@@ -103,3 +103,5 @@ export const PAY_CALLBACK = '/api/v1.5/pay/callback';
 export const COIN_PAY = '/api/v1.5/coin_pay';
 // 设置里设置省市
 export const SETTING_LOCATION = '/api/v1.5/user/modify_location'
+// 获取聊天室人数
+export const GET_CHATROOM_MEMBER = '/api/v1.5/dentifier_count'
