@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-	<navbar title="好友列表">
+	<navbar title="好友列表" />
 	<block wx:if="{{!list.length}}">
 		<empty></empty>
 	</block>

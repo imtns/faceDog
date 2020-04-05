@@ -282,9 +282,9 @@
             try {
               data = await get(`/api/discover/moment/${id}/like`);
             } catch (e) {
-              if (e == '用户未完善资料') {
-                Event.trigger('showVerify', true, 2);
-              }
+            //   if (e == '用户未完善资料') {
+            //     Event.trigger('showVerify', true, 2);
+            //   }
               return;
             }
             // this.momentList[index].likes.length += 1;
@@ -324,9 +324,9 @@
               content: value
             });
           } catch (e) {
-            if (e == '用户未完善资料') {
-              Event.trigger('showVerify', true, 2);
-            }
+            // if (e == '用户未完善资料') {
+            //   Event.trigger('showVerify', true, 2);
+            // }
             return;
           }
           const me = wepy.getStorageSync('profile');

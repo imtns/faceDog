@@ -304,11 +304,11 @@ export default class Profile extends wepy.page {
     this.id = options.id;
     index = options.index;
     position = options.position;
-    Event.listen('showVerify', (status, step) => {
-      this.verify = status;
-      this.status = step;
-      this.$apply();
-    });
+    // Event.listen('showVerify', (status, step) => {
+    //   this.verify = status;
+    //   this.status = step;
+    //   this.$apply();
+    // });
     try {
       this.timeLeft = await get(MAKEFRIEND);
       this.dentifier = options.dentifier;

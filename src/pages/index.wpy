@@ -13,7 +13,7 @@
 	</navbar>
 	<navbar wx:else title="{{pageTitle}}">
 	</navbar>
-	<view class="guest-button" wx:if="{{selectedTab != 2 && !hasProfile && loaded}}" @tap="verifyShow">游客模式</view>
+	<!-- <view class="guest-button" wx:if="{{selectedTab != 2 && !hasProfile && loaded}}" @tap="verifyShow">游客模式</view> -->
 	<block wx:if="{{verify}}">
 		<verify />
 	</block>
@@ -87,7 +87,8 @@ export default class Index extends wepy.page {
       'van-toast': '../components/vant/toast/index',
       'van-progress': '../components/vant/progress/index',
       'van-collapse': '../components/vant/collapse/index',
-      'van-collapse-item': '../components/vant/collapse-item/index'
+      'van-collapse-item': '../components/vant/collapse-item/index',
+      'van-checkbox': '../components/vant/checkbox/index'
     }
   };
   components = {
@@ -287,10 +288,10 @@ export default class Index extends wepy.page {
 
     this.user = wx.getStorageSync('profile');
     this.setProfile();
-    Event.listen('showVerify', status => {
-      this.verify = status;
-      this.$apply();
-    });
+    // Event.listen('showVerify', status => {
+    //   this.verify = status;
+    //   this.$apply();
+    // });
     let showRedpacket = wx.getStorageSync('showRedpacket');
     if (showRedpacket != 'ok') {
       let interval = setInterval(() => {

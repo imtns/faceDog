@@ -1,0 +1,61 @@
+<!--  -->
+<template>
+	<view class='pop'>
+		<image class="close" src="https://images.facedog.cn/mp/upgrade/close.png" mode="scaleToFill" lazy-load="false">
+		</image>
+		<view class="btn">开始赚钱</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Pop extends wepy.component {
+  props = {};
+
+  data = {};
+
+  components = {};
+
+  methods = {};
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+</script>
+ 
+<style lang='scss' scoped>
+	.pop {
+	  width: 520rpx;
+	  height: 810rpx;
+	  background: url(https://images.facedog.cn/mp/upgrade/page/module/bg1.png)
+	    no-repeat;
+	  background-size: contain;
+	  .close {
+	    width: 45rpx;
+	    height: 45rpx;
+	    position: absolute;
+	    top: 10rpx;
+	    right: 10rpx;
+	  }
+	  .btn {
+	    width: 420rpx;
+	    height: 92rpx;
+	    color: white;
+	    background: #000;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    position: absolute;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    bottom: 42rpx;
+	  }
+	}
+</style>

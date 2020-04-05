@@ -85,12 +85,13 @@ export default class extends wepy.app {
 
       //   'pages/activity/activity',
       //   'pages/activity/webview', // webview页面
-      'pages/register/chooseName',
-      'pages/register/chooseGender',
-      'pages/register/chooseBirth',
-      'pages/register/uploadAvatar', // 上传头像
+      //   'pages/register/chooseName',
+      //   'pages/register/chooseGender',
+      //   'pages/register/chooseBirth',
+      //   'pages/register/uploadAvatar', // 上传头像
       'pages/register/verify',
-      'pages/register/uploadVideo',
+      'pages/register/uploadVideo', //视频认证
+      'pages/register/serviceVerify', // 客服认证
       //   'pages/discover/likeList', // 点赞列表
       //   'pages/discover/commentList', // 评论列表
 
@@ -110,7 +111,8 @@ export default class extends wepy.app {
       'pages/vip/superVip', // 会员界面
       'pages/vip/vipBuy', // 会员购买
       'pages/vip/coinBuy', // 颜币购买
-      'pages/vip/vipBuySuccess'
+      'pages/vip/vipBuySuccess',
+      'pages/upgrade/index' // 评级升级
     ],
     subPackages: [
       {

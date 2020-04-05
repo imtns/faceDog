@@ -67,7 +67,7 @@ import {
   MY_FAVORITE,
   LIKE_ME,
   FRIENDS_LIST,
-  GET_UNREAD_MSG
+  GET_UNREAD_MSG,
 } from '@/utils/url';
 
 export default class Chat extends wepy.component {
@@ -84,14 +84,14 @@ export default class Chat extends wepy.component {
     ilikeTotal: 0,
     likeMeTotal: 0,
     likemeIcon: 'https://images.facedog.cn/public/chat/like-me-all.png',
-    meLikeIcon: 'https://images.facedog.cn/public/chat/i-like-all.png'
+    meLikeIcon: 'https://images.facedog.cn/public/chat/i-like-all.png',
   };
   components = {
     likeme,
     ilike,
     chatlist,
     notify,
-    tutorial
+    tutorial,
   };
 
   methods = {
@@ -111,9 +111,9 @@ export default class Chat extends wepy.component {
     goProfile(id) {
       wx.navigateTo({
         url: `battle/profile?id=${id}`,
-        success: result => {},
+        success: (result) => {},
         fail: () => {},
-        complete: () => {}
+        complete: () => {},
       });
     },
     checkAllLikeMe() {
@@ -141,7 +141,7 @@ export default class Chat extends wepy.component {
       } else if (index == 4) {
         this.$invoke('notify', 'initData');
       }
-    }
+    },
   };
   refreshData() {
     this.fetchData();
@@ -149,7 +149,7 @@ export default class Chat extends wepy.component {
   events = {
     setScroll() {
       this.scroll = true;
-    }
+    },
   };
 
   watch = {};
@@ -161,11 +161,11 @@ export default class Chat extends wepy.component {
     // Event.listen('send', () => {
     //   this.initRecentContactList();
     // });
-    Event.listen('conversationListUpdate', list => {
+    Event.listen('conversationListUpdate', (list) => {
       console.log('收到的联系列表', list);
       this.$invoke('chatlist', 'getChatList', list);
     });
-    Event.listen('tab', tab => {
+    Event.listen('tab', (tab) => {
       this.tabIndex = tab;
       console.log('tab', tab);
       if (tab == 1) {
@@ -195,8 +195,8 @@ export default class Chat extends wepy.component {
   }
   async getLikeMeList() {
     this.likemeList = [];
-    get(LIKE_ME).then(likeme => {
-      likeme.forEach(item => {
+    get(LIKE_ME).then((likeme) => {
+      likeme.forEach((item) => {
         this.likemeList.push(...item.users);
       });
       // this.likemeList = this.likemeList.slice(0,5);
@@ -205,7 +205,7 @@ export default class Chat extends wepy.component {
   }
   async getIlikeList() {
     this.ilikeList = [];
-    get(MY_FAVORITE).then(ilike => {
+    get(MY_FAVORITE).then((ilike) => {
       console.log(ilike.length);
       this.ilikeTotal = ilike.total;
       this.ilikeList = ilike.favorites.slice(0, 5);
@@ -220,7 +220,7 @@ export default class Chat extends wepy.component {
     webim.getRecentContactList(
       {
         // 获取会话列表的方法
-        Count: 200 // 最近的会话数 ,最大为 100
+        Count: 100, // 最近的会话数 ,最大为 100
       },
       function(resp) {
         wx.hideLoading();
@@ -228,7 +228,7 @@ export default class Chat extends wepy.component {
         if (resp.SessionItem) {
           if (resp.SessionItem.length == 0) {
             that.setData({
-              isNoData: false
+              isNoData: false,
             });
           } else {
             that.$invoke('chatlist', 'getChatList', resp.SessionItem);

@@ -130,9 +130,9 @@
 	          user_id: id
 	        });
 	      } catch (e) {
-	        if (e == '用户未完善资料') {
-	          Event.trigger('showVerify', true, 2);
-	        }
+	        // if (e == '用户未完善资料') {
+	        //   Event.trigger('showVerify', true, 2);
+	        // }
 	        return;
 	      }
 

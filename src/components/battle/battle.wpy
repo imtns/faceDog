@@ -278,10 +278,10 @@ export default class Battle extends wepy.component {
   }
   // 提交喜欢
   async battleCommit() {
-    if (this.noProfile) {
-      Event.trigger('showVerify', true);
-      return;
-    }
+    // if (this.noProfile) {
+    //   Event.trigger('showVerify', true);
+    //   return;
+    // }
     try {
       const data = await post(BATTLE_COMMIT, {
         result: {

@@ -18,8 +18,8 @@
 									<view class="city">{{item.province}} {{item.city}}</view>
 								</view>
 								<image class="redpacket {{item.status=='no_receive'?'waiting':''}}" @tap="redPacketClick({{item}},'get')" style="margin-left:5rpx;" src="https://images.facedog.cn/public/redpacket/redpacket-{{item.status=='no_receive'?'waiting':item.status=='expire'?'expire':'opened'}}1.png" mode="scaleToFill" lazy-load="false"></image>
-								<!-- <image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
-								</image> -->
+								<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="deleteItem({{item._id}},'get_wechat_list')" mode="scaleToFill" lazy-load="false">
+								</image>
 							</view>
 						</view>
 					</repeat>
@@ -39,8 +39,8 @@
 									<view class="city">{{item.province}} {{item.city}}</view>
 								</view>
 								<image class="redpacket" @tap="redPacketClick({{item}},'send')" style="width:{{item.status == 'receive'?'65rpx':'119rpx'}};height:{{item.status=='receive'?'105rpx':'119rpx'}};margin-right:{{item.status=='receive'?'40':'10'}}rpx" src="https://images.facedog.cn/public/redpacket/redpacket-{{item.status == 'receive'?'ok':item.status=='no_receive'?'waiting':'expire'}}.png?4" mode="aspectFill" lazy-load="false"></image>
-								<!-- <image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
-								</image> -->
+								<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="deleteItem({{item._id}},'send_wechat_list')" mode="scaleToFill" lazy-load="false">
+								</image>
 							</view>
 						</view>
 					</repeat>
@@ -69,7 +69,8 @@ import {
   SEND_WECHAT_LIST,
   GET_WECHAT_LIST,
   SEND_WECHAT,
-  UPDATE_REDPACKET_STATUS
+  UPDATE_REDPACKET_STATUS,
+  DELETE_REDPACKAGE,
 } from '@/utils/url';
 export default class RedPackList extends wepy.page {
   config = {
@@ -79,8 +80,8 @@ export default class RedPackList extends wepy.page {
       'van-toast': '../components/vant/toast/index',
       'van-tab': '../components/vant/tab/index',
       'van-tabs': '../components/vant/tabs/index',
-      'van-popup': '../components/vant/popup/index'
-    }
+      'van-popup': '../components/vant/popup/index',
+    },
   };
 
   data = {
@@ -96,15 +97,15 @@ export default class RedPackList extends wepy.page {
       0: 'coin',
       1: 'invite',
       2: 'refund',
-      3: 'agree'
+      3: 'agree',
     },
-    redpacketType: ''
+    redpacketType: '',
   };
 
   components = {
     empty,
     notify,
-    popCoin
+    popCoin,
   };
 
   methods = {
@@ -128,6 +129,12 @@ export default class RedPackList extends wepy.page {
     // 	this.$invoke('notify', 'setUserid', id);
     // 	this.showPop = true;
     // },
+    deleteItem(user_id, list_type) {
+      post(DELETE_REDPACKAGE, {
+        user_id,
+        type,
+      });
+    },
     onClose() {
       this.showPop = false;
     },
@@ -135,11 +142,11 @@ export default class RedPackList extends wepy.page {
       console.log(id);
       wx.navigateTo({
         url: `../battle/profile?id=${id}`,
-        success: result => {},
+        success: (result) => {},
         fail: () => {},
-        complete: () => {}
+        complete: () => {},
       });
-    }
+    },
   };
   onReachBottom() {}
   events = {
@@ -154,7 +161,7 @@ export default class RedPackList extends wepy.page {
         this.$apply();
       }
       this.showPop = false;
-    }
+    },
   };
 
   watch = {};

@@ -14,8 +14,8 @@
 					<view class="name">{{profile.nick_name || tempName}}</view>
 					<view class="desc">{{profile.age || '未知'}}岁 · {{profile.city || '城市已隐藏'}}</view>
 				</view>
-				<view class="verify" @tap="checkVerify({{profile.progress}})">
-					<image src="https://images.facedog.cn/public/profile/{{profile.progress || 'profile'}}.png?2" mode="scaleToFill" lazy-load="false">
+				<view class="verify">
+					<image src="https://images.facedog.cn/mp/profile/level-R.png?2" mode="scaleToFill" lazy-load="false">
 					</image>
 					<!-- {{profile.progress?progress[profile.progress]:'未认证'}} -->
 				</view>
@@ -75,26 +75,6 @@
 				<text wx:else style="color:white;">点击获取超级会员</text>
 			</view>
 		</view>
-		<!-- <view class="hr"></view> -->
-		<!-- <view class='item' @tap="redirect('mytime')">
-            <view class="title" >我的次数</view>
-            <view class="detail2">
-                <van-icon name="arrow" />
-            </view>
-        </view>
-        <view class="line"></view> -->
-		<!-- <view class='nav-item' @tap="redirect('mymoment')">
-			<image src="https://images.facedog.cn/public/profile/myshare.png?1" mode="scaleToFill" lazy-load="false">
-			</image>
-		</view> -->
-		<!-- <view class="line"></view> -->
-		<!-- <view class='item' @tap="redirect('mymoment')">
-            <view class="title">我的动态</view>
-            <view class="detail2">
-                <van-icon name="arrow" />
-            </view>
-        </view>
-        <view class="line"></view> -->
 		<view class="nav-item {{active[0]?'active':''}}" @touchstart="touchstart(0)" @touchend="touchend(0)" @tap="redirect('invite')">
 			<image style="height:31rpx;" src="https://images.facedog.cn/public/profile/share2.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
@@ -115,13 +95,6 @@
 			<image src="https://images.facedog.cn/public/profile/setting.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
-		<!-- <view class="nav-item" wx:if="{{debug >= 7}}">
-			<navigator url="test" open-type="navigate" hover-class="none">
-				<view class="item">
-					<view class="title">切换</view>
-				</view>
-			</navigator>
-		</view> -->
 		<view class="nav-item" wx:if="{{debug1 >= 12}}">
 			<navigator url="test/testCharge" open-type="navigate" hover-class="none">
 				<view class="item">
@@ -129,17 +102,9 @@
 				</view>
 			</navigator>
 		</view>
-		<!-- <view class="line"></view> -->
-		<!-- </navigator> -->
-		<!-- <navigator url="test" open-type="navigate" hover-class="none">
-            <view class="item">
-                <view class="title">切换</view>
-                <view class="detail2">
-                    <van-icon name="arrow" />
-                </view>
-            </view>
-            <view class="line"></view>
-        </navigator> -->
+		<van-popup show="{{ showUpgrade}}" bind:close="onClose">
+			<upgrade />
+		</van-popup>
 	</view>
 </template>
 
@@ -149,6 +114,7 @@ import { Event } from '@/utils/event.js';
 import notify from './notify';
 import { formatTimeShort } from '@/utils';
 import Dialog from '@/components/vant/dialog/dialog';
+import upgrade from './upgrade/index';
 export default class My extends wepy.component {
   data = {
     active: {},
@@ -157,14 +123,14 @@ export default class My extends wepy.component {
       certify: '未认证',
       audit: '审核中',
       finish: '已通过',
-      refuse: '认证失败'
+      refuse: '认证失败',
     },
     levelColor: {
       1: '#8D8D8D',
       2: '#22C8C7',
       3: '#FDBB5B',
       4: '#F87725',
-      5: '#766AFB'
+      5: '#766AFB',
     },
     debug: 0,
     debug1: 0,
@@ -172,10 +138,12 @@ export default class My extends wepy.component {
     clickCount: 0,
     levelPercent: 0,
     profile: {},
-    tempName: ''
+    tempName: '',
+    showUpgrade: false,
   };
   components = {
-    notify
+    notify,
+    upgrade,
   };
 
   methods = {
@@ -214,23 +182,23 @@ export default class My extends wepy.component {
       //   }
       wx.navigateTo({
         url: 'battle/profile?id=' + this.profile._id,
-        success: result => {},
+        success: (result) => {},
         fail: () => {},
-        complete: () => {}
+        complete: () => {},
       });
     },
     redirect(name) {
-      if (!wepy.getStorageSync('hasProfile') && name == 'propaganda') {
-        Event.trigger('showVerify', true);
-        return;
-      }
+      //   if (!wepy.getStorageSync('hasProfile') && name == 'propaganda') {
+      //     Event.trigger('showVerify', true);
+      //     return;
+      //   }
       // 跳转到我的动态页面需要带参数
       if (name === 'mymoment') {
         // wepy.navigateTo({
         //   url: `/pages/my/mymoment?id=${this.profile._id}`
         // });
         wepy.navigateTo({
-          url: `/pages/chat/friendList`
+          url: `/pages/chat/friendList`,
         });
         return;
       }
@@ -243,7 +211,7 @@ export default class My extends wepy.component {
           confirmButtonText: '确认',
           cancelButtonText: '取消',
           asyncClose: true,
-          message: `最后上传的一张照片将作为PK页封面展示，请谨慎选择`
+          message: `最后上传的一张照片将作为PK页封面展示，请谨慎选择`,
         })
           .then(async () => {
             setTimeout(() => {
@@ -269,7 +237,7 @@ export default class My extends wepy.component {
       this.clickCount = profile.play;
       this.getLevel();
       this.$apply();
-    }
+    },
   };
   getLevel() {
     if (this.clickCount >= 0 && this.clickCount < 10) {

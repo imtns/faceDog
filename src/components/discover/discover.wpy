@@ -107,10 +107,11 @@
         },
         mkPhoto() {
           let profile = wepy.getStorageSync('profile');
-          if (!profile || profile.progress == 'profile') {
-            Event.trigger('showVerify', true, 2);
-            return;
-          } else if (profile.progress !== 'finish') {
+        //   if (!profile || profile.progress == 'profile') {
+        //     Event.trigger('showVerify', true, 2);
+        //     return;
+		//   }
+		 if (profile.progress !== 'finish') {
            toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
             return;
           }

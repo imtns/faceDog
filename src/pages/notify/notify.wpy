@@ -26,7 +26,7 @@
 					<view>请求与你交换微信</view>
 				</view>
 				<view class="input-box">
-					<input type="text" placeholder="点击输入" value="{{wechat}}" @input="inputChange" class="input">
+					<input type="text" placeholder="点击输入" value="{{wechat}}" @input="inputChange" class="input" />
 				</view>
 			</block>
 			<block wx:if="{{type=='agree'}}">
@@ -34,11 +34,11 @@
 					<view>喷火的杰尼龟 同意了你的请求</view>
 				</view>
 				<view class="input-box" style="margin-top:20rpx;">
-					<input type="text" value="{{wechat}}" @input="inputChange" placeholder="点击输入" class="input">
+					<input type="text" value="{{wechat}}" @input="inputChange" placeholder="点击输入" class="input" />
 				</view>
 			</block>
 			<view class="button" style="background:{{bgColor[type]}}" @tap="copy">
-				<image src="https://images.facedog.cn/public/notify/btn-{{type}}.png?1" style="width:{{type=='coin'?'100rpx':'66rpx'}}" mode="scaleToFill" >
+				<image src="https://images.facedog.cn/public/notify/btn-{{type}}.png?1" style="width:{{type=='coin'?'100rpx':'66rpx'}}" mode="scaleToFill">
 				</image>
 			</view>
 		</view>
@@ -46,62 +46,62 @@
 </template> 
 
 <script>
-	import wepy from 'wepy';
-	export default class Notify extends wepy.page {
-	  props = {
-		  type:""
-	  };
+import wepy from 'wepy';
+export default class Notify extends wepy.page {
+  props = {
+    type: ''
+  };
 
-	  data = {
-	    bgColor: {
-	      coin: '#F25458',
-	      invite: '#FDC72F',
-	      refund: '#F25458',
-	      agree: '#FDC72F'
-	    },
-	    width: {
-	      coin: '569rpx',
-	      invite: '338rpx',
-	      refund: '543rpx',
-	      agree: '546rpx'
-	    },
-	    height: {
-	      coin: '445rpx',
-	      invite: '366rpx',
-	      refund: '395rpx',
-	      agree: '415rpx'
-	    },
-	    wechat: ''
-	  };
+  data = {
+    bgColor: {
+      coin: '#F25458',
+      invite: '#FDC72F',
+      refund: '#F25458',
+      agree: '#FDC72F'
+    },
+    width: {
+      coin: '569rpx',
+      invite: '338rpx',
+      refund: '543rpx',
+      agree: '546rpx'
+    },
+    height: {
+      coin: '445rpx',
+      invite: '366rpx',
+      refund: '395rpx',
+      agree: '415rpx'
+    },
+    wechat: ''
+  };
 
-	  components = {};
+  components = {};
 
-	  methods = {
-	    inputChange({ detail }) {
-	      this.wechat = detail.value;
-	    },
-	    copy() {
-	      wx.setClipboardData({
-	        data: this.wechat,
-	        success: res => {
-	          wx.showToast({
-	            title: '复制成功'
-	          });
-	        }
-	      });
-	    }
-	  };
+  methods = {
+    inputChange({ detail }) {
+      this.wechat = detail.value;
+    },
+    copy() {
+      wx.setClipboardData({
+        data: this.wechat,
+        success: res => {
+          wx.showToast({
+            title: '复制成功'
+          });
+        }
+      });
+    }
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {}
+  onLoad() {}
 
-	  onShow() {}
-	}
+  onShow() {}
+}
 </script>
 
 <style lang='scss' scoped>

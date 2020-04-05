@@ -3,7 +3,20 @@
 	<navbar title="我的颜币">
 	</navbar>
 	<view class='container'>
+		<view class="bg"></view>
 		<view class="coin-info">
+			<view class="coin-number">
+				<image src="https://images.facedog.cn/mp/coin/coin-b.png" mode="scaleToFill" lazy-load="false">
+				</image><text>200</text>
+
+			</view>
+			<view class="withdraw">立即提现</view>
+		</view>
+		<view class="pad">
+
+		</view>
+
+		<!-- <view class="coin-info">
 			<view class="coin-help" @tap="coinHelp">颜币获取</view>
 			<image src="https://images.facedog.cn/public/coin/icon-coin.png" mode="scaleToFill" lazy-load="false">
 			</image>
@@ -31,137 +44,109 @@
 	</view>
 	<van-popup show="{{ showPop }}" bind:close="onClose">
 		<coinPop />
-	</van-popup>
+	</van-popup> -->
+	</view>
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import coinPop from './module/coinPop';
-	export default class Coin extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '',
-	    usingComponents: {
-	      navbar: '../../components/navbar/index',
-	      'van-popup': '../components/vant/popup/index'
-	    }
-	  };
+import wepy from 'wepy';
+import coinPop from './module/coinPop';
+export default class Coin extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-popup': '../components/vant/popup/index'
+    }
+  };
 
-	  data = {
-	    showPop: false,
-	    coin: 0
-	  };
+  data = {
+    showPop: false,
+    coin: 0
+  };
 
-	  components = {
-	    coinPop
-	  };
+  components = {
+    coinPop
+  };
 
-	  methods = {
-	    coinHelp() {
-	      wepy.navigateTo({ url: 'coinHelp' });
-	    },
-	    show(type) {
-	      this.$invoke('coinPop', 'setType', type);
-	      this.showPop = true;
-	    }
-	  };
+  methods = {
+    coinHelp() {
+      wepy.navigateTo({ url: 'coinHelp' });
+    },
+    show(type) {
+      this.$invoke('coinPop', 'setType', type);
+      this.showPop = true;
+    }
+  };
 
-	  events = {
-	    closePop() {
-	      this.showPop = false;
-	    }
-	  };
+  events = {
+    closePop() {
+      this.showPop = false;
+    }
+  };
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {
-	    let profile = wx.getStorageSync('profile');
-	    this.coin = profile.coin;
-	  }
+  onLoad() {
+    let profile = wx.getStorageSync('profile');
+    this.coin = profile.coin;
+  }
 
-	  onShow() {}
-	}
+  onShow() {}
+}
 </script>
 
 <style lang='scss'>
 	.container {
 	  position: relative;
-	  width: 100%;
-	  .coin-info {
+	  .bg {
 	    width: 100%;
-	    height: 240rpx;
-	    background: #3e3a3f;
-	    display: flex;
-	    justify-content: center;
-	    padding-top: 100rpx;
-	    position: relative;
-	    .coin-help {
-	      position: absolute;
-	      right: 30rpx;
-	      top: 30rpx; 
-	      width: 111rpx;
-	      height: 50rpx;
-	      border: 1rpx solid rgba(255, 255, 255, 1);
-	      opacity: 1;
-	      border-radius: 5rpx;
-		  font-size:20rpx;
-		  color:white;
-		  display:flex;
-		  justify-content: center;
-		  align-items: center;
-	    }
-	    image {
-	      width: 70rpx;
-	      height: 70rpx;
-	      margin-right: 10rpx;
-	      margin-top: 5rpx;
-	    }
-	    .text {
-	      text-align: center;
-	      color: white;
-	      .number {
-	        font-size: 80rpx;
-	        line-height: 80rpx;
+	    background: url(https://images.facedog.cn/mp/coin/bg.png);
+	    height: 702rpx;
+	    position: absolute;
+	    background-size: contain;
+	    top: 0;
+	    z-index: -1;
+	  }
+	  .coin-info {
+	    width: 243rpx;
+	    margin: 70rpx auto 0;
+	    .coin-number {
+	      display: flex;
+	      justify-content: space-between;
+	      align-items: center;
+	      image {
+	        width: 84rpx;
+	        height: 84rpx;
 	      }
-	      .tip {
-	        font-size: 25rpx;
+	      text {
+	        font-size: 60rpx;
+	        color: white;
 	      }
 	    }
-	    .button {
-	      width: 230rpx;
-	      height: 75rpx;
-	      position: absolute;
-	      bottom: -80rpx;
-	      left: 50%;
+	    .withdraw {
+	      background: url(https://images.facedog.cn/mp/coin/button.png);
+	      width: 243rpx;
+	      height: 61rpx;
+	      background-size: contain;
 	      display: flex;
 	      justify-content: center;
-	      flex-wrap: wrap;
-	      transform: translateX(-50%);
-	      image {
-	        width: 100%;
-	        height: 100%;
-	      }
-	      .button-text {
-	        color: #a19595;
-	        font-size: 20rpx;
-	        width: 100%;
-	        text-align: center;
-	      }
+	      align-items: center;
+	      font-size: 26rpx;
+	      color: #000;
+	      margin: 0 auto;
 	    }
 	  }
-	  .button {
-	    width: 100%;
-	    display: flex;
-	    justify-content: center;
-	    margin: 100rpx auto 50rpx;
-	    &.button1 {
-	      margin-top: 150rpx;
-	    }
-	    image {
-	      width: 582rpx;
-	      height: 210rpx;
-	    }
+	  .pad {
+	    width: 674rpx;
+	    height: 1053rpx;
+	    background: url(https://images.facedog.cn/mp/coin/bottom-bg.png);
+	    background-size: contain;
+	    top: 286rpx;
+	    position: relative;
+	    margin: 0 auto;
 	  }
 	}
 </style>

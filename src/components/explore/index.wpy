@@ -35,7 +35,7 @@
 				</repeat>
 			</view>
 		</scroll-view>
-		<view class="unlock-button" @tap="showVerify" wx:if="{{!verify}}">解锁每日探索板块</view>
+		<!-- <view class="unlock-button" @tap="showVerify" wx:if="{{!verify}}">解锁每日探索板块</view> -->
 	</view>
 </template>
 

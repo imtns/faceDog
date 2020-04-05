@@ -49,9 +49,6 @@
 						</text>
 						<text style="font-size:34rpx;color:#000">才可以和别人匹配，最快只需要5分钟</text>
 					</text>
-
-					<!-- <button class="btn btn-1" open-type="getUserInfo" bindgetuserinfo="goVerify">现在认证</button>
-					<button class="btn btn-2" open-type="getUserInfo" bindgetuserinfo="goGuest">我先看看</button> -->
 					<button class="btn btn-1" @tap="goVerify">现在认证</button>
 					<button class="btn btn-2" @tap="goGuest">我先看看</button>
 				</view>
@@ -78,6 +75,11 @@
 					<uploadAvatar :number.sync="number" />
 				</view>
 			</swiper-item>
+			<swiper-item>
+				<view class="register-item">
+					<finishRegister />
+				</view>
+			</swiper-item>
 		</swiper>
 	</view>
 	<canvas canvas-id="canvas-img-0" style="top:-500rpx;position:fixed;"></canvas>
@@ -91,7 +93,7 @@ import chooseGender from '@/components/register/chooseGender';
 import chooseName from '@/components/register/chooseName';
 import chooseBirth from '@/components/register/chooseBirth';
 import uploadAvatar from '@/components/register/uploadAvatar';
-
+import finishRegister from '@/components/register/finishRegister';
 import { get, post } from '@/utils/request';
 import { GET_REGISTER_NUMBER } from '@/utils/url';
 import { toast, sleep } from '@/utils';
@@ -123,7 +125,8 @@ export default class Example extends wepy.page {
     chooseGender,
     chooseName,
     chooseBirth,
-    uploadAvatar
+    uploadAvatar,
+    finishRegister
   };
 
   methods = {
@@ -166,11 +169,11 @@ export default class Example extends wepy.page {
 
   events = {
     changeStep(step) {
-      if (step == 4) {
-        this.initAnimation = 'loaded';
-        this.showRegister = false;
-        this.textCurrent = 2;
-      }
+      //   if (step == 4) {
+      //     this.initAnimation = 'loaded';
+      //     this.showRegister = false;
+      //     this.textCurrent = 2;
+      //   }
       this.current = step;
     }
   };

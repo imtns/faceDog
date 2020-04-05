@@ -1,17 +1,18 @@
 <!--  -->
 <template>
-	<navbar title="真人认证"></navbar>
+
+	<navbar title=""></navbar>
 	<view class='container'>
-		<view class='title'>请完成真人认证</view>
-		<view class='desc'>所有用户都必须通过真人认证</view>
-		<view class='desc'>认证预计将于10分钟-6小时内完成</view>
-		<view class="not-allow">
-			<image src="https://images.facedog.cn/mp/register/not-allow.png" mode="scaleToFill" lazy-load="false">
-			</image>
-		</view>
+		<view class='title'>请填写你的微信号</view>
+		<view class='desc'>微信号不公开，你可以随时修改</view>
+		<view class='desc'>只有填写真实微信号的用户才可以<text style="color:#02F685;">领取红包奖励</text></view>
 		<view class='wrap'>
-			<button class='verify2' @tap='serviceVerify'>客服认证（不赠送颜币）</button>
-			<button class="verify1" @tap='videoVerify'>视频认证（赠送200颜币）</button>
+			<view class='field'>
+				<view class='label'>输入真实微信号(选填)</view>
+				<input class='input' @change='onName' type='text' placeholder='不公开，任何人不经你同意无法查看' placeholder-class='placeholder' />
+			</view>
+			<button class='verify2' @tap='finishRegister'>完成注册</button>
+			<button class="verify1" @tap='goPass'>跳过</button>
 		</view>
 	</view>
 </template>
@@ -21,7 +22,7 @@ import wepy from 'wepy';
 import { get, post } from '@/utils/request';
 import { USER_VERIFY, VERIFY, SUBMIT_FORMID } from '@/utils/url';
 import { toast, sleep } from '@/utils';
-export default class Verify extends wepy.page {
+export default class FinishRegister extends wepy.component {
   config = {
     navigationBarTitleText: '4/4',
     usingComponents: {
@@ -36,25 +37,29 @@ export default class Verify extends wepy.page {
   };
 
   components = {};
-
+  redirect() {
+    wx.requestSubscribeMessage({
+      tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
+      success: async () => {
+        //   toast('申请已提交，最晚1个工作日内完成完成审核');
+        //   await sleep(2);
+        wepy.reLaunch({ url: '/pages/index' });
+      },
+      complete() {
+        console.log('订阅complete');
+      }
+    });
+  }
   methods = {
     onName(event) {
       this.wechat = event.detail.value;
     },
-    async serviceVerify() {
-      //   wx.redirectTo({
-      //     url: 'index'
-      //   });
-      wepy.navigateTo({ url: 'serviceVerify' });
+
+    async finishRegister() {
+      this.redirect();
     },
-    videoVerify() {
-      let that = this;
-      wx.requestSubscribeMessage({
-        tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
-        success() {
-          wepy.navigateTo({ url: `uploadVideo` });
-        }
-      });
+    goPass() {
+      this.redirect();
     }
   };
 
@@ -76,7 +81,7 @@ export default class Verify extends wepy.page {
 }
 </script>
 
-<style lang='scss'>
+<style lang='scss' scoped>
 	.container {
 	  height: 100vh;
 	  position: relative;
@@ -88,26 +93,18 @@ export default class Verify extends wepy.page {
 	    text-align: center;
 	    color: #302f2f;
 	    font-size: 42rpx;
+	    margin-bottom: 20rpx;
 	  }
 	  .desc {
 	    color: #a6aaa8;
 	    font-size: 24rpx;
 	    margin: 10rpx auto;
 	    text-align: center;
-	    width: 384rpx;
+	    width: 604rpx;
 	    white-space: normal;
 	  }
-	  .not-allow {
-	    width: 627rpx;
-	    height: 440rpx;
-	    margin: 10rpx auto;
-	    image {
-	      width: 100%;
-	      height: 100%;
-	    }
-	  }
 	  .wrap {
-	    margin: 100rpx 60rpx 0;
+	    margin: 150rpx 60rpx 0;
 	    .filed {
 	      text-align: left;
 	      .label {
@@ -139,7 +136,7 @@ export default class Verify extends wepy.page {
 	    border-radius: 10rpx;
 	  }
 	  .verify2 {
-	    margin-top: 100rpx;
+	    margin-top: 180rpx;
 
 	    width: 420rpx;
 	    height: 92rpx;

@@ -29,7 +29,7 @@
 				</view>
 				<view class="input-wrapper">
 					<view class="input-box">
-						<input type="text" placeholder="点击输入" value="{{myWechat}}" @input="inputMyWechatChange" class="input">
+						<input type="text" placeholder="点击输入" value="{{myWechat}}" @input="inputMyWechatChange" class="input" />
 					</view>
 					<!-- <view class="button" style="background:{{bgColor[type]}}" @tap="buttonClick"> -->
 					<image class="button" src="https://images.facedog.cn/public/notify/btn-send.png" mode="scaleToFill" @tap="sendWechat">
@@ -43,7 +43,7 @@
 				</view>
 				<view class="input-wrapper">
 					<view class="input-box">
-						<input type="text" placeholder="点击输入" disabled value="{{wechat}}" @input="inputChange" class="input">
+						<input type="text" placeholder="点击输入" disabled value="{{wechat}}" @input="inputChange" class="input" />
 					</view>
 					<!-- <view class="button" style="background:{{bgColor[type]}}" @tap="buttonClick"> -->
 					<image class="button" src="https://images.facedog.cn/public/notify/btn-copy.png" mode="scaleToFill" @tap="copyWechat">
