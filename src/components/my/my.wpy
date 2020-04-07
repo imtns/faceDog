@@ -14,8 +14,13 @@
 					<view class="name">{{profile.nick_name || tempName}}</view>
 					<view class="desc">{{profile.age || '未知'}}岁 · {{profile.city || '城市已隐藏'}}</view>
 				</view>
-				<view class="verify">
-					<image src="https://images.facedog.cn/mp/profile/level-R.png?2" mode="scaleToFill" lazy-load="false">
+				<view class="verify" @tap="goUpgrade" wx:if="{{profile.level}}">
+					<image src="https://images.facedog.cn/mp/profile/level-{{[profile.level]}}.png?2" mode="scaleToFill" lazy-load="false">
+					</image>
+					<!-- {{profile.progress?progress[profile.progress]:'未认证'}} -->
+				</view>
+				<view class="verify" wx:else>
+					<image src="https://images.facedog.cn/mp/profile/unlevel.png?2" mode="scaleToFill" lazy-load="false">
 					</image>
 					<!-- {{profile.progress?progress[profile.progress]:'未认证'}} -->
 				</view>
@@ -84,14 +89,18 @@
 			<image style="height:28rpx;" src="https://images.facedog.cn/public/index/yg-share.png?2" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
-
 		<view class="line"></view>
-		<view class="nav-item {{active[2]?'active':''}}" @touchstart="touchstart(2)" @touchend="touchend(2)" @tap="redirect('contactService')">
+		<view class="nav-item {{active[2]?'active':''}}" @touchstart="touchstart(2)" @touchend="touchend(2)" @tap="redirect('video')">
+			<image style="height:35rpx;object-fit:cover;" src="https://images.facedog.cn/public/profile/video-verify.png?1" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view>
+		<view class="line"></view>
+		<view class="nav-item {{active[3]?'active':''}}" @touchstart="touchstart(3)" @touchend="touchend(3)" @tap="redirect('contactService')">
 			<image src="https://images.facedog.cn/public/profile/service.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
-		<view class="nav-item {{active[3]?'active':''}}" @touchstart="touchstart(3)" @touchend="touchend(3)" @tap="redirect('setting')">
+		<view class="nav-item {{active[4]?'active':''}}" @touchstart="touchstart(4)" @touchend="touchend(4)" @tap="redirect('setting')">
 			<image src="https://images.facedog.cn/public/profile/setting.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
@@ -102,9 +111,7 @@
 				</view>
 			</navigator>
 		</view>
-		<van-popup show="{{ showUpgrade}}" bind:close="onClose">
-			<upgrade />
-		</van-popup>
+
 	</view>
 </template>
 
@@ -114,7 +121,7 @@ import { Event } from '@/utils/event.js';
 import notify from './notify';
 import { formatTimeShort } from '@/utils';
 import Dialog from '@/components/vant/dialog/dialog';
-import upgrade from './upgrade/index';
+
 export default class My extends wepy.component {
   data = {
     active: {},
@@ -139,14 +146,17 @@ export default class My extends wepy.component {
     levelPercent: 0,
     profile: {},
     tempName: '',
-    showUpgrade: false,
   };
   components = {
     notify,
-    upgrade,
   };
 
   methods = {
+    goUpgrade() {
+      wepy.navigateTo({
+        url: '/pages/upgrade/index',
+      });
+    },
     touchstart(index) {
       this.active[index] = true;
     },
@@ -192,6 +202,14 @@ export default class My extends wepy.component {
       //     Event.trigger('showVerify', true);
       //     return;
       //   }
+      if (name === 'video') {
+        if (this.profile.video_audit == 'unfinish') {
+          wepy.navigateTo({
+            url: `/pages/register/verify`,
+          });
+        }
+        return;
+      }
       // 跳转到我的动态页面需要带参数
       if (name === 'mymoment') {
         // wepy.navigateTo({

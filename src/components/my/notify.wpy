@@ -9,7 +9,7 @@
 			<image src="https://images.facedog.cn/public/my/notify-verifying.png" mode="scaleToFill" lazy-load="false" />
 		</view> -->
 		<view class="wrap">
-			<image src="https://images.facedog.cn/mp/profile/unLevel.png" mode="scaleToFill" lazy-load="false" />
+			<image wx:if="{{!profile.level}}" src="https://images.facedog.cn/mp/profile/unLevel.png" mode="scaleToFill" lazy-load="false" />
 		</view>
 		<!-- <view class="wrap" @tap="close" wx:if="{{profile.progress === 'finish'}}">
 			<image src="https://images.facedog.cn/public/my/notify-verified.png" mode="scaleToFill" lazy-load="false">

@@ -107,3 +107,9 @@ export const SETTING_LOCATION = '/api/v1.5/user/modify_location'
 export const GET_CHATROOM_MEMBER = '/api/v1.5/dentifier_count'
 // 删除红包
 export const DELETE_REDPACKAGE = '/api/delete_request'
+// 查看当前等级信息
+export const GET_LEVEL_INFO = '/v3/api/level/see';
+// 评级升级
+export const UPGRADE_LEVEL = '/v3/api/level/upgrade';
+// 真人视频认证
+export const VIDEO_VERIFY = '/api/certify/video';

@@ -46,6 +46,9 @@
 	</van-popup>
 	<van-toast id="van-toast" />
 	<van-dialog id="van-dialog" />
+	<van-popup show="{{ showUpgrade}}" bind:close="onClose">
+		<upgrade @close="close" />
+	</van-popup>
 </template>
 
 <script>
@@ -53,13 +56,13 @@ import wepy from 'wepy';
 import tabbar from '@/components/tabbar';
 import battle from '@/components/battle/battle';
 import explore from '@/components/explore/index';
+import upgrade from '@/components/my/upgrade/index';
 // import discover from '@/components/discover/discover';
 import my from '@/components/my/my';
 import chat from '@/components/chat/chat';
 import { sleep } from '@/utils';
-import testMixin from '@/mixins/test';
 import { get } from '@/utils/request';
-import { NEW_PROFILE } from '@/utils/url';
+import { NEW_PROFILE, GET_LEVEL_INFO } from '@/utils/url';
 import { getAge } from '@/utils';
 import { Event } from '@/utils/event.js';
 import verify from '@/components/battle/module/verify';
@@ -88,8 +91,8 @@ export default class Index extends wepy.page {
       'van-progress': '../components/vant/progress/index',
       'van-collapse': '../components/vant/collapse/index',
       'van-collapse-item': '../components/vant/collapse-item/index',
-      'van-checkbox': '../components/vant/checkbox/index'
-    }
+      'van-checkbox': '../components/vant/checkbox/index',
+    },
   };
   components = {
     tabbar,
@@ -100,13 +103,14 @@ export default class Index extends wepy.page {
     my,
     verify,
     redpacketLayer,
-    VipBuyPop
+    VipBuyPop,
+    upgrade,
   };
 
   data = {
     mynum: 20,
     userInfo: {
-      nickName: '加载中...'
+      nickName: '加载中...',
     },
     test: false,
     selectedTab: -1,
@@ -120,12 +124,13 @@ export default class Index extends wepy.page {
     loaded: false,
     showHome: true,
     showRedpacketLayer: false,
-    showVipBuy: false
+    showVipBuy: false,
+    showUpgrade: false,
   };
   computed = {
     now() {
       return +new Date();
-    }
+    },
   };
   methods = {
     verifyShow() {
@@ -144,7 +149,7 @@ export default class Index extends wepy.page {
       console.log(
         `${this.$name} receive ${$event.name} from ${$event.source.$name}`
       );
-    }
+    },
   };
   onPullDownRefresh() {
     // console.error('ssss');
@@ -162,7 +167,7 @@ export default class Index extends wepy.page {
       this.$apply();
       this.profile = data;
       this.profile.images &&
-        this.profile.images.forEach(item => {
+        this.profile.images.forEach((item) => {
           if (item.is_avatar) {
             this.profile.icon = item.image;
           }
@@ -173,6 +178,13 @@ export default class Index extends wepy.page {
       wepy.setStorageSync('profile', this.profile);
       this.$invoke('battle', 'init', this.profile);
       this.$invoke('my', 'setProfile', this.profile);
+      let showLevel = wepy.getStorageSync('showLevel');
+      if (!showLevel && this.profile.level) {
+        let level = await get(GET_LEVEL_INFO);
+        wepy.setStorageSync('level', level);
+        this.$invoke('upgrade', 'setLevel', level, 'home');
+        this.showUpgrade = true;
+      }
       this.loaded = true;
       this.$apply();
     } catch (e) {
@@ -191,7 +203,7 @@ export default class Index extends wepy.page {
   }
   switchOrder(d) {
     var r = [];
-    d.forEach(e => {
+    d.forEach((e) => {
       if (e['is_avatar']) r.unshift(e);
       else r.push(e);
     });
@@ -212,6 +224,9 @@ export default class Index extends wepy.page {
     },
     recommendTap() {
       this.tabSelect = 1;
+    },
+    close() {
+      this.showUpgrade = false;
     },
     tabSelect: (...args) => {
       let $event = args[args.length - 1];
@@ -261,7 +276,7 @@ export default class Index extends wepy.page {
     },
     getProfile() {
       this.setProfile();
-    }
+    },
   };
   onLoad(options) {
     if (options.test) {
@@ -304,7 +319,7 @@ export default class Index extends wepy.page {
     wx.$app
       .login({
         userID: wx.getStorageSync('identifier'),
-        userSig: wx.getStorageSync('tencent_token')
+        userSig: wx.getStorageSync('tencent_token'),
       })
       .then(function(imResponse) {
         console.log('im登录日志::::::', imResponse.data); // 登录成功
@@ -314,7 +329,7 @@ export default class Index extends wepy.page {
             wx.$app
               .login({
                 userID: wx.getStorageSync('identifier'),
-                userSig: wx.getStorageSync('tencent_token')
+                userSig: wx.getStorageSync('tencent_token'),
               })
               .then(function(imResponse1) {
                 console.log('再次登录！！！！', imResponse1);
@@ -339,12 +354,12 @@ export default class Index extends wepy.page {
       title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
       path: `/pages/home?userid=${user ? user.ID : ''}`,
       imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
-      success: res => {
+      success: (res) => {
         console.log('转发成功', res);
       },
-      fail: res => {
+      fail: (res) => {
         console.log('转发失败', res);
-      }
+      },
     };
   }
   onShow() {

@@ -1,13 +1,13 @@
 <!--  -->
 <template>
 	<navbar title="升级任务" />
-	<view class='container' wx:if="{{level.length}}">
+	<view class='container' wx:if="{{loaded}}">
 		<view class="banner {{level[levelIndex]}}">
-			<image class="level" src="https://images.facedog.cn/mp/upgrade/page/level-{{level[levelIndex]}}.png" mode="scaleToFill" lazy-load="false">
+			<image class="level" src="https://images.facedog.cn/mp/upgrade/page/level-{{levelData.level}}.png" mode="scaleToFill" lazy-load="false">
 			</image>
 			<image class="next-level" src="https://images.facedog.cn/mp/upgrade/page/nextLevel-{{level[levelIndex]}}.png" mode="scaleToFill" lazy-load="false">
 			</image>
-			<view class="text">升级解锁：聊天室、每日推荐等</view>
+			<view class="text" wx:if="{{levelData.level !='SSR'}}">升级解锁：{{levelTip[levelIndex]}}</view>
 			<image class="loading" src="https://images.facedog.cn/mp/upgrade/page/loading-{{level[levelIndex]}}.png" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
@@ -19,74 +19,206 @@
 					<image src="https://images.facedog.cn/mp/upgrade/page/mission{{index+1}}.png" mode="scaleToFill" lazy-load="false">
 					</image>
 					<text>{{item.text}}</text>
-					<view class="status">{{item.status}}
+					<view class="status {{item.status==='已完成'?'finish':''}}" @tap="goFinish({{item.status}})">{{item.status}}
 					</view>
 				</view>
 			</repeat>
-			<view class="btn">
-				<image src="https://images.facedog.cn/mp/upgrade/page/btn.png" mode="scaleToFill" lazy-load="false">
+			<view class=" btn" wx:if="{{levelData.level !='SSR'}}">
+				<image wx:if="{{canUpgrade}}" @tap="upgrade" src="https://images.facedog.cn/mp/upgrade/page/btn.png" mode="scaleToFill" lazy-load="false">
 				</image>
+				<image wx:else src="https://images.facedog.cn/mp/upgrade/page/btn-disable.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</view>
+			<view style="text-align:center;color:#1d1d1d;" wx:else>
+				暂无
 			</view>
 		</view>
 	</view>
-	<van-popup show="{{ showUpgrade}}" bind:close="onClose">
+	<van-popup show="{{ showRedPackage}}" bind:close="onClose">
 		<pop />
+	</van-popup>
+	<van-popup show="{{ showUpgradePop}}" bind:close="onClose">
+		<upgrade @close="close" />
 	</van-popup>
 </template> 
 
 <script>
 import wepy from 'wepy';
 import pop from './module/pop';
+import upgrade from '@/components/my/upgrade/index';
+import { get, post } from '@/utils/request';
+import { GET_LEVEL_INFO, UPGRADE_LEVEL } from '@/utils/url';
 export default class Upgrade extends wepy.page {
   config = {
     usingComponents: {
       navbar: '../../components/navbar/index',
-      'van-popup': '../../components/vant/popup/index'
-    }
+      'van-popup': '../../components/vant/popup/index',
+      'van-checkbox': '../../components/vant/checkbox/index',
+    },
   };
   data = {
+    levelData: {},
     level: ['N', 'R', 'SR', 'SSR'],
-    levelIndex: 3,
-    showUpgrade: true,
+    levelIndex: 0,
+    showRedPackage: false,
+    showUpgradePop: false,
+    loaded: false,
+    canUpgrade: true,
+    levelTip: [
+      '聊天室，每日推荐等',
+      '换一组，每日红包等',
+      '红包翻倍，私人管家',
+      '',
+    ],
     mission: {
       N: [
         {
           text: '完成真人认证',
-          status: '进行中'
+          status: '',
         },
         {
           text: '点击次数达到20',
-          status: '进行中'
+          status: '',
         },
         {
           text: '上传3张本人照片',
-          status: '进行中'
+          status: '',
         },
         {
           text: '邀请3名用户注册',
-          status: '进行中'
-        }
-      ]
-    }
+          status: '',
+        },
+      ],
+      R: [
+        {
+          text: '完成真人认证',
+          status: '',
+        },
+        {
+          text: '点击次数达到20',
+          status: '',
+        },
+        {
+          text: '邀请5名用户注册并评级R以上',
+          status: '',
+        },
+        {
+          text: '购买年费会员，直接升级至SR',
+          status: '',
+        },
+      ],
+      SR: [
+        {
+          text: '完成真人认证',
+          status: '',
+        },
+        {
+          text: '胜场数达到50场',
+          status: '',
+        },
+        {
+          text: '胜率达到35%',
+          status: '',
+        },
+        {
+          text: '点击次数达到300次',
+          status: '',
+        },
+      ],
+    },
   };
 
   components = {
-    pop
+    pop,
+    upgrade,
   };
 
-  methods = {};
+  methods = {
+    goFinish(text) {
+      if (text == '去完成') {
+        wepy.navigateTo({ url: '/pages/register/verify' });
+      }
+    },
+    async upgrade() {
+      let canUpgrade = true;
 
-  events = {};
+      if (canUpgrade) {
+        await post(UPGRADE_LEVEL);
+        this.fetchData(true);
+      }
+    },
+  };
+  events = {
+    close() {
+      this.showUpgradePop = false;
+    },
+  };
 
   watch = {};
 
   computed = {};
 
   onLoad() {
-    console.log(this.level);
-    console.log(this.mission[this.level[this.levelIndex]]);
+    this.fetchData();
   }
+  async fetchData(isShow) {
+    wepy.showLoading({
+      title: '加载中...', //提示的内容,
+      mask: true, //显示透明蒙层，防止触摸穿透,
+      success: (res) => {},
+    });
 
+    let data = await get(GET_LEVEL_INFO);
+    this.levelData = data;
+    this.levelIndex = this.level.findIndex((value) => value == data.level);
+    switch (data.level) {
+      case 'N': {
+        this.mission[data.level][0].status = data.profile ? '已完成' : '去完成';
+        this.mission[data.level][1].status =
+          data.all_click_count > 20 ? '已完成' : `${data.click_count}/20`;
+        this.mission[data.level][2].status =
+          data.user_images_count > 3 ? '已完成' : `${data.user_images_count}/3`;
+        this.mission[data.level][3].status =
+          data.guide_count > 3 ? '已完成' : `${data.guide_count}/3`;
+        break;
+      }
+      case 'R': {
+        this.mission[data.level][0].status = data.profile ? '已完成' : '去完成';
+        this.mission[data.level][1].status =
+          data.win_count > 20 ? '已完成' : `${data.win_count}/20`;
+        this.mission[data.level][2].status =
+          data.guide_r_count > 5 ? '已完成' : `${data.guide_r_count}/5`;
+        this.mission[data.level][3].status = data.is_year_vip
+          ? '已完成'
+          : `未完成`;
+        break;
+      }
+      case 'SR': {
+        this.mission[data.level][0].status = data.profile ? '已完成' : '去完成';
+        this.mission[data.level][1].status =
+          data.win_count > 50 ? '已完成' : `${data.win_count}/50`;
+        this.mission[data.level][2].status =
+          data.win_rate > 35 ? '已完成' : `${data.win_rate}/35%`;
+        this.mission[data.level][3].status =
+          data.all_click_count > 300 ? '已完成' : `${data.all_click_count}/300`;
+        break;
+      }
+    }
+    this.loaded = true;
+    wepy.setStorageSync('level', this.levelData);
+    this.$invoke('upgrade', 'setLevel', this.levelData, false);
+    if (isShow) {
+      this.showUpgradePop = true;
+    }
+    this.mission[this.levelData.level].every((item) => {
+      if (item.status != '已完成') {
+        this.canUpgrade = false;
+        return false;
+      }
+    });
+    wepy.hideLoading();
+    this.$apply();
+  }
   onShow() {}
 }
 </script>
@@ -177,6 +309,9 @@ export default class Upgrade extends wepy.page {
 	        align-items: center;
 	        color: white;
 	        font-size: 22rpx;
+	        &.finish {
+	          background: #b2b2b2;
+	        }
 	      }
 	    }
 	    .btn {

@@ -130,9 +130,10 @@ export default class RedPackList extends wepy.page {
     // 	this.showPop = true;
     // },
     deleteItem(user_id, list_type) {
+      console.log(11);
       post(DELETE_REDPACKAGE, {
         user_id,
-        type,
+        list_type,
       });
     },
     onClose() {

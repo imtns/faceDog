@@ -1,23 +1,24 @@
 <!--  -->
 <template>
-    <view class='upgrade-wrap {{upgradeType}}'>
-        <image class="close" src="https://images.facedog.cn/mp/upgrade/close.png" mode="scaleToFill" lazy-load="false">
-        </image>
-        <view class="tip-wrap">
-            <image class="tip" src="https://images.facedog.cn/mp/upgrade/{{upgradeType}}-1.png" mode="scaleToFill" lazy-load="false">
-            </image>
-            <image class="tip" src="https://images.facedog.cn/mp/upgrade/{{upgradeType}}-2.png" mode="scaleToFill" lazy-load="false">
-            </image>
-            <image class="tip" src="https://images.facedog.cn/mp/upgrade/{{upgradeType}}-3.png" mode="scaleToFill" lazy-load="false">
-            </image>
-            <image class="tip" src="https://images.facedog.cn/mp/upgrade/{{upgradeType}}-4.png" mode="scaleToFill" lazy-load="false">
-            </image>
-        </view>
-        <view class="btn">查看详情</view>
-        <view class="checked">
-            <van-checkbox value="{{ checked }}" bind:change="onChange">下次不再显示该页面</van-checkbox>
-        </view>
-    </view>
+	<view class='upgrade-wrap {{levelInfo.level}}'>
+		<image class="close" @tap="close" src="https://images.facedog.cn/mp/upgrade/close.png" mode="scaleToFill" lazy-load="false">
+		</image>
+		<view class="text">{{fromHome?'你的当前等级为:':'你的等级提升至:'}}</view>
+		<view class="tip-wrap">
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{levelInfo.level}}-1.png" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{levelInfo.level}}-2.png" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{levelInfo.level}}-3.png" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{levelInfo.level}}-4.png" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view>
+		<view class="btn" @tap="go">查看详情</view>
+		<view class="checked">
+			<van-checkbox value="{{ checked }}" bind:change="onChange">下次不再显示该页面</van-checkbox>
+		</view>
+	</view>
 </template>
 
 <script>
@@ -25,8 +26,10 @@ import wepy from 'wepy';
 export default class Upgrade extends wepy.component {
   props = {};
   data = {
-    upgradeType: 'SSR', // N,R,SR,SSR
-    checked: false
+    upgradeType: '', // N,R,SR,SSR
+    checked: false,
+    levelInfo: {},
+    fromHome: false,
   };
 
   components = {};
@@ -34,7 +37,30 @@ export default class Upgrade extends wepy.component {
   methods = {
     onChange(event) {
       this.checked = event.detail;
-    }
+      if (this.checked) {
+        wepy.setStorageSync('showLevel', true);
+      } else {
+        wepy.setStorageSync('showLevel', false);
+      }
+    },
+    close() {
+      this.$emit('close');
+    },
+    setLevel(levelInfo, fromHome) {
+      if (fromHome) this.fromHome = fromHome;
+
+      this.levelInfo = levelInfo;
+    },
+    go() {
+      if (
+        getCurrentPages()[getCurrentPages().length - 1].route ==
+        'pages/upgrade/index'
+      ) {
+        this.$emit('close');
+        return;
+      }
+      wepy.navigateTo({ url: '/pages/upgrade/index' });
+    },
   };
 
   events = {};
@@ -45,69 +71,78 @@ export default class Upgrade extends wepy.component {
 
   onLoad() {}
 
-  onShow() {}
+  onShow() {
+    this.levelInfo = wepy.getStorageSync('level');
+  }
 }
 </script>
 <style lang="scss">
-    .van-checkbox__label {
-      color: #bcbcbc !important;
-      font-size: 22rpx;
-      margin-left: 7rpx !important;
-    }
+	.van-checkbox__label {
+	  color: #bcbcbc !important;
+	  font-size: 22rpx;
+	  margin-left: 7rpx !important;
+	}
 </style>
 
 <style lang='scss' scoped>
-    .upgrade-wrap {
-      width: 520rpx;
-      height: 810rpx;
-      &.N {
-        background: url('https://images.facedog.cn/mp/upgrade/bg-N.png');
-        background-size: contain;
-      }
-      &.R {
-        background: url('https://images.facedog.cn/mp/upgrade/bg-R.png');
-        background-size: contain;
-      }
-      &.SR {
-        background: url('https://images.facedog.cn/mp/upgrade/bg-SR.png');
-        background-size: contain;
-      }
-      &.SSR {
-        background: url('https://images.facedog.cn/mp/upgrade/bg-SSR.png');
-        background-size: contain;
-      }
-      .close {
-        width: 45rpx;
-        height: 45rpx;
-        position: absolute;
-        top: 10rpx;
-        right: 10rpx;
-      }
-      .tip-wrap {
-        width: 420rpx;
-        padding-top: 292rpx;
-        margin: 0 auto;
-        .tip {
-          width: 420rpx;
-          height: 62rpx;
-          margin-bottom: 15rpx;
-        }
-      }
-      .btn {
-        background: url('https://images.facedog.cn/mp/upgrade/btn-bg.png') no-repeat;
-        background-size: contain;
-        width: 366rpx;
-        height: 80rpx;
-        line-height: 80rpx;
-        text-align: center;
-        margin: 10rpx auto;
-        color: #fcfcfc;
-        font-size: 28rpx;
-      }
-      .checked {
-        display: flex;
-        justify-content: center;
-        margin-top: 20rpx;
-      }
-    }
+	.upgrade-wrap {
+	  width: 520rpx;
+	  height: 810rpx;
+	  &.N {
+	    background: url('https://images.facedog.cn/mp/upgrade/bg-N.png?1');
+	    background-size: contain;
+	  }
+	  &.R {
+	    background: url('https://images.facedog.cn/mp/upgrade/bg-R.png?1');
+	    background-size: contain;
+	  }
+	  &.SR {
+	    background: url('https://images.facedog.cn/mp/upgrade/bg-SR.png?1');
+	    background-size: contain;
+	  }
+	  &.SSR {
+	    background: url('https://images.facedog.cn/mp/upgrade/bg-SSR.png?1');
+	    background-size: contain;
+	  }
+	  .close {
+	    width: 45rpx;
+	    height: 45rpx;
+	    position: absolute;
+	    top: 10rpx;
+	    right: 10rpx;
+	  }
+	  .text {
+	    position: absolute;
+	    font-size: 27rpx;
+	    color: white;
+	    top: 136rpx;
+	    left: 67rpx;
+	  }
+	  .tip-wrap {
+	    width: 420rpx;
+	    padding-top: 292rpx;
+	    margin: 0 auto;
+	    .tip {
+	      width: 420rpx;
+	      height: 62rpx;
+	      margin-bottom: 15rpx;
+	    }
+	  }
+	  .btn {
+	    background: url('https://images.facedog.cn/mp/upgrade/btn-bg.png') no-repeat;
+	    background-size: contain;
+	    width: 366rpx;
+	    height: 80rpx;
+	    line-height: 80rpx;
+	    text-align: center;
+	    margin: 10rpx auto;
+	    color: #fcfcfc;
+	    font-size: 28rpx;
+	  }
+	  .checked {
+	    display: flex;
+	    justify-content: center;
+	    margin-top: 20rpx;
+	  }
+	}
 </style>
