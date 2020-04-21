@@ -27,31 +27,40 @@
 		</view>
 	</view>
 	<van-dialog id="van-dialog" />
+	<block wx:if="{{showVerify}}">
+		<verify />
+	</block>
 </template>
 
 <script>
 import wepy from 'wepy';
 
 import { post } from '@/utils/request';
-import { toast } from '@/utils';
+import { toast, VerifyControl } from '@/utils';
 import { PAY, PAY_CALLBACK } from '@/utils/url';
+import { Event } from '@/utils/event.js';
 import Dialog from '@/components/vant/dialog/dialog';
+import verify from '@/components/pop/verify/index';
 export default class VipBuy extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
-      navbar: '../../components/navbar/index'
-    }
+      navbar: '../../components/navbar/index',
+    },
   };
 
   data = {
-    profile: {}
+    profile: {},
+    showVerify: false,
   };
 
-  components = {};
+  components = {
+    verify,
+  };
 
   methods = {
     async pay(price) {
+      if (price != 15800 && !VerifyControl('N')) return;
       if (this.profile.progress != 'finish' && price != 15800) {
         toast('未认证用户只能购买1年会员');
         return;
@@ -59,7 +68,7 @@ export default class VipBuy extends wepy.page {
       let { nonceStr, package: _package, paySign, timeStamp } = await post(
         PAY,
         {
-          price
+          price,
         }
       );
       wx.requestPayment({
@@ -90,9 +99,9 @@ export default class VipBuy extends wepy.page {
         fail: function(res) {
           console.log('fail:', res);
         },
-        complete: function(res) {}
+        complete: function(res) {},
       });
-    }
+    },
   };
 
   events = {};
@@ -104,6 +113,11 @@ export default class VipBuy extends wepy.page {
   onLoad() {
     this.profile = wepy.getStorageSync('profile');
     this.$apply();
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
   }
 
   onShow() {}

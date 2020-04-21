@@ -1,0 +1,166 @@
+
+<!--  -->
+<template>
+	<view class="verify-container">
+		<view class='verify-pop pop1' wx:if="{{status == 'needLevel'}}">
+			<view class="text-wrap">
+				<view class="text">你需要先提升等级</view>
+				<view class="text">才能进行此操作哦</view>
+			</view>
+			<view class="btn" @tap="go">前往升级</view>
+			<view class="btn cancel" @tap="close">取消</view>
+		</view>
+		<view class='verify-pop' wx:if="{{status == 'unLevel'}}">
+			<view class="text-wrap">
+				<view class="text">你还未获得评级</view>
+				<view class="text">请耐心等待审核完成</view>
+				<view class="text">或者联系客服加急审核</view>
+			</view>
+			<view class="btn" @tap="copy('yanzc1023')">复制客服微信</view>
+			<view class="btn cancel" @tap="close">取消</view>
+		</view>
+		<view class='verify-pop' wx:if="{{status == 'levelUnmatch'}}">
+			<view class="text-wrap">
+				<view class="text">对方的等级过高</view>
+				<view class="text">你需要先提升等级</view>
+				<view class="text">或者直接索要微信号</view>
+			</view>
+			<view class="btn" @tap="go">前往升级</view>
+			<view class="btn cancel" @tap="close">取消</view>
+		</view>
+		<view class='verify-pop' wx:if="{{status == 'showSameLevel'}}">
+			<view class="text-wrap">
+				<view class="text">你目前的等级较低</view>
+				<view class="text">无法向SR以上的用户发送喜欢</view>
+				<view class="text">切换展示同级别即可正常发送</view>
+			</view>
+			<view class="btn" @tap="showSameLevel">显示同级别</view>
+			<view class="btn cancel" @tap="close">忽略</view>
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { Event } from '@/utils/event.js';
+import { put, get } from '@/utils/request';
+import { USER_SETTING } from '@/utils/url';
+export default class Verify extends wepy.component {
+  props = {};
+
+  data = {
+    status: '',
+    setting: {
+      opposite_sex: false,
+      in_city: false,
+      no_battle: false,
+      no_location: false,
+      location: false,
+      show: 'SR',
+    },
+  };
+
+  components = {};
+
+  methods = {
+    async showSameLevel() {
+      this.setting.show = 'R';
+      await put(USER_SETTING, this.setting);
+      Event.trigger('battleFresh');
+      Event.trigger('showVerify', false);
+      this.$apply();
+    },
+    go() {
+      Event.trigger('showVerify', false);
+      wepy.navigateTo({ url: '/pages/upgrade/index' });
+    },
+    close() {
+      Event.trigger('showVerify', false);
+    },
+    copy(text) {
+      wx.setClipboardData({
+        data: text,
+        success: (res) => {
+          wx.showToast({
+            title: '复制成功',
+          });
+        },
+      });
+    },
+    setValue(type) {
+      this.status = type;
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  async onLoad() {
+    const result = await get(USER_SETTING);
+    Object.assign(this.setting, result);
+    this.$apply();
+  }
+
+  onShow() {}
+}
+</script>
+ 
+<style lang='scss' scoped>
+	.verify-container {
+	  width: 100%;
+	  height: 100%;
+	  position: fixed;
+	  top: 0;
+	  left: 0;
+	  background: rgba(0, 0, 0, 0.75);
+	  z-index: 99999;
+	}
+	.verify-pop {
+	  position: fixed;
+	  top: 255rpx;
+	  left: 50%;
+	  transform: translateX(-50%);
+	  width: 520rpx;
+	  height: 810rpx;
+	  background: url(https://images.facedog.cn/mp/upgrade/upgradePop-bg.png)
+	    no-repeat;
+	  background-size: contain;
+	  &.pop1 {
+	    background: url(https://images.facedog.cn/mp/upgrade/unlevel-bg.png)
+	      no-repeat;
+	    background-size: contain;
+	  }
+	  .text-wrap {
+	    position: absolute;
+	    top: 405rpx;
+	    width: 100%;
+	    .text {
+	      font-size: 28rpx;
+	      color: #030303;
+	      text-align: center;
+	    }
+	  }
+	  .btn {
+	    width: 420rpx;
+	    height: 92rpx;
+	    color: white;
+	    background: #000;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    position: absolute;
+	    left: 50%;
+	    font-size: 26rpx;
+	    transform: translateX(-50%);
+	    bottom: 160rpx;
+	    border-radius: 10rpx;
+	  }
+	  .btn.cancel {
+	    background: #c2c2c2;
+	    bottom: 42rpx;
+	  }
+	}
+</style>

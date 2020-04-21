@@ -1,15 +1,14 @@
-<!--  -->
+
 <template>
-	<block wx:if="{{tutorialShow}}">
-		<tutorial @closeTutorial.user="closeTutorial" />
+	<navbar title="赏金模式">
+	</navbar>
+	<block wx:if="{{!show}}">
+		<loadingHeart top="-160rpx" />
 	</block>
-	<block wx:if="{{!tutorialShow && show}}">
-		<loadingHeart top="-160rpx;" />
-	</block>
-	<view class='container' wx:if="{{!show && !showPop}}" style="top:{{isphoneX?'100rpx':'0'}};">
-		<view class="blurLayer"></view>
-		<image class="icon-package" @tap="showReward" src="https://images.facedog.cn/mp/battle/reward-entry.png" mode="aspectFill" lazy-load="false">
+	<view class='container' wx:if="{{show && !showPop}}">
+		<image class="icon-package" src="https://images.facedog.cn/mp/battle/icon-package.png" mode="scaleToFill" lazy-load="false">
 		</image>
+		<view class="blurLayer"></view>
 		<swiper class="swiper" indicator-dots="{{false}}" autoplay="{{false}}" duration="{{200}}" current="{{swiperCurrent}}" bindanimationfinish="bindanimationfinish">
 			<repeat key="index" for="{{battleList}}" key="index" index="index" item="item">
 				<swiper-item catchtouchmove="stopTouchMove">
@@ -28,28 +27,25 @@
 						</view>
 						<view @tap="boxClick({{item.a.originalImages}})" class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[swiperCurrent]?'flyTop':''}}" style="transform: translate3d(0px, {{tranTopY[index] || 0}}px, 0px)!important;" catch:touchmove="touchTopMove({{swiperCurrent}})" catch:touchend="touchEnd">
 							<view wx:if="{{!draggingTop}}" class="image-count">共{{item.a.images.length}}张</view>
-							<image wx:if="{{!draggingTop}}" src="https://images.facedog.cn/mp/profile/{{item.a.level}}.png" class="{{item.a.level}} level1" mode="scaleToFill" />
+							<image wx:if="{{!draggingTop}}" src="https://images.facedog.cn/mp/profile/{{item.b.level}}.png" class="{{item.b.level}} level1" mode="scaleToFill" />
 
 							<image src="{{item.a.images[0]}}" class="{{blurTop?'blur':''}}" mode="aspectFill"></image>
 							<image src="https://images.facedog.cn/public/battle/pick.png" style="opacity:{{opacityTopPick}}" class="pick" mode="aspectFill" />
 							<view class="info" wx:if="{{draggingTop}}">
-								<image src="https://images.facedog.cn/mp/profile/{{item.a.level}}.png" class="{{item.a.level}} level" mode="scaleToFill" />
+								<image class="{{item.a.level}} level" src="https://images.facedog.cn/mp/profile/{{item.a.level}}.png" mode="scaleToFill" />
+
 								<view class="name">{{item.a.nick_name}}<view class="xingzuo">{{item.a.constellation}}</view>
 								</view>
 								<view class="signature">{{item.a.signature}}</view>
 								<!-- <view class="desc">{{item.a.gender}}/{{item.a.age}}/{{item.a.constellation}}</view> -->
 							</view>
 							<view class="info" wx:else>
-								<image class="{{item.a.level}} level" src="https://images.facedog.cn/mp/profile/{{item.a.level}}.png" mode="scaleToFill" />
+
 								<view class="name {{blurTop?'blur':''}}">{{item.a.nick_name}}<text> {{item.a.age}}</text>
 									<image wx:if="{{item.a.vip}}" class="vip-icon" src="https://images.facedog.cn/public/profile/vip-icon.png?2" mode="scaleToFill" lazy-load="false"></image>
 								</view>
 								<!-- <view class="desc {{draggingBottom?'blur':''}}">{{item.a.gender}} / {{item.a.age}} / {{item.a.constellation}}</view> -->
 								<view class="distance "><text class="{{blurTop?'blur':''}}">{{item.a.distance}}km</text> <text class="{{blurTop?'blur':''}}"> {{item.a.city}}</text></view>
-							</view>
-							<view class="pass-box {{passShow?'show':''}}">
-								<image src="https://images.facedog.cn/public/battle/pass-box.png?3" mode="scaleToFill" lazy-load="false">
-								</image>
 							</view>
 						</view>
 						<view class="divider {{bothLike?'rotated':''}}" style="top:532rpx">
@@ -94,15 +90,6 @@
 				</swiper-item>
 			</repeat>
 		</swiper>
-		<view class="PASS {{passTouch?'hover':''}}" style="bottom:{{isphoneX?'450rpx':'300rpx'}};" @tap="passHandler" @touchstart="passTouchStart" @touchend="passTouchEnd">
-			<!-- 换一组 -->
-			<image src="https://images.facedog.cn/public/battle/pass-new2.png?2" mode="scaleToFill"></image>
-		</view>
-		<view class="BOTH-LIKE {{passTouch?'hover':''}}" style="bottom:{{isphoneX?'450rpx':'300rpx'}};" @tap="bothLike" @touchstart="passTouchStart" @touchend="passTouchEnd">
-			<!-- 换一组 -->
-			<image class="icon" src="https://images.facedog.cn/public/battle/both-like-vip.png?8" mode="scaleToFill"></image>
-			<image src="https://images.facedog.cn/public/battle/both-like1.png?8" mode="scaleToFill"></image>
-		</view>
 	</view>
 	<block wx:if="{{showPop}}">
 		<pop />
@@ -110,36 +97,30 @@
 	<van-popup show="{{ showCoinPop }}" bind:close="onClose">
 		<popCoin />
 	</van-popup>
-	<van-popup show="{{ showRewardPop }}" bind:close="onClose">
-		<rewardPop />
-	</van-popup>
 </template>
 
 <script>
 import wepy from 'wepy';
-import {
-  BATTLE,
-  BATTLE_COMMIT,
-  DAILY_REPORT,
-  BATTLE_PASS,
-  BOTH_LIKE,
-} from '@/utils/url';
+import { REWARD_BATTLE_LIST, REWARD_BATTLE_COMMIT } from '@/utils/url';
 import { get, post } from '@/utils/request';
 import { Event } from '@/utils/event.js';
-import { removeDuplicates, throttle, formatDate, VerifyControl } from '@/utils';
+import { removeDuplicates, throttle, formatDate } from '@/utils';
 import Toast from '@/components/vant/toast/toast';
-import rewardPop from './module/rewardPop';
+
 import popCoin from '@/components/battle/module/popCoin';
-import tutorial from './module/tutorial';
-import loadingHeart from './module/loadingHeart';
-import pop from './module/pop';
+import loadingHeart from '@/components/battle/module/loadingHeart';
+import pop from '@/components/battle/module/pop';
 import Dialog from '@/components/vant/dialog/dialog';
-export default class Battle extends wepy.component {
+export default class Battle extends wepy.page {
+  config = {
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-popup': '../../components/vant/popup/index',
+    },
+  };
   data = {
-    passTouch: false,
-    passDuaring: false,
     haveEnjoy: 0,
-    show: true,
+    show: false,
     showPop: false,
     isphoneX: false,
     tranTopY: {}, // 当前激活元素的 Y轴 偏移量
@@ -174,107 +155,58 @@ export default class Battle extends wepy.component {
     showCoinPop: false,
     profile: {},
     isPhone: false,
-    showRewardPop: false,
   };
 
   components = {
-    tutorial,
     loadingHeart,
     pop,
     popCoin,
-    rewardPop,
   };
-  verifyMessageSend() {
-    if (!wepy.$appConfig.isProd) return;
-    Dialog.confirm({
-      confirmButtonText: '确认',
-      cancelButtonText: '取消',
-      asyncClose: true,
-      message: `为了有更好的体验
-														请先打开推送哦😘`,
-    })
-      .then(async () => {
-        Dialog.close();
-        wx.requestSubscribeMessage({
-          tmplIds: [
-            'DUwNR_XRWFNxXmrInQcUaidSMly8lQb1Q1BrcclhpSo',
-            '2D7zZBtte1zBGU-ZaEMrTYOdVbkyaHzmeZiUfBYPGo4',
-            'eVvH4HmtqVeP9nIgkEWCFKKj1v-CRnlKeKcM1xCNcJA',
-          ],
-          success(res) {
-            console.log('订阅消息', res);
-          },
-          complete() {
-            console.log('订阅complete');
-          },
-        });
-      })
-      .catch(() => {
-        Dialog.close();
-      });
-  }
 
-  setEnjoyCount() {
-    if (this.haveEnjoy <= 0) {
-      let name = `commit-${formatDate(new Date())}`;
-      let isShow = wepy.getStorageSync(name);
-      if (!isShow) {
-        this.$invoke('popCoin', 'setType', '1');
-        setTimeout(() => {
-          this.showCoinPop = true;
-          this.$apply();
-          setTimeout(() => {
-            this.showCoinPop = false;
-            this.$apply();
-          }, 2000);
-        }, 1000);
-      }
-      wepy.setStorageSync(name, true);
-      this.showPop = true;
-      this.$emit('enjoySet', 0);
-      this.$apply();
-      return;
-    }
-    let enjoyCount = this.haveEnjoy - 1;
-    this.$emit('enjoySet', --this.haveEnjoy);
-    this.haveEnjoy = enjoyCount;
-  }
-  async fly(position, both) {
+  //   setEnjoyCount() {
+  //     if (this.haveEnjoy <= 0) {
+  //       let name = `commit-${formatDate(new Date())}`;
+  //       let isShow = wepy.getStorageSync(name);
+  //       if (!isShow) {
+  //         this.$invoke('popCoin', 'setType', '1');
+  //         setTimeout(() => {
+  //           this.showCoinPop = true;
+  //           this.$apply();
+  //           setTimeout(() => {
+  //             this.showCoinPop = false;
+  //             this.$apply();
+  //           }, 2000);
+  //         }, 1000);
+  //       }
+  //       wepy.setStorageSync(name, true);
+  //       this.showPop = true;
+  //       this.$emit('enjoySet', 0);
+  //       this.$apply();
+  //       return;
+  //     }
+  //     let enjoyCount = this.haveEnjoy - 1;
+  //     this.$emit('enjoySet', --this.haveEnjoy);
+  //     this.haveEnjoy = enjoyCount;
+  //   }
+  async fly(position) {
     this.flyTempID = this.swiperCurrent;
-    if (!both) {
-      if (position == 'top') {
-        this.flyTop[this.flyTempID] = true; //图片飞走时间
-        setTimeout(() => {
-          this.topWave = true; // 飞走后盒子晃动时间
-          this.switchBattle();
-          this.$apply();
-        }, 800);
-      } else {
-        this.flyBottom[this.flyTempID] = true;
-        setTimeout(() => {
-          this.bottomWave = true;
-          // 晃动完后切换下一组
-          this.switchBattle();
-          this.$apply();
-        }, 800);
-      }
+    if (position == 'top') {
+      this.flyTop[this.flyTempID] = true; //图片飞走时间
+      setTimeout(() => {
+        this.topWave = true; // 飞走后盒子晃动时间
+        this.switchBattle();
+        this.$apply();
+      }, 800);
     } else {
-      try {
-        const data = await post(BOTH_LIKE, {
-          user_a_id: this.battleList[this.swiperCurrent].a._id,
-          user_b_id: this.battleList[this.swiperCurrent].b._id,
-        });
-      } catch (e) {}
-      this.flyTop[this.flyTempID] = true;
       this.flyBottom[this.flyTempID] = true;
       setTimeout(() => {
-        this.topWave = true;
         this.bottomWave = true;
-        console.log('both-like:::::');
-        this.switchBattle(true);
+        // 晃动完后切换下一组
+        this.switchBattle();
         this.$apply();
-      }, 100);
+      }, 800);
     }
+
     setTimeout(() => {
       this.tranBottomY[this.swiperCurrent - 1] = 0;
       this.tranTopY[this.swiperCurrent - 1] = 0;
@@ -293,9 +225,8 @@ export default class Battle extends wepy.component {
     //   Event.trigger('showVerify', true);
     //   return;
     // }
-
     try {
-      const data = await post(BATTLE_COMMIT, {
+      const data = await post(REWARD_BATTLE_COMMIT, {
         result: {
           win: this.likeImageId,
           fail: this.dislikeImageId,
@@ -303,7 +234,7 @@ export default class Battle extends wepy.component {
       });
       console.log('commit!!!!!!!', data);
       Event.trigger('refreshData');
-      this.setEnjoyCount();
+      //   this.setEnjoyCount();
 
       console.log(data);
       if (data.is_friend) {
@@ -352,40 +283,6 @@ export default class Battle extends wepy.component {
     }, 800);
   }
   methods = {
-    showReward() {
-      if (!this.profile.level) {
-        Event.trigger('showVerify', true, 'unLevel');
-        return;
-      }
-      if (this.profile.level == 'N' || this.profile.level == 'R') {
-        Event.trigger('showVerify', true, 'needLevel');
-        return;
-      }
-      this.showRewardPop = true;
-    },
-    passTouchStart() {
-      this.passTouch = true;
-    },
-    passTouchEnd() {
-      this.passTouch = false;
-    },
-    async passHandler() {
-      if (this.passDuaring) return;
-      this.passDuaring = true;
-      const data = await post(BATTLE_PASS, {
-        result: {
-          win: this.battleList[this.swiperCurrent].a._id,
-          fail: this.battleList[this.swiperCurrent].b._id,
-        },
-      });
-      this.passShow = true;
-      this.$apply();
-      setTimeout(() => {
-        this.passShow = false;
-        this.$apply();
-      }, 800);
-      this.switchBattle(true);
-    },
     bindanimationfinish() {
       // 防止swiper滑动后，滑块有的时候不还原位置的问题
       setTimeout(() => {
@@ -401,27 +298,12 @@ export default class Battle extends wepy.component {
         urls: images,
       });
     },
-    //引导层关闭
-    closeTutorial() {
-      this.tutorialShow = false;
-      wepy.setStorageSync('tutorial', true);
-      if (!this.loaded) {
-        // this.verifyMessageSend();
-        this.loaded = true;
-      }
-      this.$apply();
-    },
     //阻止swiper可以手动滑动
     stopTouchMove() {
       return false;
     },
     //上面的box拖动事件
     touchTopMove(id, e) {
-      if (!this.profile.level && this.noProfileCount >= 2) {
-        Event.trigger('showVerify', true, 'unLevel');
-        return;
-      }
-      //   if (!VerifyControl('', 'showSameLevel')) return;
       if (this.draggingBottom) return;
       this.draggingTop = true;
       this.blurBottom = true; // 拖动上面的时候下面的背景变blur
@@ -446,11 +328,10 @@ export default class Battle extends wepy.component {
     },
     //下面box拖动事件
     touchBottomMove(id, e) {
-      if (!this.profile.level && this.noProfileCount >= 2) {
-        Event.trigger('showVerify', true, 'unLevel');
-        return;
-      }
-      //   if (!VerifyControl('', 'showSameLevel')) return;
+      //   if (this.noProfile && this.noProfileCount >= 2) {
+      //     Event.trigger('showVerify', true);
+      //     return;
+      //   }
       if (this.draggingTop) return;
       this.draggingBottom = true;
       this.blurTop = true; // 拖动下面的时候上面的背景变blur
@@ -471,26 +352,6 @@ export default class Battle extends wepy.component {
       //   this.tranBottomY[this.swiperCurrent] = tranY;
       //   console.log(tranY);
       //   this.$apply();
-    },
-    //bothlike 事件
-    bothLike() {
-      if (
-        this.isPhone &&
-        this.profile.mp_status != 'online' &&
-        !this.profile.vip
-      ) {
-        Toast('此为VIP特权，请先兑换');
-        return;
-      }
-      if (!this.profile.vip) {
-        this.$emit('showVipPop');
-        return;
-      }
-      this.bottomDragDistance = true;
-      this.topDragDistance = true;
-      this.draggingBottom = true;
-      this.draggingTop = true;
-      this.fly('both', true);
     },
     //拖动结束后
     touchEnd() {
@@ -536,11 +397,10 @@ export default class Battle extends wepy.component {
     this.$apply();
   }
   async getBattle() {
-    this.show = true;
     this.swiperCurrent = 0;
     this.profile = wepy.getStorageSync('profile');
     this.battleList = [];
-    let res = await get(BATTLE, { battle: '' });
+    let res = await get(REWARD_BATTLE_LIST);
     let result = res.data;
     this.haveEnjoy = res.have_enjoy;
     if (this.haveEnjoy <= 0) {
@@ -573,32 +433,12 @@ export default class Battle extends wepy.component {
         a: result.a[index],
         b: result.b[index],
       });
-      setTimeout(() => {
-        this.show = false;
-        if (wepy.getStorageSync('tutorial')) {
-          setTimeout(() => {
-            if (!this.loaded) {
-              this.verifyMessageSend();
-              this.loaded = true;
-              this.$apply();
-            }
-          }, 1500);
-        }
-        if (!wepy.getStorageSync('tutorial')) {
-          this.tutorialShow = true;
-          this.$apply();
-        }
-        this.$apply();
-      }, 1500);
+      this.show = true;
       this.$apply();
     });
     // this.battleList = result;
   }
-  events = {
-    closeRewardPop() {
-      this.showRewardPop = false;
-    },
-  };
+  events = {};
 
   watch = {};
 
@@ -613,11 +453,6 @@ export default class Battle extends wepy.component {
       this.profile = wepy.getStorageSync('profile');
       this.$apply();
     }, 1000);
-    let name = `commit-${formatDate(new Date())}`;
-    if (wepy.getStorageSync(name)) {
-      this.showPop = true;
-      this.$apply();
-    }
     let that = this;
     wx.getSystemInfo({
       success(res) {
@@ -640,13 +475,8 @@ export default class Battle extends wepy.component {
     });
     this.getBattle();
     Event.listen('battleFresh', () => {
-      this.show = true;
-      this.$apply();
       this.getBattle();
     });
-    if (!wepy.getStorageSync('tutorial')) {
-      this.verifyMessageSend();
-    }
     setTimeout(() => {
       this.fistAnimation = true;
       this.$apply();
@@ -664,7 +494,7 @@ export default class Battle extends wepy.component {
 <style lang='less' scoped>
 	.swiper {
 	  width: 100%;
-	  height: 90vh;
+	  min-height: 93vh;
 	  overflow-x: hidden;
 	}
 	@keyframes fadeIn {
@@ -972,13 +802,30 @@ export default class Battle extends wepy.component {
 	  box-sizing: border-box;
 	  overflow-x: hidden;
 	  width: 100%;
+	  background: rgba(0, 0, 0)
+	    url(https://images.facedog.cn/mp/battle/reward_bottom.png) no-repeat;
+	  background-position: bottom;
+	  background-size: contain;
+	  position: relative;
 	  .icon-package {
-	    width: 80rpx;
-	    height: 108rpx;
+	    width: 55rpx;
+	    height: 69rpx;
 	    position: absolute;
-	    right: 36rpx;
-	    top: 198rpx;
-	    z-index: 99;
+	    right: 30rpx;
+	    top: 118rpx;
+	    z-index: 999;
+	  }
+	  .unopen-redpackage {
+	    width: 614rpx;
+	    height: 666rpx;
+	    position: absolute;
+	    top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
 	  }
 	  image {
 	    width: 100%;
@@ -1004,6 +851,7 @@ export default class Battle extends wepy.component {
 	    position: relative;
 	    height: 1064rpx;
 	    margin: 0 auto;
+	    margin-top: 40rpx;
 	    border-radius: 36rpx;
 	    &.fadeout {
 	      animation: containerOut 1s ease-in-out 1;
@@ -1136,12 +984,6 @@ export default class Battle extends wepy.component {
 	        color: white;
 	        font-size: 26rpx;
 	      }
-	      .vip-icon {
-	        position: relative;
-	        width: 72rpx;
-	        margin-left: 5rpx;
-	        height: 24rpx !important;
-	      }
 	      .level1 {
 	        height: 56rpx;
 	        position: absolute;
@@ -1160,7 +1002,12 @@ export default class Battle extends wepy.component {
 	          width: 129rpx;
 	        }
 	      }
-
+	      .vip-icon {
+	        position: relative;
+	        width: 72rpx;
+	        margin-left: 5rpx;
+	        height: 24rpx !important;
+	      }
 	      &.top {
 	        &.bothLikeMove {
 	          height: 430rpx;
@@ -1436,37 +1283,6 @@ export default class Battle extends wepy.component {
 	        //     border-radius: 0rpx 0rpx 36rpx 36rpx;
 	        // }
 	      }
-	    }
-	  }
-	  .PASS {
-	    position: absolute;
-	    right: -2rpx;
-	    bottom: 200rpx;
-	    z-index: 101;
-	    width: 126rpx;
-	    height: 78rpx;
-	    image {
-	      width: 100%;
-	      height: 100%;
-	    }
-	  }
-	  .BOTH-LIKE {
-	    position: absolute;
-	    left: -2rpx;
-	    bottom: 200rpx;
-	    z-index: 101;
-	    width: 126rpx;
-	    height: 78rpx;
-	    .icon {
-	      width: 64rpx;
-	      height: 34rpx;
-	      position: absolute;
-	      top: -12rpx;
-	      left: 30rpx;
-	    }
-	    image {
-	      width: 100%;
-	      height: 100%;
 	    }
 	  }
 	}

@@ -19,42 +19,34 @@ export default class topBanner extends wepy.component {
 
   methods = {
     toMyRank() {
-      let profile = wepy.getStorageSync('profile');
-    //   if (!profile || profile.progress == 'profile') {
-    //     Event.trigger('showVerify', true, 2);
-    //     return;
-	//   } 
-	  if (profile.progress !== 'finish') {
-        toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
-        return;
-      }
       wepy.navigateTo({
-        url: '/sub/my/myrank'
+        url: '/sub/my/myrank',
       });
     },
     toRank() {
       wepy.navigateTo({
-        url: 'rank/rank'
+        url: 'rank/rank',
       });
     },
     toSquare() {
       wepy.navigateTo({
-        url: 'discover/discover'
+        url: 'discover/discover',
       });
     },
     toChatroom() {
-      let profile = wepy.getStorageSync('profile');
-      if (!profile || profile.progress == 'profile') {
-        Event.trigger('showVerify', true, 2);
-        return;
-      } else if (profile.progress !== 'finish') {
-        toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
-        return;
-      }
+      //   let profile = wepy.getStorageSync('profile');
+      //   if (!profile || profile.progress == 'profile') {
+      //     Event.trigger('showVerify', true, 2);
+      //     return;
+      //   } else if (profile.progress !== 'finish') {
+      //     toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
+      //     return;
+      //   }
+      if (!VerifyControl()) return;
       wepy.navigateTo({
-        url: '/pages/chat/chatRoom'
+        url: '/pages/chat/chatRoomList',
       });
-    }
+    },
   };
 
   events = {};

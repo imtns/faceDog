@@ -26,14 +26,14 @@ export default class FinishRegister extends wepy.component {
   config = {
     navigationBarTitleText: '4/4',
     usingComponents: {
-      navbar: '../../components/navbar/index'
-    }
+      navbar: '../../components/navbar/index',
+    },
   };
 
   data = {
     wechat: '',
     status: false,
-    profile: {}
+    profile: {},
   };
 
   components = {};
@@ -47,7 +47,7 @@ export default class FinishRegister extends wepy.component {
       },
       complete() {
         console.log('订阅complete');
-      }
+      },
     });
   }
   methods = {
@@ -56,11 +56,15 @@ export default class FinishRegister extends wepy.component {
     },
 
     async finishRegister() {
+      if (!this.wechat) {
+        toast('请填写微信号');
+        return;
+      }
       this.redirect();
     },
     goPass() {
       this.redirect();
-    }
+    },
   };
 
   events = {};

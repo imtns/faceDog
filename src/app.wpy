@@ -18,7 +18,7 @@ import TIM from 'tim-wx-sdk';
 import COS from 'cos-wx-sdk-v5';
 import { Event } from '@/utils/event.js';
 const tim = TIM.create({
-  SDKAppID: 1400214230
+  SDKAppID: 1400214230,
 });
 tim.setLogLevel(0);
 wx.$app = tim;
@@ -45,7 +45,7 @@ function onReadyStateUpdate({ name }) {
             ? TIM.TYPES.GENDER_MALE
             : TIM.TYPES.GENDER_FEMALE,
         selfSignature: '',
-        allowType: TIM.TYPES.ALLOW_TYPE_ALLOW_ANY
+        allowType: TIM.TYPES.ALLOW_TYPE_ALLOW_ANY,
       })
       .then(function(imResponse) {
         console.log('imResponse.data', imResponse.data); // 存储用户资料的数组 - [Profile]
@@ -99,6 +99,7 @@ export default class extends wepy.app {
       'pages/chat/ilike', //我喜欢的
       'pages/chat/likeme', //喜欢我的
       'pages/chat/friendList',
+      'pages/chat/chatRoomList',
       //   'pages/notify/notify',
       'pages/redPacket/list', // 红包列表
       'pages/invite/index', //邀请奖励
@@ -112,7 +113,8 @@ export default class extends wepy.app {
       'pages/vip/vipBuy', // 会员购买
       'pages/vip/coinBuy', // 颜币购买
       'pages/vip/vipBuySuccess',
-      'pages/upgrade/index' // 评级升级
+      'pages/upgrade/index', // 评级升级
+      'pages/battle/reward', //赏金模式
     ],
     subPackages: [
       {
@@ -121,15 +123,16 @@ export default class extends wepy.app {
           'my/setting',
           'my/editname',
           'my/editdesc',
+          'my/myCharacter', // 我的人设
           'my/editfile',
           'my/withdraw', // 红包提现
           'my/activityRule', // 活动规则
           'my/contactService', // 联系客服
           'my/myCard', // 生成美图]
           'my/likeHelp',
-          'my/myrank'
-        ] // 点击说明
-      }
+          'my/myrank',
+        ], // 点击说明
+      },
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -137,13 +140,13 @@ export default class extends wepy.app {
       navigationBarTitleText: '颜狗',
       navigationBarTextStyle: 'black',
       onReachBottomDistance: 200,
-      navigationStyle: 'custom'
+      navigationStyle: 'custom',
     },
     permission: {
       'scope.userLocation': {
-        desc: '你的位置信息将用于小程序位置接口的效果展示'
-      }
-    }
+        desc: '你的位置信息将用于小程序位置接口的效果展示',
+      },
+    },
   };
 
   globalData = {
@@ -152,7 +155,8 @@ export default class extends wepy.app {
     welcome: false,
     inviteCode: '',
     isphoneX: false,
-    navHeight: 0
+    navHeight: 0,
+    profile: {},
   };
 
   constructor() {
@@ -165,7 +169,9 @@ export default class extends wepy.app {
     const baseUrl = wepy.$appConfig.baseUrl;
     console.log('baseUrl', baseUrl);
     var that = this;
-
+    if (wepy.getStorageSync('profile')) {
+      this.globalData.profile = wepy.getStorageSync('profile');
+    }
     wx.getSystemInfo({
       success(res) {
         wx.setStorageSync('navHeight', res.statusBarHeight + 46);
@@ -174,23 +180,23 @@ export default class extends wepy.app {
           that.globalData.isphoneX = true;
         }
         console.warn(res);
-      }
+      },
     });
     console.log('on launch');
     if (!wx.cloud) {
       // console.error('请使用 2.2.3 或以上的基础库以使用云能力');
     } else {
       wx.cloud.init({
-        traceUser: true
+        traceUser: true,
       });
       setTimeout(() => {
         wx.cloud
           .callFunction({
-            name: 'getOpenID'
+            name: 'getOpenID',
           })
-          .then(res => {
+          .then((res) => {
             // console.log(res.result.userInfo.openId);
-            wx.dsp.setOpenid(res.result.userInfo.openId);
+            // wx.dsp.setOpenid(res.result.userInfo.openId);
             // console.log('call sdk!!!!!!');
           });
       }, 500);
@@ -220,7 +226,7 @@ export default class extends wepy.app {
       success(res) {
         that.globalData.userInfo = res.userInfo;
         cb && cb(res.userInfo);
-      }
+      },
     });
   }
 }

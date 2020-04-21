@@ -5,13 +5,14 @@
 	<view class="rank-page">
 		<view class="rank-search">
 			<van-tabs class="tabs" bind:change="onChange" bind:click="onClickTabs" active="{{ active }}">
-				<van-tab title="全部"></van-tab>
+				<van-tab title="本月"></van-tab>
+				<van-tab title="总榜"></van-tab>
 				<van-tab title="同城"></van-tab>
 				<van-tab title="星座"></van-tab>
 			</van-tabs>
-			<image wx:if="{{!showConstellation && active !== 2}}" src="https://images.facedog.cn/public/rank/down-pic.png" mode="aspectFill" class="rank-down-pic"></image>
-			<image wx:if="{{!showConstellation && active === 2}}" src="https://images.facedog.cn/public/rank/down-pic.png" mode="aspectFill" class="rank-down-pic spe"></image>
-			<image wx:if="{{showConstellation && active === 2}}" src="https://images.facedog.cn/public/rank/down-pic.png" mode="aspectFill" class="rank-down-pic roate"></image>
+			<image wx:if="{{!showConstellation && active !== 3}}" src="https://images.facedog.cn/public/rank/down-pic.png" mode="aspectFill" class="rank-down-pic"></image>
+			<image wx:if="{{!showConstellation && active === 3}}" src="https://images.facedog.cn/public/rank/down-pic.png" mode="aspectFill" class="rank-down-pic spe"></image>
+			<image wx:if="{{showConstellation && active === 3}}" src="https://images.facedog.cn/public/rank/down-pic.png" mode="aspectFill" class="rank-down-pic roate"></image>
 			<block wx:if="{{showConstellation}}">
 				<Constellation @getRankListByXZ.user="getRankListByXZ"></Constellation>
 			</block>
@@ -45,183 +46,205 @@
 			</view>
 			<image src="https://images.facedog.cn/public/profile/close1.png" mode="aspectFill" class="layer-close" @tap="hidechangeGenderPop"></image>
 		</view>
+		<block wx:if="{{showVerify}}">
+			<verify />
+		</block>
 	</view>
 </template>
 <script>
-	import wepy from 'wepy';
-	import { get } from '@/utils/request';
-	import { toast } from '@/utils';
-	import { RANK_LIST } from '@/utils/url';
-	import rankList from '@/components/rank/rankList';
-	import Constellation from '@/components/rank/Constellation';
-	import empty from '@/components/empty';
-	export default class fabu extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '排行榜',
-	    usingComponents: {
-	      'van-tabs': '../../components/vant/tabs/index',
-	      'van-tab': '../../components/vant/tab/index',
-	      navbar: '../../components/navbar/index'
-	    }
-	  };
-	  data = {
-	    all: [1, 2, 3, 4, 5, 6, 7],
-	    top3: [],
-	    topOthers: [],
-	    showConstellation: false,
-	    gender: '1',
-	    changeGenderPop: false,
-	    by: 'all',
-	    active: 0,
-	    page: 1,
-	    list: {}
-	  };
+import verify from '@/components/pop/verify/index';
+import wepy from 'wepy';
+import { get } from '@/utils/request';
+import { toast, VerifyControl } from '@/utils';
+import { RANK_LIST, MONTH_RANK_LIST } from '@/utils/url';
+import rankList from '@/components/rank/rankList';
+import Constellation from '@/components/rank/Constellation';
+import empty from '@/components/empty';
+import { Event } from '@/utils/event.js';
+export default class fabu extends wepy.page {
+  config = {
+    navigationBarTitleText: '排行榜',
+    usingComponents: {
+      'van-tabs': '../../components/vant/tabs/index',
+      'van-tab': '../../components/vant/tab/index',
+      navbar: '../../components/navbar/index',
+    },
+  };
+  data = {
+    all: [1, 2, 3, 4, 5, 6, 7],
+    top3: [],
+    topOthers: [],
+    showConstellation: false,
+    gender: '1',
+    changeGenderPop: false,
+    by: 'all',
+    active: 0,
+    page: 1,
+    list: {},
+    isMonth: true,
+    showVerify: false,
+  };
 
-	  components = {
-	    rankList,
-	    Constellation,
-	    empty
-	  };
+  components = {
+    rankList,
+    Constellation,
+    empty,
+    verify,
+  };
 
-	  myCatchTouch() {}
+  myCatchTouch() {}
 
-	  onClickTabs(event) {
-	    console.log('event.detail.index', event.detail.index);
-	    const { index } = event.detail;
-	    if (+index === 2) {
-	      // 点击星座tab
-	      this.showConstellation = !this.showConstellation;
-	    }
-	  }
-	  onChange(event) {
-	    console.log('event.detail.index', event.detail.index);
-	    const { index } = event.detail;
-	    this.active = index;
-	    if (+index === 2) {
-	      // 点击星座tab
-	      this.showConstellation = true;
-	    } else if (+index === 1) {
-	      // 点击同城
-	      this.showConstellation = false;
-	      this.by = '';
-	      this.page = 1;
-	      this.getRankList({
-	        by: '',
-	        gender: this.gender
-	      });
-	    } else if (+index === 0) {
-	      // 点击全国
-	      this.showConstellation = false;
-	      this.by = 'all';
-	      this.page = 1;
-	      this.getRankList({
-	        by: 'all',
-	        gender: this.gender
-	      });
-	    }
-	  }
+  onClickTabs(event) {
+    console.log('event.detail.index', event.detail.index);
+    const { index } = event.detail;
+    if (+index === 2) {
+      // 点击星座tab
+      //   this.showConstellation = !this.showConstellation;
+    }
+  }
+  onChange(event) {
+    console.log('event.detail.index', event.detail.index);
+    const { index } = event.detail;
+    this.active = index;
+    this.showConstellation = false;
+    this.page = 1;
+    if (+index === 3) {
+      // 点击星座tab
+      this.showConstellation = true;
+    } else if (+index === 1) {
+      // 点击全国
+      this.by = 'all';
+      this.isMonth = false;
+      this.getRankList({
+        by: 'all',
+        gender: this.gender,
+      });
+    } else if (+index === 2) {
+      // 点击同城
+      this.by = '';
+      this.isMonth = false;
+      this.getRankList({
+        by: '',
+        gender: this.gender,
+      });
+    } else if (+index === 0) {
+      // 点击本月
+      this.by = 'all';
+      this.isMonth = true;
+      this.getRankList({
+        by: 'all',
+        gender: this.gender,
+      });
+    }
+  }
 
-	  getTabStyle() {
-	    return 'background:red';
-	  }
-	  onReachBottom() {
-	    this.page = this.page + 1;
-	    this.getRankList({
-	      by: this.by,
-	      gender: this.gender
-	    });
-	  }
-	  methods = {
-		toRules(){
-			wepy.navigateTo({ url: '/pages/rank/rankHelp' });
-			
-		},
-	    async getRankListByXZ(obj) {
-	      this.showConstellation = false;
-	      this.by = obj.by || '';
-	      this.page = 1;
-	      await this.getRankList(obj);
-	    },
-	    showchangeGenderPop() {
-	      this.changeGenderPop = true;
-	    },
-	    hidechangeGenderPop() {
-	      this.changeGenderPop = false;
-	    },
-	    changeGender() {
-	      this.gender = this.gender === '1' ? '0' : '1';
-	      this.hidechangeGenderPop();
-	      this.page = 1;
-	      this.getRankList({
-	        by: this.by,
-	        gender: this.gender
-	      });
-	    },
-	    toMyRank() {
-	      this.hidechangeGenderPop();
-	      wepy.navigateTo({
-	        url: `/pages/my/myrank`
-	      });
-	    }
-	  };
-	  hidechangeGenderPop() {
-	    this.changeGenderPop = false;
-	  }
-	  events = {};
+  getTabStyle() {
+    return 'background:red';
+  }
+  onReachBottom() {
+    this.page = this.page + 1;
+    this.getRankList({
+      by: this.by,
+      gender: this.gender,
+    });
+  }
+  methods = {
+    toRules() {
+      wepy.navigateTo({ url: '/pages/rank/rankHelp' });
+    },
+    async getRankListByXZ(obj) {
+      this.showConstellation = false;
+      this.by = obj.by || '';
+      this.page = 1;
+      await this.getRankList(obj);
+    },
+    showchangeGenderPop() {
+      this.changeGenderPop = true;
+    },
+    hidechangeGenderPop() {
+      this.changeGenderPop = false;
+    },
+    changeGender() {
+      this.gender = this.gender === '1' ? '0' : '1';
+      this.hidechangeGenderPop();
+      this.page = 1;
+      this.getRankList({
+        by: this.by,
+        gender: this.gender,
+      });
+    },
+    toMyRank() {
+      this.hidechangeGenderPop();
+      wepy.navigateTo({
+        url: `/pages/my/myrank`,
+      });
+    },
+  };
+  hidechangeGenderPop() {
+    this.changeGenderPop = false;
+  }
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {
-	    this.getRankList({
-	      by: 'all',
-	      gender: this.gender
-	    });
-	  }
+  onLoad() {
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
+    this.getRankList(
+      {
+        by: 'all',
+        gender: this.gender,
+      },
+      true
+    );
+  }
 
-	  onShow() {}
+  onShow() {}
+  async getRankList({ by = '', gender = '' }, isMonth) {
+    let data = await get(this.isMonth ? MONTH_RANK_LIST : RANK_LIST, {
+      by,
+      gender: gender || this.gender,
+      page: this.page,
+    });
+    data.map((item) => {
+      if (item.distance) {
+        item.distance = (item.distance / 1000).toFixed(2);
+      }
+      item.avatar =
+        item.avatar + '?x-oss-process=image/resize,w_400,h_400/format,jpg';
+      return item;
+    });
+    if (data.length && this.page === 1) {
+      this.top3 = data.filter((x, index) => index <= 2);
+      this.topOthers = data.filter((x, index) => index > 2);
+    } else if (this.page !== 1 && !data.length) {
+      toast('没有更多纪录');
+      return;
+    } else if (this.page == 1 && !data.length) {
+      this.top3 = [];
+      this.topOthers = [];
+      this.$apply();
+      return;
+    } else {
+      // this.topOthers.push(...data.filter((x, index) => index > 2));
+      this.topOthers.push(...data);
+    }
 
-	  async getRankList({ by = '', gender = '' }) {
-	    let data = await get(RANK_LIST, {
-	      by,
-	      gender: gender || this.gender,
-	      page: this.page
-	    });
-	    data.map(item => {
-	      if (item.distance) {
-	        item.distance = (item.distance / 1000).toFixed(2);
-	      }
-	      item.avatar =
-	        item.avatar + '?x-oss-process=image/resize,w_400,h_400/format,jpg';
-	      return item;
-	    });
-	    if (data.length && this.page === 1) {
-	      this.top3 = data.filter((x, index) => index <= 2);
-	      this.topOthers = data.filter((x, index) => index > 2);
-	    } else if (this.page !== 1 && !data.length) {
-	      toast('没有更多纪录');
-	      return;
-	    } else if (this.page == 1 && !data.length) {
-	      this.top3 = [];
-	      this.topOthers = [];
-	      this.$apply();
-	      return;
-	    } else {
-	      // this.topOthers.push(...data.filter((x, index) => index > 2));
-	      this.topOthers.push(...data);
-	    }
-
-	    this.$apply();
-	    console.log(data);
-	  }
-	}
+    this.$apply();
+    console.log(data);
+  }
+}
 </script>
 
 <style lang='less'>
 	.rank-page {
 	  .rank-search {
-	    width: 50vw;
+	    width: 60vw;
 	    margin-bottom: 30rpx;
 	    position: relative;
 	    display: inline-block;
@@ -229,9 +252,9 @@
 	      width: 22rpx;
 	      height: 22rpx;
 	      position: absolute;
-		  top: 30rpx;
-		  left:420rpx;
-		  z-index: 999;
+	      top: 30rpx;
+	      left: 485rpx;
+	      z-index: 999;
 	    }
 	    .rank-down-pic {
 	      position: absolute;
@@ -248,7 +271,7 @@
 	      right: -23rpx !important;
 	    }
 	    .spe {
-	      right: -23rpx !important;
+	      right: -10rpx !important;
 	    }
 	    .tabs {
 	      .van-tab--active {

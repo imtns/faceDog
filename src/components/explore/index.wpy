@@ -45,25 +45,26 @@ import wepy from 'wepy';
 import topBanner from '@/components/discover/topBanner';
 import { get, post } from '@/utils/request';
 import { GET_RECOMMENT_LIST } from '@/utils/url';
-import { countDown } from '@/utils';
+import { countDown, VerifyControl } from '@/utils';
 import Toast from '@/components/vant/toast/toast';
 import { MAKEFRIEND } from '@/utils/url';
 export default class Explore extends wepy.component {
   props = {
     verify: {
       type: Boolean,
-      value: false
-    }
+      value: false,
+    },
   };
 
   data = {
     list: [],
     countdown: countDown(),
-    show: false
+    // countdown: '',
+    show: false,
   };
 
   components = {
-    topBanner
+    topBanner,
   };
 
   methods = {
@@ -71,39 +72,37 @@ export default class Explore extends wepy.component {
       this.fetchData();
     },
     clockClick() {
-      Toast('已发送过好友申请');
+      Toast('已向TA申请好友');
     },
     goProfile(id) {
-      if (!this.verify) {
-        this.$emit('verifyShow');
-        return;
-      }
+      //   if (!this.verify) {
+      //     this.$emit('verifyShow');
+      //     return;
+      //   }
+      if (!VerifyControl()) return;
       wepy.navigateTo({ url: `battle/profile?id=${id}` });
     },
     async makeFriend(id) {
-      if (!this.verify) {
-        this.$emit('verifyShow');
-        return;
-      }
+      if (!VerifyControl() || !VerifyControl('N')) return;
       wepy.showLoading({
         title: '', //提示的内容,
         mask: true, //显示透明蒙层，防止触摸穿透,
-        success: res => {}
+        success: (res) => {},
       });
       await post(MAKEFRIEND, {
         to_be: 'friend',
-        user_id: id
+        user_id: id,
       });
       wx.hideLoading();
       Toast('申请成功');
       //   this.fetchData();
     },
-    showVerify() {
-      this.$emit('verifyShow');
-    },
+    // showVerify() {
+    //   this.$emit('verifyShow');
+    // },
     bindscrolltolower() {
       console.log(1111);
-    }
+    },
   };
 
   events = {};
@@ -125,7 +124,7 @@ export default class Explore extends wepy.component {
     }, 1000);
     this.list = [];
     let result = await get(GET_RECOMMENT_LIST);
-    result.forEach(item => {
+    result.forEach((item) => {
       item.distance = (item.distance / 1000).toFixed(2);
     });
     this.list = result;

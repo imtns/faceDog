@@ -37,13 +37,13 @@
 
 <script>
 import wepy from 'wepy';
-export default class VipBuy extends wepy.component {
+export default class vipPop extends wepy.component {
   props = {};
 
   data = {
     indicator: true,
     interval: 2000,
-    autoplay: true
+    autoplay: true,
   };
 
   components = {};
@@ -55,7 +55,7 @@ export default class VipBuy extends wepy.component {
     go() {
       wepy.navigateTo({ url: '/pages/vip/superVip' });
       this.$emit('closeVipPop');
-    }
+    },
   };
 
   events = {};

@@ -16,7 +16,7 @@
 			<loading></loading>
 		</block>
 		<view class="wrong-tip" wx:if="{{tipCover}}">
-			<view class="text">颜狗是一个高颜值的社交圈<text style="color:#68e1a5;">初始评级</text></view>
+			<view class="text">上传的头像将决定你的<text style="color:#68e1a5;">初始评级</text></view>
 			<view class="text">评级影响你的权益，通过任务可以升级</view>
 			<view class="pic-box">
 				<image src="https://images.facedog.cn/mp/register/wrong1.png" mode="scaleToFill" lazy-load="false">
@@ -28,7 +28,7 @@
 				<image src="https://images.facedog.cn/mp/register/wrong4.png" mode="scaleToFill" lazy-load="false">
 				</image>
 			</view>
-			<view class="text" style="color:#CBC9C8;">*每人拥有一次重新评级的机会</view>
+			<!-- <view class="text" style="color:#CBC9C8;">*每人拥有一次重新评级的机会</view> -->
 			<view class="btn" @tap="closeTipCover">我知道了</view>
 		</view>
 	</view>
@@ -52,15 +52,15 @@ export default class ChooseGender extends wepy.component {
   props = {
     number: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   };
   config = {
     navigationBarTitleText: '3/4',
     usingComponents: {
       'van-loading': '../../components/vant/loading/index',
-      'van-dialog': '../../components/vant/dialog/index'
-    }
+      'van-dialog': '../../components/vant/dialog/index',
+    },
   };
 
   data = {
@@ -78,14 +78,14 @@ export default class ChooseGender extends wepy.component {
         x: (width - 300) / 2,
         y: (height - 300) / 2,
         width: 300,
-        height: 300
-      }
-    }
+        height: 300,
+      },
+    },
   };
 
   components = {
     cropper,
-    loading
+    loading,
   };
   upload(src) {
     this.loading = true;
@@ -95,7 +95,7 @@ export default class ChooseGender extends wepy.component {
       birthday: wepy.getStorageSync('birthday'),
       nick_name: wepy.getStorageSync('name'),
       gender: wepy.getStorageSync('gender'),
-      number: this.number
+      number: this.number,
     };
     console.log('注册data!!!!!!!!:', data);
     uploader(
@@ -103,9 +103,9 @@ export default class ChooseGender extends wepy.component {
       {
         data,
         name: 'avatar',
-        noLoading: true
+        noLoading: true,
       },
-      async result => {
+      async (result) => {
         this.show = false;
         this.loading = false;
         this.src = src;
@@ -125,7 +125,7 @@ export default class ChooseGender extends wepy.component {
     },
     async submitForm(e) {
       await post(SUBMIT_FORMID, {
-        formId: e.detail.formId
+        formId: e.detail.formId,
       });
       // wepy.navigateTo({ url: 'verify' });
     },
@@ -145,7 +145,7 @@ export default class ChooseGender extends wepy.component {
       }
       this.$emit('changeStep', 4);
       //   wepy.navigateTo({ url: 'verify' });
-    }
+    },
   };
 
   events = {
@@ -166,27 +166,27 @@ export default class ChooseGender extends wepy.component {
     },
     getCropImage: () => {
       this.$invoke('cropper', 'getCropperImage')
-        .then(src => {
+        .then((src) => {
           this.loading = true;
           this.$apply();
           console.log(src);
           checkImgSafe(src, 0)
-            .then(res => {
+            .then((res) => {
               this.upload(src);
             })
-            .catch(err => {
+            .catch((err) => {
               Toast('上传图片包含敏感信息，请重新上传');
               this.show = false;
               this.loading = false;
               this.$apply();
             });
         })
-        .catch(async err => {
+        .catch(async (err) => {
           // toast('error');
           this.show = false;
           console.log(err + '获取图片地址失败，请稍后重试');
         });
-    }
+    },
   };
 
   watch = {};
@@ -202,7 +202,7 @@ function checkImgSafe(tempFiles, index) {
   return new Promise((resolve, reject) => {
     // 压缩图片
     getImg(tempFiles, index)
-      .then(tmpPath => {
+      .then((tmpPath) => {
         //先将图片转换为base64，然后调用云函数
         const fs = wx.getFileSystemManager();
         fs.readFile({
@@ -212,23 +212,23 @@ function checkImgSafe(tempFiles, index) {
             wx.cloud
               .callFunction({
                 name: 'securityCheck',
-                data: { imgbase64: res.data }
+                data: { imgbase64: res.data },
               })
-              .then(res => {
+              .then((res) => {
                 if (res && res.result && res.result.errCode === 87014) {
                   reject(); //有安全风险
                 } else {
                   resolve('ok');
                 }
               })
-              .catch(err => {
+              .catch((err) => {
                 //只要检查失败，都算作没有安全风险
                 resolve('ok');
               });
-          }
+          },
         });
       })
-      .catch(err => {
+      .catch((err) => {
         resolve();
       });
   });
@@ -279,13 +279,13 @@ function getImg(path, index) {
             },
             fail: function(err) {
               reject(err);
-            }
+            },
           });
         });
       },
       fail: function(err) {
         reject(err);
-      }
+      },
     });
   });
 }

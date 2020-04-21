@@ -30,7 +30,7 @@
 							<image src="https://images.facedog.cn/public/my/level-{{level}}.png" mode="scaleToFill" lazy-load="false">
 							</image>
 						</view>
-						<view class="click-count">累计点击{{profile.play}}次 <image @tap="toRules" src="https://images.facedog.cn/public/my/question-mark.png" mode="scaleToFill" lazy-load="false">
+						<view class="click-count">累计滑动{{profile.play}}次 <image @tap="toRules" src="https://images.facedog.cn/public/my/question-mark.png" mode="scaleToFill" lazy-load="false">
 							</image>
 						</view>
 					</view>
@@ -92,6 +92,8 @@
 		<view class="line"></view>
 		<view class="nav-item {{active[2]?'active':''}}" @touchstart="touchstart(2)" @touchend="touchend(2)" @tap="redirect('video')">
 			<image style="height:35rpx;object-fit:cover;" src="https://images.facedog.cn/public/profile/video-verify.png?1" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image class="tip" style="width:{{profile.video_audit == 'unfinish'?'74rpx':'97rpx'}}" src="https://images.facedog.cn/mp/profile/{{profile.video_audit == 'unfinish'?'un':''}}verify.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
@@ -529,6 +531,15 @@ export default class My extends wepy.component {
 	.nav-item {
 	  display: flex;
 	  flex-wrap: wrap;
+	  position: relative;
+	  .tip {
+	    width: 97rpx;
+	    height: 30rpx;
+	    position: absolute;
+	    right: 50rpx;
+	    top: 50%;
+	    transform: translateY(-50%);
+	  }
 	  &.active {
 	    background: rgba(242, 242, 242, 1);
 	  }

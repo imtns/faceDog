@@ -1,292 +1,292 @@
 
 <template>
-	<block wx:if="{{!list.length && init}}">
-		<empty></empty>
-	</block>
-	<view class='wrapper' wx:else>
-		<view class="tabs">
-			<view class="tab" @tap="clearFavorites('all')">一键清空列表</view>
-			<view class="tab" @tap="makeFriend('all')">一键添加好友</view>
-		</view>
-		<scroll-view scroll-y="true" style="height: 80vh;" bindscrolltolower="load" bindscroll="scroll">
-			<repeat for="{{list}}" key="index" index="index" item="item">
-				<view class="like-box">
-					<view class="like-list">
-						<image class="avatar" @tap="goProfile({{item.user_id}},{{item.dentifier}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
-						<view class="desc">
-							<view class="left">
-								<view class="name">{{item.nick_name}}</view>
-								<view class="info">22岁 / 射手座</view>
-							</view>
-							<form report-submit='true' bindsubmit='agree' data-user="">
-								<view class="right">
-									<view class="apply" wx:if="{{!item.liked}}" @tap="makeFriend({{item.user_id}})">
-										<image class="apply-icon" src="https://images.facedog.cn/public/chat/heart.png" mode="scaleToFill"></image>
-									</view>
-									<image class="apply-clock" wx:if="{{item.friend}}" mode="aspectFill" @tap="gochat({{item.avatar}},{{item.dentifier}},{{item.nick_name}})" src="https://images.facedog.cn/public/profile/icon-chat.png"></image>
-									<image class="apply-clock" wx:if="{{item.liked && !item.friend}}" mode="aspectFill" @tap="toastTip" src="https://images.facedog.cn/public/profile/icon-clock.png"></image>
-									<image class="apply-icon" src="https://images.facedog.cn/public/chat/cancel.png" @tap="clearFavorites({{item._id}})" mode="aspectFill"></image>
-								</view>
-							</form>
-						</view>
-					</view>
-				</view>
-			</repeat>
-		</scroll-view>
-	</view>
+    <block wx:if="{{!list.length && init}}">
+        <empty></empty>
+    </block>
+    <view class='wrapper' wx:else>
+        <view class="tabs">
+            <view class="tab" @tap="clearFavorites('all')">一键清空列表</view>
+            <view class="tab" @tap="makeFriend('all')">一键添加好友</view>
+        </view>
+        <scroll-view scroll-y="true" style="height: 80vh;" bindscrolltolower="load" bindscroll="scroll">
+            <repeat for="{{list}}" key="index" index="index" item="item">
+                <view class="like-box">
+                    <view class="like-list">
+                        <image class="avatar" @tap="goProfile({{item.user_id}},{{item.dentifier}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
+                        <view class="desc">
+                            <view class="left">
+                                <view class="name">{{item.nick_name}}</view>
+                                <view class="info">22岁 / 射手座</view>
+                            </view>
+                            <form report-submit='true' bindsubmit='agree' data-user="">
+                                <view class="right">
+                                    <view class="apply" wx:if="{{!item.liked}}" @tap="makeFriend({{item.user_id}})">
+                                        <image class="apply-icon" src="https://images.facedog.cn/public/chat/heart.png" mode="scaleToFill"></image>
+                                    </view>
+                                    <image class="apply-clock" wx:if="{{item.friend}}" mode="aspectFill" @tap="gochat({{item.avatar}},{{item.dentifier}},{{item.nick_name}})" src="https://images.facedog.cn/public/profile/icon-chat.png"></image>
+                                    <image class="apply-clock" wx:if="{{item.liked && !item.friend}}" mode="aspectFill" @tap="toastTip" src="https://images.facedog.cn/public/profile/icon-clock.png"></image>
+                                    <image class="apply-icon" src="https://images.facedog.cn/public/chat/cancel.png" @tap="clearFavorites({{item._id}})" mode="aspectFill"></image>
+                                </view>
+                            </form>
+                        </view>
+                    </view>
+                </view>
+            </repeat>
+        </scroll-view>
+    </view>
 </template>
 
 
 <script>
-	import wepy from 'wepy';
-	import { getAge } from '@/utils';
-	import { get, post } from '@/utils/request';
-	import empty from '@/components/empty';
-	import { MAKEFRIEND, MY_FAVORITE, DELETE_FAVORITE } from '@/utils/url';
-	import Dialog from '@/components/vant/dialog/dialog';
-	import Toast from '@/components/vant/toast/toast';
+import wepy from 'wepy';
+import { getAge } from '@/utils';
+import { get, post } from '@/utils/request';
+import empty from '@/components/empty';
+import { MAKEFRIEND, MY_FAVORITE, DELETE_FAVORITE } from '@/utils/url';
+import Dialog from '@/components/vant/dialog/dialog';
+import Toast from '@/components/vant/toast/toast';
 
-    import { Event } from '@/utils/event.js';
-	export default class Like extends wepy.component {
-	  props = {};
+import { Event } from '@/utils/event.js';
+export default class Like extends wepy.component {
+  props = {};
 
-	  data = {
-	    list: [],
-	    init: false,
-	    page: 1,
-	    nomore: false,
-	    show: false
-	  };
+  data = {
+    list: [],
+    init: false,
+    page: 1,
+    nomore: false,
+    show: false,
+  };
 
-	  components = {
-	    empty
-	  };
-	  async initList() {
-	    this.page = 1;
-	    this.nomore = false;
-	    this.show = false;
-	    this.list = [];
-	    this.fetchData();
-	  }
-	  async fetchData() {
-	    if (this.nomore) {
-	      this.show = true;
-	      Toast('没有更多啦...');
-	      return;
-	    }
-	    const result = await get(MY_FAVORITE, { page: this.page });
-	    console.log(result.length);
-	    if (!result.length && this.init) {
-	      this.nomore = true;
-	      this.$apply();
-	      return;
-	    }
-	    this.list.push(...result);
-	    this.init = true;
-	    this.$apply();
-	  }
-	  methods = {
-	    load() {
-	      this.page++;
-	      if (!this.show) this.fetchData();
-	    },
-	    toastTip() {
-	      Toast('已发送过好友申请');
-	    },
-	    goProfile(id, dentifier) {
-	      wx.navigateTo({
-	        url: `battle/profile?id=${id}&dentifier=${dentifier}`,
-	        success: result => {},
-	        fail: () => {},
-	        complete: () => {}
-	      });
-	    },
-	    async initData() {
-	      this.initList();
-	    },
-	    gochat(avartar, dentifier, nickname) {
-	      wx.setStorageSync('chatIcon', avartar);
-	      wepy.navigateTo({
-	        url: `/pages/chat/chat?id=${dentifier}&nick=${nickname}`
-	      });
-	    },
-	    async makeFriend(id) {
-	      wepy.showLoading({
-	        title: '', //提示的内容,
-	        mask: true, //显示透明蒙层，防止触摸穿透,
-	        success: res => {}
-	      });
-	      if (id == 'all') {
-	        id = [];
-	        this.list.forEach(item => {
-	          if (!item.liked) {
-	            id.push(item.user_id);
-	          }
-	        });
-	      }
-	      try {
-	        await post(MAKEFRIEND, {
-	          to_be: 'friend',
-	          user_id: id
-	        });
-	      } catch (e) {
-	        // if (e == '用户未完善资料') {
-	        //   Event.trigger('showVerify', true, 2);
-	        // }
-	        return;
-	      }
+  components = {
+    empty,
+  };
+  async initList() {
+    this.page = 1;
+    this.nomore = false;
+    this.show = false;
+    this.list = [];
+    this.fetchData();
+  }
+  async fetchData() {
+    if (this.nomore) {
+      this.show = true;
+      Toast('没有更多啦...');
+      return;
+    }
+    const result = await get(MY_FAVORITE, { page: this.page });
+    console.log(result.length);
+    if (!result.length && this.init) {
+      this.nomore = true;
+      this.$apply();
+      return;
+    }
+    this.list.push(...result);
+    this.init = true;
+    this.$apply();
+  }
+  methods = {
+    load() {
+      this.page++;
+      if (!this.show) this.fetchData();
+    },
+    toastTip() {
+      Toast('已向TA申请好友');
+    },
+    goProfile(id, dentifier) {
+      wx.navigateTo({
+        url: `battle/profile?id=${id}&dentifier=${dentifier}`,
+        success: (result) => {},
+        fail: () => {},
+        complete: () => {},
+      });
+    },
+    async initData() {
+      this.initList();
+    },
+    gochat(avartar, dentifier, nickname) {
+      wx.setStorageSync('chatIcon', avartar);
+      wepy.navigateTo({
+        url: `/pages/chat/chat?id=${dentifier}&nick=${nickname}`,
+      });
+    },
+    async makeFriend(id) {
+      wepy.showLoading({
+        title: '', //提示的内容,
+        mask: true, //显示透明蒙层，防止触摸穿透,
+        success: (res) => {},
+      });
+      if (id == 'all') {
+        id = [];
+        this.list.forEach((item) => {
+          if (!item.liked) {
+            id.push(item.user_id);
+          }
+        });
+      }
+      try {
+        await post(MAKEFRIEND, {
+          to_be: 'friend',
+          user_id: id,
+        });
+      } catch (e) {
+        // if (e == '用户未完善资料') {
+        //   Event.trigger('showVerify', true, 2);
+        // }
+        return;
+      }
 
-	      wx.hideLoading();
-	      Toast('申请成功');
-	      this.initList();
-	      this.$apply();
-	    },
-	    async clearFavorites(id) {
-	      wepy.showLoading({
-	        title: '', //提示的内容,
-	        mask: true, //显示透明蒙层，防止触摸穿透,
-	        success: res => {}
-	      });
+      wx.hideLoading();
+      Toast('申请成功');
+      this.initList();
+      this.$apply();
+    },
+    async clearFavorites(id) {
+      wepy.showLoading({
+        title: '', //提示的内容,
+        mask: true, //显示透明蒙层，防止触摸穿透,
+        success: (res) => {},
+      });
 
-	      if (id == 'all') {
-	        id = [];
-	        this.list.forEach(item => {
-	          id.push(item._id);
-	        });
-	      }
-	      await post(DELETE_FAVORITE, { id });
-	      Toast('删除成功');
-	      wepy.hideLoading();
-	      this.initList();
-	    }
-	  };
+      if (id == 'all') {
+        id = [];
+        this.list.forEach((item) => {
+          id.push(item._id);
+        });
+      }
+      await post(DELETE_FAVORITE, { id });
+      Toast('删除成功');
+      wepy.hideLoading();
+      this.initList();
+    },
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {}
+  onLoad() {}
 
-	  onShow() {}
-	}
+  onShow() {}
+}
 </script>
 
 <style lang='less' scoped>
-	.wrapper {
-	  width: 690rpx;
-	  padding-top: 20rpx;
-	  margin-left: 30rpx;
-	  .tabs {
-	    width: 100%;
-	    display: flex;
-	    justify-content: space-between;
-	    .tab {
-	      width: 344rpx;
-	      height: 54rpx;
-	      background: rgba(0, 0, 0, 1);
-	      box-shadow: 0px 3rpx 6rpx rgba(0, 0, 0, 0.41);
-	      opacity: 1;
-	      border-radius: 5rpx;
-	      font-size: 20rpx;
-	      color: White;
-	      line-height: 54rpx;
-	      text-align: center;
-	    }
-	  }
-	  .like-box {
-	    width: 100%;
-	    margin-bottom: 75rpx;
-	    .header {
-	      height: 49rpx;
-	      display: flex;
-	      align-items: center;
-	      justify-content: space-between;
-	      .date {
-	        text {
-	          &:nth-child(1) {
-	            font-size: 40rpx;
-	            font-weight: 900;
-	          }
-	          &:nth-child(2) {
-	            font-weight: 100;
-	            line-height: 37rpx;
-	            color: rgba(150, 150, 150, 1);
-	          }
-	        }
-	      }
-	      .all {
-	        font-size: 20rpx;
-	        color: rgba(158, 157, 157, 1);
-	        height: 49rpx;
-	        line-height: 49rpx;
-	      }
-	    }
-	    .like-list {
-	      width: 100%;
-	      height: 110rpx;
-	      display: flex;
-	      justify-content: space-between;
-	      &:first-child {
-	        margin-top: 30rpx;
-	      }
-	      margin-bottom: 60rpx;
-	      align-items: center;
-	      .avatar {
-	        overflow: hidden;
-	        border-radius: 50%;
-	        width: 157rpx;
-	        flex: 1;
-	        height: 157rpx;
-	        display: block;
-	      }
-	      .desc {
-	        display: flex;
-	        justify-content: space-between;
-	        align-items: center;
-	        flex: 5;
-	        padding-left: 20rpx;
-	        .name {
-	          font-family: PingFang SC;
-	          font-size: 28rpx;
-	          color: #000;
-	          font-weight: bold;
-	        }
-	        .info {
-	          font-size: 25rpx;
-	          color: #7e7e7e;
-	        }
-	        .right {
-	          padding-right: 30rpx;
-	          margin-right: auto;
-	          display: flex;
-	          flex-wrap: nowrap;
-	          align-items: center;
-	          .apply {
-	            width: 94rpx;
-	            height: 94rpx;
-	            background: rgba(255, 255, 255, 1);
-	            display: flex;
-	            justify-content: center;
-	            align-items: center;
-	            box-shadow: 0px 0px 18rpx rgba(128, 159, 159, 0.16);
-	            border-radius: 50%;
-	            opacity: 1;
-	            margin-right: 40rpx;
-	          }
-	        }
-	        .apply-icon {
-	          width: 45rpx;
-	          height: 39rpx;
-	        }
-	        .apply-clock {
-	          width: 124rpx;
-	          height: 124rpx;
-	          margin-right: 20rpx;
-	        }
-	      }
-	    }
-	  }
-	}
+    .wrapper {
+      width: 690rpx;
+      padding-top: 20rpx;
+      margin-left: 30rpx;
+      .tabs {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        .tab {
+          width: 344rpx;
+          height: 54rpx;
+          background: rgba(0, 0, 0, 1);
+          box-shadow: 0px 3rpx 6rpx rgba(0, 0, 0, 0.41);
+          opacity: 1;
+          border-radius: 5rpx;
+          font-size: 20rpx;
+          color: White;
+          line-height: 54rpx;
+          text-align: center;
+        }
+      }
+      .like-box {
+        width: 100%;
+        margin-bottom: 75rpx;
+        .header {
+          height: 49rpx;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .date {
+            text {
+              &:nth-child(1) {
+                font-size: 40rpx;
+                font-weight: 900;
+              }
+              &:nth-child(2) {
+                font-weight: 100;
+                line-height: 37rpx;
+                color: rgba(150, 150, 150, 1);
+              }
+            }
+          }
+          .all {
+            font-size: 20rpx;
+            color: rgba(158, 157, 157, 1);
+            height: 49rpx;
+            line-height: 49rpx;
+          }
+        }
+        .like-list {
+          width: 100%;
+          height: 110rpx;
+          display: flex;
+          justify-content: space-between;
+          &:first-child {
+            margin-top: 30rpx;
+          }
+          margin-bottom: 60rpx;
+          align-items: center;
+          .avatar {
+            overflow: hidden;
+            border-radius: 50%;
+            width: 157rpx;
+            flex: 1;
+            height: 157rpx;
+            display: block;
+          }
+          .desc {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 5;
+            padding-left: 20rpx;
+            .name {
+              font-family: PingFang SC;
+              font-size: 28rpx;
+              color: #000;
+              font-weight: bold;
+            }
+            .info {
+              font-size: 25rpx;
+              color: #7e7e7e;
+            }
+            .right {
+              padding-right: 30rpx;
+              margin-right: auto;
+              display: flex;
+              flex-wrap: nowrap;
+              align-items: center;
+              .apply {
+                width: 94rpx;
+                height: 94rpx;
+                background: rgba(255, 255, 255, 1);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0px 0px 18rpx rgba(128, 159, 159, 0.16);
+                border-radius: 50%;
+                opacity: 1;
+                margin-right: 40rpx;
+              }
+            }
+            .apply-icon {
+              width: 45rpx;
+              height: 39rpx;
+            }
+            .apply-clock {
+              width: 124rpx;
+              height: 124rpx;
+              margin-right: 20rpx;
+            }
+          }
+        }
+      }
+    }
 </style>

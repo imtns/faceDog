@@ -10,6 +10,7 @@
 		</view> -->
 		<view class="wrap">
 			<image wx:if="{{!profile.level}}" src="https://images.facedog.cn/mp/profile/unLevel.png" mode="scaleToFill" lazy-load="false" />
+			<image @tap="hide" wx:if="{{profile.progress == 'finish' && showFinish}}" src="https://images.facedog.cn/mp/profile/virify-finish.png" mode="scaleToFill" lazy-load="false" />
 		</view>
 		<!-- <view class="wrap" @tap="close" wx:if="{{profile.progress === 'finish'}}">
 			<image src="https://images.facedog.cn/public/my/notify-verified.png" mode="scaleToFill" lazy-load="false">
@@ -24,6 +25,7 @@ export default class Notify extends wepy.component {
 
   data = {
     profile: {},
+    showFinish: null,
   };
 
   components = {};
@@ -35,8 +37,17 @@ export default class Notify extends wepy.component {
     go() {
       wepy.navigateTo({ url: `register/verify` });
     },
+    hide() {
+      wepy.setStorageSync('showFinish', true);
+      this.showFinish = false;
+    },
     setProfile(profile) {
       this.profile = profile;
+      let showFinish = wepy.getStorageSync('showFinish');
+      console.log('showFinish', showFinish);
+      if (!showFinish) {
+        this.showFinish = true;
+      }
       console.log('PROGRESS:::', this.profile.progress);
       this.$apply();
     },

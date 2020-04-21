@@ -13,7 +13,6 @@
 	</navbar>
 	<navbar wx:else title="{{pageTitle}}">
 	</navbar>
-	<!-- <view class="guest-button" wx:if="{{selectedTab != 2 && !hasProfile && loaded}}" @tap="verifyShow">游客模式</view> -->
 	<block wx:if="{{verify}}">
 		<verify />
 	</block>
@@ -28,10 +27,6 @@
 			<explore :verify.sync="hasProfile" />
 		</block>
 	</view>
-	<!-- <view wx:if="{{selectedTab == 1}}">
-		<discover />
-	</view> -->
-
 	<view wx:if="{{selectedTab == 2}}">
 		<my />
 	</view>
@@ -42,13 +37,16 @@
 		<redpacketLayer />
 	</van-popup>
 	<van-popup show="{{ showVipBuy}}" bind:close="onClose">
-		<VipBuyPop />
+		<vipBuyPop />
 	</van-popup>
 	<van-toast id="van-toast" />
 	<van-dialog id="van-dialog" />
-	<van-popup show="{{ showUpgrade}}" bind:close="onClose">
-		<upgrade @close="close" />
+	<van-popup show="{{ showLevelPop}}" bind:close="onClose">
+		<levelPop @close="close" />
 	</van-popup>
+	<block wx:if="{{showVerify}}">
+		<verify />
+	</block>
 </template>
 
 <script>
@@ -56,8 +54,9 @@ import wepy from 'wepy';
 import tabbar from '@/components/tabbar';
 import battle from '@/components/battle/battle';
 import explore from '@/components/explore/index';
-import upgrade from '@/components/my/upgrade/index';
-// import discover from '@/components/discover/discover';
+import levelPop from '@/components/pop/upgrade/levelPop';
+import vipBuyPop from '@/components/pop/vip/index';
+import redpacketLayer from '@/components/pop/redpackage/index';
 import my from '@/components/my/my';
 import chat from '@/components/chat/chat';
 import { sleep } from '@/utils';
@@ -65,9 +64,8 @@ import { get } from '@/utils/request';
 import { NEW_PROFILE, GET_LEVEL_INFO } from '@/utils/url';
 import { getAge } from '@/utils';
 import { Event } from '@/utils/event.js';
-import verify from '@/components/battle/module/verify';
-import redpacketLayer from '@/components/battle/module/redpacket';
-import VipBuyPop from '@/components/battle/module/vipBuy';
+import verify from '@/components/pop/verify/index';
+
 let tabClicked = false;
 let optionFrom = false;
 // import { toast } from '@/utils';
@@ -103,8 +101,8 @@ export default class Index extends wepy.page {
     my,
     verify,
     redpacketLayer,
-    VipBuyPop,
-    upgrade,
+    vipBuyPop,
+    levelPop,
   };
 
   data = {
@@ -125,7 +123,8 @@ export default class Index extends wepy.page {
     showHome: true,
     showRedpacketLayer: false,
     showVipBuy: false,
-    showUpgrade: false,
+    showLevelPop: false,
+    showVerify: false,
   };
   computed = {
     now() {
@@ -179,11 +178,13 @@ export default class Index extends wepy.page {
       this.$invoke('battle', 'init', this.profile);
       this.$invoke('my', 'setProfile', this.profile);
       let showLevel = wepy.getStorageSync('showLevel');
-      if (!showLevel && this.profile.level) {
-        let level = await get(GET_LEVEL_INFO);
-        wepy.setStorageSync('level', level);
-        this.$invoke('upgrade', 'setLevel', level, 'home');
-        this.showUpgrade = true;
+      if (!showLevel && this.profile.level && !this.loaded) {
+        // let level = await get(GET_LEVEL_INFO);
+        this.showLevelPop = true;
+        wepy.setStorageSync('level', this.profile.level);
+        this.$invoke('levelPop', 'setLevel', this.profile.level, 'home');
+
+        this.$apply();
       }
       this.loaded = true;
       this.$apply();
@@ -226,7 +227,7 @@ export default class Index extends wepy.page {
       this.tabSelect = 1;
     },
     close() {
-      this.showUpgrade = false;
+      this.showLevelPop = false;
     },
     tabSelect: (...args) => {
       let $event = args[args.length - 1];
@@ -303,10 +304,11 @@ export default class Index extends wepy.page {
 
     this.user = wx.getStorageSync('profile');
     this.setProfile();
-    // Event.listen('showVerify', status => {
-    //   this.verify = status;
-    //   this.$apply();
-    // });
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
     let showRedpacket = wx.getStorageSync('showRedpacket');
     if (showRedpacket != 'ok') {
       let interval = setInterval(() => {

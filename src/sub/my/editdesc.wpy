@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-	<navbar title="个性签名">
+	<navbar title="我的愿望">
 	</navbar>
 	<view class='wrapper'>
 		<view class="input">
@@ -16,72 +16,72 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import mixin from '@/mixins/editMixin';
+import wepy from 'wepy';
+import mixin from '@/mixins/editMixin';
 
-	import { toast, contentCheck } from '@/utils';
-	export default class EditDesc extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '个性签名',
-	    usingComponents: {
-	      navbar: '../../components/navbar/index'
-	    }
-	  };
-	  data = {
-	    textleft: 0
-	  };
-	  mixins = [mixin];
-	  components = {};
+import { toast, contentCheck } from '@/utils';
+export default class EditDesc extends wepy.page {
+  config = {
+    navigationBarTitleText: '个性签名',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
+  data = {
+    textleft: 0,
+  };
+  mixins = [mixin];
+  components = {};
 
-	  methods = {
-	    inputChange({ detail }) {
-	      this.text = detail.value;
-	      this.textleft = detail.value.length;
-	    },
-	    formSubmit(e) {
-	      console.log(e);
-	      if (this.text) {
-	        contentCheck(this.text).then(res => {
-	          console.log(res);
-	          if (!res) {
-	            toast('内容包含敏感内容，请重新输入');
-	            return;
-	          } else {
-	            this.submit({
-	              signature: this.text
-	            });
-	          }
-	        });
-	      } else {
-	        this.submit({
-	          formId: e.detail.formId,
-	          signature: this.text
-	        });
-	      }
-	      // if (e.detail.formId != 'the formId is a mock one') {
-	      //     this.setData({
-	      //         formIdString: e.detail.formId + ',' + this.data.formIdString
-	      //     });
-	      // }
-	      // console.log(this.data.formIdString);
-	    }
-	    // submit() {
-	    //     this.submit({
-	    //         signature: this.text
-	    //     });
-	    // }
-	  };
+  methods = {
+    inputChange({ detail }) {
+      this.text = detail.value;
+      this.textleft = detail.value.length;
+    },
+    formSubmit(e) {
+      console.log(e);
+      if (this.text) {
+        contentCheck(this.text).then((res) => {
+          console.log(res);
+          if (!res) {
+            toast('内容包含敏感内容，请重新输入');
+            return;
+          } else {
+            this.submit({
+              signature: this.text,
+            });
+          }
+        });
+      } else {
+        this.submit({
+          formId: e.detail.formId,
+          signature: this.text,
+        });
+      }
+      // if (e.detail.formId != 'the formId is a mock one') {
+      //     this.setData({
+      //         formIdString: e.detail.formId + ',' + this.data.formIdString
+      //     });
+      // }
+      // console.log(this.data.formIdString);
+    },
+    // submit() {
+    //     this.submit({
+    //         signature: this.text
+    //     });
+    // }
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {}
+  onLoad() {}
 
-	  onShow() {}
-	}
+  onShow() {}
+}
 </script>
 
 <style lang='less'>

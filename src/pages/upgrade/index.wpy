@@ -16,7 +16,9 @@
 		<view class="upgrade-mission">
 			<repeat for="{{mission[level[levelIndex]]}}" key="index" index="index" item="item">
 				<view class="mission">
-					<image src="https://images.facedog.cn/mp/upgrade/page/mission{{index+1}}.png" mode="scaleToFill" lazy-load="false">
+					<image wx:if="{{item.notRequire}}" src="https://images.facedog.cn/mp/upgrade/page/star.png" mode="scaleToFill" lazy-load="false">
+					</image>
+					<image wx:else src="https://images.facedog.cn/mp/upgrade/page/mission{{index+1}}.png" mode="scaleToFill" lazy-load="false">
 					</image>
 					<text>{{item.text}}</text>
 					<view class="status {{item.status==='已完成'?'finish':''}}" @tap="goFinish({{item.status}})">{{item.status}}
@@ -44,8 +46,8 @@
 
 <script>
 import wepy from 'wepy';
-import pop from './module/pop';
-import upgrade from '@/components/my/upgrade/index';
+import pop from '@/components/pop/redpackage/index';
+import upgrade from '@/components/pop/upgrade/levelPop';
 import { get, post } from '@/utils/request';
 import { GET_LEVEL_INFO, UPGRADE_LEVEL } from '@/utils/url';
 export default class Upgrade extends wepy.page {
@@ -77,7 +79,7 @@ export default class Upgrade extends wepy.page {
           status: '',
         },
         {
-          text: '点击次数达到20',
+          text: '完成20次滑动',
           status: '',
         },
         {
@@ -95,7 +97,7 @@ export default class Upgrade extends wepy.page {
           status: '',
         },
         {
-          text: '点击次数达到20',
+          text: 'PK获胜次数达到20',
           status: '',
         },
         {
@@ -105,6 +107,7 @@ export default class Upgrade extends wepy.page {
         {
           text: '购买年费会员，直接升级至SR',
           status: '',
+          notRequire: true,
         },
       ],
       SR: [
@@ -140,9 +143,7 @@ export default class Upgrade extends wepy.page {
       }
     },
     async upgrade() {
-      let canUpgrade = true;
-
-      if (canUpgrade) {
+      if (this.canUpgrade) {
         await post(UPGRADE_LEVEL);
         this.fetchData(true);
       }
@@ -175,19 +176,21 @@ export default class Upgrade extends wepy.page {
       case 'N': {
         this.mission[data.level][0].status = data.profile ? '已完成' : '去完成';
         this.mission[data.level][1].status =
-          data.all_click_count > 20 ? '已完成' : `${data.click_count}/20`;
+          data.all_click_count >= 20 ? '已完成' : `${data.click_count}/20`;
         this.mission[data.level][2].status =
-          data.user_images_count > 3 ? '已完成' : `${data.user_images_count}/3`;
+          data.user_images_count >= 3
+            ? '已完成'
+            : `${data.user_images_count}/3`;
         this.mission[data.level][3].status =
-          data.guide_count > 3 ? '已完成' : `${data.guide_count}/3`;
+          data.guide_count >= 3 ? '已完成' : `${data.guide_count}/3`;
         break;
       }
       case 'R': {
         this.mission[data.level][0].status = data.profile ? '已完成' : '去完成';
         this.mission[data.level][1].status =
-          data.win_count > 20 ? '已完成' : `${data.win_count}/20`;
+          data.win_count >= 20 ? '已完成' : `${data.win_count}/20`;
         this.mission[data.level][2].status =
-          data.guide_r_count > 5 ? '已完成' : `${data.guide_r_count}/5`;
+          data.guide_r_count >= 5 ? '已完成' : `${data.guide_r_count}/5`;
         this.mission[data.level][3].status = data.is_year_vip
           ? '已完成'
           : `未完成`;
@@ -196,11 +199,15 @@ export default class Upgrade extends wepy.page {
       case 'SR': {
         this.mission[data.level][0].status = data.profile ? '已完成' : '去完成';
         this.mission[data.level][1].status =
-          data.win_count > 50 ? '已完成' : `${data.win_count}/50`;
+          data.win_count >= 50 ? '已完成' : `${data.win_count}/50`;
         this.mission[data.level][2].status =
-          data.win_rate > 35 ? '已完成' : `${data.win_rate}/35%`;
+          data.win_rate >= 35
+            ? '已完成'
+            : `${Math.ceil(data.win_rate * 100)}%/35%`;
         this.mission[data.level][3].status =
-          data.all_click_count > 300 ? '已完成' : `${data.all_click_count}/300`;
+          data.all_click_count >= 300
+            ? '已完成'
+            : `${data.all_click_count}/300`;
         break;
       }
     }
@@ -210,9 +217,13 @@ export default class Upgrade extends wepy.page {
     if (isShow) {
       this.showUpgradePop = true;
     }
-    this.mission[this.levelData.level].every((item) => {
-      if (item.status != '已完成') {
+    this.mission[this.levelData.level].forEach((item) => {
+      if (item.status != '已完成' && !item.notRequire) {
         this.canUpgrade = false;
+        return false;
+      }
+      if (item.notRequire && item.status == '已完成') {
+        this.canUpgrade = true;
         return false;
       }
     });
@@ -298,6 +309,8 @@ export default class Upgrade extends wepy.page {
 	      text {
 	        margin-right: auto;
 	        margin-left: 10rpx;
+	        font-size: 26rpx;
+	        color: #000;
 	      }
 	      .status {
 	        width: 115rpx;

@@ -41,7 +41,7 @@
 		<view class="warn" @tap="genderBy('not')">只看异性</view>
 		<view class="warn last" @tap="closeshowGender">取消</view>
 	</van-popup>
-	<block wx:if="{{verify}}">
+	<block wx:if="{{showVerify}}">
 		<verify />
 	</block>
 	<van-toast id="van-toast" />
@@ -52,12 +52,12 @@
 import { get } from '@/utils/request';
 import { DISCOVER_MOMENT_LIST } from '@/utils/url.js';
 import wepy from 'wepy';
-import { toast } from '@/utils';
+import { toast, VerifyControl } from '@/utils';
 import { Event } from '@/utils/event.js';
 import topBanner from '@/components/discover/topBanner';
 import momentCard from '@/components/discover/momentCard';
 import empty from '@/components/empty';
-import verify from '@/components/battle/module/verify';
+import verify from '@/components/pop/verify/index';
 import loadingHeart from '@/components/battle/module/loadingHeart';
 let nomore = false;
 export default class Discover extends wepy.page {
@@ -73,8 +73,8 @@ export default class Discover extends wepy.page {
       'van-dialog': '../../components/vant/dialog/index',
       'van-popup': '../../components/vant/popup/index',
       'van-tabs': '../../components/vant/tabs/index',
-      'van-tab': '../../components/vant/tab/index'
-    }
+      'van-tab': '../../components/vant/tab/index',
+    },
   };
   data = {
     showGender: false,
@@ -83,8 +83,8 @@ export default class Discover extends wepy.page {
     same_city: 0,
     opposite: '',
     loading: false,
-    verify: false,
-    show: false
+    showVerify: false,
+    show: false,
   };
 
   components = {
@@ -92,7 +92,7 @@ export default class Discover extends wepy.page {
     momentCard,
     empty,
     verify,
-    loadingHeart
+    loadingHeart,
   };
   onClose() {
     this.show = false;
@@ -110,7 +110,7 @@ export default class Discover extends wepy.page {
     this.methods.initList.call(this, {
       page: 1,
       same_city: this.same_city,
-      opposite: this.opposite
+      opposite: this.opposite,
     });
   }
   onReachBottom() {
@@ -127,7 +127,7 @@ export default class Discover extends wepy.page {
       this.methods.initList.call(this, {
         page: 1,
         same_city,
-        opposite
+        opposite,
       });
       this.showGender = false;
     },
@@ -140,13 +140,13 @@ export default class Discover extends wepy.page {
         this.same_city = 0;
         this.methods.initList.call(this, {
           page: 1,
-          same_city: 0
+          same_city: 0,
         });
       } else if (+index === 1) {
         this.same_city = 1;
         this.methods.initList.call(this, {
           page: 1,
-          same_city: 1
+          same_city: 1,
         });
       }
     },
@@ -157,16 +157,9 @@ export default class Discover extends wepy.page {
       this.showGender = true;
     },
     mkPhoto() {
-      let profile = wepy.getStorageSync('profile');
-      if (!profile || profile.progress == 'profile') {
-        this.verify = true;
-        return;
-      } else if (profile.progress !== 'finish') {
-        toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
-        return;
-      }
+      if (!VerifyControl() || !VerifyControl('N')) return;
       wepy.redirectTo({
-        url: '/pages/publish/publish'
+        url: '/pages/publish/publish',
       });
     },
     async initList({ page = 1, same_city = 0, opposite = '' }) {
@@ -181,7 +174,7 @@ export default class Discover extends wepy.page {
       const List = await get(DISCOVER_MOMENT_LIST, {
         page,
         same_city,
-        opposite
+        opposite,
       });
       this.loading = false;
       if (!List.length && page != 1) {
@@ -204,13 +197,13 @@ export default class Discover extends wepy.page {
       //         opposite: this.opposite,
       //     });
       // }, 500);
-    }
+    },
   };
   pageTuring() {
     this.methods.initList.call(this, {
       page: (this.page += 1),
       same_city: this.same_city,
-      opposite: this.opposite
+      opposite: this.opposite,
     });
     console.log(this.methods.initList);
   }
@@ -218,12 +211,13 @@ export default class Discover extends wepy.page {
     this.methods.initList.call(this, {
       page: 1,
       same_city: this.same_city,
-      opposite: this.opposite
+      opposite: this.opposite,
     });
-    // Event.listen('showVerify', status => {
-    //   this.verify = status;
-    //   this.$apply();
-    // });
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
   }
 
   onShow() {}

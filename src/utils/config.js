@@ -21,7 +21,11 @@ const CONFIG = {
 		}
 	],
 	// avChatRoomId: '@TGS#3JCCOPFG4' // 群ID, 必选,这里为了快速演示，固定了群ID，可以由您指定。
-	avChatRoomId: '@TGS#3JCCOPFG4'
+	// avChatRoomId: '@TGS#3JCCOPFG4',
+	avChatRoomId:'',
+	avChatRoom1: '@TGS#36D3WBLGY',
+	avChatRoom2: '@TGS#3B35WBLGV',
+	avChatRoom3: '@TGS#36G7WBLGA',
 };
 
 module.exports = CONFIG;

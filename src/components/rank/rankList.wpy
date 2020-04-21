@@ -56,63 +56,64 @@
 </template>
 
 <script>
-	import wepy from 'wepy';
+import wepy from 'wepy';
+import { VerifyControl } from '@/utils';
+import verify from '@/components/pop/verify/index';
+export default class Discover extends wepy.component {
+  data = {
+    verify: false,
+  };
+  props = {
+    top3: {
+      type: Array,
+      default: [],
+    },
+    topOthers: {
+      type: Array,
+      default: [],
+    },
+    by: {
+      type: String,
+      default: 'all',
+    },
+  };
+  components = {
+    verify,
+  };
 
-	import verify from '@/components/battle/module/verify';
-	export default class Discover extends wepy.component {
-	  data = {
-		  verify:false
-	  };
-	  props = {
-	    top3: {
-	      type: Array,
-	      default: []
-	    },
-	    topOthers: {
-	      type: Array,
-	      default: []
-	    },
-	    by: {
-	      type: String,
-	      default: 'all'
-	    }
-	  };
-	  components = {
-		  verify
-	  };
+  events = {
+    close() {
+      this.verify = false;
+    },
+  };
 
-	  events = {
-		  close(){
-			  this.verify = false;
-		  }
-	  };
+  watch = {};
 
-	  watch = {};
+  computed = {};
+  methods = {};
+  onLoad() {
+    console.log(this.top3);
+    console.log(this.topOthers);
+  }
 
-	  computed = {};
-	  methods = {};
-	  onLoad() {
-	    console.log(this.top3);
-	    console.log(this.topOthers);
-	  }
-
-	  onShow() {
-	    console.log(this.top3);
-	    console.log(this.topOthers);
-	  }
-	  methods = {
-	    toProfile(e) {
-	      if (!wepy.getStorageSync('hasProfile')) {
-	        this.verify = true;
-	        return;
-	      }
-	      const { id } = e.currentTarget.dataset;
-	      wepy.navigateTo({
-	        url: `/pages/battle/profile?id=${id}`
-	      });
-	    }
-	  };
-	}
+  onShow() {
+    console.log(this.top3);
+    console.log(this.topOthers);
+  }
+  methods = {
+    toProfile(e) {
+      //   if (!wepy.getStorageSync('hasProfile')) {
+      //     this.verify = true;
+      //     return;
+      //   }
+      if (!VerifyControl()) return;
+      const { id } = e.currentTarget.dataset;
+      wepy.navigateTo({
+        url: `/pages/battle/profile?id=${id}`,
+      });
+    },
+  };
+}
 </script>
 
 <style lang='less'>

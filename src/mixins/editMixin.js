@@ -69,6 +69,7 @@ export default class Mixin extends wepy.mixin {
 				this.actions[1].disabled = false;
 			}
 		}
+		this.heightIndex = this.heightList.indexOf(this.profile.height);
 		this.$apply();
 	}
 	onShow() {

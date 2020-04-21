@@ -1,17 +1,17 @@
 <!--  -->
 <template>
-	<view class='upgrade-wrap {{levelInfo.level}}'>
+	<view class='upgrade-wrap {{level}}'>
 		<image class="close" @tap="close" src="https://images.facedog.cn/mp/upgrade/close.png" mode="scaleToFill" lazy-load="false">
 		</image>
 		<view class="text">{{fromHome?'你的当前等级为:':'你的等级提升至:'}}</view>
 		<view class="tip-wrap">
-			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{levelInfo.level}}-1.png" mode="scaleToFill" lazy-load="false">
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{level}}-1.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
-			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{levelInfo.level}}-2.png" mode="scaleToFill" lazy-load="false">
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{level}}-2.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
-			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{levelInfo.level}}-3.png" mode="scaleToFill" lazy-load="false">
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{level}}-3.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
-			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{levelInfo.level}}-4.png" mode="scaleToFill" lazy-load="false">
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{level}}-4.png?1" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 		<view class="btn" @tap="go">查看详情</view>
@@ -28,7 +28,7 @@ export default class Upgrade extends wepy.component {
   data = {
     upgradeType: '', // N,R,SR,SSR
     checked: false,
-    levelInfo: {},
+    level: '',
     fromHome: false,
   };
 
@@ -46,10 +46,10 @@ export default class Upgrade extends wepy.component {
     close() {
       this.$emit('close');
     },
-    setLevel(levelInfo, fromHome) {
+    setLevel(level, fromHome) {
       if (fromHome) this.fromHome = fromHome;
 
-      this.levelInfo = levelInfo;
+      this.level = level;
     },
     go() {
       if (

@@ -1,7 +1,7 @@
 <!--  -->
 <template>
 	<view class='container-moment' wx:if="{{list.length}}">
-		<view class="line"></view>
+		<!-- <view class="line"></view>
 		<view class="tabs">
 			<view @tap="tabClick('big')" class="tab {{big?'active':''}}">
 				<image wx:if="{{big}}" src="https://images.facedog.cn/public/profile/icon-big-active.png" mode="scaleToFill" lazy-load="false">
@@ -18,7 +18,7 @@
 		</view>
 		<view class="ta-moment-list-page" wx:if="{{big}}">
 			<momentCard></momentCard>
-		</view>
+		</view> -->
 		<view class="small-list" wx:else>
 			<repeat for="{{imgList}}" key="index" index="index" item="item">
 				<image @tap="preview({{index}})" src="{{item}}?x-oss-process=image/resize,w_180,h_180/format,jpg" mode="aspectFill" lazy-load="false">

@@ -133,15 +133,15 @@ const recordOptions = {
   sampleRate: 44100,
   numberOfChannels: 1,
   encodeBitRate: 192000,
-  format: 'aac' // 音频格式，选择此格式创建的音频消息，可以在即时通信 IM 全平台（Android、iOS、微信小程序和Web）互通
+  format: 'aac', // 音频格式，选择此格式创建的音频消息，可以在即时通信 IM 全平台（Android、iOS、微信小程序和Web）互通
 };
 var loading = false;
 export default class ChatRoom extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
-      navbar: '../../components/navbar/index'
-    }
+      navbar: '../../components/navbar/index',
+    },
   };
   data = {
     nextReqMessageID: '',
@@ -175,7 +175,7 @@ export default class ChatRoom extends wepy.page {
     recordShow: false,
     inputHeight: 0,
     isFocus: false,
-    groupMemberNumber: 0
+    groupMemberNumber: 0,
   };
 
   components = {};
@@ -187,7 +187,7 @@ export default class ChatRoom extends wepy.page {
       .getMessageList({
         conversationID,
         nextReqMessageID: this.nextReqMessageID,
-        count: 20
+        count: 20,
       })
       .then(function(res) {
         console.log(res);
@@ -319,7 +319,7 @@ export default class ChatRoom extends wepy.page {
       let id = e.currentTarget.dataset.id;
       if (id == 'administrator') return;
       wx.navigateTo({
-        url: `../battle/profile?dentifier=${e.currentTarget.dataset.id}`
+        url: `../battle/profile?dentifier=${e.currentTarget.dataset.id}`,
       });
     },
     deleteInput() {
@@ -339,14 +339,14 @@ export default class ChatRoom extends wepy.page {
       this.messageSend(content);
       //     }
       //   });
-    }
+    },
   };
   messageSend(content) {
     var that = this;
     const message = wx.$app.createTextMessage({
       to: that.id || Config.avChatRoomId,
       conversationType: that.id ? 'C2C' : 'GROUP',
-      payload: { text: content }
+      payload: { text: content },
     });
     message.sendTime = formatDateFromSeconds(
       parseInt(new Date().getTime() / 1000)
@@ -360,7 +360,7 @@ export default class ChatRoom extends wepy.page {
     message.virtualDom = decodeElement(message);
     that.msgList.push(message);
     that.$apply();
-    wx.$app.sendMessage(message).then(res => {
+    wx.$app.sendMessage(message).then((res) => {
       console.log('!!!!', res);
       that.msgList.forEach((item, index) => {
         if (index == that.msgList.length - 1) {
@@ -368,7 +368,7 @@ export default class ChatRoom extends wepy.page {
         }
       });
       that.setData({
-        msgList: that.msgList
+        msgList: that.msgList,
       });
     });
     that.toview = `chat${that.msgList.length - 1}`;
@@ -378,7 +378,7 @@ export default class ChatRoom extends wepy.page {
   }
   startRecording() {
     wx.getSetting({
-      success: res => {
+      success: (res) => {
         let auth = res.authSetting['scope.record'];
         if (auth === false) {
           // 已申请过授权，但是用户拒绝
@@ -389,16 +389,16 @@ export default class ChatRoom extends wepy.page {
                 wx.showToast({
                   title: '授权成功',
                   icon: 'success',
-                  duration: 1500
+                  duration: 1500,
                 });
               } else {
                 wx.showToast({
                   title: '授权失败',
                   icon: 'none',
-                  duration: 1500
+                  duration: 1500,
                 });
               }
-            }
+            },
           });
         } else if (auth === true) {
           // 用户已经同意授权
@@ -412,9 +412,9 @@ export default class ChatRoom extends wepy.page {
               wx.showToast({
                 title: '授权成功',
                 icon: 'success',
-                duration: 1500
+                duration: 1500,
               });
-            }
+            },
           });
         }
       },
@@ -422,9 +422,9 @@ export default class ChatRoom extends wepy.page {
         wx.showToast({
           title: '授权失败',
           icon: 'none',
-          duration: 1500
+          duration: 1500,
         });
-      }
+      },
     });
   }
 
@@ -437,11 +437,9 @@ export default class ChatRoom extends wepy.page {
   async onLoad(options) {
     let that = this;
     this.id = options.id;
+
     this.conversationID = options.conversationID;
     this.profile = wx.getStorageSync('profile');
-    this.groupMemberNumber = 150 + await post(GET_CHATROOM_MEMBER, {
-      dentifier: this.profile.dentifier
-    });
     if (this.id) {
       if (this.id == 'administrator') {
         this.user.nick_name = '颜狗客服';
@@ -452,7 +450,7 @@ export default class ChatRoom extends wepy.page {
           this.user = result;
           this.user.face = Math.floor(this.user.face * 100);
           this.user.age = getAge(this.user.birthday);
-          this.user.images.forEach(item => {
+          this.user.images.forEach((item) => {
             if (item.is_avatar) {
               this.user.avatar =
                 item.image +
@@ -464,12 +462,18 @@ export default class ChatRoom extends wepy.page {
       }
       this.getMessageList();
     } else {
+      this.groupMemberNumber =
+        150 +
+        (await post(GET_CHATROOM_MEMBER, {
+          dentifier: this.profile.dentifier,
+          room: options.type,
+        }));
       let promise = wx.$app.joinGroup({
         groupID: Config.avChatRoomId,
-        type: wx.TIM.TYPES.GRP_PUBLIC
+        type: wx.TIM.TYPES.GRP_PUBLIC,
       });
       promise
-        .then(imResponse => {
+        .then((imResponse) => {
           switch (imResponse.data.status) {
             case wx.TIM.TYPES.JOIN_STATUS_WAIT_APPROVAL: // 等待管理员同意
               break;
@@ -495,7 +499,7 @@ export default class ChatRoom extends wepy.page {
     recorderManager.onPause(() => {
       console.log('recorder pause');
     });
-    recorderManager.onStop(res => {
+    recorderManager.onStop((res) => {
       console.log('recorder stop');
       wx.hideLoading();
       if (this.canSend) {
@@ -506,8 +510,8 @@ export default class ChatRoom extends wepy.page {
             to: this.id || Config.avChatRoomId,
             conversationType: this.id ? 'C2C' : 'GROUP',
             payload: {
-              file: res
-            }
+              file: res,
+            },
           });
 
           message.sendTime = formatDateFromSeconds(
@@ -521,7 +525,7 @@ export default class ChatRoom extends wepy.page {
               : parseInt(new Date().getTime() / 1000);
           that.msgList.push(message);
           that.$apply();
-          wx.$app.sendMessage(message).then(res => {
+          wx.$app.sendMessage(message).then((res) => {
             console.log('!!!!', res);
             that.msgList.forEach((item, index) => {
               if (index == that.msgList.length - 1) {
@@ -529,7 +533,7 @@ export default class ChatRoom extends wepy.page {
               }
             });
             that.setData({
-              msgList: that.msgList
+              msgList: that.msgList,
             });
           });
           this.msgContent = '';
@@ -554,13 +558,13 @@ export default class ChatRoom extends wepy.page {
           that.scrollHeight = wx.getSystemInfoSync().windowHeight - 124;
           that.$apply();
         }
-      }
+      },
     });
 
     this.$apply();
   }
   onShow() {
-    Event.listen('receiveMessage', message => {
+    Event.listen('receiveMessage', (message) => {
       if (this.id && message.conversationType === 'GROUP') return;
       if (message.type == 'TIMTextElem') {
         message.virtualDom = decodeElement(message);
@@ -575,7 +579,7 @@ export default class ChatRoom extends wepy.page {
     if (this.id)
       wx.$app
         .setMessageRead({ conversationID: this.conversationID })
-        .then(imResponse => {
+        .then((imResponse) => {
           console.log('messageRead:', imResponse);
         })
         .catch(function(imError) {

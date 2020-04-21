@@ -28,6 +28,8 @@ export const FRIENDS_LIST = '/api/user/contacts';
 export const AGREE_FRIEND = '/api/face/join_contact';
 // 排行榜页面
 export const RANK_LIST = '/api/face/list';
+// 月榜
+export const MONTH_RANK_LIST = '/api/face/month/list';
 // 用户设置
 export const USER_SETTING = '/api/user/settings';
 // 获取用户喜欢次数
@@ -106,10 +108,22 @@ export const SETTING_LOCATION = '/api/v1.5/user/modify_location'
 // 获取聊天室人数
 export const GET_CHATROOM_MEMBER = '/api/v1.5/dentifier_count'
 // 删除红包
-export const DELETE_REDPACKAGE = '/api/delete_request'
+export const DELETE_REDPACKAGE = '/api/user/delete_request'
 // 查看当前等级信息
 export const GET_LEVEL_INFO = '/v3/api/level/see';
 // 评级升级
 export const UPGRADE_LEVEL = '/v3/api/level/upgrade';
 // 真人视频认证
 export const VIDEO_VERIFY = '/api/certify/video';
+// 聊天室人数统计
+export const ROOM_COUNT = '/api/v1.5/room_count';
+// 用户举报
+export const USER_REPORT = '/api/user/report';
+// 赏金模式pk列表
+export const REWARD_BATTLE_LIST = '/api/reward/battle';
+// 赏金模式battle提交
+export const REWARD_BATTLE_COMMIT = '/api/reward/battle_commit';
+// 修改用户身高，人设，心愿
+export const SETTING_PROFILE_EXTRA = '/api/user/interest';
+// 获取人设数据
+export const GET_USER_CHARACTER = '/api/user/get_characters';

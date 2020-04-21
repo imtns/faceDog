@@ -53,32 +53,42 @@
 			<image @tap="goVipBuy" src="https://images.facedog.cn/public/vip/btn-gree.png" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
+
 	</view>
+	<block wx:if="{{showVerify}}">
+		<verify />
+	</block>
 </template>
 
 <script>
 import wepy from 'wepy';
 import { NEW_PROFILE } from '@/utils/url';
 import { get } from '@/utils/request';
-import { formatTimeShort, toast } from '@/utils';
+import { Event } from '@/utils/event.js';
+import verify from '@/components/pop/verify/index';
+import { formatTimeShort, toast, VerifyControl } from '@/utils';
 export default class SuperVip extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
-      navbar: '../../components/navbar/index'
-    }
+      navbar: '../../components/navbar/index',
+    },
   };
 
   data = {
     isVip: true,
     profile: {},
-    isPhone: false
+    isPhone: false,
+    showVerify: false,
   };
 
-  components = {};
+  components = {
+    verify,
+  };
 
   methods = {
     goCoinBuy() {
+      if (!VerifyControl() || !VerifyControl('N')) return;
       if (this.profile.progress != 'finish') {
         toast('你还未通过认证，暂时不能购买');
         return;
@@ -90,6 +100,7 @@ export default class SuperVip extends wepy.page {
       wepy.navigateTo({ url: 'coinBuy' });
     },
     goVipBuy() {
+      if (!VerifyControl()) return;
       if (this.profile.vip) {
         toast('你已经是会员了');
         return;
@@ -98,7 +109,7 @@ export default class SuperVip extends wepy.page {
         return;
       }
       wepy.navigateTo({ url: 'vipBuy' });
-    }
+    },
   };
 
   events = {};
@@ -107,7 +118,13 @@ export default class SuperVip extends wepy.page {
 
   computed = {};
 
-  onLoad() {}
+  onLoad() {
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
+  }
 
   async onShow() {
     this.profile = await get(NEW_PROFILE, { loading: false });
@@ -122,7 +139,7 @@ export default class SuperVip extends wepy.page {
           that.isPhone = true;
           that.$apply();
         }
-      }
+      },
     });
     // this.profile.vip = true;
     // this.profile.vip_expire = '2020-20-20';

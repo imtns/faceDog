@@ -1,4 +1,4 @@
-import { toast } from './index';
+import { toast, VerifyControl } from './index';
 import wepy from 'wepy';
 let baseUrl = wepy.$appConfig.baseUrl;
 const http = (method, ...props) => new Promise((resolve, reject) => {
@@ -43,11 +43,17 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
 				if (data.return_code === 0) {
 					resolve(data.data);
 				} else {
-					if (data.message == '用户未审核') {
-						toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
-					} else {
-						if (data.message !== '用户未完善资料' && data.message !== '未完善资料') { toast(data.message || '服务器开小差了, 请稍后再试'); }
+					if (data.message == '用户未完善资料') {
+						if (!VerifyControl()) return;
+						// toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
 					}
+					else if (data.return_code == 1003) {
+						if (data.data.msg == '需要切换等级') {
+							VerifyControl('', 'showSameLevel')
+						} else if (!VerifyControl('', 'levelUnmatch')) return;
+					}
+					else if (data.message !== '用户未完善资料' && data.message !== '未完善资料') { toast(data.message || '服务器开小差了, 请稍后再试'); }
+
 					reject(data.message);
 				}
 			},

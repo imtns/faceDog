@@ -11,6 +11,14 @@
 				<!-- <van-switch checked="{{ opposite_sex }}" @change="onChange('opposite_sex')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" /> -->
 			</view>
 		</view>
+		<view class='item'>
+			<view class="title">只看</view>
+			<view class="detail3">
+				<view @tap="setBattleLevel('R')" class="sex-btn {{level=='R'?'active':''}}">R</view>
+				<view @tap="setBattleLevel('SR')" class="sex-btn {{level=='SR'?'active':''}}">SR</view>
+				<!-- <van-switch checked="{{ opposite_sex }}" @change="onChange('opposite_sex')" active-color="#090909" inactive-color="#cfcfcf" size="24rpx" /> -->
+			</view>
+		</view>
 		<view class="line"></view>
 		<view class='item'>
 			<view class="title">距离优先（只显示500km范围）</view>
@@ -73,8 +81,8 @@ export default class Setting extends wepy.page {
       'van-button': '../../components/vant/button/index',
       'van-icon': '../../components/vant/icon/index',
       'van-switch': '../../components/vant/switch/index',
-      'van-area': '../../components/vant/area/index'
-    }
+      'van-area': '../../components/vant/area/index',
+    },
   };
 
   data = {
@@ -83,13 +91,15 @@ export default class Setting extends wepy.page {
       in_city: false,
       no_battle: false,
       no_location: false,
-      location: false
+      location: false,
+      show: 'SR',
     },
     areaList: [],
     show: false,
     selectCity: '',
     gender: 1,
-    profile: {}
+    level: '',
+    profile: {},
   };
 
   components = {};
@@ -104,7 +114,7 @@ export default class Setting extends wepy.page {
 
       post(SETTING_LOCATION, {
         province,
-        city
+        city,
       });
       this.show = false;
     },
@@ -145,7 +155,14 @@ export default class Setting extends wepy.page {
       Event.trigger('battleFresh');
       this.$apply();
       console.log(status);
-    }
+    },
+    async setBattleLevel(level) {
+      this.level = level;
+      this.setting.show = level;
+      await put(USER_SETTING, this.setting);
+      Event.trigger('battleFresh');
+      this.$apply();
+    },
   };
 
   events = {};
@@ -161,6 +178,7 @@ export default class Setting extends wepy.page {
     const result = await get(USER_SETTING);
     Object.assign(this.setting, result);
     this.gender = result.opposite_sex ? 1 : 2;
+    this.level = result.show;
     this.areaList = area;
     this.$apply();
   }
