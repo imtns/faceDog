@@ -35,9 +35,9 @@ export default class SquareMessage extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
-	  navbar: '../../components/navbar/index',
-	  'van-toast': '../../components/vant/toast/index'
-    }
+      navbar: '../../components/navbar/index',
+      'van-toast': '../../components/vant/toast/index',
+    },
   };
 
   data = {
@@ -45,12 +45,12 @@ export default class SquareMessage extends wepy.page {
     type: {
       comment: '评论了',
       like: '喜欢了',
-      reply: '回复'
-    }
+      reply: '回复',
+    },
   };
 
   components = {
-    empty
+    empty,
   };
   async initData() {
     const result = await get(USER_MSG_UNREAD);
@@ -65,7 +65,7 @@ export default class SquareMessage extends wepy.page {
       try {
         await post(USER_MSG_UNREAD, {
           id,
-          unread_type: type
+          unread_type: type,
         });
         this.list.splice(index, 1);
         Toast('删除成功');
@@ -74,7 +74,7 @@ export default class SquareMessage extends wepy.page {
     },
     redirect(id) {
       wepy.navigateTo({ url: `/pages/ta/momentDetail?momentId=${id}` });
-    }
+    },
   };
 
   events = {};
@@ -144,6 +144,8 @@ export default class SquareMessage extends wepy.page {
 	        font-size: 24rpx;
 	        font-family: PingFang SC;
 	        font-weight: 300;
+	        display: inline-block;
+	        padding: 5rpx;
 	        color: rgba(229, 0, 17, 1);
 	      }
 	    }

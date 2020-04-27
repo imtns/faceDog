@@ -127,3 +127,13 @@ export const REWARD_BATTLE_COMMIT = '/api/reward/battle_commit';
 export const SETTING_PROFILE_EXTRA = '/api/user/interest';
 // 获取人设数据
 export const GET_USER_CHARACTER = '/api/user/get_characters';
+// 打开赏金红包
+export const REWARD_OPEN = '/api/reward/open';
+// 聊天列表获取用户信息
+export const GET_CHATLIST_USERINFO = '/api/user/get_battle';
+// 获取用户已赚取红包
+export const GET_USER_MONEY = '/api/reward/info';
+// 获取聊天室相关人数
+export const GET_ROOM_INFO = '/api/user/enter_house';
+// 注册时保存微信
+export const ADD_REG_WECHAT = '/api/user/add_wechat';

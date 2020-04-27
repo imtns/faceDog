@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-	<view class='upgrade-wrap {{level}}'>
+	<view class='upgrade-wrap {{level}}' wx:if="{{level}}">
 		<image class="close" @tap="close" src="https://images.facedog.cn/mp/upgrade/close.png" mode="scaleToFill" lazy-load="false">
 		</image>
 		<view class="text">{{fromHome?'你的当前等级为:':'你的等级提升至:'}}</view>
@@ -48,7 +48,7 @@ export default class Upgrade extends wepy.component {
     },
     setLevel(level, fromHome) {
       if (fromHome) this.fromHome = fromHome;
-
+      console.log('level!!!!!!!~~~~~~~~~~~~~~~~!', level);
       this.level = level;
     },
     go() {

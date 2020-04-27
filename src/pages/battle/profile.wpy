@@ -46,7 +46,7 @@
 						<view class="user-info">
 							<image class="{{profile.level}}" src="https://images.facedog.cn/mp/profile/{{profile.level}}.png" mode="scaleToFill" lazy-load="false">
 							</image>
-							<view class="user-name">{{profile.nick_name}}<image class="verify" src="https://images.facedog.cn/mp/profile/icon-verify.png" mode="scaleToFill" lazy-load="false">
+							<view class="user-name">{{profile.nick_name}}<image class="verify" wx:if="{{profile.video_audit == 'finish'}}" src="https://images.facedog.cn/mp/profile/icon-verify.png" mode="scaleToFill" lazy-load="false">
 								</image>
 							</view>
 							<view class="user-desc">
@@ -115,7 +115,7 @@
 							</view>
 						</repeat>
 						<view class="bottom-btn" wx:if="{{me.ID != profile.ID}}">
-							<view class="btn">发起挑战</view>
+							<view class="btn" @tap="challenge">发起挑战</view>
 							<view class="btn" @tap="reportShow">举报用户</view>
 						</view>
 					</view>
@@ -218,6 +218,9 @@ export default class Profile extends wepy.page {
   };
 
   methods = {
+    challenge() {
+      Toast('功能开发中，敬请期待');
+    },
     onReportSelect(event) {
       console.log(event.detail);
       post(USER_REPORT, {
@@ -341,7 +344,7 @@ export default class Profile extends wepy.page {
   async onLoad(options) {
     var that = this;
     this.isphoneX = this.$parent.globalData.isphoneX;
-    this.scrollHeight = systemInfo.windowHeight - 80;
+    this.scrollHeight = systemInfo.windowHeight - (this.isphoneX ? 100 : 80);
     this.id = options.id;
     index = options.index;
     position = options.position;
@@ -457,7 +460,7 @@ export default class Profile extends wepy.page {
 	      position: absolute;
 	      top: 0;
 	      left: 0;
-	      z-index: 999;
+	      z-index: 98;
 	    }
 	    .cover-bottom {
 	      width: 700rpx;
@@ -468,7 +471,7 @@ export default class Profile extends wepy.page {
 	      position: absolute;
 	      bottom: 0;
 	      left: 0;
-	      z-index: 999;
+	      z-index: 98;
 	    }
 	    #scroll-content {
 	      position: relative;
@@ -577,6 +580,7 @@ export default class Profile extends wepy.page {
 	  .wrap {
 	    background: #1b1a28;
 	    width: 100%;
+	    padding-bottom: 15rpx;
 	    // border-radius: 0 0 30rpx 30rpx;
 	    .moment-box {
 	      background: rgba(0, 0, 0, 1);

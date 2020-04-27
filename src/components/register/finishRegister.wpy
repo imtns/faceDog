@@ -9,10 +9,16 @@
 		<view class='wrap'>
 			<view class='field'>
 				<view class='label'>输入真实微信号(选填)</view>
-				<input class='input' @change='onName' type='text' placeholder='不公开，任何人不经你同意无法查看' placeholder-class='placeholder' />
+				<input class='input'
+				       @change='onName'
+				       type='text'
+				       placeholder='不公开，任何人不经你同意无法查看'
+				       placeholder-class='placeholder' />
 			</view>
-			<button class='verify2' @tap='finishRegister'>完成注册</button>
-			<button class="verify1" @tap='goPass'>跳过</button>
+			<button class='verify2'
+			        @tap='finishRegister'>完成注册</button>
+			<button class="verify1"
+			        @tap='goPass'>跳过</button>
 		</view>
 	</view>
 </template>
@@ -20,7 +26,12 @@
 <script>
 import wepy from 'wepy';
 import { get, post } from '@/utils/request';
-import { USER_VERIFY, VERIFY, SUBMIT_FORMID } from '@/utils/url';
+import {
+  USER_VERIFY,
+  VERIFY,
+  SUBMIT_FORMID,
+  ADD_REG_WECHAT,
+} from '@/utils/url';
 import { toast, sleep } from '@/utils';
 export default class FinishRegister extends wepy.component {
   config = {
@@ -60,6 +71,9 @@ export default class FinishRegister extends wepy.component {
         toast('请填写微信号');
         return;
       }
+      await post(ADD_REG_WECHAT, {
+        wechat: this.wechat,
+      });
       this.redirect();
     },
     goPass() {

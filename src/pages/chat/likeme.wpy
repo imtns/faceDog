@@ -8,6 +8,9 @@
 	<block wx:if="{{!list.length && show}}">
 		<empty></empty>
 	</block>
+	<block wx:if="{{showVerify}}">
+		<verify />
+	</block>
 	<view class='container' wx:else>
 		<repeat for="{{list}}" key="index" index="index" item="item">
 			<view class="box">
@@ -39,7 +42,9 @@ import wepy from 'wepy';
 import { getAge } from '@/utils';
 import { get, post } from '@/utils/request';
 import empty from '@/components/empty';
+import { Event } from '@/utils/event.js';
 import Toast from '@/components/vant/toast/toast';
+import verify from '@/components/pop/verify/index';
 import loadingHeart from '@/components/battle/module/loadingHeart';
 import { LIKE_ME, AGREE_FRIEND, MAKEFRIEND, DELETE_ENJOY } from '@/utils/url';
 export default class LikeMe extends wepy.page {
@@ -48,18 +53,20 @@ export default class LikeMe extends wepy.page {
     enablePullDownRefresh: true,
     usingComponents: {
       navbar: '../../components/navbar/index',
-      'van-toast': '../../components/vant/toast/index'
-    }
+      'van-toast': '../../components/vant/toast/index',
+    },
   };
 
   data = {
     list: [],
-    show: false
+    show: false,
+    showVerify: false,
   };
 
   components = {
     empty,
-    loadingHeart
+    loadingHeart,
+    verify,
   };
 
   methods = {
@@ -67,7 +74,7 @@ export default class LikeMe extends wepy.page {
       wepy.showLoading({
         title: '', //提示的内容,
         mask: true, //显示透明蒙层，防止触摸穿透,
-        success: res => {}
+        success: (res) => {},
       });
       await post(DELETE_ENJOY, { user_id: id });
       Toast('删除成功');
@@ -81,7 +88,7 @@ export default class LikeMe extends wepy.page {
       //   });
       await post(MAKEFRIEND, {
         to_be: 'friend',
-        user_id: user._id
+        user_id: user._id,
       });
       wepy.setStorageSync(
         'chatIcon',
@@ -93,18 +100,18 @@ export default class LikeMe extends wepy.page {
           user.nick_name
         }&icon=${encodeURI(
           `${user.avatar}?x-oss-process=image/resize,w_100,h_100/format,jpg`
-        )}`
+        )}`,
       });
     },
     goProfile(id) {
       console.log(id);
       wx.navigateTo({
         url: `../battle/profile?id=${id}`,
-        success: result => {},
+        success: (result) => {},
         fail: () => {},
-        complete: () => {}
+        complete: () => {},
       });
-    }
+    },
   };
   onPullDownRefresh() {
     this.initData();
@@ -116,6 +123,11 @@ export default class LikeMe extends wepy.page {
   computed = {};
 
   onShow() {
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
     this.initData();
   }
   async initData() {
@@ -123,7 +135,7 @@ export default class LikeMe extends wepy.page {
     // this.list = result;
     // console.warn(this.list);
     this.list = [];
-    result.forEach(item => {
+    result.forEach((item) => {
       this.list.push(...item.users);
       //   item.day = item.date_time.split('-')[2];
       //   item.month = new Date(item.date_time).toDateString().split(' ')[1];

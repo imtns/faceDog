@@ -226,10 +226,11 @@ function VerifyControl(checkLevel, type) {
 		Event.trigger('showVerify', true, type);
 		return false;
 	}
-	if (profile.level == checkLevel) {
+	if (profile.level == checkLevel || profile.progress == 'refuse') {
 		Event.trigger('showVerify', true, 'needLevel');
 		return false;
 	}
+
 	if (!profile.level) {
 		Event.trigger('showVerify', true, 'unLevel');
 		return false;

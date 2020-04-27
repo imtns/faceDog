@@ -1,76 +1,129 @@
 <!--  -->
 <template>
 	<navbar title="{{id?user.nick_name:'Cpdd聊天室 （'+groupMemberNumber + '人)'}}"></navbar>
-	<view class="chat" @longpress="handleLongPress" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
-		<scroll-view class="scrollView" scroll-y scroll-with-animation="{{false}}" bindscrolltoupper="getMoreData" upper-threshold="300" style="height:{{scrollHeight - inputHeight - (showEmoji?'180':0)}}px;" scroll-into-view="{{toview}}">
-			<view class="chatBox-content-demo" @tap="hideEmoji" wx:for="{{msgList}}" id="chat{{index}}" wx:key="index">
-				<view class="clearfloat" wx:if="{{!item.isSend}}" style="margin-bottom:{{index == msgList.length-1 && isphoneX?'170rpx':''}}">
-					<view class="author-name" wx:if="{{item.showtime}}">
+	<view class="chat"
+	      @longpress="handleLongPress"
+	      @touchmove="handleTouchMove"
+	      @touchend="handleTouchEnd">
+		<scroll-view class="scrollView"
+		             scroll-y
+		             scroll-with-animation="{{false}}"
+		             bindscrolltoupper="getMoreData"
+		             upper-threshold="300"
+		             style="height:{{scrollHeight - inputHeight - (showEmoji?'180':0)}}px;"
+		             scroll-into-view="{{toview}}">
+			<view class="chatBox-content-demo"
+			      @tap="hideEmoji"
+			      wx:for="{{msgList}}"
+			      id="chat{{index}}"
+			      wx:key="index">
+				<view class="clearfloat"
+				      wx:if="{{!item.isSend}}"
+				      style="margin-bottom:{{index == msgList.length-1 && isphoneX?'170rpx':''}}">
+					<view class="author-name"
+					      wx:if="{{item.showtime}}">
 						<text class="chat-date">{{item.sendTime}}</text>
 					</view>
-					<view class="left" style="margin-bottom:40rpx;" wx:if="{{Complete && index == 0 && id !='administrator' && id}}">
+					<view class="left"
+					      style="margin-bottom:40rpx;"
+					      wx:if="{{Complete && index == 0 && id !='administrator' && id}}">
 						<view class="chat-avatars">
-							<image src="{{user.avatar}}" class="avatar" mode="aspectFill" data-id="{{user.dentifier ||item.from}}" bindtap="goProfile"></image>
+							<image src="{{user.avatar}}"
+							       class="avatar"
+							       mode="aspectFill"
+							       data-id="{{user.dentifier ||item.from}}"
+							       bindtap="goProfile"></image>
 						</view>
-						<view class="profile-image " wx:if="{{index==0}}" data-id="{{user.dentifier ||item.from}}" bindtap="goProfile">
-							<image class="thumb" src="{{user.avatar}}" mode="aspectFill"></image>
+						<view class="profile-image "
+						      wx:if="{{index==0}}"
+						      data-id="{{user.dentifier ||item.from}}"
+						      bindtap="goProfile">
+							<image class="thumb"
+							       src="{{user.avatar}}"
+							       mode="aspectFill"></image>
 							<view class="profile-desc {{user.be || 'friend'}}">
 								<view class="left-container">
 									<view class="top">{{user.nick_name}} {{user.age}}岁/{{user.constellation}}</view>
 									<view class="bottom">在全国颜值排名前{{user.face}}%</view>
 								</view>
 								<view class="right-container">
-									<image class="like-icon" src="https://images.facedog.cn/public/profile/{{item.be || 'friend'}}.png?v2" mode="aspectFill"></image>
+									<image class="like-icon"
+									       src="https://images.facedog.cn/public/profile/{{item.be || 'friend'}}.png?v2"
+									       mode="aspectFill"></image>
 								</view>
 							</view>
 						</view>
 					</view>
 					<view class="{{item.flow == 'in'?'left':'right'}}">
 						<view class="chat-avatars">
-							<image wx:if="{{item.flow == 'in'}}" src="{{user.avatar || item.avatar}}" class="avatar" data-id="{{user.dentifier ||item.from}}" mode="aspectFill" bindtap="goProfile"></image>
+							<image wx:if="{{item.flow == 'in'}}"
+							       src="{{user.avatar || item.avatar}}"
+							       class="avatar"
+							       data-id="{{user.dentifier ||item.from}}"
+							       mode="aspectFill"
+							       bindtap="goProfile"></image>
 						</view>
-						<view class="load" wx:if="{{item.from === profile.dentifier && item.status === 'unSend'}}">
+						<view class="load"
+						      wx:if="{{item.from === profile.dentifier && item.status === 'unSend'}}">
 							<view class="{{item.status}}">
 							</view>
 						</view>
-						<view wx:if="{{!id && item.flow == 'in'}}" style="display:inline-block;position:relative;top:-24rpx;">
+						<view wx:if="{{!id && item.flow == 'in'}}"
+						      style="display:inline-block;position:relative;top:-24rpx;">
 							<view class="user-name">{{item.nick}}</view>
 							<view class="chat-message">
 
 								<block wx:if="{{item.type == 'TIMTextElem'}}">
-									<repeat for="{{item.virtualDom}}" key="index1" index="index1" item="item1">
+									<repeat for="{{item.virtualDom}}"
+									        key="index1"
+									        index="index1"
+									        item="item1">
 										<block wx:if="{{item1.name == 'span'}}">
 											<text selectable='true'>{{item1.text}}</text>
 										</block>
 										<block wx:if="{{item1.name == 'img'}}">
-											<image src="{{item1.src}}" style="width:50rpx;height:50rpx;margin:0 2rpx;" mode="scaleToFill" lazy-load="false">
+											<image src="{{item1.src}}"
+											       style="width:70rpx;height:60rpx;margin:0 2rpx;"
+											       mode="aspectFit"
+											       lazy-load="false">
 											</image>
 										</block>
 									</repeat>
 								</block>
 								<block wx:elif="{{item.type == 'TIMSoundElem'}}">
-									<view @tap="openAudio({{item.payload.url}})" style="display:flex;align-items:center;">
-										<image src="https://images.facedog.cn/public/chat/audio-play.png" style="height:44rpx;width:44rpx" />
+									<view @tap="openAudio({{item.payload.url}})"
+									      style="display:flex;align-items:center;">
+										<image src="https://images.facedog.cn/public/chat/audio-play.png"
+										       style="height:44rpx;width:44rpx" />
 										<text style="padding-left: 4rpx;font-weight: 500; font-size: 36rpx">{{item.payload.second}}s</text>
 									</view>
 								</block>
 							</view>
 						</view>
-						<view class="chat-message" wx:else>
+						<view class="chat-message"
+						      wx:else>
 							<block wx:if="{{item.type == 'TIMTextElem'}}">
-								<repeat for="{{item.virtualDom}}" key="index1" index="index1" item="item1">
+								<repeat for="{{item.virtualDom}}"
+								        key="index1"
+								        index="index1"
+								        item="item1">
 									<block wx:if="{{item1.name == 'span'}}">
 										<text selectable='true'>{{item1.text}}</text>
 									</block>
 									<block wx:if="{{item1.name == 'img'}}">
-										<image src="{{item1.src}}" style="width:50rpx;height:50rpx;margin:0 2rpx;" mode="scaleToFill" lazy-load="false">
+										<image src="{{item1.src}}"
+										       style="width:70rpx;height:60rpx;margin:0 2rpx;"
+										       mode="aspectFit"
+										       lazy-load="false">
 										</image>
 									</block>
 								</repeat>
 							</block>
 							<block wx:elif="{{item.type == 'TIMSoundElem'}}">
-								<view @tap="openAudio({{item.payload.url}})" style="display:flex;align-items:center;">
-									<image src="https://images.facedog.cn/public/chat/audio-play.png" style="height:44rpx;width:44rpx" />
+								<view @tap="openAudio({{item.payload.url}})"
+								      style="display:flex;align-items:center;">
+									<image src="https://images.facedog.cn/public/chat/audio-play.png"
+									       style="height:44rpx;width:44rpx" />
 									<text style="padding-left: 4rpx;font-weight: 500; font-size: 36rpx">{{item.payload.second}}s</text>
 								</view>
 							</block>
@@ -79,32 +132,73 @@
 				</view>
 			</view>
 		</scroll-view>
-		<view class="chatInput" style="height:82rpx;bottom:{{isFocus?inputHeight*2+10:showEmoji?350:23}}rpx">
+		<view class="chatInput"
+		      style="height:82rpx;bottom:{{isFocus?inputHeight*2+10:showEmoji?350:23}}rpx">
 			<view class="input">
-				<image style="margin-right:14rpx;" wx:if="{{!recordShow}}" @tap="audioRecordClick" src="https://images.facedog.cn/public/chat/audio.png" mode="scaleToFill" lazy-load="false"></image>
-				<image style="margin-right:14rpx;" wx:if="{{recordShow}}" @tap="audioRecordClick" src="https://images.facedog.cn/public/chat/keyboard-icon.png?1" mode="scaleToFill" lazy-load="false">
+				<image style="margin-right:14rpx;"
+				       wx:if="{{!recordShow}}"
+				       @tap="audioRecordClick"
+				       src="https://images.facedog.cn/public/chat/audio.png"
+				       mode="scaleToFill"
+				       lazy-load="false"></image>
+				<image style="margin-right:14rpx;"
+				       wx:if="{{recordShow}}"
+				       @tap="audioRecordClick"
+				       src="https://images.facedog.cn/public/chat/keyboard-icon.png?1"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
-				<view id="record" wx:if="{{recordShow}}" class="record-bar">
+				<view id="record"
+				      wx:if="{{recordShow}}"
+				      class="record-bar">
 					<block wx:if="{{!isRecording}}">按住 说话</block>
 					<block wx:else>抬起 停止</block>
 				</view>
-				<input hidden="{{recordShow}}" type="text" adjust-position="{{false}}" confirm-hold="true" confirm-type="send" placeholder="请输入消息~" bindconfirm="bindConfirm" bindfocus="bindFocus" bindinput="bindInput" bindblur="bindBlur" value="{{msgContent}}" class="input_text"></input>
-				<image style="margin-left:14rpx;" @tap="showEmojiHandler" src="https://images.facedog.cn/public/chat/smile.png" mode="scaleToFill" lazy-load="false">
+				<input hidden="{{recordShow}}"
+				       type="text"
+				       adjust-position="{{false}}"
+				       confirm-hold="true"
+				       confirm-type="send"
+				       placeholder="请输入消息~"
+				       bindconfirm="bindConfirm"
+				       bindfocus="bindFocus"
+				       bindinput="bindInput"
+				       bindblur="bindBlur"
+				       value="{{msgContent}}"
+				       class="input_text"></input>
+				<image style="margin-left:14rpx;"
+				       @tap="showEmojiHandler"
+				       src="https://images.facedog.cn/public/chat/smile.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
 			</view>
-			<view class="emojis" wx:if="{{showEmoji}}">
-				<scroll-view class="scrollView" scroll-y style="height:325rpx">
-					<repeat for="{{emojiName}}" key="index" index="index" item="item">
-						<image src="{{emojiUrl + emojiMap[item]}}" @tap="chooseEmoji({{item}})" style="width:52rpx;height:52rpx;padding:14rpx;" />
+			<view class="emojis"
+			      wx:if="{{showEmoji}}">
+				<scroll-view class="scrollView"
+				             scroll-y
+				             style="height:325rpx">
+					<repeat for="{{emojiName}}"
+					        key="index"
+					        index="index"
+					        item="item">
+						<image src="{{emojiUrl + emojiMap[item]}}"
+						       @tap="chooseEmoji({{item}})"
+						       style="width:52rpx;height:52rpx;padding:14rpx;" />
 					</repeat>
 				</scroll-view>
 				<view class="emoji-btn">
-					<image src="https://images.facedog.cn/public/chat/delete-emoji.png" @tap="deleteInput" mode="scaleToFill" />
-					<image src="https://images.facedog.cn/public/chat/send.png" @tap="bindConfirm" mode="scaleToFill" />
+					<image src="https://images.facedog.cn/public/chat/delete-emoji.png"
+					       @tap="deleteInput"
+					       mode="scaleToFill" />
+					<image src="https://images.facedog.cn/public/chat/send.png"
+					       @tap="bindConfirm"
+					       mode="scaleToFill" />
 				</view>
 			</view>
 		</view>
-		<view hidden="{{!isRecording}}" class="record-modal">
+		<view hidden="{{!isRecording}}"
+		      class="record-modal">
 			<view class="wrapper">
 				<view class="modal-loading"></view>
 			</view>

@@ -13,42 +13,51 @@
 			</image>
 			<view>已加入{{list.room2 + 150}}人</view>
 		</view>
-		<view class="room room3" style="z-index:1" @tap="goRoom(3)">
+		<!-- <view class="room room3" style="z-index:1" @tap="goRoom(3)">
 			<image src="https://images.facedog.cn/mp/chat/room3.png" mode="scaleToFill" lazy-load="false">
 			</image>
 			<view>已加入{{list.room3 + 150}}人</view>
-		</view>
+		</view> -->
 	</view>
 	<block wx:if="{{showVerify}}">
 		<verify />
 	</block>
+	<van-dialog id="van-dialog" />
 </template>
 
 <script>
 import wepy from 'wepy';
 import Config from '@/utils/config';
 import { get, post } from '@/utils/request';
-import { ROOM_COUNT } from '@/utils/url';
+import { ROOM_COUNT, GET_ROOM_INFO } from '@/utils/url';
 import { Event } from '@/utils/event.js';
-import { VerifyControl } from '@/utils';
+import { VerifyControl, toast } from '@/utils';
 import verify from '@/components/pop/verify/index';
+import Dialog from '@/components/vant/dialog/dialog';
 export default class ChatRoomList extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
       navbar: '../../components/navbar/index',
+      'van-dialog': '../../components/vant/dialog/index',
     },
   };
 
   data = {
     list: [],
     showVerify: false,
+    isPay: false,
   };
 
   components = {
     verify,
   };
   async fetchData() {
+    this.profile = wx.getStorageSync('profile');
+    this.isPay = await get(GET_ROOM_INFO, {
+      dentifier: this.profile.dentifier,
+      room: 'room3',
+    });
     this.list = await get(ROOM_COUNT);
     this.$apply();
   }
@@ -57,13 +66,28 @@ export default class ChatRoomList extends wepy.page {
       if (!VerifyControl('N')) return;
       if (room == 1) {
         Config.avChatRoomId = Config.avChatRoom1;
+        wepy.navigateTo({ url: `chatRoom?type=room${room}` });
       } else if (room == 2) {
-		if (!VerifyControl('R')) return;
+        if (!VerifyControl('R')) return;
         Config.avChatRoomId = Config.avChatRoom2;
+        wepy.navigateTo({ url: `chatRoom?type=room${room}` });
       } else {
-        Config.avChatRoomId = Config.avChatRoom3;
+        if (this.profile.coin < 500) {
+          toast('颜币不足');
+          return;
+        }
+        Dialog.confirm({
+          message: '支付500颜币进入聊天室?',
+        }).then(async () => {
+          await post(GET_ROOM_INFO, {
+            dentifier: this.profile.dentifier,
+            room: 'room3',
+          }).then(() => {
+            Config.avChatRoomId = Config.avChatRoom3;
+            wepy.navigateTo({ url: `chatRoom?type=room${room}` });
+          });
+        });
       }
-      wepy.navigateTo({ url: `chatRoom?type=room${room}` });
     },
   };
 

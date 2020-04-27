@@ -1,45 +1,82 @@
 <!--  -->
 <template>
 	<navbar title="升级任务" />
-	<view class='container' wx:if="{{loaded}}">
+	<view class='container'
+	      wx:if="{{loaded}}">
+		<view class="coin-help"
+		      @tap="levelRule">规则介绍</view>
 		<view class="banner {{level[levelIndex]}}">
-			<image class="level" src="https://images.facedog.cn/mp/upgrade/page/level-{{levelData.level}}.png" mode="scaleToFill" lazy-load="false">
+			<image class="level"
+			       src="https://images.facedog.cn/mp/upgrade/page/level-{{levelData.level}}.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
-			<image class="next-level" src="https://images.facedog.cn/mp/upgrade/page/nextLevel-{{level[levelIndex]}}.png" mode="scaleToFill" lazy-load="false">
+			<image class="next-level"
+			       src="https://images.facedog.cn/mp/upgrade/page/nextLevel-{{level[levelIndex]}}.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
-			<view class="text" wx:if="{{levelData.level !='SSR'}}">升级解锁：{{levelTip[levelIndex]}}</view>
-			<image class="loading" src="https://images.facedog.cn/mp/upgrade/page/loading-{{level[levelIndex]}}.png" mode="scaleToFill" lazy-load="false">
+			<view class="text"
+			      wx:if="{{levelData.level !='SSR'}}">升级解锁：{{levelTip[levelIndex]}}</view>
+			<image class="loading"
+			       src="https://images.facedog.cn/mp/upgrade/page/loading-{{level[levelIndex]}}.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
 		</view>
-		<image class="tip" src="https://images.facedog.cn/mp/upgrade/page/tip.png" mode="scaleToFill" lazy-load="false">
+		<image class="tip"
+		       src="https://images.facedog.cn/mp/upgrade/page/tip.png"
+		       mode="scaleToFill"
+		       lazy-load="false">
 		</image>
 		<view class="upgrade-mission">
-			<repeat for="{{mission[level[levelIndex]]}}" key="index" index="index" item="item">
+			<repeat for="{{mission[level[levelIndex]]}}"
+			        key="index"
+			        index="index"
+			        item="item">
 				<view class="mission">
-					<image wx:if="{{item.notRequire}}" src="https://images.facedog.cn/mp/upgrade/page/star.png" mode="scaleToFill" lazy-load="false">
+					<image wx:if="{{item.notRequire}}"
+					       src="https://images.facedog.cn/mp/upgrade/page/star.png"
+					       mode="scaleToFill"
+					       lazy-load="false">
 					</image>
-					<image wx:else src="https://images.facedog.cn/mp/upgrade/page/mission{{index+1}}.png" mode="scaleToFill" lazy-load="false">
+					<image wx:else
+					       src="https://images.facedog.cn/mp/upgrade/page/mission{{index+1}}.png"
+					       mode="scaleToFill"
+					       lazy-load="false">
 					</image>
 					<text>{{item.text}}</text>
-					<view class="status {{item.status==='已完成'?'finish':''}}" @tap="goFinish({{item.status}})">{{item.status}}
+					<view class="status {{item.status==='已完成'?'finish':''}}"
+					      @tap="goFinish({{item.status}})">{{item.status}}
 					</view>
 				</view>
 			</repeat>
-			<view class=" btn" wx:if="{{levelData.level !='SSR'}}">
-				<image wx:if="{{canUpgrade}}" @tap="upgrade" src="https://images.facedog.cn/mp/upgrade/page/btn.png" mode="scaleToFill" lazy-load="false">
+			<view class=" btn"
+			      wx:if="{{levelData.level !='SSR'}}">
+				<image wx:if="{{canUpgrade}}"
+				       @tap="upgrade"
+				       src="https://images.facedog.cn/mp/upgrade/page/btn.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
-				<image wx:else src="https://images.facedog.cn/mp/upgrade/page/btn-disable.png" mode="scaleToFill" lazy-load="false">
+				<image wx:else
+				       src="https://images.facedog.cn/mp/upgrade/page/btn-disable.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
 			</view>
-			<view style="text-align:center;color:#1d1d1d;" wx:else>
+			<view style="text-align:center;color:#1d1d1d;"
+			      wx:else>
 				暂无
 			</view>
 		</view>
 	</view>
-	<van-popup show="{{ showRedPackage}}" bind:close="onClose">
+	<van-popup show="{{ showRedPackage}}"
+	           bind:close="onClose">
 		<pop />
 	</van-popup>
-	<van-popup show="{{ showUpgradePop}}" bind:close="onClose">
+	<van-popup show="{{ showUpgradePop}}"
+	           bind:close="onClose">
 		<upgrade @close="close" />
 	</van-popup>
 </template> 
@@ -124,7 +161,7 @@ export default class Upgrade extends wepy.page {
           status: '',
         },
         {
-          text: '点击次数达到300次',
+          text: '滑动次数达到300次',
           status: '',
         },
       ],
@@ -137,6 +174,9 @@ export default class Upgrade extends wepy.page {
   };
 
   methods = {
+    levelRule() {
+      wepy.navigateTo({ url: 'levelRule' });
+    },
     goFinish(text) {
       if (text == '去完成') {
         wepy.navigateTo({ url: '/pages/register/verify' });
@@ -176,7 +216,7 @@ export default class Upgrade extends wepy.page {
       case 'N': {
         this.mission[data.level][0].status = data.profile ? '已完成' : '去完成';
         this.mission[data.level][1].status =
-          data.all_click_count >= 20 ? '已完成' : `${data.click_count}/20`;
+          data.click_count >= 20 ? '已完成' : `${data.click_count}/20`;
         this.mission[data.level][2].status =
           data.user_images_count >= 3
             ? '已完成'
@@ -211,9 +251,9 @@ export default class Upgrade extends wepy.page {
         break;
       }
     }
-    this.loaded = true;
+
     wepy.setStorageSync('level', this.levelData);
-    this.$invoke('upgrade', 'setLevel', this.levelData, false);
+    this.$invoke('upgrade', 'setLevel', this.levelData.level, false);
     if (isShow) {
       this.showUpgradePop = true;
     }
@@ -227,6 +267,10 @@ export default class Upgrade extends wepy.page {
         return false;
       }
     });
+    setTimeout(() => {
+      this.loaded = true;
+      this.$apply();
+    }, 500);
     wepy.hideLoading();
     this.$apply();
   }
@@ -236,6 +280,21 @@ export default class Upgrade extends wepy.page {
 
 <style lang='scss' scoped>
 	.container {
+	  .coin-help {
+	    position: absolute;
+	    right: 30rpx;
+	    top: 30rpx;
+	    width: 111rpx;
+	    height: 50rpx;
+	    border: 1rpx solid rgba(255, 255, 255, 1);
+	    opacity: 1;
+	    border-radius: 5rpx;
+	    font-size: 20rpx;
+	    color: white;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	  }
 	  width: 100%;
 	  position: relative;
 	  .banner {

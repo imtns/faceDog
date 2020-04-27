@@ -3,7 +3,7 @@
 	<view class="wrapper" wx:if="{{show}}" style="padding-top:{{isphoneX?'100rpx':'0'}};height:{{isphoneX?'93vh':'100vh'}}">
 		<view class="wrap">
 			<image class="logo-text" src="https://images.facedog.cn/public/home/logo-text.png?1" mode="aspectFill"></image>
-			<image class="beta" src="https://images.facedog.cn/public/home/icon-beta.png?1" mode="aspectFill"></image>
+			<!-- <image class="beta" src="https://images.facedog.cn/public/home/icon-beta.png?1" mode="aspectFill"></image> -->
 			<image class="logo" src="https://images.facedog.cn/public/home/home-logo.png?1" mode="aspectFill"></image>
 			<view class="bottom">
 				<form report-submit='true' bindsubmit='submitForm'>
@@ -34,8 +34,8 @@ export default class Home extends wepy.page {
   config = {
     navigationBarTitleText: '颜狗',
     usingComponents: {
-      'van-loading': '../../components/vant/loading/index'
-    }
+      'van-loading': '../../components/vant/loading/index',
+    },
   };
 
   data = {
@@ -50,7 +50,7 @@ export default class Home extends wepy.page {
     // showUserInfoButton: false,
     loading: false,
     buttonText: '',
-    select: ''
+    select: '',
   };
 
   components = {};
@@ -58,7 +58,7 @@ export default class Home extends wepy.page {
   methods = {
     async submitForm(e) {
       await post(SUBMIT_FORMID, {
-        formId: e.detail.formId
+        formId: e.detail.formId,
       });
     },
     redirect() {
@@ -72,7 +72,7 @@ export default class Home extends wepy.page {
         { code: wepy.getStorageSync('code') },
         {
           latitude,
-          longitude
+          longitude,
         }
       );
       wepy.setStorageSync('welcome', result.welcome);
@@ -82,13 +82,13 @@ export default class Home extends wepy.page {
       wepy.setStorageSync('identifier', result.identifier);
       if (result.welcome) {
         wx.redirectTo({
-          url: `register/index?userid=${inviteUserId}`
+          url: `register/index?userid=${inviteUserId}`,
         });
       } else {
         let url = 'index';
         if (t.select) url += '?select=' + t.select;
         wx.redirectTo({
-          url
+          url,
         });
       }
     },
@@ -106,26 +106,26 @@ export default class Home extends wepy.page {
       this.showPositionButton = true;
       this.showUserInfoButton = false;
       // this.getUserInfoAuth();
-    }
+    },
   };
 
   authorizeLocation() {
     wx.showModal({
       title: '是否授权当前位置',
       content: '需要获取您的地理位置，请确认授权，否则无法使用',
-      success: res => {
+      success: (res) => {
         if (res.cancel) {
         } else if (res.confirm) {
           wx.openSetting({
-            success: data => {
+            success: (data) => {
               console.log(data);
               if (data.authSetting['scope.userLocation']) {
                 this.events.getLocation(this);
               }
-            }
+            },
           });
         }
-      }
+      },
     });
   }
   onShareAppMessage() {
@@ -136,17 +136,17 @@ export default class Home extends wepy.page {
       title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
       path: `/pages/home?userid=${user ? user.ID : ''}`,
       imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
-      success: res => {
+      success: (res) => {
         console.log('转发成功', res);
       },
-      fail: res => {
+      fail: (res) => {
         console.log('转发失败', res);
-      }
+      },
     };
   }
   getLocationAuth() {
     wx.getSetting({
-      success: res => {
+      success: (res) => {
         console.log(res.authSetting['scope.userLocation']);
         if (
           res.authSetting['scope.userLocation'] !== undefined &&
@@ -156,7 +156,7 @@ export default class Home extends wepy.page {
         } else {
           this.events.getLocation(this);
         }
-      }
+      },
     });
   }
   events = {
@@ -166,7 +166,7 @@ export default class Home extends wepy.page {
     getLocation(t) {
       wx.getLocation({
         type: 'wgs84',
-        success: res => {
+        success: (res) => {
           wepy.setStorageSync('latitude', res.latitude);
           wepy.setStorageSync('longitude', res.longitude);
           // wepy.redirectTo({
@@ -174,18 +174,18 @@ export default class Home extends wepy.page {
           // });
           // console.log(t);
           wx.login({
-            success: ress => {
+            success: (ress) => {
               wepy.setStorageSync('code', ress.code);
               t.methods.goLogin(res.latitude, res.longitude, t);
-            }
+            },
           });
         },
-        fail: err => {
+        fail: (err) => {
           console.log(err);
           t.authorizeLocation();
-        }
+        },
       });
-    }
+    },
   };
 
   watch = {};
@@ -251,7 +251,7 @@ export default class Home extends wepy.page {
         if (res.model.indexOf(name) > -1) {
           that.isphoneX = true;
         }
-      }
+      },
     });
     // if (wepy.getStorageSync('latitude')) {
     //     wepy.redirectTo({

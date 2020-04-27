@@ -3,7 +3,7 @@
 	<navbar title="邀请奖励">
 	</navbar>
 	<view class='container'>
-		<image class="bg" src="https://images.facedog.cn/public/invite/bg.png" mode="scaleToFill" lazy-load="false">
+		<image class="bg" src="https://images.facedog.cn/public/invite/bg.png?2" mode="scaleToFill" lazy-load="false">
 		</image>
 		<button open-type="share" class="share">
 			<image src="https://images.facedog.cn/public/invite/share.png" mode="aspectFill"></image>
@@ -15,34 +15,36 @@
 		</view>
 		<view class="invite-progress">
 			<view class="title">
-				继续邀请<text style="font-size:50rpx;color:#5572FA;">2</text>位好友可以进红包群
+				<!-- 继续邀请<text style="font-size:50rpx;color:#5572FA;">2</text>位SR好友可以进红包群 -->
+				<image style="width:455rpx;height:50rpx" src="https://images.facedog.cn/public/invite/invite-tip.png" mode="scaleToFill" lazy-load="false">
+				</image>
 			</view>
 			<view class="progress-box">
-				<view class="box {{!list[0]?'grey':''}}">
+				<view class="box {{!list[0] && list[1].level == 'SR'?'grey':''}}">
 					<image wx:if="{{list[0]}}" src="{{list[0].avatar}}" mode="scaleToFill" lazy-load="false">
 					</image>
 					<image wx:else src="https://images.facedog.cn/public/invite/progress-circle.png" mode="scaleToFill" lazy-load="false">
 					</image>
 					<view class="text">恭喜你</view>
-					<view class="text">获得300颜币</view>
+					<view class="text">获得500颜币</view>
 				</view>
 				<view class="line line1">
 					<image src="https://images.facedog.cn/public/invite/progress-line.png" mode="scaleToFill" lazy-load="false">
 					</image>
 				</view>
-				<view class="box {{!list[1]?'grey':''}}">
+				<view class="box {{!list[1] && list[1].level == 'SR'?'grey':''}}">
 					<image wx:if="{{list[1]}}" src="{{list[1].avatar}}" mode="scaleToFill" lazy-load="false">
 					</image>
 					<image wx:else src="https://images.facedog.cn/public/invite/progress-circle.png" mode="scaleToFill" lazy-load="false">
 					</image>
 					<view class="text">恭喜你</view>
-					<view class="text">获得300颜币</view>
+					<view class="text">获得500颜币</view>
 				</view>
 				<view class="line line2">
 					<image src="https://images.facedog.cn/public/invite/progress-line.png" mode="scaleToFill" lazy-load="false">
 					</image>
 				</view>
-				<view class="box {{list[1]?'':'grey'}}">
+				<view class="box {{list[1] && list[1].level == 'SR'?'':'grey'}}">
 					<image @tap="previewCard" src="{{list[1]?'https://images.facedog.cn/public/invite/wechat-card-icon.png':'https://images.facedog.cn/public/invite/qrcode.png?1'}}" mode="scaleToFill" lazy-load="false">
 					</image>
 					<view class="text">恭喜你</view>
@@ -54,10 +56,10 @@
 			<view class="title">
 				<view class="invite-status">
 					<view class="value">{{successNum}}人</view>
-					<view class="key">已成功邀请</view>
+					<view class="key">已获得颜币</view>
 				</view>
 				<view class="invite-status">
-					<view class="value">{{successNum*300}}</view>
+					<view class="value">{{invite_coin}}</view>
 					<view class="key">已获得颜币</view>
 				</view>
 			</view>
@@ -79,8 +81,9 @@
 						<text>{{item.nick_name}}</text>
 					</view>
 					<view class="progress-icon">
-						<image src="https://images.facedog.cn/public/invite/{{item.progress}}.png?2" mode="scaleToFill" lazy-load="false">
+						<image src="https://images.facedog.cn/public/invite/process-line.png?2" mode="scaleToFill" lazy-load="false">
 						</image>
+						<image class="{{item.level}} level" src="https://images.facedog.cn/mp/profile/{{item.level}}.png" mode="aspectFill" />
 					</view>
 					<view class="progress-time">
 						{{item.create_time}}
@@ -103,13 +106,14 @@ export default class Invite extends wepy.page {
     navigationBarTitleText: '',
     usingComponents: {
       navbar: '../../components/navbar/index',
-      'van-toast': '../../components/vant/toast/index'
-    }
+      'van-toast': '../../components/vant/toast/index',
+    },
   };
 
   data = {
     list: [],
-    successNum: 0
+    successNum: 0,
+    invite_coin: 0,
   };
 
   components = {};
@@ -126,9 +130,9 @@ export default class Invite extends wepy.page {
       if (this.list.length < 2) return;
       wx.previewImage({
         current: 'https:images.facedog.cn/public/invite/wechat-card.png?1',
-        urls: ['https:images.facedog.cn/public/invite/wechat-card.png?1']
+        urls: ['https:images.facedog.cn/public/invite/wechat-card.png?1'],
       });
-    }
+    },
   };
 
   events = {};
@@ -138,16 +142,17 @@ export default class Invite extends wepy.page {
   computed = {};
 
   async onLoad() {
-    let { invitation } = await get(INVATATION);
+    let { invitation, invite_coin } = await get(INVATATION);
     this.list = invitation;
-    this.list.forEach(item => {
+    this.invite_coin = invite_coin;
+    this.list.forEach((item) => {
       if (item.avatar.indexOf('x-oss') == -1) {
         item.avatar =
           item.avatar + '?x-oss-process=image/resize,w_100,h_100/format,jpg';
       }
     });
     this.successNum = this.list.filter(
-      item => item.progress == 'finish'
+      (item) => item.progress == 'finish'
     ).length;
     this.$apply();
   }
@@ -158,12 +163,12 @@ export default class Invite extends wepy.page {
       title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
       path: `/pages/home?userid=${user ? user.ID : ''}`,
       imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
-      success: res => {
+      success: (res) => {
         console.log('转发成功', res);
       },
-      fail: res => {
+      fail: (res) => {
         console.log('转发失败', res);
-      }
+      },
     };
   }
   onShow() {}
@@ -233,6 +238,7 @@ export default class Invite extends wepy.page {
 	      font-size: 30rpx;
 	      text-align: center;
 	    }
+
 	    .progress-box {
 	      width: 580rpx;
 	      display: flex;
@@ -360,11 +366,28 @@ export default class Invite extends wepy.page {
 	        font-size: 16rpx;
 	      }
 	      .progress-icon {
-	        width: 129rpx;
-	        height: 47rpx;
+	        display: flex;
+	        align-items: center;
 	        image {
-	          width: 100%;
-	          height: 100%;
+	          width: 86rpx;
+	          height: 9rpx;
+	        }
+	        .level {
+	          height: 30rpx;
+	          border-radius: 0;
+	          display: inline-block;
+	          &.N {
+	            width: 27rpx;
+	          }
+	          &.R {
+	            width: 28rpx;
+	          }
+	          &.SR {
+	            width: 47rpx;
+	          }
+	          &.SSR {
+	            width: 60rpx;
+	          }
 	        }
 	      }
 	      .progress-time {

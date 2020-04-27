@@ -5,68 +5,138 @@
 	<block wx:if="{{!show}}">
 		<loadingHeart top="-160rpx" />
 	</block>
-	<view class='container' wx:if="{{show && !showPop}}">
-		<image class="icon-package" src="https://images.facedog.cn/mp/battle/icon-package.png" mode="scaleToFill" lazy-load="false">
-		</image>
+	<view class='container'
+	      wx:if="{{show && !showPop}}">
+		<view class="icon-package shine"
+		      @tap="showPackage"
+		      wx:if="{{swipeCount>=SWIPE_REWARD_COUNT && !packageOpen && !opened}}">
+		</view>
+		<view class="icon-package"
+		      wx:if="{{swipeCount<SWIPE_REWARD_COUNT && !opened}}">
+			<text>{{swipeCount}}/{{SWIPE_REWARD_COUNT}}</text>
+		</view>
 		<view class="blurLayer"></view>
-		<swiper class="swiper" indicator-dots="{{false}}" autoplay="{{false}}" duration="{{200}}" current="{{swiperCurrent}}" bindanimationfinish="bindanimationfinish">
-			<repeat key="index" for="{{battleList}}" key="index" index="index" item="item">
+		<swiper wx:if="{{!packageOpen}}"
+		        class="swiper"
+		        indicator-dots="{{false}}"
+		        autoplay="{{false}}"
+		        duration="{{200}}"
+		        current="{{swiperCurrent}}"
+		        bindanimationfinish="bindanimationfinish">
+			<repeat key="index"
+			        for="{{battleList}}"
+			        key="index"
+			        index="index"
+			        item="item">
 				<swiper-item catchtouchmove="stopTouchMove">
-					<view class="battle-container " style="top:{{isphoneX?'100rpx':'0'}};">
+					<view class="battle-container "
+					      style="top:{{isphoneX?'100rpx':'0'}};">
 						<view class="cubit-box cubit-box-top">
-							<view class="cubit-heart {{topWave?'wave':''}}" wx:if="{{topDragDistance}}">
-								<image class="star {{topWave?'wave':''}}" src="https://images.facedog.cn/public/battle/cubit-star.png" mode="scaleToFill">
+							<view class="cubit-heart {{topWave?'wave':''}}"
+							      wx:if="{{topDragDistance}}">
+								<image class="star {{topWave?'wave':''}}"
+								       src="https://images.facedog.cn/public/battle/cubit-star.png"
+								       mode="scaleToFill">
 								</image>
 							</view>
 						</view>
 						<view class="cubit-box cubit-box-bottom">
-							<view class="cubit-heart {{bottomWave?'wave':''}}" wx:if="{{bottomDragDistance}}">
-								<image class="star {{bottomWave?'wave':''}}" src="https://images.facedog.cn/public/battle/cubit-star.png" mode="scaleToFill">
+							<view class="cubit-heart {{bottomWave?'wave':''}}"
+							      wx:if="{{bottomDragDistance}}">
+								<image class="star {{bottomWave?'wave':''}}"
+								       src="https://images.facedog.cn/public/battle/cubit-star.png"
+								       mode="scaleToFill">
 								</image>
 							</view>
 						</view>
-						<view @tap="boxClick({{item.a.originalImages}})" class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[swiperCurrent]?'flyTop':''}}" style="transform: translate3d(0px, {{tranTopY[index] || 0}}px, 0px)!important;" catch:touchmove="touchTopMove({{swiperCurrent}})" catch:touchend="touchEnd">
-							<view wx:if="{{!draggingTop}}" class="image-count">共{{item.a.images.length}}张</view>
-							<image wx:if="{{!draggingTop}}" src="https://images.facedog.cn/mp/profile/{{item.b.level}}.png" class="{{item.b.level}} level1" mode="scaleToFill" />
+						<view @tap="boxClick({{item.a.originalImages}})"
+						      class="battle-box {{bothLikeMove ?'bothLikeMove':''}} top {{draggingTop?'frame':''}} {{flyTop[swiperCurrent]?'flyTop':''}}"
+						      style="transform: translate3d(0px, {{tranTopY[index] || 0}}px, 0px)!important;"
+						      catch:touchmove="touchTopMove({{swiperCurrent}})"
+						      catch:touchend="touchEnd">
+							<view wx:if="{{!draggingTop}}"
+							      class="image-count">共{{item.a.images.length}}张</view>
+							<image wx:if="{{!draggingTop}}"
+							       src="https://images.facedog.cn/mp/profile/{{item.b.level}}.png"
+							       class="{{item.b.level}} level1"
+							       mode="scaleToFill" />
 
-							<image src="{{item.a.images[0]}}" class="{{blurTop?'blur':''}}" mode="aspectFill"></image>
-							<image src="https://images.facedog.cn/public/battle/pick.png" style="opacity:{{opacityTopPick}}" class="pick" mode="aspectFill" />
-							<view class="info" wx:if="{{draggingTop}}">
-								<image class="{{item.a.level}} level" src="https://images.facedog.cn/mp/profile/{{item.a.level}}.png" mode="scaleToFill" />
+							<image src="{{item.a.images[0]}}"
+							       class="{{blurTop?'blur':''}}"
+							       mode="aspectFill"></image>
+							<image src="https://images.facedog.cn/public/battle/pick.png"
+							       style="opacity:{{opacityTopPick}}"
+							       class="pick"
+							       mode="aspectFill" />
+							<view class="info"
+							      wx:if="{{draggingTop}}">
+								<image class="{{item.a.level}} level"
+								       src="https://images.facedog.cn/mp/profile/{{item.a.level}}.png"
+								       mode="scaleToFill" />
 
 								<view class="name">{{item.a.nick_name}}<view class="xingzuo">{{item.a.constellation}}</view>
 								</view>
 								<view class="signature">{{item.a.signature}}</view>
 								<!-- <view class="desc">{{item.a.gender}}/{{item.a.age}}/{{item.a.constellation}}</view> -->
 							</view>
-							<view class="info" wx:else>
+							<view class="info"
+							      wx:else>
 
 								<view class="name {{blurTop?'blur':''}}">{{item.a.nick_name}}<text> {{item.a.age}}</text>
-									<image wx:if="{{item.a.vip}}" class="vip-icon" src="https://images.facedog.cn/public/profile/vip-icon.png?2" mode="scaleToFill" lazy-load="false"></image>
+									<image wx:if="{{item.a.vip}}"
+									       class="vip-icon"
+									       src="https://images.facedog.cn/public/profile/vip-icon.png?2"
+									       mode="scaleToFill"
+									       lazy-load="false"></image>
 								</view>
 								<!-- <view class="desc {{draggingBottom?'blur':''}}">{{item.a.gender}} / {{item.a.age}} / {{item.a.constellation}}</view> -->
 								<view class="distance "><text class="{{blurTop?'blur':''}}">{{item.a.distance}}km</text> <text class="{{blurTop?'blur':''}}"> {{item.a.city}}</text></view>
 							</view>
 						</view>
-						<view class="divider {{bothLike?'rotated':''}}" style="top:532rpx">
+						<view class="divider {{bothLike?'rotated':''}}"
+						      style="top:532rpx">
 							<view class="vs-pic front {{bothLikeRotate ?'rotated':''}} {{!bothLike && !init?'notRotate':''}}">
-								<image src="https://images.facedog.cn/public/battle/fist-left.png?2" class="left {{fistAnimation?'ani':''}}" mode="scaleToFill"></image>
-								<image src="https://images.facedog.cn/public/battle/vs.png?7" class="vs {{fistAnimation?'ani':''}} " mode="aspectFill"></image>
-								<image src="https://images.facedog.cn/public/battle/star.png?7" class="star {{fistAnimation?'ani':''}}" mode="aspectFill"></image>
-								<image src="https://images.facedog.cn/public/battle/fist-right.png?2" class="right  {{fistAnimation?'ani':''}}" mode="scaleToFill"></image>
+								<image src="https://images.facedog.cn/public/battle/fist-left.png?2"
+								       class="left {{fistAnimation?'ani':''}}"
+								       mode="scaleToFill"></image>
+								<image src="https://images.facedog.cn/public/battle/vs.png?7"
+								       class="vs {{fistAnimation?'ani':''}} "
+								       mode="aspectFill"></image>
+								<image src="https://images.facedog.cn/public/battle/star.png?7"
+								       class="star {{fistAnimation?'ani':''}}"
+								       mode="aspectFill"></image>
+								<image src="https://images.facedog.cn/public/battle/fist-right.png?2"
+								       class="right  {{fistAnimation?'ani':''}}"
+								       mode="scaleToFill"></image>
 							</view>
 							<!-- <view class="vs-pic back {{bothLikeRotate ?'rotated':''}} {{!bothLike && !init?'notRotate':''}} {{bothLikeMove ?'bothLikeMove':''}}" style="opacity:0">
 								<image src="https://images.facedog.cn/public/battle/both-like.png" class="both-like" mode="aspectFill"></image>
 							</view> -->
 						</view>
-						<view @tap="boxClick({{item.b.originalImages}})" class="battle-box bottom {{bothLikeMove ?'bothLikeMove':''}} {{draggingBottom?'frame':''}} {{flyBottom[swiperCurrent]?'flyBottom':''}}" style="transform: translate3d(0px, {{tranBottomY[index] || 0}}px, 0px);" catch:touchmove="touchBottomMove({{swiperCurrent}})" catch:touchend="touchEnd">
-							<view wx:if="{{!draggingBottom}}" class="image-count">共{{item.b.images.length}}张</view>
-							<image wx:if="{{!draggingBottom}}" src="https://images.facedog.cn/mp/profile/{{item.b.level}}.png" class="{{item.b.level}} level1" mode="scaleToFill" />
+						<view @tap="boxClick({{item.b.originalImages}})"
+						      class="battle-box bottom {{bothLikeMove ?'bothLikeMove':''}} {{draggingBottom?'frame':''}} {{flyBottom[swiperCurrent]?'flyBottom':''}}"
+						      style="transform: translate3d(0px, {{tranBottomY[index] || 0}}px, 0px);"
+						      catch:touchmove="touchBottomMove({{swiperCurrent}})"
+						      catch:touchend="touchEnd">
+							<view wx:if="{{!draggingBottom}}"
+							      class="image-count">共{{item.b.images.length}}张</view>
+							<image wx:if="{{!draggingBottom}}"
+							       src="https://images.facedog.cn/mp/profile/{{item.b.level}}.png"
+							       class="{{item.b.level}} level1"
+							       mode="scaleToFill" />
 
-							<image src="{{item.b.images[0]}}" class="{{blurBottom?'blur':''}}" mode="aspectFill"></image>
-							<image src="https://images.facedog.cn/public/battle/pick.png" style="opacity:{{opacityBottomPick}}" class="pick" mode="aspectFill" />
-							<view class="info" wx:if="{{draggingBottom}}">
-								<image class="{{item.b.level}} level" src="https://images.facedog.cn/mp/profile/{{item.b.level}}.png" mode="scaleToFill" />
+							<image src="{{item.b.images[0]}}"
+							       class="{{blurBottom?'blur':''}}"
+							       mode="aspectFill"></image>
+							<image src="https://images.facedog.cn/public/battle/pick.png"
+							       style="opacity:{{opacityBottomPick}}"
+							       class="pick"
+							       mode="aspectFill" />
+							<view class="info"
+							      wx:if="{{draggingBottom}}">
+								<image class="{{item.b.level}} level"
+								       src="https://images.facedog.cn/mp/profile/{{item.b.level}}.png"
+								       mode="scaleToFill" />
 
 								<view class="name">{{item.b.nick_name}}<view class="xingzuo">{{item.b.constellation}}</view>
 								</view>
@@ -74,15 +144,22 @@
 								<!-- <view class="distance"><text class="number">{{item.b.distance}}km</text> <text class="city"> {{item.b.city}}</text></view> -->
 								<!-- <view class="desc">{{item.b.gender}}/{{item.b.age}}/{{item.b.constellation}}</view> -->
 							</view>
-							<view class="info" wx:else>
+							<view class="info"
+							      wx:else>
 								<view class="name {{blurBottom?'blur':''}}">{{item.b.nick_name}}<text> {{item.b.age}}</text>
-									<image wx:if="{{item.b.vip}}" class="vip-icon" src="https://images.facedog.cn/public/profile/vip-icon.png?2" mode="scaleToFill" lazy-load="false"></image>
+									<image wx:if="{{item.b.vip}}"
+									       class="vip-icon"
+									       src="https://images.facedog.cn/public/profile/vip-icon.png?2"
+									       mode="scaleToFill"
+									       lazy-load="false"></image>
 								</view>
 								<!-- <view class="desc {{draggingTop?'blur':''}}">{{item.b.gender}} / {{item.b.age}} / {{item.b.constellation}}</view> -->
 								<view class="distance"><text class="{{blurBottom?'blur':''}}">{{item.b.distance}}km</text> <text class="{{blurBottom?'blur':''}}"> {{item.b.city}}</text></view>
 							</view>
 							<view class="pass-box {{passShow?'show':'' }}">
-								<image src="https://images.facedog.cn/public/battle/pass-box.png?2" mode="scaleToFill" lazy-load="false">
+								<image src="https://images.facedog.cn/public/battle/pass-box.png?2"
+								       mode="scaleToFill"
+								       lazy-load="false">
 								</image>
 							</view>
 						</view>
@@ -94,14 +171,36 @@
 	<block wx:if="{{showPop}}">
 		<pop />
 	</block>
-	<van-popup show="{{ showCoinPop }}" bind:close="onClose">
+	<van-popup show="{{ showCoinPop }}"
+	           bind:close="onClose">
 		<popCoin />
+	</van-popup>
+	<van-popup show="{{ showRedPackage }}"
+	           bind:close="onClose">
+		<view class="redpackage"
+		      @tap="openPackage"></view>
+	</van-popup>
+	<van-popup show="{{ packageOpen }}"
+	           bind:close="onClose">
+		<view class="redpackage open">
+			<view class="money"><text>{{money}}</text>元</view>
+			<image class="btn"
+			       @tap="goHome"
+			       src="https://images.facedog.cn/mp/battle/btn.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+		</view>
 	</van-popup>
 </template>
 
 <script>
 import wepy from 'wepy';
-import { REWARD_BATTLE_LIST, REWARD_BATTLE_COMMIT } from '@/utils/url';
+import {
+  REWARD_BATTLE_LIST,
+  REWARD_BATTLE_COMMIT,
+  REWARD_OPEN,
+} from '@/utils/url';
 import { get, post } from '@/utils/request';
 import { Event } from '@/utils/event.js';
 import { removeDuplicates, throttle, formatDate } from '@/utils';
@@ -116,9 +215,11 @@ export default class Battle extends wepy.page {
     usingComponents: {
       navbar: '../../components/navbar/index',
       'van-popup': '../../components/vant/popup/index',
+      'van-overlay': '../../components/vant/overlay/index',
     },
   };
   data = {
+    SWIPE_REWARD_COUNT: 8,
     haveEnjoy: 0,
     show: false,
     showPop: false,
@@ -155,6 +256,11 @@ export default class Battle extends wepy.page {
     showCoinPop: false,
     profile: {},
     isPhone: false,
+    swipeCount: 0,
+    showRedPackage: false,
+    packageOpen: false,
+    opened: false,
+    money: 0,
   };
 
   components = {
@@ -163,31 +269,6 @@ export default class Battle extends wepy.page {
     popCoin,
   };
 
-  //   setEnjoyCount() {
-  //     if (this.haveEnjoy <= 0) {
-  //       let name = `commit-${formatDate(new Date())}`;
-  //       let isShow = wepy.getStorageSync(name);
-  //       if (!isShow) {
-  //         this.$invoke('popCoin', 'setType', '1');
-  //         setTimeout(() => {
-  //           this.showCoinPop = true;
-  //           this.$apply();
-  //           setTimeout(() => {
-  //             this.showCoinPop = false;
-  //             this.$apply();
-  //           }, 2000);
-  //         }, 1000);
-  //       }
-  //       wepy.setStorageSync(name, true);
-  //       this.showPop = true;
-  //       this.$emit('enjoySet', 0);
-  //       this.$apply();
-  //       return;
-  //     }
-  //     let enjoyCount = this.haveEnjoy - 1;
-  //     this.$emit('enjoySet', --this.haveEnjoy);
-  //     this.haveEnjoy = enjoyCount;
-  //   }
   async fly(position) {
     this.flyTempID = this.swiperCurrent;
     if (position == 'top') {
@@ -225,6 +306,8 @@ export default class Battle extends wepy.page {
     //   Event.trigger('showVerify', true);
     //   return;
     // }
+    this.swipeCount++;
+    this.$apply();
     try {
       const data = await post(REWARD_BATTLE_COMMIT, {
         result: {
@@ -233,10 +316,11 @@ export default class Battle extends wepy.page {
         },
       });
       console.log('commit!!!!!!!', data);
-      Event.trigger('refreshData');
       //   this.setEnjoyCount();
 
       console.log(data);
+      //   this.swipeCount = data.slide_count / 2;
+
       if (data.is_friend) {
         wx.setStorageSync('chatIcon', data.enjoy_user_avatar);
         wx.navigateTo({
@@ -282,7 +366,27 @@ export default class Battle extends wepy.page {
       }, 400);
     }, 800);
   }
+  async open() {
+    this.showRedPackage = false;
+    let data = await post(REWARD_OPEN);
+    this.packageOpen = true;
+    this.opened = true;
+    this.money = data.money;
+    Event.trigger('updateMoney');
+    this.$apply();
+  }
   methods = {
+    showPackage() {
+      this.showRedPackage = true;
+    },
+    openPackage() {
+      this.open();
+    },
+    goHome() {
+      wepy.navigateBack({
+        delta: 1, //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+      });
+    },
     bindanimationfinish() {
       // 防止swiper滑动后，滑块有的时候不还原位置的问题
       setTimeout(() => {
@@ -400,9 +504,16 @@ export default class Battle extends wepy.page {
     this.swiperCurrent = 0;
     this.profile = wepy.getStorageSync('profile');
     this.battleList = [];
+    this.show = false;
     let res = await get(REWARD_BATTLE_LIST);
     let result = res.data;
     this.haveEnjoy = res.have_enjoy;
+    this.swipeCount = res.slide_count / 2;
+    if (this.swipeCount >= 8) {
+      this.open();
+      this.$apply();
+      return;
+    }
     if (this.haveEnjoy <= 0) {
       let name = `commit-${formatDate(new Date())}`;
       wepy.setStorageSync(name, true);
@@ -443,12 +554,12 @@ export default class Battle extends wepy.page {
   watch = {};
 
   computed = {};
-
+  onUnload() {
+    console.log('onUnload!!!!!!!');
+    Event.trigger('settingShowLevel', 'SR');
+  }
   onLoad() {
-    if (!wepy.getStorageSync('hasProfile')) {
-      this.noProfile = true;
-      this.$apply();
-    }
+    Event.trigger('settingShowLevel', 'R');
     setTimeout(() => {
       this.profile = wepy.getStorageSync('profile');
       this.$apply();
@@ -473,11 +584,9 @@ export default class Battle extends wepy.page {
         that.$apply();
       },
     });
-    this.getBattle();
-    Event.listen('battleFresh', () => {
-      this.getBattle();
-    });
+
     setTimeout(() => {
+      this.getBattle();
       this.fistAnimation = true;
       this.$apply();
     }, 900);
@@ -492,6 +601,37 @@ export default class Battle extends wepy.page {
 </style>
 
 <style lang='less' scoped>
+	.redpackage {
+	  width: 634rpx;
+	  height: 666rpx;
+	  background: url(https://images.facedog.cn/mp/battle/redpackage.png);
+	  background-size: cover;
+	  &.open {
+	    width: 634rpx;
+	    height: 744rpx;
+	    background: url(https://images.facedog.cn/mp/battle/redpackage-open.png);
+	    background-size: cover;
+	    .money {
+	      position: absolute;
+	      top: 158rpx;
+	      left: 50%;
+	      transform: translateX(-50%);
+	      color: #000;
+	      font-size: 32rpx;
+	      text {
+	        font-size: 70rpx;
+	      }
+	    }
+	    .btn {
+	      width: 253rpx;
+	      height: 80rpx;
+	      position: absolute;
+	      bottom: 74rpx;
+	      left: 50%;
+	      transform: translateX(-50%);
+	    }
+	  }
+	}
 	.swiper {
 	  width: 100%;
 	  min-height: 93vh;
@@ -808,10 +948,26 @@ export default class Battle extends wepy.page {
 	  background-size: contain;
 	  position: relative;
 	  .icon-package {
-	    width: 55rpx;
-	    height: 69rpx;
+	    width: 79rpx;
+	    height: 92rpx;
 	    position: absolute;
-	    right: 30rpx;
+	    background: url(https://images.facedog.cn/mp/battle/icon-package.png?1);
+	    background-size: cover;
+	    &.shine {
+	      background: url(https://images.facedog.cn/mp/battle/package-shine.png?1);
+	      width: 114rpx;
+	      height: 121rpx;
+	      background-size: cover;
+	    }
+	    text {
+	      color: #f6e031;
+	      font-size: 20rpx;
+	      top: 45rpx;
+	      position: relative;
+	    }
+
+	    text-align: center;
+	    right: 60rpx;
 	    top: 118rpx;
 	    z-index: 999;
 	  }

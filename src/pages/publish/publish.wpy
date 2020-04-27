@@ -54,370 +54,370 @@
     </view>
 </template>
 <script>
-	import wepy from 'wepy';
-	import { post, put } from '@/utils/request';
-	import { sleep, toast } from '@/utils/index';
-	import { FABU_FABU_MOMENT, FABU_UPLOAD_PIC } from '@/utils/url';
-	import { Event } from '@/utils/event.js';
-	import Toast from '@/components/vant/toast/toast';
-	let auth = false;
-	function IsJsonString(str) {
-	  try {
-	    JSON.parse(str);
-	  } catch (e) {
-	    return false;
-	  }
-	  return true;
-	}
-	export default class Publish extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '发布动态',
-	    usingComponents: {
-	      'van-icon': '../../components/vant/icon/index',
-	      'van-loading': '../components/vant/loading/index',
-		  'van-toast': '../components/vant/toast/index',
-		  navbar: '../components/navbar/index'
-	    }
-	  };
-	  data = {
-	    content: '', // 动态内容
-	    region: '',
-	    latitude: '',
-	    longitude: '',
-	    loading: false,
-	    loadingText: '',
-	    // tempFilePaths: [],
-	    uploadedPics: [],
-	    postPics: [],
-	    isPublishing: false
-	  };
+import wepy from 'wepy';
+import { post, put } from '@/utils/request';
+import { sleep, toast } from '@/utils/index';
+import { FABU_FABU_MOMENT, FABU_UPLOAD_PIC } from '@/utils/url';
+import { Event } from '@/utils/event.js';
+import Toast from '@/components/vant/toast/toast';
+let auth = false;
+function IsJsonString(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+export default class Publish extends wepy.page {
+  config = {
+    navigationBarTitleText: '发布动态',
+    usingComponents: {
+      'van-icon': '../../components/vant/icon/index',
+      'van-loading': '../components/vant/loading/index',
+      'van-toast': '../components/vant/toast/index',
+      navbar: '../components/navbar/index',
+    },
+  };
+  data = {
+    content: '', // 动态内容
+    region: '',
+    latitude: '',
+    longitude: '',
+    loading: false,
+    loadingText: '',
+    // tempFilePaths: [],
+    uploadedPics: [],
+    postPics: [],
+    isPublishing: false,
+  };
 
-	  components = {};
-	  showLoading(text) {
-	    this.loading = true;
-	    this.loadingText = text;
-	    this.$apply();
-	  }
-	  hideLoading() {
-	    this.loading = false;
-	    this.loadingText = '';
-	    this.$apply();
-	  }
-	  methods = {
-	    preview(url) {
-	      const urls = this.uploadedPics.map(x => x);
-	      wepy.previewImage({
-	        url, // 当前显示图片的http链接
-	        urls // 需要预览的图片http链接列表
-	      });
-	    },
-	    // 点击取消
-	    prepareToCancle() {
-	      wx.showModal({
-	        title: '提示',
-	        content: '确认退出吗',
-	        success(res) {
-	          if (res.confirm) {
-	            // wx.navigateBack({
-	            //   delta: 1
-				// });
-				wepy.redirectTo({url: '/pages/discover/discover' });
-	          } else if (res.cancel) {
-	            console.log('用户点击取消');
-	          }
-	        }
-	      });
-	    },
-	    // 删除照片
-	    minus(e) {
-	      const { index } = e.currentTarget.dataset;
-	      this.uploadedPics.splice(index, 1);
-	      this.postPics.splice(index, 1);
-	      this.$apply();
-	    },
-	    inputDesc(e) {
-	      this.content = e.detail.value;
-	    },
-	    async uploadPic() {
-	      const { tempFilePaths } = await wepy.chooseImage({ count: 6 });
-	      if (this.uploadedPics.length + tempFilePaths.length > 6) {
-	        toast('最多只能上传六张照片！');
-	        return;
-	      }
-	      // this.tempFilePaths = tempFilePaths;
-	      this.showLoading('上传中');
-	      //   wx.showLoading({ title: '上传中', mask: true });
-	      Promise.all(
-	        tempFilePaths.map((x, index) => this.methods.wxUploade(x, index))
-	      ).then(res => {
-	        console.log('上传图片成功', res);
-	        let imgs = res.filter(r => {
-	          return r != 'fail';
-	        });
-	        let uploadPics = imgs.map(img => {
-	          return img.data;
-	        });
-	        let showPics = imgs.map(img => {
-	          return img.tempFilePath;
-	        });
-	        this.hideLoading();
-	        // wx.hideLoading();
-	        this.postPics = this.postPics.concat(uploadPics);
-	        this.uploadedPics = this.uploadedPics.concat(showPics);
-	        if (imgs.length != res.length) {
-	          if (tempFilePaths.length > 1) {
-	            toast('部分图片存在违规，请重新上传');
-	          } else {
-	            toast('图片存在违规，请重新上传');
-	          }
-	        }
-	        this.$apply();
-	      });
-	      this.$apply();
-	    },
-	    wxUploade(tempFilePath, index) {
-	      console.log(tempFilePath);
-	      return new Promise((resolve, reject) => {
-	        // 	resolve('111')
-	        checkImgSafe(tempFilePath, index)
-	          .then(res => {
-	            resolve(upload(tempFilePath));
-	          })
-	          .catch(err => {
-	            resolve('fail');
-	          });
-	      });
-	    },
-	    async choseLocation() {
-	      const {
-	        latitude = 0,
-	        longitude = 0,
-	        name = '',
-	        address = ''
-	      } = await wepy.chooseLocation();
-	      this.region = name;
-	      this.longitude = longitude;
-	      this.latitude = latitude;
-	      this.$apply();
-	    },
-	    async publish(e) {
-	      if (auth) {
-	        toast('认证审核中，加急审核请联系客服微信：yanzc1023');
-	        return;
-	      }
-	      try {
-	        if (this.isPublishing) {
-	          return;
-	        }
-	        if (!this.uploadedPics.length) {
-	          toast('未上传图片');
-	          return;
-	        }
+  components = {};
+  showLoading(text) {
+    this.loading = true;
+    this.loadingText = text;
+    this.$apply();
+  }
+  hideLoading() {
+    this.loading = false;
+    this.loadingText = '';
+    this.$apply();
+  }
+  methods = {
+    preview(url) {
+      const urls = this.uploadedPics.map((x) => x);
+      wepy.previewImage({
+        url, // 当前显示图片的http链接
+        urls, // 需要预览的图片http链接列表
+      });
+    },
+    // 点击取消
+    prepareToCancle() {
+      wx.showModal({
+        title: '提示',
+        content: '确认退出吗',
+        success(res) {
+          if (res.confirm) {
+            // wx.navigateBack({
+            //   delta: 1
+            // });
+            wepy.redirectTo({ url: '/pages/discover/discover' });
+          } else if (res.cancel) {
+            console.log('用户点击取消');
+          }
+        },
+      });
+    },
+    // 删除照片
+    minus(e) {
+      const { index } = e.currentTarget.dataset;
+      this.uploadedPics.splice(index, 1);
+      this.postPics.splice(index, 1);
+      this.$apply();
+    },
+    inputDesc(e) {
+      this.content = e.detail.value;
+    },
+    async uploadPic() {
+      const { tempFilePaths } = await wepy.chooseImage({ count: 6 });
+      if (this.uploadedPics.length + tempFilePaths.length > 6) {
+        toast('最多只能上传六张照片！');
+        return;
+      }
+      // this.tempFilePaths = tempFilePaths;
+      this.showLoading('上传中');
+      //   wx.showLoading({ title: '上传中', mask: true });
+      Promise.all(
+        tempFilePaths.map((x, index) => this.methods.wxUploade(x, index))
+      ).then((res) => {
+        console.log('上传图片成功', res);
+        let imgs = res.filter((r) => {
+          return r != 'fail';
+        });
+        let uploadPics = imgs.map((img) => {
+          return img.data;
+        });
+        let showPics = imgs.map((img) => {
+          return img.tempFilePath;
+        });
+        this.hideLoading();
+        // wx.hideLoading();
+        this.postPics = this.postPics.concat(uploadPics);
+        this.uploadedPics = this.uploadedPics.concat(showPics);
+        if (imgs.length != res.length) {
+          if (tempFilePaths.length > 1) {
+            toast('部分图片存在违规，请重新上传');
+          } else {
+            toast('图片存在违规，请重新上传');
+          }
+        }
+        this.$apply();
+      });
+      this.$apply();
+    },
+    wxUploade(tempFilePath, index) {
+      console.log(tempFilePath);
+      return new Promise((resolve, reject) => {
+        // 	resolve('111')
+        checkImgSafe(tempFilePath, index)
+          .then((res) => {
+            resolve(upload(tempFilePath));
+          })
+          .catch((err) => {
+            resolve('fail');
+          });
+      });
+    },
+    async choseLocation() {
+      const {
+        latitude = 0,
+        longitude = 0,
+        name = '',
+        address = '',
+      } = await wepy.chooseLocation();
+      this.region = name;
+      this.longitude = longitude;
+      this.latitude = latitude;
+      this.$apply();
+    },
+    async publish(e) {
+      if (auth) {
+        toast('认证审核中，加急审核请联系客服微信：yanzc1023');
+        return;
+      }
+      try {
+        if (this.isPublishing) {
+          return;
+        }
+        if (!this.uploadedPics.length) {
+          toast('未上传图片');
+          return;
+        }
 
-	        const subData = {
-	          content: this.content,
-	          region: this.region,
-	          latitude: this.latitude,
-	          longitude: this.longitude,
-	          formId: e.detail.formId,
-	          images: this.postPics
-	        };
-	        this.showLoading('正在发布');
-	        // wx.showLoading({
-	        //   title: '正在发布',
-	        //   mask: true
-	        // });
-	        this.msgSecCheck(this.content).then(async valid => {
-	          console.warn(valid);
-	          console.log(subData);
-	          if (valid) {
-	            this.isPublishing = true;
-				await post(FABU_FABU_MOMENT, subData);
-				this.hideLoading();
-	            Event.trigger('refresh');
-	            Toast.success('发布成功');
-	            await sleep(2);
-	            this.isPublishing = false;
-				wepy.redirectTo({url: '/pages/discover/discover' });
-				
-	            // wx.hideLoading();
-	            // wx.navigateBack({
-	            //   delta: 1
-	            // });
-	            this.$apply();
-	          } else {
-	            this.hideLoading();
-	            // wx.hideLoading();
-	            toast('文字存在违规,请重新编辑后发布');
-	          }
-	        });
-	      } catch (error) {
-	        this.isPublishing = false;
-	      }
-	    }
-	  };
+        const subData = {
+          content: this.content,
+          region: this.region,
+          latitude: this.latitude,
+          longitude: this.longitude,
+          formId: e.detail.formId,
+          images: this.postPics,
+        };
+        this.showLoading('正在发布');
+        // wx.showLoading({
+        //   title: '正在发布',
+        //   mask: true
+        // });
+        this.msgSecCheck(this.content).then(async (valid) => {
+          console.warn(valid);
+          console.log(subData);
+          if (valid) {
+            this.isPublishing = true;
+            await post(FABU_FABU_MOMENT, subData);
+            this.hideLoading();
+            Event.trigger('refresh');
+            Toast.success('发布成功');
+            await sleep(2);
+            this.isPublishing = false;
+            wepy.redirectTo({ url: '/pages/discover/discover' });
 
-	  events = {};
+            // wx.hideLoading();
+            // wx.navigateBack({
+            //   delta: 1
+            // });
+            this.$apply();
+          } else {
+            this.hideLoading();
+            // wx.hideLoading();
+            toast('文字存在违规,请重新编辑后发布');
+          }
+        });
+      } catch (error) {
+        this.isPublishing = false;
+      }
+    },
+  };
 
-	  watch = {};
+  events = {};
 
-	  computed = {};
+  watch = {};
 
-	  onLoad() {}
-	  onShow() {
-	    auth = false;
-	  }
-	  msgSecCheck(content) {
-	    return new Promise((resolve, reject) => {
-	      wx.cloud
-	        .callFunction({
-	          name: 'securityCheck',
-	          data: { content, type: 2 }
-	        })
-	        .then(res => {
-	          console.log(res);
-	          if (res && res.result && res.result.errCode === 87014) {
-	            resolve(false);
-	          } else {
-	            resolve(true);
-	          }
-	        })
-	        .catch(err => {
-	          console.log(err);
-	          //只要检查失败，都算作没有安全风险
-	          resolve(true);
-	        });
-	    });
-	  }
-	}
-	function upload(tempFilePath) {
-	  return new Promise((resolve, reject) => {
-	    wx.uploadFile({
-	      url: 'https://www.facedog.cn/api/discover/moment/images',
-	      filePath: tempFilePath,
-	      name: 'image',
-	      header: {
-	        Authorization: `Bearer ${wx.getStorageSync('token')}`,
-	        'Content-Type': 'multipart/form-data'
-	      },
-	      success(res) {
-	        // console.warn(res);
-	        // if (!IsJsonStrifng(res.data)) {
-	        //   toast('服务器开小差了，请稍后重试');
-	        //   return;
-	        // }
-	        const data = JSON.parse(res.data);
-	        console.log(data);
-	        if (data.message === '用户未审核') {
-	          toast('认证审核中，加急审核请联系客服微信：yanzc1023');
-	          auth = true;
-	          return;
-	        }
-	        let o = {
-	          tempFilePath,
-	          data: data.data.id
-	        };
-	        resolve(o);
-	        // do something
-	      },
-	      fail(res) {
-	        toast(res.message);
-	        reject(res);
-	      }
-	    });
-	  });
-	}
-	function checkImgSafe(tempFiles, index) {
-	  return new Promise((resolve, reject) => {
-	    // 压缩图片
-	    getImg(tempFiles, index)
-	      .then(tmpPath => {
-	        //先将图片转换为base64，然后调用云函数
-	        const fs = wx.getFileSystemManager();
-	        fs.readFile({
-	          filePath: tmpPath,
-	          encoding: 'base64',
-	          success: function(res) {
-	            wx.cloud
-	              .callFunction({
-	                name: 'securityCheck',
-	                data: { imgbase64: res.data }
-	              })
-	              .then(res => {
-	                if (res && res.result && res.result.errCode === 87014) {
-	                  reject(); //有安全风险
-	                } else {
-	                  resolve('ok');
-	                }
-	              })
-	              .catch(err => {
-	                //只要检查失败，都算作没有安全风险
-	                resolve('ok');
-	              });
-	          }
-	        });
-	      })
-	      .catch(err => {
-	        resolve();
-	      });
-	  });
-	}
-	function getImg(path, index) {
-	  return new Promise((resolve, reject) => {
-	    wx.getImageInfo({
-	      src: path,
-	      success(res) {
-	        // 图片原尺寸
-	        let height = res.height;
-	        let width = res.width;
+  computed = {};
 
-	        let maxWidth = 200;
-	        let maxHeight = 200;
+  onLoad() {}
+  onShow() {
+    auth = false;
+  }
+  msgSecCheck(content) {
+    return new Promise((resolve, reject) => {
+      wx.cloud
+        .callFunction({
+          name: 'securityCheck',
+          data: { content, type: 2 },
+        })
+        .then((res) => {
+          console.log(res);
+          if (res && res.result && res.result.errCode === 87014) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          //只要检查失败，都算作没有安全风险
+          resolve(true);
+        });
+    });
+  }
+}
+function upload(tempFilePath) {
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: `${wepy.$appConfig.baseUrl}/api/discover/moment/images`,
+      filePath: tempFilePath,
+      name: 'image',
+      header: {
+        Authorization: `Bearer ${wx.getStorageSync('token')}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      success(res) {
+        // console.warn(res);
+        // if (!IsJsonStrifng(res.data)) {
+        //   toast('服务器开小差了，请稍后重试');
+        //   return;
+        // }
+        const data = JSON.parse(res.data);
+        console.log(data);
+        if (data.message === '用户未审核') {
+          toast('认证审核中，加急审核请联系客服微信：yanzc1023');
+          auth = true;
+          return;
+        }
+        let o = {
+          tempFilePath,
+          data: data.data.id,
+        };
+        resolve(o);
+        // do something
+      },
+      fail(res) {
+        toast(res.message);
+        reject(res);
+      },
+    });
+  });
+}
+function checkImgSafe(tempFiles, index) {
+  return new Promise((resolve, reject) => {
+    // 压缩图片
+    getImg(tempFiles, index)
+      .then((tmpPath) => {
+        //先将图片转换为base64，然后调用云函数
+        const fs = wx.getFileSystemManager();
+        fs.readFile({
+          filePath: tmpPath,
+          encoding: 'base64',
+          success: function(res) {
+            wx.cloud
+              .callFunction({
+                name: 'securityCheck',
+                data: { imgbase64: res.data },
+              })
+              .then((res) => {
+                if (res && res.result && res.result.errCode === 87014) {
+                  reject(); //有安全风险
+                } else {
+                  resolve('ok');
+                }
+              })
+              .catch((err) => {
+                //只要检查失败，都算作没有安全风险
+                resolve('ok');
+              });
+          },
+        });
+      })
+      .catch((err) => {
+        resolve();
+      });
+  });
+}
+function getImg(path, index) {
+  return new Promise((resolve, reject) => {
+    wx.getImageInfo({
+      src: path,
+      success(res) {
+        // 图片原尺寸
+        let height = res.height;
+        let width = res.width;
 
-	        // 压缩后尺寸
-	        let targetWidth = width;
-	        let targetHeight = height;
-	        // 等比例压缩，如果宽度大于高度，则宽度优先，否则高度优先
-	        if (width > maxWidth || height > maxHeight) {
-	          if (width / height > maxWidth / maxHeight) {
-	            // 要求宽度*(原生图片比例)=新图片尺寸
-	            targetWidth = maxWidth;
-	            targetHeight = Math.round(maxWidth * (height / width));
-	          } else {
-	            targetHeight = maxHeight;
-	            targetWidth = Math.round(maxHeight * (width / height));
-	          }
-	        }
+        let maxWidth = 200;
+        let maxHeight = 200;
 
-	        const ctx = wx.createCanvasContext(`canvas-img-${index}`);
+        // 压缩后尺寸
+        let targetWidth = width;
+        let targetHeight = height;
+        // 等比例压缩，如果宽度大于高度，则宽度优先，否则高度优先
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            // 要求宽度*(原生图片比例)=新图片尺寸
+            targetWidth = maxWidth;
+            targetHeight = Math.round(maxWidth * (height / width));
+          } else {
+            targetHeight = maxHeight;
+            targetWidth = Math.round(maxHeight * (width / height));
+          }
+        }
 
-	        ctx.clearRect(0, 0, targetWidth, targetHeight);
-	        ctx.drawImage(path, 0, 0, targetWidth, targetHeight);
-	        ctx.draw(true, function() {
-	          wx.canvasToTempFilePath({
-	            canvasId: `canvas-img-${index}`,
-	            x: 0,
-	            y: 0,
-	            width: targetWidth,
-	            height: targetHeight,
-	            quality: 0.5,
-	            fileType: 'jpg',
-	            success: function(res) {
-	              console.log('index', index);
-	              resolve(res.tempFilePath);
-	            },
-	            fail: function(err) {
-	              reject(err);
-	            }
-	          });
-	        });
-	      },
-	      fail: function(err) {
-	        reject(err);
-	      }
-	    });
-	  });
-	}
+        const ctx = wx.createCanvasContext(`canvas-img-${index}`);
+
+        ctx.clearRect(0, 0, targetWidth, targetHeight);
+        ctx.drawImage(path, 0, 0, targetWidth, targetHeight);
+        ctx.draw(true, function() {
+          wx.canvasToTempFilePath({
+            canvasId: `canvas-img-${index}`,
+            x: 0,
+            y: 0,
+            width: targetWidth,
+            height: targetHeight,
+            quality: 0.5,
+            fileType: 'jpg',
+            success: function(res) {
+              console.log('index', index);
+              resolve(res.tempFilePath);
+            },
+            fail: function(err) {
+              reject(err);
+            },
+          });
+        });
+      },
+      fail: function(err) {
+        reject(err);
+      },
+    });
+  });
+}
 </script>
 
 <style lang='less' scoped>

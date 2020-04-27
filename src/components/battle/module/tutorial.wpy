@@ -29,73 +29,73 @@
 		<!-- <image style="top:{{isphoneX?'300rpx':'0'}}" class="tutorial3" @tap="show(3)" wx:if="{{step3}}" src="https://images.facedog.cn/public/battle/tutorial/guide3.png" mode="aspectFill">
         </image> -->
 	</view>
-	<image style="top:{{isphoneX?'160rpx':'110rpx'}}" class="tutorial3" @tap="show()" wx:if="{{step4 && !showCover}}" src="https://images.facedog.cn/public/tutorial/step3.png" mode="aspectFill">
+	<image style="top:{{isphoneX?'160rpx':'110rpx'}}" class="tutorial3" @tap="show()" wx:if="{{step4 && !showCover}}" src="https://images.facedog.cn/public/tutorial/step3.png?1" mode="aspectFill">
 	</image>
 </template>
 
 <script>
-	import wepy from 'wepy';
-	export default class Turorial extends wepy.component {
-	  props = {};
+import wepy from 'wepy';
+export default class Turorial extends wepy.component {
+  props = {};
 
-	  data = {
-	    step1: true,
-	    step2: false,
-	    step3: false,
-	    step4: false,
-	    isphoneX: false,
-	    showCover: true,
-	    num: 1
-	  };
+  data = {
+    step1: true,
+    step2: false,
+    step3: false,
+    step4: false,
+    isphoneX: false,
+    showCover: true,
+    num: 1,
+  };
 
-	  components = {};
+  components = {};
 
-	  methods = {
-	    show() {
-	      if (this.num == 1) {
-	        this.step2 = true;
-	        this.step1 = false;
-	        this.num = 2;
-	      } else if (this.num == 2) {
-	        this.step2 = false;
-	        this.step3 = true;
-	        this.num = 3;
-	      } else if (this.num == 3) {
-	        this.step3 = false;
-	        this.step4 = true;
-	        this.showCover = false;
-	        this.num = 4;
-	      } else {
-	        this.$emit('closeTutorial');
-	      }
-	    }
-	  };
+  methods = {
+    show() {
+      if (this.num == 1) {
+        this.step2 = true;
+        this.step1 = false;
+        this.num = 2;
+      } else if (this.num == 2) {
+        this.step2 = false;
+        this.step3 = true;
+        this.num = 3;
+      } else if (this.num == 3) {
+        this.step3 = false;
+        this.step4 = true;
+        this.showCover = false;
+        this.num = 4;
+      } else {
+        this.$emit('closeTutorial');
+      }
+    },
+  };
 
-	  events = {};
+  events = {};
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {
-	    var that = this;
-	    wx.getSystemInfo({
-	      success(res) {
-	        var name = 'iPhone X';
-	        if (
-	          res.model.indexOf('iPhone 11') > -1 ||
-	          res.model.indexOf('iPhone X') > -1 ||
-	          res.model.indexOf('unknown<iPhone') > -1
-	        ) {
-	          that.isphoneX = true;
-	          that.$apply();
-	        }
-	      }
-	    });
-	  }
+  onLoad() {
+    var that = this;
+    wx.getSystemInfo({
+      success(res) {
+        var name = 'iPhone X';
+        if (
+          res.model.indexOf('iPhone 11') > -1 ||
+          res.model.indexOf('iPhone X') > -1 ||
+          res.model.indexOf('unknown<iPhone') > -1
+        ) {
+          that.isphoneX = true;
+          that.$apply();
+        }
+      },
+    });
+  }
 
-	  onShow() {}
-	}
+  onShow() {}
+}
 </script>
 
 <style lang='less' scoped>
@@ -151,15 +151,15 @@
 	        width: 261rpx;
 	        height: 239rpx;
 	      }
-		}
-		&.step3{
-			position: relative;
-	        top: 600rpx;
-	        font-size: 38rpx;
-	        color: white;
-	        width: 100%;
-	        text-align: center;
-		}
+	    }
+	    &.step3 {
+	      position: relative;
+	      top: 600rpx;
+	      font-size: 38rpx;
+	      color: white;
+	      width: 100%;
+	      text-align: center;
+	    }
 	    .tutorial1 {
 	      animation: swipedown 2s linear infinite;
 	      @keyframes swipedown {
@@ -194,13 +194,13 @@
 	    height: 69rpx;
 	    border: 3rpx solid rgba(248, 184, 0, 1);
 	    opacity: 1;
-		border-radius: 11rpx;
-		display:flex;
-		justify-content: center;
-		align-items: center;
-		font-size: 32rpx;
-		margin: 30rpx auto;
-		color:#F9B900;
+	    border-radius: 11rpx;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    font-size: 32rpx;
+	    margin: 30rpx auto;
+	    color: #f9b900;
 	  }
 	}
 </style>

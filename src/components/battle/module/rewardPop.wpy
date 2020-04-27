@@ -1,8 +1,9 @@
 <!--  -->
 <template>
 	<view class='wrapper'>
-		<image class="bg" src="https://images.facedog.cn/mp/reward/rewardPop-bg.png" mode="scaleToFill" lazy-load="false">
+		<image class="bg" src="https://images.facedog.cn/mp/reward/rewardPop-bg.png?1" mode="scaleToFill" lazy-load="false">
 		</image>
+		<view class="money">{{userMoney.money}}元</view>
 		<view class="try" @tap="try">
 			开始赚钱
 		</view>
@@ -15,10 +16,14 @@
 
 <script>
 import wepy from 'wepy';
+import { GET_USER_MONEY } from '@/utils/url';
+import { get } from '@/utils/request';
 export default class RewardPop extends wepy.component {
   props = {};
 
-  data = {};
+  data = {
+    userMoney: {},
+  };
 
   components = {};
 
@@ -29,6 +34,10 @@ export default class RewardPop extends wepy.component {
     },
     close() {
       this.$emit('closeRewardPop');
+    },
+    async getMoney() {
+      this.userMoney = await get(GET_USER_MONEY);
+      this.$apply();
     },
   };
 
@@ -64,6 +73,14 @@ export default class RewardPop extends wepy.component {
 	      margin-top: 56rpx;
 	    }
 	  }
+	  .money {
+	    position: absolute;
+	    top: 268rpx;
+	    left: 50%;
+	    font-size: 40rpx;
+	    color: white;
+	    transform: translateX(-50%);
+	  }
 	  .try {
 	    width: 420rpx;
 	    height: 92rpx;
@@ -76,7 +93,7 @@ export default class RewardPop extends wepy.component {
 	    position: absolute;
 	    left: 50%;
 	    transform: translateX(-50%);
-	    bottom: 110rpx;
+	    bottom: 70rpx;
 	  }
 	  .close {
 	    width: 45rpx;

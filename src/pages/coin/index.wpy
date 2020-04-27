@@ -4,90 +4,122 @@
 	</navbar>
 	<view class='container'>
 		<view class="coin-info">
-			<view class="coin-help" @tap="coinHelp">颜币获取</view>
-			<image src="https://images.facedog.cn/public/coin/icon-coin.png" mode="scaleToFill" lazy-load="false">
+			<view class="coin-help"
+			      @tap="coinHelp">颜币获取</view>
+			<image src="https://images.facedog.cn/public/coin/icon-coin.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
 			<view class="text">
 				<view class="number">{{coin}}</view>
 				<view class="tip">(价值{{coin/10}}元)</view>
 			</view>
-			<view class="button">
-				<image src="https://images.facedog.cn/public/coin/withdraw.png" mode="aspectFill" lazy-load="false">
+			<view class="button"
+			      @tap="previewCard">
+				<image src="https://images.facedog.cn/mp/other/withdraw.png"
+				       mode="aspectFill"
+				       lazy-load="false">
 				</image>
-				<view class="button-text">
+				<!-- <view class="button-text">
 					*下一版本开放
-				</view>
+				</view> -->
 			</view>
 
 		</view>
-		<view class="button button1" @tap="show(1)">
+		<view class="waiting">
+			<image src="https://images.facedog.cn/mp/other/waiting.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+		</view>
+		<!-- <view class="button button1" @tap="show(1)">
 			<image src="https://images.facedog.cn/public/coin/red-banner.png" mode="scaleToFill" lazy-load="false">
 			</image>
 		</view>
 		<view class="button button2" @tap="show(2)">
 			<image src="https://images.facedog.cn/public/coin/green-banner.png" mode="scaleToFill" lazy-load="false">
 			</image>
-		</view>
+		</view> -->
 	</view>
-	<van-popup show="{{ showPop }}" bind:close="onClose">
+	<van-popup show="{{ showPop }}"
+	           bind:close="onClose">
 		<coinPop />
 	</van-popup>
 </template>
 
 <script>
-	import wepy from 'wepy';
-	import coinPop from './module/coinPop';
-	export default class Coin extends wepy.page {
-	  config = {
-	    navigationBarTitleText: '',
-	    usingComponents: {
-	      navbar: '../../components/navbar/index',
-	      'van-popup': '../components/vant/popup/index'
-	    }
-	  };
+import wepy from 'wepy';
+import coinPop from './module/coinPop';
+export default class Coin extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-popup': '../components/vant/popup/index',
+    },
+  };
 
-	  data = {
-	    showPop: false,
-	    coin: 0
-	  };
+  data = {
+    showPop: false,
+    coin: 0,
+  };
 
-	  components = {
-	    coinPop
-	  };
+  components = {
+    coinPop,
+  };
 
-	  methods = {
-	    coinHelp() {
-	      wepy.navigateTo({ url: 'coinHelp' });
-	    },
-	    show(type) {
-	      this.$invoke('coinPop', 'setType', type);
-	      this.showPop = true;
-	    }
-	  };
+  methods = {
+    coinHelp() {
+      wepy.navigateTo({ url: 'coinHelp' });
+    },
+    show(type) {
+      //   this.$invoke('coinPop', 'setType', type);
+      //   this.showPop = true;
+    },
+    previewCard() {
+      //    this.$emit('closePop');
+      wx.previewImage({
+        current: 'https:images.facedog.cn/public/invite/wechat-card.png?1',
+        urls: ['https:images.facedog.cn/public/invite/wechat-card.png?1'],
+      });
+    },
+  };
 
-	  events = {
-	    closePop() {
-	      this.showPop = false;
-	    }
-	  };
+  events = {
+    closePop() {
+      this.showPop = false;
+    },
+  };
 
-	  watch = {};
+  watch = {};
 
-	  computed = {};
+  computed = {};
 
-	  onLoad() {
-	    let profile = wx.getStorageSync('profile');
-	    this.coin = profile.coin;
-	  }
+  onLoad() {
+    let profile = wx.getStorageSync('profile');
+    this.coin = profile.coin;
+  }
 
-	  onShow() {}
-	}
+  onShow() {}
+}
 </script>
 
 <style lang='scss'>
 	.container {
 	  position: relative;
 	  width: 100%;
+	  .waiting {
+	    width: 336rpx;
+	    height: 384rpx;
+	    position: absolute;
+	    top: 500rpx;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
+	  }
 	  .coin-info {
 	    width: 100%;
 	    height: 240rpx;
@@ -96,20 +128,21 @@
 	    justify-content: center;
 	    padding-top: 100rpx;
 	    position: relative;
+
 	    .coin-help {
 	      position: absolute;
 	      right: 30rpx;
-	      top: 30rpx; 
+	      top: 30rpx;
 	      width: 111rpx;
 	      height: 50rpx;
 	      border: 1rpx solid rgba(255, 255, 255, 1);
 	      opacity: 1;
 	      border-radius: 5rpx;
-		  font-size:20rpx;
-		  color:white;
-		  display:flex;
-		  justify-content: center;
-		  align-items: center;
+	      font-size: 20rpx;
+	      color: white;
+	      display: flex;
+	      justify-content: center;
+	      align-items: center;
 	    }
 	    image {
 	      width: 70rpx;

@@ -10,7 +10,10 @@
 		</view> -->
 		<view class="wrap">
 			<image wx:if="{{!profile.level}}" src="https://images.facedog.cn/mp/profile/unLevel.png" mode="scaleToFill" lazy-load="false" />
-			<image @tap="hide" wx:if="{{profile.progress == 'finish' && showFinish}}" src="https://images.facedog.cn/mp/profile/virify-finish.png" mode="scaleToFill" lazy-load="false" />
+			<image @tap="hide3" wx:if="{{profile.progress == 'finish' && showFinish1}}" src="https://images.facedog.cn/mp/profile/level-set.png" mode="scaleToFill" lazy-load="false" />
+		</view>
+		<view class="wrap" @tap="hide2" wx:if="{{profile.video_audit == 'finish' && showFinish2}}">
+			<image src="https://images.facedog.cn/mp/profile/video-finish.png" mode="scaleToFill" lazy-load="false" />
 		</view>
 		<!-- <view class="wrap" @tap="close" wx:if="{{profile.progress === 'finish'}}">
 			<image src="https://images.facedog.cn/public/my/notify-verified.png" mode="scaleToFill" lazy-load="false">
@@ -25,7 +28,8 @@ export default class Notify extends wepy.component {
 
   data = {
     profile: {},
-    showFinish: null,
+    showFinish1: null,
+    showFinish2: null,
   };
 
   components = {};
@@ -37,16 +41,26 @@ export default class Notify extends wepy.component {
     go() {
       wepy.navigateTo({ url: `register/verify` });
     },
-    hide() {
+    hide3() {
       wepy.setStorageSync('showFinish', true);
-      this.showFinish = false;
+      console.log(12123);
+      this.showFinish1 = false;
+      this.$apply();
+    },
+    hide2() {
+      wepy.setStorageSync('showVideoFinish', true);
+      this.showFinish2 = false;
+      this.$apply();
     },
     setProfile(profile) {
       this.profile = profile;
-      let showFinish = wepy.getStorageSync('showFinish');
-      console.log('showFinish', showFinish);
-      if (!showFinish) {
-        this.showFinish = true;
+      let showFinish1 = wepy.getStorageSync('showFinish');
+      if (!showFinish1) {
+        this.showFinish1 = true;
+      }
+      let showFinish2 = wepy.getStorageSync('showVideoFinish');
+      if (!showFinish2) {
+        this.showFinish2 = true;
       }
       console.log('PROGRESS:::', this.profile.progress);
       this.$apply();

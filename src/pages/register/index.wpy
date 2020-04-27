@@ -1,5 +1,6 @@
 <!--  -->
 <template>
+	<!-- <navbar title="{{title}}"></navbar> -->
 	<view class='container'>
 		<!-- <view class="stopMoveCover" wx:if="{{isSwiperMoving}}"></view> -->
 		<view class="dog-wrap" wx:if="{{!showRegister}}">
@@ -72,7 +73,12 @@
 			</swiper-item>
 			<swiper-item catchtouchmove='catchTouchMove'>
 				<view class="register-item">
-					<uploadAvatar :number.sync="number" />
+					<uploadAvatar />
+				</view>
+			</swiper-item>
+			<swiper-item catchtouchmove='catchTouchMove'>
+				<view class="register-item">
+					<setCharacter />
 				</view>
 			</swiper-item>
 			<swiper-item>
@@ -93,6 +99,7 @@ import chooseGender from '@/components/register/chooseGender';
 import chooseName from '@/components/register/chooseName';
 import chooseBirth from '@/components/register/chooseBirth';
 import uploadAvatar from '@/components/register/uploadAvatar';
+import setCharacter from '@/components/register/setCharacter';
 import finishRegister from '@/components/register/finishRegister';
 import { get, post } from '@/utils/request';
 import { GET_REGISTER_NUMBER } from '@/utils/url';
@@ -103,10 +110,11 @@ export default class Example extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
+      navbar: '../../components/navbar/index',
       'van-toast': '../../components/vant/toast/index',
       'van-dialog': '../../components/vant/dialog/index',
-      'van-loading': '../../components/vant/loading/index'
-    }
+      'van-loading': '../../components/vant/loading/index',
+    },
   };
 
   data = {
@@ -117,8 +125,10 @@ export default class Example extends wepy.page {
     textCurrent: 0,
     numObj: {},
     initAnimation: false,
+    title: '',
     timeout: null,
-    isSwiperMoving: false
+    isSwiperMoving: false,
+    isPhoneX: false,
   };
 
   components = {
@@ -126,7 +136,8 @@ export default class Example extends wepy.page {
     chooseName,
     chooseBirth,
     uploadAvatar,
-    finishRegister
+    setCharacter,
+    finishRegister,
   };
 
   methods = {
@@ -143,7 +154,7 @@ export default class Example extends wepy.page {
         success: async () => {},
         complete() {
           wepy.redirectTo({ url: 'verify' });
-        }
+        },
       });
     },
     goGuest() {
@@ -153,29 +164,42 @@ export default class Example extends wepy.page {
         complete() {
           console.log('订阅complete');
           wx.redirectTo({
-            url: '/pages/index'
+            url: '/pages/index',
           });
-        }
+        },
       });
     },
     clickShowRegister() {
       this.showRegister = true;
+
+      this.title = '1/6';
       this.current = 0;
     },
     catchTouchMove() {
       return false;
-    }
+    },
   };
 
   events = {
     changeStep(step) {
+      console.log(step);
+      let titleIndex = 1;
+      if (step == 0) {
+        this.title = `${titleIndex}/6`;
+      } else {
+        titleIndex = step + 1;
+        if (step == 4) {
+          this.$invoke('setCharacter', 'init');
+        }
+        this.title = `${titleIndex}/6`;
+      }
       //   if (step == 4) {
       //     this.initAnimation = 'loaded';
       //     this.showRegister = false;
       //     this.textCurrent = 2;
       //   }
       this.current = step;
-    }
+    },
   };
 
   watch = {};
@@ -192,6 +216,8 @@ export default class Example extends wepy.page {
     this.showRegister = false;
     this.textCurrent = 0;
     this.numObj = {};
+    this.isPhoneX = wepy.getStorageSync('iphoneX');
+
     this.$apply();
     timeout1 = setTimeout(() => {
       clearTimeout(timeout1);

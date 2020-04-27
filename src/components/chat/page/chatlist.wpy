@@ -3,13 +3,27 @@
 	<!-- <block wx:if="{{!list.length}}">
 		<empty></empty>
 	</block> -->
-	<view class='wrapper'>
-		<view class="chat-box">
-			<image class="icon" @tap.capture.stop="goProfile('颜币红包')" src="https://images.facedog.cn/public/battle/redpacket.png" mode="aspectFill"></image>
-			<view class="msg" @tap.capture.stop="onClick('颜币红包')">
-				<view class="name">颜币红包<view wx:if="{{unreadRedPacket}}" class="unreadMsg">有新消息</view>
+	<view class="wrapper {{isphoneX?'iphoneX':''}}">
+		<view class="chat-box" @tap.capture.stop="onClick('颜币红包')">
+			<image class="icon" src="https://images.facedog.cn/mp/other/wechat-icon.png" mode="aspectFill"></image>
+			<view class="msg">
+				<view class="name">微信申请<view wx:if="{{unreadRedPacket}}" class="unreadMsg">
+						<image style="width:94rpx;height:37rpx;" src="https://images.facedog.cn/mp/other/new-msg.png" mode="scaleToFill" lazy-load="false">
+						</image>
+					</view>
 				</view>
-				<view class="content"></view>
+				<view class="content">通过微信申请，可以获得颜币奖励哦</view>
+			</view>
+			<view class="right-part">
+				<view class="time"></view>
+			</view>
+		</view>
+		<view class="chat-box" @tap.capture.stop="toFriendList">
+			<image class="icon" src="https://images.facedog.cn/mp/other/friend-icon.png" mode="aspectFill"></image>
+			<view class="msg">
+				<view class="name">好友列表
+				</view>
+				<view class="content">聊天列表消失，可以在这里重新打开</view>
 			</view>
 			<view class="right-part">
 				<view class="time"></view>
@@ -19,8 +33,12 @@
 			<van-swipe-cell class="swipe" id="{{item.id}}" async-close data-index="{{index}}" right-width="{{ 70 }}" data-unread="{{item.unreadCount}}" async-close bind:close="onDelete">
 				<view class="chat-box {{index==list.length-1?'last':''}}">
 					<image class="icon" @tap.capture.stop="goProfile({{item.id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_200,h_200/format,jpg" mode="aspectFill"></image>
+					<image class="level {{item.level}}" src="https://images.facedog.cn/mp/profile/{{item.level}}.png" mode="scaleToFill" lazy-load="false">
+					</image>
 					<view class="msg" @tap.capture.stop="onClick({{item.id}},{{item.conversationID}},{{item.unreadCount}})">
-						<view class="name">{{item.nick}}</view>
+						<view class="name">{{item.nick}}<image wx:if="{{item.vip}}" class="vip" src="https://images.facedog.cn/public/profile/vip-icon.png" mode="scaleToFill" lazy-load="false">
+							</image>
+						</view>
 						<view class="content">{{item.message}}</view>
 					</view>
 					<view class="right-part">
@@ -39,7 +57,7 @@
 import wepy from 'wepy';
 import { formatDateFromSeconds } from '@/utils';
 import { get, deltemp } from '@/utils/request';
-import { FRIENDS_LIST } from '@/utils/url';
+import { FRIENDS_LIST, GET_CHATLIST_USERINFO } from '@/utils/url';
 // import webimhandler from '@/utils/handler';
 // import webim from '@/utils/webim.js'; // 腾讯云im包
 import empty from '@/components/empty';
@@ -53,30 +71,27 @@ export default class Chatlist extends wepy.component {
     unread: 0,
     touch: false,
     friendList: [],
-    unreadRedPacket: false
+    unreadRedPacket: false,
+    isphoneX: false,
   };
 
   components = {
-    empty
+    empty,
   };
   methods = {
+    toFriendList() {
+      wepy.navigateTo({ url: '/pages/chat/friendList' });
+    },
     touchstart() {
       this.touch = true;
     },
     goProfile(id) {
-      if (id == '颜币红包') {
-        wepy.navigateTo({ url: '/pages/redPacket/list' });
-        return;
-      }
       if (id === 'administrator') return;
-      wx.navigateTo({
-        url: 'battle/profile?dentifier=' + id,
-        success: result => {},
-        fail: () => {},
-        complete: () => {}
-      });
+      wepy.navigateTo({ url: 'battle/profile?dentifier=' + id });
     },
     async getChatList(data) {
+      console.log(this.$parent);
+      this.isphoneX = wepy.getStorageSync('iphoneX');
       const friendList = await get(FRIENDS_LIST);
       this.list = [];
       this.unread = 0;
@@ -86,9 +101,9 @@ export default class Chatlist extends wepy.component {
       } else {
         this.unreadRedPacket = false;
       }
-      data = data.filter(x => x.type == 'C2C' || x.type == 'TIMTextElem');
+      data = data.filter((x) => x.type == 'C2C' || x.type == 'TIMTextElem');
       console.log('DATA:::::', data);
-      data.forEach(item => {
+      data.forEach((item) => {
         item.nick = decodeURIComponent(item.userProfile.nick);
         item.id = item.userProfile.userID;
         item.message = decodeURIComponent(item.lastMessage.messageForShow);
@@ -99,14 +114,16 @@ export default class Chatlist extends wepy.component {
           item.avatar = 'https://images.facedog.cn/public/chat/chatIcon.png';
           item.nick = '颜狗客服';
         }
-        if (!item.nick) {
-          friendList.forEach(friend => {
-            if (item.id == friend.dentifier) {
-              item.nick = friend.nick_name;
-              item.avatar = friend.avatar;
-            }
-          });
-        }
+        // if (!item.nick) {
+        friendList.forEach((friend) => {
+          if (item.id == friend.dentifier) {
+            item.nick = friend.nick_name;
+            item.avatar = friend.avatar;
+            item.level = friend.level;
+            item.vip = friend.vip;
+          }
+        });
+        // }
       });
       data.sort((x, y) => {
         return x.conversationID === 'C2Cadministrator'
@@ -116,12 +133,12 @@ export default class Chatlist extends wepy.component {
             : 0;
       });
 
-      const r = data.filter(elem =>
+      const r = data.filter((elem) =>
         friendList.find(
           ({ dentifier }) => elem.id === dentifier || elem.id == 'administrator'
         )
       );
-      r.forEach(x => {
+      r.forEach((x) => {
         this.unread += x.unreadCount;
       });
       this.$emit('unreadSet', this.unread);
@@ -141,7 +158,7 @@ export default class Chatlist extends wepy.component {
         }
       }
       let list = JSON.parse(JSON.stringify(that.list));
-      list.forEach(item => {
+      list.forEach((item) => {
         if (item.conversationID == conversationID) {
           item.unreadCount = 0;
         }
@@ -150,7 +167,7 @@ export default class Chatlist extends wepy.component {
       that.$apply();
       wx.$app.setMessageRead({ conversationID });
       wx.navigateTo({
-        url: `chat/chatRoom?id=${id}&conversationID=${conversationID}`
+        url: `chat/chatRoom?id=${id}&conversationID=${conversationID}`,
       });
     },
     async onDelete(event) {
@@ -173,7 +190,7 @@ export default class Chatlist extends wepy.component {
             });
           if (instance.id != 'administrator') {
             await deltemp(FRIENDS_LIST, {
-              user_id: instance.id
+              user_id: instance.id,
             });
           }
           this.list.splice(instance.dataset.index, 1);
@@ -182,7 +199,7 @@ export default class Chatlist extends wepy.component {
           this.$apply();
           break;
       }
-    }
+    },
   };
   events = {};
 
@@ -200,7 +217,10 @@ export default class Chatlist extends wepy.component {
 	.wrapper {
 	  width: 750rpx;
 	  margin-top: 32rpx;
-	  padding-bottom: 70rpx;
+	  padding-bottom: 80rpx;
+	  &.iphoneX {
+	    padding-bottom: 150rpx;
+	  }
 	  .redpacket {
 	    width: 100%;
 	    height: 100rpx;
@@ -258,15 +278,44 @@ export default class Chatlist extends wepy.component {
 	      height: 126rpx;
 	      border-radius: 50%;
 	    }
+	    .level {
+	      height: 28rpx;
+	      position: absolute;
+	      left: 72rpx;
+	      top: 110rpx;
+	      border-radius: 0;
+	      &.N {
+	        width: 26rpx;
+	      }
+	      &.R {
+	        width: 26rpx;
+	        left: 86rpx;
+	      }
+	      &.SR {
+	        width: 44rpx;
+	      }
+	      &.SSR {
+	        width: 65rpx;
+	      }
+	    }
 	    .msg {
 	      margin-right: auto;
 	      margin-left: 30rpx;
 	      width: 400rpx;
+
 	      .name {
 	        font-size: 31rpx;
 	        font-family: PingFang SC;
 	        font-weight: 600;
 	        color: rgba(0, 0, 0, 1);
+	        position: relative;
+	        .vip {
+	          width: 72rpx;
+	          height: 24rpx;
+	          position: relative;
+	          left: 10rpx;
+	          top: 0rpx;
+	        }
 	      }
 	      .content {
 	        margin-top: 4rpx;

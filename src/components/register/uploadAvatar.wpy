@@ -17,16 +17,19 @@
 		</block>
 		<view class="wrong-tip" wx:if="{{tipCover}}">
 			<view class="text">上传的头像将决定你的<text style="color:#68e1a5;">初始评级</text></view>
+			<view class="text">根据<text style="color:#68e1a5;">大数据算法</text>和<text style="color:#68e1a5;">大众审核</text>得出</view>
 			<view class="text">评级影响你的权益，通过任务可以升级</view>
 			<view class="pic-box">
-				<image src="https://images.facedog.cn/mp/register/wrong1.png" mode="scaleToFill" lazy-load="false">
-				</image>
-				<image src="https://images.facedog.cn/mp/register/wrong2.png" mode="scaleToFill" lazy-load="false">
-				</image>
-				<image src="https://images.facedog.cn/mp/register/wrong3.png" mode="scaleToFill" lazy-load="false">
-				</image>
-				<image src="https://images.facedog.cn/mp/register/wrong4.png" mode="scaleToFill" lazy-load="false">
-				</image>
+				<view>
+					<image style="height:313rpx" src="https://images.facedog.cn/mp/register/wrong1.png?1" mode="aspectFit" lazy-load="false">
+					</image>
+				</view>
+				<view>
+					<image src="https://images.facedog.cn/mp/register/wrong-2.png?1" mode="aspectFill" lazy-load="false">
+					</image>
+					<image src="https://images.facedog.cn/mp/register/wrong-3.png?1" mode="aspectFill" lazy-load="false">
+					</image>
+				</view>
 			</view>
 			<!-- <view class="text" style="color:#CBC9C8;">*每人拥有一次重新评级的机会</view> -->
 			<view class="btn" @tap="closeTipCover">我知道了</view>
@@ -296,12 +299,12 @@ function getImg(path, index) {
 	  .wrong-tip {
 	    width: 100%;
 	    background: rgba(0, 0, 0, 0.7);
-	    height: 100vh;
+	    height: 99vh;
 	    position: absolute;
 	    z-index: 99;
 	    top: 0;
 	    left: 0;
-	    padding-top: 200rpx;
+	    padding-top: 160rpx;
 	    text-align: center;
 	    .text {
 	      font-size: 35rpx;
@@ -315,8 +318,8 @@ function getImg(path, index) {
 	      margin: 52rpx auto;
 	      justify-content: center;
 	      image {
-	        width: 223rpx;
-	        height: 265rpx;
+	        width: 227rpx;
+	        height: 313rpx;
 	        object-fit: cover;
 	        margin: 15rpx 20rpx;
 	      }
@@ -352,7 +355,7 @@ function getImg(path, index) {
 	    text-align: center;
 	  }
 	  .wrap {
-	    margin: 90rpx 132rpx 0;
+	    margin: 80rpx 132rpx 0;
 	    display: flex;
 	    justify-content: center;
 	  }

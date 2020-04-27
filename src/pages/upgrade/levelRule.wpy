@@ -1,20 +1,20 @@
 <!--  -->
 <template>
-	<navbar title="获取颜币">
+	<navbar title="等级规则">
 	</navbar>
 	<view class='container'>
-		<image src="https://images.facedog.cn/mp/other/intro-coin.png" mode="scaleToFill" lazy-load="false">
+		<image src="https://images.facedog.cn/mp/profile/intro-level.png?12" mode="scaleToFill" lazy-load="false">
 		</image>
 	</view>
 </template>
 
 <script>
 import wepy from 'wepy';
-export default class CoinHelp extends wepy.page {
+export default class LevelRule extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
-      navbar: '../../components/navbar/index',
+      navbar: '../../../components/navbar/index',
     },
   };
 
@@ -43,7 +43,7 @@ export default class CoinHelp extends wepy.page {
 	  image {
 	    margin: 50rpx 30rpx;
 	    width: 683rpx;
-	    height: 1095rpx;
+	    height: 1141rpx;
 	  }
 	}
 </style>

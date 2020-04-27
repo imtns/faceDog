@@ -144,14 +144,14 @@ export default class Setting extends wepy.page {
       this.setting[name] = e.detail;
       this.opposite_sex = this.gender == 1;
       this.$apply();
-      await put(USER_SETTING, this.setting);
+      this.settingSet(this.setting);
       Event.trigger('battleFresh');
     },
     async genderChange(status) {
       this.gender = status;
       this.setting.opposite_sex = status == 1;
       this.$apply();
-      await put(USER_SETTING, this.setting);
+      this.settingSet(this.setting);
       Event.trigger('battleFresh');
       this.$apply();
       console.log(status);
@@ -159,12 +159,15 @@ export default class Setting extends wepy.page {
     async setBattleLevel(level) {
       this.level = level;
       this.setting.show = level;
-      await put(USER_SETTING, this.setting);
+      this.settingSet(this.setting);
       Event.trigger('battleFresh');
       this.$apply();
     },
   };
-
+  async settingSet(setting) {
+    wepy.setStorageSync('setting', JSON.stringify(setting));
+    await put(USER_SETTING, setting);
+  }
   events = {};
 
   watch = {};

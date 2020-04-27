@@ -11,7 +11,7 @@
 import wepy from 'wepy';
 
 import { Event } from '@/utils/event.js';
-import { toast } from '@/utils';
+import { toast, VerifyControl } from '@/utils';
 export default class topBanner extends wepy.component {
   data = {};
 

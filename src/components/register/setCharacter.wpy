@@ -1,0 +1,194 @@
+<!--  -->
+<template>
+	<view class='container-gender'>
+		<view class="title">丰富你的人设，让推荐更精准</view>
+		<view class="tip">可以随时修改，最多选择3项</view>
+		<view class="tag-wrap">
+			<repeat for="{{tags}}"
+			        key="index"
+			        index="index"
+			        item="item">
+				<view class="tag {{item.choose?'active':''}}"
+				      @tap="tagClick({{item}},{{index}})">{{item.name}}</view>
+			</repeat>
+		</view>
+		<!-- <form report-submit='true' bindsubmit='submitForm'> -->
+		<button size="large"
+		        style="background:#09A776;bottom:310rpx;"
+		        @tap="save">下一步</button>
+		<button size="large"
+		        @tap="skip">跳过</button>
+
+		<!-- </form> -->
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { post, get } from '@/utils/request';
+import { toast } from '@/utils';
+import { GET_USER_CHARACTER, SETTING_PROFILE_EXTRA } from '@/utils/url';
+export default class SetCharacter extends wepy.component {
+  data = {
+    tags: [],
+    chooseTags: [],
+  };
+
+  components = {};
+
+  methods = {
+    async init() {
+      this.tags = await get(GET_USER_CHARACTER);
+      this.tags = this.tags.map((tag) => {
+        return {
+          name: tag,
+          choose: false,
+        };
+      });
+      this.$apply();
+    },
+    skip() {
+      this.$emit('changeStep', 5);
+    },
+    async save() {
+      await post(SETTING_PROFILE_EXTRA, {
+        character: this.chooseTags.map((item) => item.name),
+      });
+      setTimeout(() => {
+        this.$emit('changeStep', 5);
+      }, 500);
+    },
+    tagClick(tag, index) {
+      if (tag.choose) {
+        let findIndex = this.chooseTags.findIndex((x) => x.name === tag.name);
+        this.tags[index].choose = false;
+        this.chooseTags.splice(findIndex, 1);
+        return;
+      }
+      if (this.chooseTags.length === 3) {
+        Toast('最多选择三个');
+        return;
+      }
+      this.chooseTags.push(tag);
+      this.tags[index].choose = true;
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+}
+</script>
+
+<style lang='scss'>
+	.container-gender {
+	  height: 100vh;
+	  position: relative;
+	  overflow: hidden;
+	  width: 100%;
+	  margin: 0 auto;
+	  .title {
+	    margin-top: 140rpx;
+	    text-align: center;
+	    color: #302f2f;
+	    font-size: 42rpx;
+	  }
+	  .tip {
+	    color: #a6aaa8;
+	    font-size: 24rpx;
+	    margin-top: 10rpx;
+	    text-align: center;
+	  }
+	  .tag-wrap {
+	    display: flex;
+	    justify-content: center;
+	    width: 100%;
+	    flex-wrap: wrap;
+	    margin-top: 100rpx;
+	    .tag {
+	      background: rgba(255, 255, 255, 1);
+	      border-radius: 32rpx;
+	      border: 2rpx solid rgba(0, 0, 0, 1);
+	      color: #211f1f;
+	      font-size: 28rpx;
+	      display: flex;
+	      justify-content: center;
+	      align-items: center;
+	      margin: 15rpx;
+	      padding: 12rpx 30rpx;
+	      &.active {
+	        background: rgba(27, 26, 40, 1);
+	        color: white;
+	      }
+	    }
+	  }
+	  .wrap {
+	    margin: 186rpx 132rpx 0;
+	    display: flex;
+	    justify-content: space-between;
+	    .box {
+	      display: flex;
+	      text-align: center;
+	      align-items: center;
+	      flex-direction: column;
+	      image {
+	        width: 196rpx;
+	        height: 196rpx;
+	      }
+	      .text {
+	        font-size: 24rpx;
+	        margin-top: 35rpx;
+	        color: #707070;
+	        &.active {
+	          color: #000;
+	          font-weight: bold;
+	        }
+	      }
+	      .dot {
+	        width: 32rpx;
+	        height: 32rpx;
+	        background: rgba(255, 255, 255, 1);
+	        border-radius: 50%;
+	        position: relative;
+	        border: 4rpx solid #707070;
+	        margin-top: 10rpx;
+	        font-size: 24rpx;
+	        color: #707070;
+	        &.active {
+	          border: 4rpx solid rgba(0, 0, 0, 1);
+	          color: #000000;
+	        }
+	        .circle {
+	          width: 25rpx;
+	          height: 25rpx;
+	          border-radius: 50%;
+	          background: #e1e1e1;
+	          &.active {
+	            background: rgba(0, 0, 0, 1);
+	          }
+	          position: absolute;
+	          top: 50%;
+	          left: 50%;
+	          transform: translate(-12rpx, -12rpx);
+	        }
+	      }
+	    }
+	  }
+	  button {
+	    width: 420rpx;
+	    height: 100rpx;
+	    background: rgba(0, 0, 0, 1);
+	    opacity: 1;
+	    color: #fcfcfc;
+	    font-size: 28rpx;
+	    text-align: center;
+	    line-height: 92rpx;
+	    position: absolute;
+	    left: 50%;
+	    bottom: 176rpx;
+	    transform: translateX(-50%);
+	  }
+	}
+</style>

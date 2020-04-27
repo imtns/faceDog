@@ -33,9 +33,9 @@
 	<block wx:if="{{tabbarshow}}">
 		<tabbar :tabIndex.sync="selectedTab" />
 	</block>
-	<van-popup show="{{ showRedpacketLayer}}" bind:close="onClose">
+	<!-- <van-popup show="{{ showRedpacketLayer}}" bind:close="onClose">
 		<redpacketLayer />
-	</van-popup>
+	</van-popup> -->
 	<van-popup show="{{ showVipBuy}}" bind:close="onClose">
 		<vipBuyPop />
 	</van-popup>
@@ -60,8 +60,8 @@ import redpacketLayer from '@/components/pop/redpackage/index';
 import my from '@/components/my/my';
 import chat from '@/components/chat/chat';
 import { sleep } from '@/utils';
-import { get } from '@/utils/request';
-import { NEW_PROFILE, GET_LEVEL_INFO } from '@/utils/url';
+import { get, put } from '@/utils/request';
+import { NEW_PROFILE, GET_LEVEL_INFO, USER_SETTING } from '@/utils/url';
 import { getAge } from '@/utils';
 import { Event } from '@/utils/event.js';
 import verify from '@/components/pop/verify/index';
@@ -100,7 +100,7 @@ export default class Index extends wepy.page {
     chat,
     my,
     verify,
-    redpacketLayer,
+    // redpacketLayer,
     vipBuyPop,
     levelPop,
   };
@@ -279,7 +279,7 @@ export default class Index extends wepy.page {
       this.setProfile();
     },
   };
-  onLoad(options) {
+  async onLoad(options) {
     if (options.test) {
       this.test = true;
     }
@@ -309,15 +309,25 @@ export default class Index extends wepy.page {
       if (type) this.$invoke('verify', 'setValue', type);
       this.$apply();
     });
-    let showRedpacket = wx.getStorageSync('showRedpacket');
-    if (showRedpacket != 'ok') {
-      let interval = setInterval(() => {
-        if (wepy.getStorageSync('tutorial')) {
-          this.redpacketLayer();
-          clearInterval(interval);
-        }
-      }, 5000);
-    }
+    let setting = {};
+    const settingResult = await get(USER_SETTING);
+    Object.assign(setting, settingResult);
+    wepy.setStorageSync('setting', JSON.stringify(setting));
+
+    Event.listen('settingShowLevel', async (level) => {
+      let setting = JSON.parse(wepy.getStorageSync('setting'));
+      setting.show = level;
+      await put(USER_SETTING, setting);
+    });
+    // let showRedpacket = wx.getStorageSync('showRedpacket');
+    // if (showRedpacket != 'ok') {
+    //   let interval = setInterval(() => {
+    //     if (wepy.getStorageSync('tutorial')) {
+    //     //   this.redpacketLayer();
+    //       clearInterval(interval);
+    //     }
+    //   }, 5000);
+    // }
     wx.$app
       .login({
         userID: wx.getStorageSync('identifier'),
@@ -344,10 +354,10 @@ export default class Index extends wepy.page {
         }
       });
   }
-  redpacketLayer() {
-    this.showRedpacketLayer = true;
-    this.$apply();
-  }
+  //   redpacketLayer() {
+  //     this.showRedpacketLayer = true;
+  //     this.$apply();
+  //   }
   onShareAppMessage() {
     let user = wx.getStorageSync('profile') || '';
     let num = Math.floor(Math.random() * 5) + 1;

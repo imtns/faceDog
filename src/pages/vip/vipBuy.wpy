@@ -4,25 +4,50 @@
 	</navbar>
 	<view class='container'>
 		<view class="bg">
-			<view class="box" @tap="pay(3000)">
-				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip1.png?2" mode="scaleToFill" lazy-load="false">
+			<view class="box"
+			      @tap="pay(3000)">
+				<image class="tip"
+				       src="https://images.facedog.cn/public/vip/vip-tip1.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
-				<image class="icon" src="https://images.facedog.cn/public/vip/vip-1.png?2" mode="scaleToFill" lazy-load="false">
+				<image class="icon"
+				       src="https://images.facedog.cn/public/vip/vip-1.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
 			</view>
-			<view class="box" @tap="pay(6800)">
-				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip2.png?2" mode="scaleToFill" lazy-load="false">
+			<view class="box"
+			      @tap="pay(6800)">
+				<image class="tip"
+				       src="https://images.facedog.cn/public/vip/vip-tip2.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
-				<image class="icon" src="https://images.facedog.cn/public/vip/vip-2.png?2" mode="scaleToFill" lazy-load="false">
+				<image class="icon"
+				       src="https://images.facedog.cn/public/vip/vip-2.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
 			</view>
-			<view class="box" @tap="pay(15800)">
-				<image class="tip" src="https://images.facedog.cn/public/vip/vip-tip3.png?2" mode="scaleToFill" lazy-load="false">
+			<view class="box"
+			      @tap="pay(15800)">
+				<image class="tip"
+				       src="https://images.facedog.cn/public/vip/vip-tip3.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
-				<image class="icon" src="https://images.facedog.cn/public/vip/vip-3.png?2" mode="scaleToFill" lazy-load="false">
+				<image class="icon"
+				       src="https://images.facedog.cn/public/vip/vip-3.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
-				<image class="vip-icon" src="https://images.facedog.cn/public/vip/vip-icon.png" mode="scaleToFill" lazy-load="false">
+				<image class="vip-icon"
+				       src="https://images.facedog.cn/mp/other/buy-icon.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
 				</image>
+				<view class="tiptext">N/R购买，立刻升至SR级</view>
 			</view>
 		</view>
 	</view>
@@ -146,6 +171,12 @@ export default class VipBuy extends wepy.page {
 	        position: absolute;
 	        top: 235rpx;
 	        left: 20rpx;
+	      }
+	      .tiptext {
+	        color: #f7c170;
+	        font-size: 22rpx;
+	        position: relative;
+	        left: -15rpx;
 	      }
 	      .icon {
 	        width: 209rpx;

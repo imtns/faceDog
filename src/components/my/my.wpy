@@ -4,45 +4,67 @@
 		<notify />
 		<view class="head">
 			<view class="profile">
-				<view class="headIcon" @tap="goProfile">
-					<image wx:if="{{profile.vip}}" class="vip-icon" src="https://images.facedog.cn/public/vip/vip-profile.png?6" mode="scaleToFill" lazy-load="false">
+				<view class="headIcon"
+				      @tap="goProfile">
+					<image wx:if="{{profile.vip}}"
+					       class="vip-icon"
+					       src="https://images.facedog.cn/public/vip/vip-profile.png?6"
+					       mode="scaleToFill"
+					       lazy-load="false">
 					</image>
-					<image src="{{profile.icon || 'https://images.facedog.cn/public/discover/default-avatar.png'}}" style="width:172rpx;height:172rpx;"></image>
-					<view class="edit-profile" @tap.stop="redirect('editfile')"></view>
+					<image src="{{profile.icon || 'https://images.facedog.cn/public/discover/default-avatar.png'}}"
+					       style="width:172rpx;height:172rpx;"></image>
+					<view class="edit-profile"
+					      @tap.stop="redirect('editfile')"></view>
 				</view>
 				<view class="info">
 					<view class="name">{{profile.nick_name || tempName}}</view>
 					<view class="desc">{{profile.age || '未知'}}岁 · {{profile.city || '城市已隐藏'}}</view>
 				</view>
-				<view class="verify" @tap="goUpgrade" wx:if="{{profile.level}}">
-					<image src="https://images.facedog.cn/mp/profile/level-{{[profile.level]}}.png?2" mode="scaleToFill" lazy-load="false">
+				<view class="verify"
+				      @tap="goUpgrade"
+				      wx:if="{{profile.level}}">
+					<image src="https://images.facedog.cn/mp/profile/level-{{[profile.level]}}.png?2"
+					       mode="scaleToFill"
+					       lazy-load="false">
 					</image>
 					<!-- {{profile.progress?progress[profile.progress]:'未认证'}} -->
 				</view>
-				<view class="verify" wx:else>
-					<image src="https://images.facedog.cn/mp/profile/unlevel.png?2" mode="scaleToFill" lazy-load="false">
+				<view class="verify"
+				      wx:else>
+					<image src="https://images.facedog.cn/mp/profile/unlevel.png?2"
+					       mode="scaleToFill"
+					       lazy-load="false">
 					</image>
 					<!-- {{profile.progress?progress[profile.progress]:'未认证'}} -->
 				</view>
 				<view class="level">
 					<view class="level-box">
 						<view class="level-text">
-							<image src="https://images.facedog.cn/public/my/level-{{level}}.png" mode="scaleToFill" lazy-load="false">
+							<image src="https://images.facedog.cn/public/my/level-{{level}}.png"
+							       mode="scaleToFill"
+							       lazy-load="false">
 							</image>
 						</view>
-						<view class="click-count">累计滑动{{profile.play}}次 <image @tap="toRules" src="https://images.facedog.cn/public/my/question-mark.png" mode="scaleToFill" lazy-load="false">
+						<view class="click-count">累计滑动{{profile.play}}次 <image @tap="toRules"
+							       src="https://images.facedog.cn/public/my/question-mark.png"
+							       mode="scaleToFill"
+							       lazy-load="false">
 							</image>
 						</view>
 					</view>
 					<view class="progress">
-						<van-progress show-pivot="{{false}}" color="{{levelColor[level]}}" percentage="{{levelPercent}}" />
+						<van-progress show-pivot="{{false}}"
+						              color="{{levelColor[level]}}"
+						              percentage="{{levelPercent}}" />
 					</view>
 				</view>
 			</view>
 		</view>
 		<view class="box">
 			<view class="box-item">
-				<view class="item" @tap="addDebugCount">
+				<view class="item"
+				      @tap="addDebugCount">
 					<view class="login-bubble">
 						<block wx:if="{{profile.continuous_login == 1}}">再登陆1天，出场率提升50%</block>
 						<block wx:elif="{{profile.continuous_login == 2}}">再登陆3天，出场率翻倍</block>
@@ -50,64 +72,114 @@
 						<block wx:elif="{{profile.continuous_login == 4}}">再登陆1天，出场率翻倍</block>
 						<block wx:elif="{{profile.continuous_login >= 5}}">继续登陆，维持最高出场率</block>
 					</view>
-					<image src="https://images.facedog.cn/public/profile/box-1.png?" mode="scaleToFill" lazy-load="false">
+					<image src="https://images.facedog.cn/public/profile/box-1.png?"
+					       mode="scaleToFill"
+					       lazy-load="false">
 					</image>
 					<text class="text value">{{profile.continuous_login}}</text>
 					<text class="text label">连续登录</text>
 				</view>
-				<view class="item" @tap="toMyCoin">
-					<image src="https://images.facedog.cn/public/profile/box-2.png?2" mode="scaleToFill" lazy-load="false">
+				<view class="item"
+				      @tap="toMyCoin">
+					<image src="https://images.facedog.cn/public/profile/box-2.png?2"
+					       mode="scaleToFill"
+					       lazy-load="false">
 					</image>
 					<text class="text value">{{profile.coin}}</text>
 					<text class="text label">我的颜币</text>
-					<image class="icon-new" src="https://images.facedog.cn/public/my/icon-new.png?2" mode="scaleToFill" lazy-load="false">
-					</image>
+					<!-- <image class="icon-new" src="https://images.facedog.cn/public/my/icon-new.png?2" mode="scaleToFill" lazy-load="false">
+					</image> -->
 					<!-- <text class="text unopen">功能未开启</text> -->
 				</view>
-				<view class="item" @tap="addDebugCount1">
-					<image src="https://images.facedog.cn/public/profile/box-3.png?" mode="scaleToFill" lazy-load="false">
+				<view class="item"
+				      @tap="addDebugCount1">
+					<image src="https://images.facedog.cn/public/profile/box-3.png?"
+					       mode="scaleToFill"
+					       lazy-load="false">
 					</image>
 					<text class="text value">{{profile.win}}</text>
 					<text class="text label">获胜次数</text>
 				</view>
 			</view>
-			<view class="vip-bar" @tap="goVip">
-				<image src="https://images.facedog.cn/public/my/vip-bar.png?2" mode="aspectFill" lazy-load="false">
+			<view class="vip-bar"
+			      @tap="goVip">
+				<image src="https://images.facedog.cn/public/my/vip-bar.png?2"
+				       mode="aspectFill"
+				       lazy-load="false">
 				</image>
-				<image class="icon" src="https://images.facedog.cn/public/my/icon-kangyi.png?" mode="aspectFill" lazy-load="false">
+				<image class="icon"
+				       src="https://images.facedog.cn/public/my/icon-kangyi.png?"
+				       mode="aspectFill"
+				       lazy-load="false">
 				</image>
 				<text wx:if="{{profile.vip}}">{{profile.vip_expire}}</text>
-				<text wx:else style="color:white;">点击获取超级会员</text>
+				<text wx:else
+				      style="color:white;">点击获取超级会员</text>
 			</view>
 		</view>
-		<view class="nav-item {{active[0]?'active':''}}" @touchstart="touchstart(0)" @touchend="touchend(0)" @tap="redirect('invite')">
-			<image style="height:31rpx;" src="https://images.facedog.cn/public/profile/share2.png?1" mode="scaleToFill" lazy-load="false">
+		<view class="nav-item {{active[0]?'active':''}}"
+		      @touchstart="touchstart(0)"
+		      @touchend="touchend(0)"
+		      @tap="redirect('invite')">
+			<image style="height:31rpx;"
+			       src="https://images.facedog.cn/public/profile/share2.png?1"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
-		<view class="nav-item {{active[1]?'active':''}}" @touchstart="touchstart(1)" @touchend="touchend(1)" @tap="redirect('myCard')">
-			<image style="height:28rpx;" src="https://images.facedog.cn/public/index/yg-share.png?2" mode="scaleToFill" lazy-load="false">
+		<view class="nav-item {{active[1]?'active':''}}"
+		      @touchstart="touchstart(1)"
+		      @touchend="touchend(1)"
+		      @tap="redirect('myCard')">
+			<image style="height:28rpx;"
+			       src="https://images.facedog.cn/public/index/yg-share.png?2"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
-		<view class="nav-item {{active[2]?'active':''}}" @touchstart="touchstart(2)" @touchend="touchend(2)" @tap="redirect('video')">
-			<image style="height:35rpx;object-fit:cover;" src="https://images.facedog.cn/public/profile/video-verify.png?1" mode="scaleToFill" lazy-load="false">
+		<view class="nav-item {{active[2]?'active':''}}"
+		      @touchstart="touchstart(2)"
+		      @touchend="touchend(2)"
+		      @tap="redirect('video')">
+			<image style="height:35rpx;object-fit:cover;"
+			       src="https://images.facedog.cn/public/profile/video-verify.png?1"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
-			<image class="tip" style="width:{{profile.video_audit == 'unfinish'?'74rpx':'97rpx'}}" src="https://images.facedog.cn/mp/profile/{{profile.video_audit == 'unfinish'?'un':''}}verify.png?1" mode="scaleToFill" lazy-load="false">
+			<image class="tip"
+			       style="width:{{profile.video_audit == 'finish'?'97rpx':'74rpx'}}"
+			       src="https://images.facedog.cn/mp/profile/{{profile.video_audit == 'unfinish'?'unverify':profile.video_audit=='auditing'?'verifying':'verify'}}.png?1"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
-		<view class="nav-item {{active[3]?'active':''}}" @touchstart="touchstart(3)" @touchend="touchend(3)" @tap="redirect('contactService')">
-			<image src="https://images.facedog.cn/public/profile/service.png?1" mode="scaleToFill" lazy-load="false">
+		<view class="nav-item {{active[3]?'active':''}}"
+		      @touchstart="touchstart(3)"
+		      @touchend="touchend(3)"
+		      @tap="redirect('contactService')">
+			<image src="https://images.facedog.cn/public/profile/service.png?1"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
 		</view>
 		<view class="line"></view>
-		<view class="nav-item {{active[4]?'active':''}}" @touchstart="touchstart(4)" @touchend="touchend(4)" @tap="redirect('setting')">
-			<image src="https://images.facedog.cn/public/profile/setting.png?1" mode="scaleToFill" lazy-load="false">
+		<view class="nav-item {{active[4]?'active':''}}"
+		      @touchstart="touchstart(4)"
+		      @touchend="touchend(4)"
+		      @tap="redirect('setting')">
+			<image src="https://images.facedog.cn/public/profile/setting.png?1"
+			       mode="scaleToFill"
+			       lazy-load="false">
 			</image>
 		</view>
-		<view class="nav-item" wx:if="{{debug1 >= 12}}">
-			<navigator url="test/testCharge" open-type="navigate" hover-class="none">
+		<view class="nav-item"
+		      wx:if="{{debug1 >= 12}}">
+			<navigator url="test/testCharge"
+			           open-type="navigate"
+			           hover-class="none">
 				<view class="item">
 					<view class="title">充值</view>
 				</view>
