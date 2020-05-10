@@ -1,0 +1,117 @@
+<!--  -->
+<template>
+	<navbar title="颜币红包">
+	</navbar>
+	<view class='container'>
+		修改特权
+		<view class="box">
+			<view>UID:</view>
+			<input type="text" value="{{uid1}}" @input="inputChange1" />
+		</view>
+		<button disabled="{{disable1}}" @tap="submit1">提交</button>
+		充值
+		<view class="box">
+			<view>UID:</view>
+			<input type="text" value="{{uid2}}" @input="inputChange3" />
+		</view>
+		<view class="box">
+			<view>金额:</view>
+			<input type="text" value="{{value2}}" @input="inputChange4" />
+		</view>
+		<button disabled="{{disable2}}" @tap="submit2">提交</button>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	import { get, post } from '@/utils/request';
+
+	import { TEST_PRIVILEGE, TEST_CHARGE } from '@/utils/url';
+	export default class Example extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '测试页面',
+	    usingComponents: {
+	      navbar: '../components/navbar/index'
+	    }
+	  };
+
+	  data = {
+	    uid1: '',
+	    value2: '',
+		uid2: '',
+		disable1:false,
+		disable2:false
+	  };
+
+	  components = {};
+
+	  methods = {
+	    inputChange1({ detail }) {
+	      this.uid1 = detail.value;
+	    },
+	    inputChange3({ detail }) {
+	      this.uid2 = detail.value;
+	    },
+	    inputChange4({ detail }) {
+	      this.value2 = detail.value;
+	    },
+	    async submit1() {
+		  this.disable1 = true;
+	      let a = await post(TEST_PRIVILEGE, {
+	        uid: this.uid1
+	      });
+	      let msg = '';
+	      if (a.error) {
+	        msg = a.error;
+	      }
+	      wepy.showToast({
+	        title: msg || '修改成功', //提示的内容,
+	        duration: 2000, //延迟时间,
+	        mask: true, //显示透明蒙层，防止触摸穿透,
+	        success: res => {}
+		  });
+		  setTimeout(() => {
+			  this.disable1 = false;
+			  this.$apply();
+		  }, 2000);
+	    },
+	    async submit2() {
+		  this.disable2 = true;
+	      let a = await post(TEST_CHARGE, {
+	        uid: this.uid2,
+	        coin: this.value2
+	      });
+	      let msg = '';
+	      if (a.error) {
+	        msg = a.error;
+		  }
+	      wepy.showToast({
+	        title: msg || '修改成功', //提示的内容,
+	        duration: 2000, //延迟时间,
+	        mask: true, //显示透明蒙层，防止触摸穿透,
+	        success: res => {}
+		  });
+		  setTimeout(() => {
+			  this.disable2 = false;
+			  this.$apply();
+		  }, 2000);
+	    }
+	  };
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='scss'>
+	input {
+	  border: 1px solid black;
+	}
+</style>

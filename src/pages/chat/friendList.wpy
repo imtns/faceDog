@@ -1,0 +1,161 @@
+<!--  -->
+<template>
+	<navbar title="好友列表" />
+	<block wx:if="{{!show}}">
+		<loadingHeart top="-160rpx" />
+	</block>
+	<block wx:if="{{!list.length && show}}">
+		<empty></empty>
+	</block>
+	<view class='wrapper' wx:else>
+
+		<repeat for="{{list}}" key="index" index="index" item="item">
+			<van-swipe-cell class="swipe" right-width="{{ 80 }}" data-userid="{{item._id}}" data-dentifier="{{item.dentifier}}" data-index="{{index}}" async-close bind:close="onClose">
+				<view class="friends-box">
+					<image class="icon" @tap="goProfile({{item.dentifier}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="aspectFill"></image>
+					<view class="msg" @tap="goChat({{item.dentifier}},{{item.nick_name}},{{item.avatar}})">
+						<view class="name">{{item.nick_name}}</view>
+						<view class="distance">匹配于{{item.month}}/{{item.day}}</view>
+					</view>
+				</view>
+				<view class="delete" slot="right">解除好友</view>
+			</van-swipe-cell>
+		</repeat>
+	</view>
+
+</template>
+
+<script>
+import wepy from 'wepy';
+import { dialog } from '@/utils';
+import { get, deltemp } from '@/utils/request';
+import { FRIENDS_LIST } from '@/utils/url';
+import empty from '@/components/empty';
+
+import loadingHeart from '@/components/battle/module/loadingHeart';
+import { Event } from '@/utils/event.js';
+export default class Friends extends wepy.page {
+  props = {};
+  config = {
+    navigationBarTitleText: '谁的颜值更高？',
+    // disableScroll: true,
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-swipe-cell': '../../components/vant/swipe-cell/index',
+      'van-toast': '../../components/vant/toast/index',
+      'van-progress': '../../components/vant/progress/index',
+      'van-collapse': '../../components/vant/collapse/index',
+      'van-collapse-item': '../../components/vant/collapse-item/index',
+    },
+  };
+  data = {
+    list: {},
+    show: false,
+  };
+
+  components = {
+    empty,
+    loadingHeart,
+  };
+
+  methods = {
+    goChat(id, name, icon) {
+      wepy.navigateTo({ url: `chatRoom?id=${id}&conversationID=C2C${id}` });
+    },
+    goProfile(id) {
+      wepy.navigateTo({ url: `/pages/battle/profile?dentifier=${id}` });
+    },
+    async onClose(event) {
+      const { position, instance } = event.detail;
+      switch (position) {
+        case 'left':
+        case 'cell':
+          instance.close();
+          break;
+        case 'right':
+          await deltemp(FRIENDS_LIST, {
+            user_id: instance.dataset.dentifier,
+          });
+          Event.trigger('deleteChat', instance.dataset.dentifier);
+          this.list.splice(instance.dataset.index, 1);
+          this.$apply();
+          instance.close();
+          break;
+      }
+    },
+  };
+  async getList() {
+    const result = await get(FRIENDS_LIST);
+    this.list = result;
+    this.list.forEach((item) => {
+      item.month = item.create_time.split(' ')[0].split('-')[1];
+      item.day = item.create_time.split(' ')[0].split('-')[2];
+    });
+    this.list.sort((a, b) => {
+      return a.create_time < b.create_time ? 1 : -1;
+    });
+    this.show = true;
+    this.$apply();
+  }
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    this.getList();
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+	.wrapper {
+	  width: 750rpx;
+	  margin-top: 32rpx;
+	  .delete {
+	    background: red;
+	    height: 100rpx;
+	    line-height: 100rpx;
+	    color: white;
+	    text-align: center;
+	    width: 142rpx;
+	    font-size: 28rpx;
+	  }
+	  .friends-box {
+	    padding: 0 30rpx;
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	    margin-bottom: 61rpx;
+	    .icon {
+	      width: 100rpx;
+	      height: 100rpx;
+	      border-radius: 50%;
+	    }
+	    .msg {
+	      margin-right: auto;
+	      margin-left: 27rpx;
+	      width: 450rpx;
+	      .name {
+	        font-size: 28rpx;
+	        font-family: PingFang SC;
+	        font-weight: 600;
+	        color: rgba(0, 0, 0, 1);
+	      }
+	      .distance {
+	        margin-top: 8rpx;
+	        font-size: 25rpx;
+	        font-family: PingFang SC;
+	        font-weight: 300;
+	        color: #7e7e7e;
+	        text-overflow: ellipsis;
+	        white-space: nowrap;
+	        overflow: hidden;
+	      }
+	    }
+	  }
+	}
+</style>

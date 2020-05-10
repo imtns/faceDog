@@ -1,0 +1,222 @@
+
+<template>
+	<block wx:if="{{!list.length}}">
+		<empty></empty>
+	</block>
+	<view class='wrapper' wx:else>
+		<repeat for="{{list.users}}" key="index" index="index" item="item">
+			<view class="like-box">
+				<view class="header">
+					<view class="date"><text>{{item.day}}</text><text>/{{item.month}}</text></view>
+					<view class="all" @tap="redirect({{item}})">全部
+						<van-icon name="arrow" />
+					</view>
+				</view>
+				<repeat for="{{item.users}}" key="index" index="index" item="user">
+					<view class="like-list">
+						<view class="like" @tap="goProfile({{user._id}})">
+							<image src="{{user.avatar}}" mode="aspectFill"></image>
+							<view class="desc">
+								<view class="left">
+									<view class="name">{{user.nick_name}}</view>
+									<view class="info">{{user.age}}岁 / {{user.constellation}}</view>
+								</view>
+								<form report-submit='true' bindsubmit='agree' data-user="{{user}}">
+									<view class="right">
+										<button @tap.stop="a" form-type='submit' hover-class="hover-heart" class="heart">
+											<!-- <view class="right"> -->
+											<!-- <image src="https://images.facedog.cn/public/chat/icon-{{user.be}}.png" mode="aspectFill"></image> -->
+										</button>
+									</view>
+									<!-- </view> -->
+								</form>
+							</view>
+						</view>
+					</view>
+				</repeat>
+			</view>
+		</repeat>
+	</view>
+</template>
+
+
+<script>
+	import wepy from 'wepy';
+	import { getAge } from '@/utils';
+	import { LIKE_ME, AGREE_FRIEND, MAKEFRIEND } from '@/utils/url';
+	import { get, post } from '@/utils/request';
+	import empty from '@/components/empty';
+	export default class Like extends wepy.component {
+	  props = {};
+
+	  data = {
+	    list: {}
+	  };
+
+	  components = {
+	    empty
+	  };
+
+	  methods = {
+	    async agree(e) {
+	      let user = e.currentTarget.dataset.user;
+	      console.log(user, e);
+	      get(AGREE_FRIEND, {
+	        user_id: user._id
+	      });
+	      await post(MAKEFRIEND, {
+	        to_be: user.be,
+	        user_id: user._id,
+	        formId: e.detail.formId
+	      });
+	      wx.navigateTo({
+	        url: `chat/becomeFriend?id=${user.dentifier}&nick=${
+	          user.nick_name
+	        }&icon=${encodeURI(
+	          `${user.avatar}?x-oss-process=image/resize,w_100,h_100/format,jpg`
+	        )}`
+	      });
+	    },
+	    redirect(user) {
+	      wepy.setStorageSync('currentLike', user);
+	      wx.navigateTo({
+	        url: 'chat/like'
+	      });
+	    },
+	    goProfile(id) {
+	      wepy.navigateTo({ url: `battle/profile?id=${id}` });
+	    },
+	    a() {},
+	    async initData() {
+	      const result = await get(LIKE_ME);
+	      this.list = result;
+	      console.warn(this.list);
+	      this.list.forEach(item => {
+	        item.day = item.date_time.split('-')[2];
+	        item.month = new Date(item.date_time).toDateString().split(' ')[1];
+	        item.users.forEach(t => {
+	          t.age = getAge(t.birthday);
+	        });
+	      });
+	      this.$apply();
+	    }
+	  };
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='less' scoped>
+	.wrapper {
+	  width: 690rpx;
+	  margin-top: 68rpx;
+	  margin-left: 30rpx;
+	  .like-box {
+	    width: 100%;
+	    margin-bottom: 75rpx;
+	    .header {
+	      height: 49rpx;
+	      display: flex;
+	      align-items: center;
+	      justify-content: space-between;
+	      .date {
+	        text {
+	          &:nth-child(1) {
+	            font-size: 40rpx;
+	            font-weight: 900;
+	          }
+	          &:nth-child(2) {
+	            font-weight: 100;
+	            line-height: 37rpx;
+	            color: rgba(150, 150, 150, 1);
+	          }
+	        }
+	      }
+	      .all {
+	        font-size: 20rpx;
+	        color: rgba(158, 157, 157, 1);
+	        height: 49rpx;
+	        line-height: 49rpx;
+	      }
+	    }
+	    .like-list {
+	      width: 100%;
+	      height: 360rpx;
+	      display: flex;
+	      justify-content: space-between;
+	      margin-top: 30rpx;
+	      .like {
+	        width: 214rpx;
+	        height: 360rpx;
+	        image {
+	          overflow: hidden;
+	          border-radius: 12rpx 12rpx 0px 0px;
+	          width: 100%;
+	          height: 281rpx;
+	          display: block;
+	        }
+	        .desc {
+	          width: 100%;
+	          height: 79rpx;
+	          background: rgba(0, 0, 0, 1);
+	          opacity: 1;
+	          border-radius: 0px 0px 12rpx 12rpx;
+	          display: flex;
+	          justify-content: space-between;
+	          .left {
+	            width: 65%;
+
+	            .name {
+	              color: white;
+	              font-size: 22rpx;
+	              margin: 12rpx 0 0 20rpx;
+	              text-overflow: ellipsis;
+	              overflow: hidden;
+	              white-space: nowrap;
+	              width: 120rpx;
+	            }
+	            .info {
+	              color: #979797;
+	              font-size: 16rpx;
+	              margin-left: 20rpx;
+	            }
+	          }
+	          .right {
+	            width: 45%;
+	            display: flex;
+	            height: 79rpx;
+	            align-items: center;
+	            margin-left: 10rpx;
+	            .heart {
+	              background: url('https://images.facedog.cn/public/chat/icon-friend.png');
+	              background-size: contain;
+	              background-repeat: no-repeat;
+	              margin-left: auto;
+	              margin-right: 17rpx;
+	              width: 46rpx;
+	              height: 46rpx;
+	            }
+	          }
+	          .hover-heart {
+	            background: url('https://images.facedog.cn/public/chat/icon-friend-active.png');
+	            background-size: contain;
+	            background-repeat: no-repeat;
+	            margin-left: auto;
+	            margin-right: 17rpx;
+	            width: 46rpx;
+	            height: 46rpx;
+	          }
+	        }
+	      }
+	    }
+	  }
+	}
+</style>

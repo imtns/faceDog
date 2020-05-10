@@ -1,0 +1,180 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view class="step-info">
+            <view class="num">3.</view>真人认证
+        </view>
+        <view class="form">
+            <view class="field">
+                <view class="label">个人微信号（必填，号码保密，仅供审核使用）</view>
+                <input class="input" type="text" @input="onChangeName"   placeholder="" />
+            </view>
+            <view class="verify-box">
+                <view class="box">
+                    <view class="title">方式一</view>
+                    <view class="desc">需要推荐人确认</view>
+                    <view class="desc" style="margin-top:0;"> 预计60分钟内审核完成</view>
+                    <button @tap="verify">直接认证</button>
+                </view>
+                <view class="box">
+                    <view class="title">方式二</view>
+                    <view class="desc">无需推荐人确认</view>
+                    <view class="desc" style="margin-top:0">预计30分钟内审核完成</view>
+                    <button @tap="redirect">视频认证</button>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { post } from '@/utils/request';
+    import { toast, sleep } from '@/utils';
+import { VERIFY } from '../../../utils/url.js';
+export default class ChooseVerify extends wepy.component {
+    props = {
+        step: {
+            type: Number,
+            default: 0,
+            twoWay: true
+        },
+        disabled: {
+            type: Boolean,
+            default: false
+        }
+    };
+
+    data = {
+        wechat: ''
+    };
+    components = {};
+
+    methods = {
+        onChangeName(event) {
+            this.wechat = event.detail.value;
+        },
+        async verify() {
+            try {
+                if (!this.wechat) {
+                    toast('请填写微信号');
+                    return;
+                }
+                const data = await post(VERIFY, {
+                    wechat: this.wechat
+                });
+                console.log(data);
+                toast('已提交审核');
+                await sleep(2);
+                wx.redirectTo({
+                    url: 'index'
+                });
+            } catch (e) {
+                toast('认证失败');
+            }
+        },
+        redirect() {
+            // this.step = 5;
+            if (!this.wechat) {
+                toast('请填写微信号');
+                return;
+            }
+            wepy.setStorageSync('wechat', this.wechat);
+
+            this.$emit('changeStep', 5);
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+}
+</script>
+
+<style lang='less' scoped>
+.wrapper {
+    width: 556rpx;
+    margin: 60rpx auto 0;
+    text-align: center;
+    .van-cell {
+        padding: 10rpx 0 !important;
+    }
+    .step-info {
+        display: flex;
+        justify-content: flex-start;
+        font-size: 36rpx;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 1);
+        .num {
+            width: 51rpx;
+            height: 51rpx;
+            text-align: center;
+            line-height: 51rpx;
+            background: rgba(28, 28, 28, 1);
+            border-radius: 50%;
+            color: white;
+            font-weight: 600;
+            font-size: 36rpx;
+            margin-right: 21rpx;
+        }
+    }
+    .form {
+        .field {
+            position: relative;
+            margin-top: 105rpx;
+            font-size: 28rpx;
+            color: rgba(0, 0, 0, 1);
+            text-align: left;
+            .label {
+                width: 100%;
+                font-weight: 600;
+                display: block;
+            }
+            .input {
+                width: 481rpx;
+                margin-top:12rpx;
+                height: 80rpx;
+                border: 2rpx solid rgba(0, 0, 0, 1);
+                box-sizing: border-box;
+                padding-left: 24rpx;
+            }
+        }
+    }
+    .verify-box {
+        margin-top: 170rpx;
+        display: flex;
+        justify-content: flex-start;
+        .box {
+            width: 50%;
+            .title {
+                font-size: 28rpx;
+                font-weight: 600;
+                text-align: left;
+                color: rgba(10, 10, 10, 1);
+            }
+            .desc {
+                margin-top:19rpx;
+                font-size: 24rpx;
+                font-family: PingFang SC;
+                font-weight: 300;
+                text-align: left;
+                color: rgba(10, 10, 10, 1);
+            }
+            button{
+                width:260rpx;
+                height:92rpx;
+                text-align: center;
+                line-height:92rpx;
+                font-size:28rpx;
+                border-radius: 0;
+                color:#FCFCFC;
+                margin-left:0;
+                background:rgba(0,0,0,1);
+                margin-top:23rpx;
+            }
+        }
+    }
+}
+</style>

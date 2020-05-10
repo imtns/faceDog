@@ -1,0 +1,71 @@
+<!--  -->
+<template>
+    <view class="loadingLayer">
+        <view class="loading">
+            <view class="icon">
+                <van-loading type="spinner" color="#fff" />
+            </view>
+            <view class="text">上传中</view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Loading extends wepy.component {
+    props = {};
+
+    data = {};
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {}
+
+    onShow() {}
+}
+</script>
+
+<style lang='scss' scoped>
+.loadingLayer {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.1);
+    top: 0;
+    left:0;
+    z-index: 9999;
+    .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200rpx;
+        height: 200rpx;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 10rpx;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        .icon {
+            width: 100%;
+            margin-top: 40rpx;
+            text-align: center;
+            height: 50rpx;
+        }
+        .text {
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 28rpx;
+        }
+    }
+}
+</style>

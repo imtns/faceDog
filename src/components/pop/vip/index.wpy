@@ -1,0 +1,152 @@
+<!--  -->
+<template>
+	<view class='vip'>
+		<image class="close"
+		       @tap="close"
+		       src="https://images.facedog.cn/public/battle/vip-close.png"
+		       mode="scaleToFill"
+		       lazy-load="false">
+		</image>
+		<swiper class="swiper"
+		        indicator-color="#959396"
+		        indicator-active-color="white"
+		        indicator-dots="{{indicator}}"
+		        autoplay="{{autoplay}}"
+		        interval="{{interval}}"
+		        duration="{{300}}">
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/battle/vip-buy-1.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+			</swiper-item>
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/battle/vip-buy-2.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+			</swiper-item>
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/battle/vip-buy-3.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+			</swiper-item>
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/battle/vip-buy-4.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+			</swiper-item>
+		</swiper>
+		<view class="buttons">
+			<view class="button-wrap">
+				<image src="https://images.facedog.cn/public/battle/vip-price1.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+				<image src="https://images.facedog.cn/public/battle/vip-price2.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+				<image src="https://images.facedog.cn/public/battle/vip-price3.png?1"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+			</view>
+			<view class="button"
+			      @tap="go">立即获取</view>
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class vipPop extends wepy.component {
+  props = {};
+
+  data = {
+    indicator: true,
+    interval: 2000,
+    autoplay: true,
+  };
+
+  components = {};
+
+  methods = {
+    close() {
+      this.$emit('closeVipPop');
+    },
+    go() {
+      wepy.navigateTo({ url: '/pages/vip/superVip' });
+      this.$emit('closeVipPop');
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss' scoped>
+	.vip {
+	  width: 520rpx;
+	  height: 837rpx;
+	  position: relative;
+	  background: white;
+	  border-radius: 18rpx;
+	  overflow: hidden;
+	  .close {
+	    width: 45rpx;
+	    height: 45rpx;
+	    position: absolute;
+	    right: 30rpx;
+	    top: 30rpx;
+	    z-index: 999;
+	  }
+	  swiper {
+	    width: 100%;
+	    height: 477rpx;
+	    image {
+	      width: 100%;
+	      height: 477rpx;
+	    }
+	  }
+	  .buttons {
+	    display: flex;
+	    justify-content: center;
+	    flex-wrap: wrap;
+	    .button-wrap {
+	      display: flex;
+	      justify-content: center;
+	      margin-top: 30rpx;
+	      image {
+	        width: 134rpx;
+	        height: 194rpx;
+	        margin: 10rpx;
+	        // &:last-child {
+	        //   width: 159rpx;
+	        // }
+	      }
+	    }
+	    .button {
+	      width: 241rpx;
+	      height: 71rpx;
+	      background: #e15350;
+	      color: white;
+	      display: flex;
+	      justify-content: center;
+	      margin-top: 15rpx;
+	      align-items: center;
+	      border-radius: 6rpx;
+	    }
+	  }
+	}
+</style>

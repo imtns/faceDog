@@ -1,0 +1,115 @@
+<!--  -->
+<template>
+	<view class='wrapper'>
+		<image class="bg"
+		       src="https://images.facedog.cn/mp/reward/rewardPop-bg.png?1"
+		       mode="scaleToFill"
+		       lazy-load="false">
+		</image>
+		<view class="money">{{userMoney}}元</view>
+		<view class="try"
+		      @tap="try">
+			开始赚钱
+		</view>
+		<view class="box"
+		      @tap="close">
+			<image class="close"
+			       src="https://images.facedog.cn/mp/reward/rewardPop-close.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { GET_USER_MONEY } from '@/utils/url';
+import { get } from '@/utils/request';
+export default class RewardPop extends wepy.component {
+  props = {};
+
+  data = {
+    userMoney: {},
+  };
+
+  components = {};
+
+  methods = {
+    try() {
+      this.$emit('closeRewardPop');
+      wepy.navigateTo({ url: '/pages/battle/reward' });
+    },
+    close() {
+      this.$emit('closeRewardPop');
+    },
+    async getMoney() {
+      let userMoney = await get(GET_USER_MONEY);
+      this.userMoney = userMoney.money.toFixed(2);
+      this.$apply();
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss' scoped>
+	.wrapper {
+	  width: 100%;
+	  display: flex;
+	  justify-content: center;
+	  flex-wrap: wrap;
+	  position: relative;
+	  .bg {
+	    width: 520rpx;
+	    height: 810rpx;
+	  }
+	  .box {
+	    display: flex;
+	    justify-content: center;
+	    width: 100%;
+	    margin-top: 20rpx;
+	    &:nth-of-type(2) {
+	      margin-top: 56rpx;
+	    }
+	  }
+	  .money {
+	    position: absolute;
+	    top: 268rpx;
+	    left: 50%;
+	    font-size: 40rpx;
+	    color: white;
+	    transform: translateX(-50%);
+	  }
+	  .try {
+	    width: 420rpx;
+	    height: 92rpx;
+	    display: flex;
+	    justify-content: center;
+	    color: white;
+	    background: #000;
+	    border-radius: 10rpx;
+	    align-items: center;
+	    position: absolute;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    bottom: 70rpx;
+	  }
+	  .close {
+	    width: 45rpx;
+	    height: 45rpx;
+	    position: absolute;
+	    right: 20rpx;
+	    top: 20rpx;
+	  }
+	}
+</style>

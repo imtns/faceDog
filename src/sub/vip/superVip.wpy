@@ -1,0 +1,238 @@
+<!--  -->
+<template>
+	<navbar title="超级会员">
+	</navbar>
+	<view class='container'>
+		<swiper class="swiper" indicator-color="#959396" indicator-active-color="white" indicator-dots="{{true}}" autoplay="{{false}}" duration="{{300}}">
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner1.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item>
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner2.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item>
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner3.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item>
+			<swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner4.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item>
+			<!-- <swiper-item>
+				<image src="https://images.facedog.cn/public/vip/banner5.png" mode="scaleToFill" lazy-load="false">
+				</image>
+			</swiper-item> -->
+		</swiper>
+
+		<view class="middle-content {{profile.vip?'vip':''}}">
+			<image class="icon" wx:if="{{profile.vip}}" src="https://images.facedog.cn/public/vip/vip-info-icon.png" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image class="icon" wx:if="{{!profile.vip}}" src="https://images.facedog.cn/public/vip/vip-info-icon1.png" mode="scaleToFill" lazy-load="false">
+			</image>
+			<block wx:if="{{!profile.vip}}">
+				<text class="text1">您还未获得超级会员</text>
+				<!-- <text class="text2">*66天特权会员赠送认证</text> -->
+			</block>
+			<block wx:else>
+				<text class="text1">有效期至 {{profile.vip_expire}}</text>
+			</block>
+
+		</view>
+		<view class="tag">
+			<image style="width:254rpx;height:38rpx" src="https://images.facedog.cn/public/vip/tag.png" mode="scaleToFill" lazy-load="false" />
+		</view>
+		</image>
+		<view class="grey-bg"></view>
+
+		<view class="btns">
+			<image @tap="goCoinBuy" src="https://images.facedog.cn/public/vip/btn-black.png" mode="scaleToFill" lazy-load="false">
+			</image>
+
+			<image @tap="goVipBuy" src="https://images.facedog.cn/public/vip/btn-gree.png" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view>
+
+	</view>
+	<block wx:if="{{showVerify}}">
+		<verify />
+	</block>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { NEW_PROFILE } from '@/utils/url';
+import { get } from '@/utils/request';
+import { Event } from '@/utils/event.js';
+import verify from '@/components/pop/verify/index';
+import { formatTimeShort, toast, VerifyControl } from '@/utils';
+export default class SuperVip extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
+
+  data = {
+    isVip: true,
+    profile: {},
+    isPhone: false,
+    showVerify: false,
+  };
+
+  components = {
+    verify,
+  };
+
+  methods = {
+    goCoinBuy() {
+      if (!VerifyControl() || !VerifyControl('N')) return;
+      if (this.profile.progress != 'finish') {
+        toast('你还未通过认证，暂时不能购买');
+        return;
+      }
+      if (this.profile.vip) {
+        toast('你已经是会员了');
+        return;
+      }
+      wepy.navigateTo({ url: 'coinBuy' });
+    },
+    goVipBuy() {
+      if (!VerifyControl()) return;
+      if (this.profile.vip) {
+        toast('你已经是会员了');
+        return;
+      } else if (this.profile.mp_status != 'online' && this.isPhone) {
+        toast('iOS系统暂时不可用');
+        return;
+      }
+      wepy.navigateTo({ url: 'vipBuy' });
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
+  }
+
+  async onShow() {
+    this.profile = await get(NEW_PROFILE, { loading: false });
+    if (this.profile.vip) {
+      this.profile.vip_expire = formatTimeShort(this.profile.vip_expire);
+    }
+    let that = this;
+    wx.getSystemInfo({
+      success(res) {
+        var name = 'iPhone X';
+        if (res.model.indexOf('iPhone') > -1) {
+          that.isPhone = true;
+          that.$apply();
+        }
+      },
+    });
+    // this.profile.vip = true;
+    // this.profile.vip_expire = '2020-20-20';
+    this.$apply();
+  }
+}
+</script>
+
+<style lang='less'>
+	.container {
+	  position: relative;
+	  swiper {
+	    width: 100%;
+	    height: 359rpx;
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
+	  }
+	  .middle-content {
+	    width: 630rpx;
+	    height: 459rpx;
+	    margin-left: 20rpx;
+	    position: relative;
+	    background: url(https://images.facedog.cn/public/vip/vip-info.png?5);
+	    background-size: contain;
+	    background-repeat: no-repeat;
+	    &.vip {
+	      .text1 {
+	        color: #fbdf78;
+	        font-weight: 600;
+	        font-size: 19rpx;
+	        left: 290rpx;
+	      }
+	    }
+	    margin-top: 60rpx;
+	    position: relative;
+	    z-index: 2;
+	    .icon {
+	      width: 94rpx;
+	      height: 31rpx;
+	      position: absolute;
+	      left: 330rpx;
+	      top: 155rpx;
+	    }
+	    .text1 {
+	      font-size: 19rpx;
+	      color: #f8f4ea;
+	      position: absolute;
+	      top: 200rpx;
+	      left: 300rpx;
+	    }
+	    // .text2 {
+	    //   font-size: 20rpx;
+	    //   color: #fcd154;
+	    //   position: absolute;
+	    //   top: 450rpx;
+	    //   left: 260rpx;
+	    // }
+	  }
+	  .grey-bg {
+	    width: 100%;
+	    margin: 0 auto;
+	    height: 240rpx;
+	    background: linear-gradient(
+	      to bottom,
+	      rgb(196, 196, 196),
+	      rgba(255, 255, 255, 1)
+	    );
+	    background-size: cover;
+	    position: relative;
+	    top: -140rpx;
+	    z-index: 1;
+	  }
+	  .tag {
+	    position: relative;
+	    z-index: 111;
+	    display: flex;
+	    justify-content: center;
+	  }
+	  .btns {
+	    width: 100%;
+	    display: flex;
+	    position: relative;
+	    z-index: 100;
+	    top: -120rpx;
+	    justify-content: center;
+	    image {
+	      width: 285rpx;
+	      height: 91rpx;
+	      margin: 0 30rpx;
+	      position: relative;
+	    }
+	  }
+	}
+</style>

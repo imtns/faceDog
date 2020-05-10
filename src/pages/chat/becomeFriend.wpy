@@ -1,0 +1,210 @@
+<!--  -->
+<template>
+	<view class='wrapper' style="padding-top:{{isphoneX?'200rpx':'110rpx'}}">
+		<view class="matched">
+			<image src="https://images.facedog.cn/public/match/match-title.png" mode="aspectFill"></image>
+		</view>
+		<image class="heart-left" src="https://images.facedog.cn/public/match/heart-left.png" mode="aspectFill"></image>
+		<image class="heart-right" src="https://images.facedog.cn/public/match/heart-right.png" mode="aspectFill"></image>
+		<view class="avatars">
+			<image class="avatar flyleft" src="{{me.icon}}" mode="aspectFill"></image>
+			<image class="avatar flyright" src="{{friendIcon}}" mode="aspectFill"></image>
+		</view>
+		<!-- <view class="text">你 与 <text>{{nick}}</text>互相喜欢了对方匹配成功</view> -->
+		<view class="goChat" @tap="redirect">
+			发送消息
+		</view>
+		<view class="back" @tap="back">继续探索</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import Config from '@/utils/config';
+export default class BecomeFriend extends wepy.page {
+  config = {
+    navigationBarTitleText: '成为朋友'
+  };
+
+  data = {
+    friendIcon: '',
+    nick: '',
+    id: '',
+    icon: '',
+    dentifier: '',
+    me: {},
+    isphoneX: false
+  };
+
+  components = {};
+
+  methods = {
+    redirect() {
+      wx.redirectTo({
+        url: `chatRoom?id=${this.id}&conversationID=C2C${this.id}`
+      });
+    },
+    back() {
+      wx.navigateBack({
+        delta: -1
+      });
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad(options) {
+    this.id = options.id;
+    this.title = options.nick;
+    this.nick = options.nick;
+    this.me = wx.getStorageSync('profile');
+    if (this.me.icon.indexOf('oss') == -1) {
+      this.me.icon =
+        this.me.icon + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
+    }
+    this.friendIcon = wx.getStorageSync('chatIcon');
+
+    this.initChat();
+    let that = this;
+    wx.getSystemInfo({
+      success(res) {
+        var name = 'iPhone X';
+        if (
+          res.model.indexOf('iPhone 11') > -1 ||
+          res.model.indexOf('iPhone X') > -1 ||
+          res.model.indexOf('unknown<iPhone') > -1
+        ) {
+          console.warn('isIphoneX !!!!!!!');
+          that.isphoneX = true;
+          that.$apply();
+        }
+      }
+    });
+  }
+  initChat() {
+    const message = wx.$app.createTextMessage({
+      to: this.id,
+      conversationType: 'C2C',
+      payload: { text: '你们可以开始对话啦（7天内无互动列表自动删除）' }
+    });
+    wx.$app.sendMessage(message);
+  }
+  onShow() {}
+}
+</script>
+
+<style lang='less'>
+	.wrapper {
+	  width: 100%;
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  background: #343434;
+	  z-index: 99999;
+	  height: 100vh;
+	  padding-top: 100rpx;
+	  text-align: center;
+	  .heart-left {
+	    width: 58rpx;
+	    height: 56rpx;
+	    left: 330rpx;
+	    top: 235rpx;
+	    position: absolute;
+	  }
+	  .heart-right {
+	    width: 41rpx;
+	    height: 40rpx;
+	    left: 380rpx;
+	    top: 270rpx;
+	    position: absolute;
+	  }
+	  .matched {
+	    width: 416rpx;
+	    height: 58rpx;
+	    margin: 0 auto;
+	    padding-top: 50rpx;
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
+	  }
+	  .avatars {
+	    margin-top: 80rpx;
+	    .avatar {
+	      width: 230rpx;
+	      position: relative;
+	      height: 230rpx;
+	      border: 6rpx solid snow;
+	      border-radius: 50%;
+	      &.flyleft {
+	        animation: flyleft 0.7s ease-in-out 1;
+	        animation-fill-mode: both;
+	        @keyframes flyleft {
+	          from {
+	            transform: translateX(-150%);
+	          }
+	          to {
+	            transform: translateX(0);
+	          }
+	        }
+	      }
+	      &.flyright {
+	        animation: flyright 0.7s ease-in-out 1;
+	        animation-fill-mode: both;
+	        @keyframes flyright {
+	          from {
+	            transform: translateX(150%);
+	          }
+	          to {
+	            transform: translateX(0);
+	          }
+	        }
+	      }
+	      &:first-child {
+	        left: 18rpx;
+	        transform: translateX(-150%);
+	      }
+	      &:last-child {
+	        transform: translateX(150%);
+	        right: 18rpx;
+	      }
+	    }
+	  }
+	  .text {
+	    margin: 0 auto;
+	    margin-top: 67rpx;
+	    text-align: center;
+	    font-size: 24rpx;
+	    color: white;
+	    width: 408rpx;
+	  }
+	  .goChat {
+	    width: 362rpx;
+	    height: 70rpx;
+	    background: rgba(242, 84, 88, 1);
+	    opacity: 1;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    border-radius: 46rpx;
+	    color: white;
+	    font-size: 35rpx;
+	    margin: 400rpx auto 40rpx;
+	  }
+	  .back {
+	    width: 362rpx;
+	    height: 70rpx;
+	    background: rgba(246, 246, 246, 1);
+	    opacity: 1;
+	    border-radius: 46rpx;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    margin: 0 auto;
+	  }
+	}
+</style>

@@ -1,0 +1,92 @@
+<!--  -->
+<template>
+	<view class='tutorial'>
+		<image class="t1" wx:if="{{show1}}" src="https://images.facedog.cn/public/tutorial/t-likeme.png" @tap="close1" mode="scaleToFill" lazy-load="false">
+		</image>
+		<image class="t2" wx:if="{{show2}}" src="https://images.facedog.cn/public/tutorial/t-ilike.png?1" @tap="close2" mode="scaleToFill" lazy-load="false">
+		</image>
+		<image class="t3" wx:if="{{show3}}" src="https://images.facedog.cn/public/tutorial/t-hongbao.png?1" @tap="close3" mode="scaleToFill" lazy-load="false">
+		</image>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Tutorial extends wepy.component {
+  props = {};
+
+  data = {
+    show1: true,
+    show2: true,
+    show3: true
+  };
+
+  components = {};
+
+  methods = {
+    close1() {
+      this.show1 = false;
+      if (!this.show2 && !this.show3) {
+        wepy.setStorageSync('showNotice', 'ok');
+        this.$emit('setScroll');
+      }
+    },
+    close2() {
+      this.show2 = false;
+      if (!this.show1 && !this.show3) {
+        wepy.setStorageSync('showNotice', 'ok');
+        this.$emit('setScroll');
+      }
+    },
+    close3() {
+      this.show3 = false;
+      if (!this.show1 && !this.show2) {
+        wepy.setStorageSync('showNotice', 'ok');
+        this.$emit('setScroll');
+      }
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    let showNotice = wepy.getStorageSync('showNotice');
+    if (showNotice == 'ok') {
+      this.$emit('setScroll');
+    }
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+	.tutorial {
+	  width: 100%;
+	  height: 100vh;
+	  position: absolute;
+	  top: 0;
+	  z-index: 10;
+	  background: rgba(0, 0, 0, 0.5);
+	  image {
+	    width: 703rpx;
+	    height: 136rpx;
+	    position: absolute;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    &.t1 {
+	      top: 200rpx;
+	    }
+	    &.t2 {
+	      top: 460rpx;
+	    }
+	    &.t3 {
+	      top: 655rpx;
+	    }
+	  }
+	}
+</style>

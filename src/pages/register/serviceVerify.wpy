@@ -1,0 +1,89 @@
+<!--  -->
+<template>
+	<navbar title="客服认证"></navbar>
+	<view class='container'>
+		<image src="https://images.facedog.cn/mp/register/qrcode.png" mode="scaleToFill" lazy-load="false">
+		</image>
+		<view class="text">客服微信号：yanzc1023</view>
+		<view class="copy" @tap="copy">复制微信号</view>
+		<view class="desc">1：截图扫码或复制微信号添加客服</view>
+		<view class="desc">2：打开朋友圈（需要有1个月前照片）或根据客服要求完成自拍</view>
+		<view class="desc">3：认证完成</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class ServiceVerify extends wepy.page {
+  config = {
+    usingComponents: {
+      navbar: '../../components/navbar/index'
+    }
+  };
+
+  data = {};
+
+  components = {};
+
+  methods = {
+    copy() {
+      wx.setClipboardData({
+        data: 'yanzc1023',
+        success: res => {
+          wx.showToast({
+            title: '复制成功'
+          });
+        }
+      });
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss' scoped>
+	.container {
+	  width: 100%;
+	  position: relative;
+	  image {
+	    width: 444rpx;
+	    height: 444rpx;
+	    display: block;
+	    margin: 100rpx auto 60rpx;
+	  }
+	  .text {
+	    text-align: center;
+	    font-size: 27rpx;
+	    font-family: PingFang SC;
+	    font-weight: 400;
+	    line-height: 32rpx;
+	  }
+	  .copy {
+	    width: 207rpx;
+	    height: 72rpx;
+	    margin: 30rpx auto 40rpx;
+	    line-height: 72rpx;
+	    color: white;
+	    border-radius: 8rpx;
+	    background: #1d1d1d;
+	    text-align: center;
+	    font-size: 26rpx;
+	  }
+	  .desc {
+	    color: #8e8e8e;
+	    font-size: 28rpx;
+	    width: 480rpx;
+	    margin: 15rpx auto;
+	    text-align: left;
+	  }
+	}
+</style>

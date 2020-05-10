@@ -1,0 +1,256 @@
+<!--  -->
+<template>
+	<view class='container-notify' style="background:{{bgColor[type]}}">
+		<image class="title" src="https://images.facedog.cn/public/notify/title-{{type}}.png" mode="scaleToFill">
+		</image>
+		<view class="box">
+			<image class="close" src="https://images.facedog.cn/public/notify/close-{{type=='agree' || type == 'invite'?'yellow':'red'}}.png" @tap="close" mode="scaleToFill">
+			</image>
+			<image class="pic" style="width:{{width[type]}};height:{{height[type]}}" src="https://images.facedog.cn/public/notify/image-{{type}}.png?1" mode="scaleToFill">
+			</image>
+			<block wx:if="{{type=='coin'}}">
+				<view class="text">
+					<view>{{userName}} 收到了你的微信号</view>
+					<view>你的颜币增加了200，记得去提现哦😢</view>
+				</view>
+				<image class="button iknow" src="https://images.facedog.cn/public/notify/btn-iknow.png" mode="scaleToFill" @tap="closeRefresh">
+				</image>
+			</block>
+			<block wx:if="{{type=='refund'}}">
+				<view class="text-wrap refund">
+					<view class="text">{{userName}} 没有及时查看你的请求😢</view>
+					<view class="text">不过还好，消耗的颜币已退回账户里啦😊</view>
+				</view>
+			</block>
+			<block wx:if="{{type=='invite'}}">
+				<view class="text-wrap" style="margin-top:10rpx">
+					<view class="text">{{userName}} 向你发送了200颜币</view>
+					<view class="text">你愿意给TA你的微信么？（7天后自动退还）</view>
+				</view>
+				<view class="input-wrapper">
+					<view class="input-box">
+						<input type="text" placeholder="点击输入" value="{{myWechat}}" @input="inputMyWechatChange" class="input" />
+					</view>
+					<!-- <view class="button" style="background:{{bgColor[type]}}" @tap="buttonClick"> -->
+					<image class="button" src="https://images.facedog.cn/public/notify/btn-send.png" mode="scaleToFill" @tap="sendWechat">
+					</image>
+					<!-- </view> -->
+				</view>
+			</block>
+			<block wx:if="{{type=='agree'}}">
+				<view class="text" style="margin-top:10rpx">
+					<view>{{userName}} 同意和你交换微信啦✌️</view>
+				</view>
+				<view class="input-wrapper">
+					<view class="input-box">
+						<input type="text" placeholder="点击输入" disabled value="{{wechat}}" @input="inputChange" class="input" />
+					</view>
+					<!-- <view class="button" style="background:{{bgColor[type]}}" @tap="buttonClick"> -->
+					<image class="button" src="https://images.facedog.cn/public/notify/btn-copy.png" mode="scaleToFill" @tap="copyWechat">
+					</image>
+					<!-- </view> -->
+				</view>
+			</block>
+		</view>
+	</view>
+</template> 
+
+<script>
+	import wepy from 'wepy';
+	import { toast } from '@/utils';
+	import { get, post } from '@/utils/request';
+	import { SEND_WECHAT_LIST, GET_WECHAT_LIST, SEND_WECHAT } from '@/utils/url';
+	export default class Notify extends wepy.component {
+	  props = {};
+
+	  data = {
+	    bgColor: {
+	      coin: '#F25458',
+	      invite: '#FDC72F',
+	      refund: '#F25458',
+	      agree: '#FDC72F'
+	    },
+	    width: {
+	      coin: '569rpx',
+	      invite: '338rpx',
+	      refund: '543rpx',
+	      agree: '546rpx'
+	    },
+	    height: {
+	      coin: '445rpx',
+	      invite: '366rpx',
+	      refund: '395rpx',
+	      agree: '415rpx'
+	    },
+	    type: '',
+	    wechat: '',
+	    userid: '',
+	    userName: '',
+	    myWechat: ''
+	  };
+
+	  components = {};
+
+	  methods = {
+	    close() {
+	      this.$emit('closeNotify',false);
+	    },
+	    closeRefresh() {
+	      this.$emit('closeNotify', true);
+	    },
+	    inputMyWechatChange({ detail }) {
+	      this.myWechat = detail.value;
+	    },
+	    inputChange({ detail }) {
+	      this.wechat = detail.value;
+	    },
+	    copyWechat() {
+	      wx.setClipboardData({
+	        data: this.wechat,
+	        success: res => {
+	          wx.showToast({
+	            title: '复制成功'
+	          });
+	        }
+	      });
+	    },
+	    buttonClick() {
+	      post(SEND_WECHAT, {
+	        user_id: this.userid,
+	        wechat: this.wechat
+	      });
+	    },
+	    setData(type, user) {
+	      this.type = type;
+	      this.userid = user._id;
+	      this.wechat = user.wechat;
+	      this.userName = user.nick_name;
+	      this.myWechat = user.myWechat;
+	    },
+	    setUserid(userid) {
+	      this.userid = userid;
+	    },
+	    sendWechat() {
+	      post(SEND_WECHAT, {
+	        user_id: this.userid,
+	        wechat: this.myWechat
+	      });
+	      this.type = 'coin';
+	    }
+	  };
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='scss' scoped>
+	.container-notify {
+	  width: 672rpx;
+	  height: 811rpx;
+	  margin: 0 auto;
+	  box-shadow: 0px 3rpx 10rpx rgba(39, 39, 39, 0.31);
+	  opacity: 1;
+	  border-radius: 28rpx;
+	  display: flex;
+	  justify-content: center;
+	  flex-wrap: wrap;
+	  image {
+	    width: 100%;
+	    height: 100%;
+	  }
+	  .title {
+	    width: 230rpx;
+	    height: 57rpx;
+	    margin-top: 20rpx;
+	  }
+	  .box {
+	    width: 652rpx;
+	    height: 713rpx;
+	    background: rgba(255, 255, 255, 1);
+	    box-shadow: 0px 3rpx 10rpx rgba(39, 39, 39, 0.31);
+	    opacity: 1;
+	    border-radius: 28rpx;
+	    position: relative;
+	    display: inline-block;
+	    text-align: center;
+
+	    .close {
+	      position: absolute;
+	      width: 54rpx;
+	      height: 54rpx;
+	      top: 10rpx;
+	      left: 10rpx;
+	    }
+	    .pic {
+	      width: 540rpx;
+	      height: 395rpx;
+	      margin-top: 30rpx;
+	    }
+	    .text {
+	      color: #5f5f5f;
+	      font-size: 30rpx;
+	      margin: 10rpx auto;
+	    }
+	    .text-wrap {
+	      &.refund {
+	        margin-top: 70rpx;
+	        .text {
+	          color: #5f5f5f;
+	          font-size: 30rpx;
+	          margin: 10rpx auto;
+	        }
+	      }
+	      .text {
+	        margin-top: 33rpx;
+	        &:nth-child(2) {
+	          margin-top: 30rpx;
+	        }
+	        color: #8e8e8e;
+	        font-size: 28rpx;
+	      }
+	    }
+	    .iknow {
+	      margin-top: 10rpx;
+	      width: 154rpx;
+	      height: 75rpx;
+	    }
+	    .input-wrapper {
+	      float: left;
+	      width: 100%;
+	      margin-top: 50rpx;
+	      display: flex;
+	      align-items: center;
+	      .button {
+	        float: left;
+	        width: 109rpx;
+	        height: 71rpx;
+	      }
+	      .input-box {
+	        width: 332rpx;
+	        height: 53rpx;
+	        margin-left: 120rpx;
+	        margin-right: 17rpx;
+	        background: url(https://images.facedog.cn/public/notify/notify-wechat-frame.png);
+	        background-size: cover;
+	        float: left;
+	        display: flex;
+	        align-items: center;
+	        .input {
+	          width: 290rpx;
+	          text-align: left;
+	          font-size: 22rpx;
+	          margin-left: 80rpx;
+	        }
+	      }
+	    }
+	  }
+	}
+</style>

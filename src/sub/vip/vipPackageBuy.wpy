@@ -1,0 +1,250 @@
+<!--  -->
+<template>
+	<navbar title="会员礼包">
+	</navbar>
+	<view class='container'>
+		<view class="wrap">
+			<image class="comment comment1 p1"
+			       src="https://images.facedog.cn/public/vip/package/comment-1.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+			<image class="comment comment1 p2"
+			       src="https://images.facedog.cn/public/vip/package/comment-2.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+			<image class="btn"
+			       @tap="pay(600)"
+			       src="https://images.facedog.cn/public/vip/package/btn.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+		</view>
+		<view class="countdown">剩余时间：{{countdown}}</view>
+
+		<image class="comment comment2 p3"
+		       src="https://images.facedog.cn/public/vip/package/comment-2.png"
+		       mode="scaleToFill"
+		       lazy-load="false">
+		</image>
+		<image class="comment comment2 p4"
+		       src="https://images.facedog.cn/public/vip/package/comment-3.png"
+		       mode="scaleToFill"
+		       lazy-load="false">
+		</image>
+		<image class="comment comment3 p5"
+		       src="https://images.facedog.cn/public/vip/package/comment-3.png"
+		       lazy-load="false">
+		</image>
+		<image class="comment comment3 p6"
+		       src="https://images.facedog.cn/public/vip/package/comment-1.png"
+		       lazy-load="false">
+		</image>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { PAY, PAY_CALLBACK, SHOW_VIP_PACKAGE } from '@/utils/url';
+import { post, get } from '@/utils/request';
+import { countDown } from '@/utils';
+export default class extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
+
+  data = {
+    countdown: '',
+    show1: true,
+    show2: false,
+    show3: false,
+  };
+
+  components = {};
+
+  methods = {
+    async pay(price) {
+      let { nonceStr, package: _package, paySign, timeStamp } = await post(
+        PAY,
+        {
+          price,
+        }
+      );
+      wx.requestPayment({
+        timeStamp,
+        nonceStr,
+        package: _package,
+        signType: 'MD5',
+        paySign,
+        success: async function(res) {
+          if (res.errMsg === 'requestPayment:ok') {
+            await post(PAY_CALLBACK, { price });
+            wepy.navigateTo({ url: 'vipBuySuccess' });
+          }
+        },
+        fail: function(res) {
+          console.log('fail:', res);
+        },
+        complete: function(res) {},
+      });
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    get(SHOW_VIP_PACKAGE).then((res) => {
+      setInterval(() => {
+        this.countdown = countDown(res.create_time);
+        this.$apply();
+      }, 1000);
+    });
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	.van-enter-active-class,
+	.van-leave-active-class {
+	  transition-property: background-color, transform;
+	}
+
+	.van-enter-class,
+	.van-leave-to-class {
+	  background-color: red;
+	  transform: rotate(-360deg) translate3d(-100%, -100%, 0);
+	}
+	.container {
+	  background: #302a2f;
+	  width: 100%;
+	  height: 100vh;
+	  padding-top: 120rpx;
+	  .wrap {
+	    width: 628rpx;
+	    height: 745rpx;
+	    background: url(https://images.facedog.cn/public/vip/package/bg.png);
+	    background-size: cover;
+	    margin: 0 auto;
+	    position: relative;
+	  }
+	  .btn {
+	    position: absolute;
+	    bottom: 30rpx;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    width: 207rpx;
+	    height: 75rpx;
+	  }
+	}
+	.countdown {
+	  color: #fcc930;
+	  font-size: 28rpx;
+	  text-align: center;
+	  margin-top: 20rpx;
+	}
+	.comment {
+	  width: 378rpx;
+	  height: 54rpx;
+	  left: 50%;
+	  transform: translateX(-50%);
+	  position: relative;
+	}
+	.comment1 {
+	  bottom: 130rpx;
+	  position: absolute;
+	  &.p2 {
+	    animation: fade1 ease-in-out 5s infinite;
+	    animation-fill-mode: both;
+	    @keyframes fade1 {
+	      0% {
+	        opacity: 0;
+	      }
+	      10% {
+	        opacity: 0;
+	      }
+	      20% {
+	        opacity: 1;
+	      }
+	      60% {
+	        opacity: 1;
+	      }
+	      70% {
+	        opacity: 0;
+	      }
+	      100% {
+	        opacity: 0;
+	      }
+	    }
+	  }
+	}
+	.comment2 {
+	  position: relative;
+	  margin-top: 20rpx;
+	  &.p4 {
+	    position: absolute;
+	    animation: fade2 ease-in-out 5s infinite;
+	    animation-fill-mode: both;
+	    animation-delay: 1s;
+	    @keyframes fade2 {
+	      0% {
+	        opacity: 0;
+	      }
+	      10% {
+	        opacity: 0;
+	      }
+	      20% {
+	        opacity: 1;
+	      }
+	      60% {
+	        opacity: 1;
+	      }
+	      70% {
+	        opacity: 0;
+	      }
+	      100% {
+	        opacity: 0;
+	      }
+	    }
+	  }
+	}
+	.comment3 {
+	  position: relative;
+	  margin-top: 20rpx;
+	  &.p6 {
+	    position: absolute;
+	    animation: fade3 ease-in-out 5s infinite;
+	    animation-fill-mode: both;
+	    animation-delay: 2s;
+	    @keyframes fade3 {
+	      0% {
+	        opacity: 0;
+	      }
+	      10% {
+	        opacity: 0;
+	      }
+	      20% {
+	        opacity: 1;
+	      }
+	      60% {
+	        opacity: 1;
+	      }
+	      70% {
+	        opacity: 0;
+	      }
+	      100% {
+	        opacity: 0;
+	      }
+	    }
+	  }
+	}
+</style>

@@ -1,0 +1,172 @@
+<!--  -->
+<template>
+
+	<view class='container'>
+		<view class="list">
+			<repeat for="{{comments}}" key="index" index="index" item="item">
+				<view class="box">
+					<image src="{{item.avatar}}?x-oss-process=image/resize,w_900,h_900/format,jpg" mode="aspectFill"></image>
+					<view class="comment-box">
+						<view class="name">{{item.user_nick_name}}</view>
+						<view class="comment">{{item.content}}</view>
+						<view class="comment-reply">
+							<view class="reply-content">
+								<text class="reply-name">张三</text> 回复 <text class="reply-name">李四</text>：天哪，这也太好看了吧
+							</view>
+						</view>
+					</view>
+					<view class="time">3小时前</view>
+				</view>
+			</repeat>
+			<!-- <view class="box">
+				<image src="https://images.facedog.cn/discover/thumbnail-discover-5d3ee3f1630746f89f09437e-d41d8cd98f00b204e9800998ecf8427e-1573124769.711497.jpg?x-oss-process=image/resize,w_900,h_900/format,jpg" mode="aspectFill"></image>
+				<view class="comment-box">
+					<view class="name">王妮尔</view>
+					<view class="comment">天哪，这也太好看了吧</view>
+					<view class="comment-reply">
+						<block wx:if="{{show}}">
+							<view class="reply-content">
+								<text class="reply-name">张三</text> 回复 <text class="reply-name">李四</text>：天哪，这也太好看了吧
+							</view>
+							<view class="reply-content">
+								<text class="reply-name">哈哈</text> 回复 <text class="reply-name">呵呵</text>：天哪，这也太好看了吧,天哪，这也太好看了吧天哪，这也太好看了吧
+							</view>
+						</block>
+						<view class="more" @tap="showMore">{{!show?'查看更多50条回复':'隐藏回复'}}
+							<image src="https://images.facedog.cn/public/discover/more-arrow-{{show?'up':'down'}}.png" mode="scaleToFill"></image>
+						</view>
+
+					</view>
+				</view>
+				<view class="time">3小时前</view>
+			</view>
+			<view class="box">
+				<image src="https://images.facedog.cn/discover/thumbnail-discover-5d3ee3f1630746f89f09437e-d41d8cd98f00b204e9800998ecf8427e-1573124769.711497.jpg?x-oss-process=image/resize,w_900,h_900/format,jpg" mode="aspectFill"></image>
+				<view class="comment-box">
+					<view class="name">王妮尔</view>
+					<view class="comment">天哪，这也太好看了吧</view>
+				</view>
+				<view class="time">3小时前</view>
+			</view>
+			<view class="box">
+				<image src="https://images.facedog.cn/discover/thumbnail-discover-5d3ee3f1630746f89f09437e-d41d8cd98f00b204e9800998ecf8427e-1573124769.711497.jpg?x-oss-process=image/resize,w_900,h_900/format,jpg" mode="aspectFill"></image>
+				<view class="comment-box">
+					<view class="name">王妮尔</view>
+					<view class="comment">天哪，这也太好看了吧</view>
+				</view>
+				<view class="time">3小时前</view>
+			</view> -->
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { GET_MOMENT_DETAIL } from '@/utils/url';
+import { get } from '@/utils/request';
+export default class CommentList extends wepy.page {
+  config = {
+    navigationBarTitleText: '评论'
+  };
+
+  data = {
+    show: false,
+    comments: []
+  };
+
+  components = {};
+
+  methods = {
+    showMore() {
+      this.show = !this.show;
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  async onLoad(options) {
+    let { comments } = await get(`${GET_MOMENT_DETAIL}/${options.id}/comments`);
+    this.comments = comments;
+    this.$apply();
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss' scoped>
+	.container {
+	  position: relative;
+	  width: 100%;
+	  .list {
+	    width: 690rpx;
+	    margin: 0 auto;
+	    .box {
+	      margin-top: 40rpx;
+	      width: 690rpx;
+	      float: left;
+	      display: block;
+	      image {
+	        float: left;
+	        width: 75rpx;
+	        height: 75rpx;
+	        overflow: hidden;
+	        border-radius: 50%;
+	      }
+	      .comment-box {
+	        float: left;
+	        margin-right: auto;
+	        color: #000;
+	        position: relative;
+	        margin-left: 34rpx;
+	        .name {
+	          margin-top: 10rpx;
+	          font-size: 23rpx;
+	          font-weight: bold;
+	        }
+	        .comment {
+	          margin-top: 4rpx;
+	          font-size: 20rpx;
+	        }
+	        .comment-reply {
+	          position: relative;
+	          width: 500rpx;
+	          font-size: 20rpx;
+	          top: 15rpx;
+	          .more {
+	            display: flex;
+	            align-items: center;
+	            font-size: 23rpx;
+	            color: #000;
+	            font-weight: bold;
+	            width: 230rpx;
+	            image {
+	              width: 48rpx;
+	              height: 48rpx;
+	            }
+	          }
+	          .reply-content {
+	            font-size: 23rpx;
+	            color: #000;
+	            .reply-name {
+	              color: #000;
+	              font-size: 23rpx;
+	              font-weight: bold;
+	            }
+	          }
+	        }
+	      }
+	      .time {
+	        margin-top: 17rpx;
+	        float: right;
+	        color: #9a9a9a;
+	        font-size: 20rpx;
+	      }
+	    }
+	  }
+	}
+</style>

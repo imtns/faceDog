@@ -1,0 +1,124 @@
+<!--  -->
+<template>
+    <image wx:if="{{imgLoadList.length}}" wx:for="{{ imgLoadList }}" wx:key="index" item="item" src="{{ item.image }}" data-from="{{item.from}}" data-src="{{ item }}" bindload="_imgOnLoad" binderror="_imgOnLoadError" style="width:0;height:0;opacity:0" />
+</template>
+
+<script>
+let loadedLength = 0;
+import wepy from 'wepy';
+import { Event } from '@/utils/event.js';
+export default class ImageLoader extends wepy.component {
+    props = {};
+
+    data = {
+        imgLoadList: [],
+        imgInfo: {},
+        callbacks: {},
+        loadPart: false
+    };
+
+    components = {};
+
+    methods = {
+        _imgOnLoad(ev) {
+            let src = ev.currentTarget.dataset.src;
+            let width = ev.detail.width;
+            let height = ev.detail.height;
+            // 记录已下载图片的尺寸信息
+            //   this.imgInfo[src] = { width, height };
+            // this._removeFromLoadList(src);
+            // this._runCallback(null, src);
+            // console.log('src', src);
+            src.loaded = true;
+            console.log('hello', loadedLength);
+            loadedLength++;
+            if (loadedLength === this.imgLoadList.length) {
+                console.log('oj8k');
+                this.imgLoadList.forEach(item => {
+                    item.loaded = true;
+                });
+                this.$emit('getLoadedImage', this.imgLoadList, this.loadPart);
+            }
+            // this.$emit('getLoadedImage', src);
+            // this.imgLoadList.forEach((item, index) => {
+            //     if (item.image_id === src.image_id) {
+            //         this.imgLoadList.splice(index, 1);
+            //         this.$apply();
+            //     }
+            // });
+            this.$apply();
+        },
+
+        _imgOnLoadError(ev) {
+            let src = ev.currentTarget.dataset.src;
+            // this._removeFromLoadList(src);
+            // this._runCallback('Loading failed', src);
+        }
+    };
+    load(src, name, callback) {
+        if (!src) return;
+        src.from = name;
+        this.imgLoadList.push(src);
+        let imgInfo = this.imgInfo[src];
+        if (callback) {
+            this.callbacks[src] = callback;
+        }
+        // 已经加载成功过的，直接回调
+        if (imgInfo) {
+            this._runCallback(null, src);
+
+            // 新的未在下载队列中的
+        } else if (list.indexOf(src) == -1) {
+            list.push(src);
+            this.imgLoadList = list;
+            this.$apply();
+        }
+    }
+    // 将图片从下载队列中移除
+    _removeFromLoadList(src) {
+        let list = this.imgLoadList;
+        list.splice(list.indexOf(src), 1);
+        this.imgLoadList = list;
+        this.$apply();
+    }
+
+    // 执行回调
+    _runCallback(err, data) {
+        let callback = this.callbacks[data.src] || this.defaultCallback;
+        this.$emit('getLoadedImage', data);
+        delete this.callbacks[data.src];
+    }
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {
+        Event.listen('imageLoader', (imgList, type) => {
+            this.imgLoadList = [];
+            loadedLength = 0;
+            this.loadPart = type;
+            this.$apply();
+            imgList.a.forEach((item, index) => {
+                item.from = 'a';
+                // this.load(item, 'a', item.image_id);
+                this.imgLoadList.push(item);
+            });
+            imgList.b.forEach((item, index) => {
+                item.from = 'b';
+                // this.load(item, 'b', item.image_id);
+                this.imgLoadList.push(item);
+            });
+            console.log(111, this.imgLoadList);
+            // this.imgLoadList.push(...imgList.a);
+            // this.imgLoadList.push(...imgList.b);
+            this.$apply();
+        });
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+</style>

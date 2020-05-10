@@ -1,0 +1,88 @@
+<template>
+	<van-tabbar active="{{ tabIndex }}" @change="onChange">
+		<van-tabbar-item info="{{unread}}">
+			<image slot="icon" src="{{ icon.message.normal }}" mode="aspectFit"></image>
+			<image slot="icon-active" src="{{ icon.message.active }}" mode="aspectFit"></image>
+			<!-- 消息 -->
+		</van-tabbar-item>
+		<van-tabbar-item info="{{enjoy}}"> 
+			<image slot="icon" src="{{ icon.home.normal }}" mode="aspectFit"></image>
+			<image slot="icon-active" src="{{ icon.home.active }}" mode="aspectFit"></image>
+			<!-- 颜值 -->
+		</van-tabbar-item>
+		<!-- <van-tabbar-item>
+            <image slot="icon" src="{{ icon.discover.normal }}" mode="aspectFit"></image>
+            <image slot="icon-active" src="{{ icon.discover.active }}" mode="aspectFit"></image>
+        </van-tabbar-item> -->
+
+		<van-tabbar-item>
+			<image slot="icon" src="{{ icon.my.normal }}" mode="aspectFit"></image>
+			<image slot="icon-active" src="{{ icon.my.active }}" mode="aspectFit"></image>
+			<!-- 我的 -->
+		</van-tabbar-item>
+	</van-tabbar>
+</template>
+<script>
+	import wepy from 'wepy';
+
+	export default class tabbar extends wepy.component {
+	  data = {
+	    active: 0,
+		unread: '',
+		enjoy:'',
+	    icon: {
+	      home: {
+	        normal: 'https://images.facedog.cn/public/tabbar/tab1.png?1',
+	        active: 'https://images.facedog.cn/public/tabbar/tab1-active.png?1'
+	      },
+	      discover: {
+	        normal: 'https://images.facedog.cn/public/tabbar/tab2.png?1',
+	        active: 'https://images.facedog.cn/public/tabbar/tab2-active.png?1'
+	      },
+	      message: {
+	        normal: 'https://images.facedog.cn/public/tabbar/tab3.png?1',
+	        active: 'https://images.facedog.cn/public/tabbar/tab3-active.png?1'
+	      },
+	      my: {
+	        normal: 'https://images.facedog.cn/public/tabbar/tab4.png?1',
+	        active: 'https://images.facedog.cn/public/tabbar/tab4-active.png?1'
+	      }
+	    }
+	  };
+	  props = {
+	    tabIndex: {
+	      type: Number,
+	      default: 0
+	    }
+	  };
+
+	  methods = {
+	    onChange(event) {
+	      this.tabIndex = event.detail;
+	      this.$emit('tabSelect', event.detail);
+	    },
+	    unreadSet(num) {
+	      this.unread = num || '';
+	      this.$apply();
+		},
+		enjoySet(num) {
+	      this.enjoy = num || '';
+	      this.$apply();
+		}
+	  };
+	}
+</script>
+<style lang="less">
+	.van-info {
+	  right: 40rpx !important;
+	  z-index: 9999;
+	  top: -10rpx !important;
+	}
+	.van-tabbar-item__icon image {
+	  width: 136rpx !important;
+	  height: 70rpx !important;
+	}
+	.van-tabbar-item__text {
+	  font-size: 22rpx !important;
+	}
+</style>

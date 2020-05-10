@@ -1,0 +1,196 @@
+<!--  -->
+<template>
+	<navbar title="直接获取">
+	</navbar>
+	<view class='container'>
+		<view class="bg">
+			<view class="box"
+			      @tap="pay(3000)">
+				<image class="tip"
+				       src="https://images.facedog.cn/public/vip/vip-tip1.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+				<image class="icon"
+				       src="https://images.facedog.cn/public/vip/vip-1.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+			</view>
+			<view class="box"
+			      @tap="pay(6800)">
+				<image class="tip"
+				       src="https://images.facedog.cn/public/vip/vip-tip2.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+				<image class="icon"
+				       src="https://images.facedog.cn/public/vip/vip-2.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+			</view>
+			<view class="box"
+			      @tap="pay(15800)">
+				<image class="tip"
+				       src="https://images.facedog.cn/public/vip/vip-tip3.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+				<image class="icon"
+				       src="https://images.facedog.cn/public/vip/vip-3.png?2"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+				<image class="vip-icon"
+				       src="https://images.facedog.cn/mp/other/buy-icon.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+				<view class="tiptext">N/R购买，立刻升至SR级</view>
+			</view>
+		</view>
+	</view>
+	<van-dialog id="van-dialog" />
+	<block wx:if="{{showVerify}}">
+		<verify />
+	</block>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+import { post } from '@/utils/request';
+import { toast, VerifyControl } from '@/utils';
+import { PAY, PAY_CALLBACK } from '@/utils/url';
+import { Event } from '@/utils/event.js';
+import Dialog from '@/components/vant/dialog/dialog';
+import verify from '@/components/pop/verify/index';
+export default class VipBuy extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
+
+  data = {
+    profile: {},
+    showVerify: false,
+  };
+
+  components = {
+    verify,
+  };
+
+  methods = {
+    async pay(price) {
+      if (price != 15800 && !VerifyControl('N')) return;
+      if (this.profile.progress != 'finish' && price != 15800) {
+        toast('未认证用户只能购买1年会员');
+        return;
+      }
+      let { nonceStr, package: _package, paySign, timeStamp } = await post(
+        PAY,
+        {
+          price,
+        }
+      );
+      wx.requestPayment({
+        timeStamp,
+        nonceStr,
+        package: _package,
+        signType: 'MD5',
+        paySign,
+        success: async function(res) {
+          if (res.errMsg === 'requestPayment:ok') {
+            await post(PAY_CALLBACK, { price });
+            wepy.navigateTo({ url: 'vipBuySuccess' });
+
+            // console.log('支付成功');
+            // Dialog.alert({
+            //   title: '',
+            //   message: '支付成功',
+            //   asyncClose: true
+            // }).then(() => {
+            //   setTimeout(() => {
+            //     wepy.navigateBack({
+            //       delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+            //     });
+            //   }, 1000);
+            // });
+          }
+        },
+        fail: function(res) {
+          console.log('fail:', res);
+        },
+        complete: function(res) {},
+      });
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    this.profile = wepy.getStorageSync('profile');
+    this.$apply();
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='less'>
+	page {
+	  background: #2e2b2e;
+	}
+	.container {
+	  position: relative;
+	  .bg {
+	    background: url(https://images.facedog.cn/public/vip/coin-bg.png);
+	    background-size: cover;
+	    width: 730rpx;
+	    height: 642rpx;
+	    margin: 200rpx auto;
+	    display: flex;
+	    justify-content: space-around;
+	    .box {
+	      position: relative;
+	      .tip {
+	        width: 171rpx;
+	        height: 100rpx;
+	        position: absolute;
+	        top: 235rpx;
+	        left: 20rpx;
+	      }
+	      .tiptext {
+	        color: #f7c170;
+	        font-size: 22rpx;
+	        position: relative;
+	        left: -15rpx;
+	      }
+	      .icon {
+	        width: 209rpx;
+	        height: 228rpx;
+	        margin-top: 300rpx;
+	      }
+	      .vip-icon {
+	        width: 104rpx;
+	        height: 104rpx;
+	        top: 294rpx;
+	        position: absolute;
+	        right: -20rpx;
+	      }
+	    }
+	  }
+	}
+</style>

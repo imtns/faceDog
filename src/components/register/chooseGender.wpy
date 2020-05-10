@@ -1,0 +1,153 @@
+<!--  -->
+<template>
+	<view class='container-gender'>
+		<view class="title">请选择你的性别</view>
+		<view class="tip">性别一旦选择无法更改</view>
+		<view class="wrap">
+			<view class="box" @tap="choose(1)">
+				<image src="https://images.facedog.cn/public/register/male{{select==1?'-active':''}}.png" mode="aspectFill" />
+				<view class="text {{select==1?'active':''}}">男生</view>
+				<view class="dot  {{select==1?'active':''}}">
+					<view class="circle  {{select==1?'active':''}}"></view>
+				</view>
+			</view>
+			<view class="box" @tap="choose(2)">
+				<image src="https://images.facedog.cn/public/register/female{{select==2?'-active':''}}.png" mode="aspectFill" />
+				<view class="text {{select==2?'active':''}}">女生</view>
+				<view class="dot  {{select==2?'active':''}}">
+					<view class="circle  {{select==2?'active':''}}"></view>
+				</view>
+			</view>
+		</view>
+		<!-- <form report-submit='true' bindsubmit='submitForm'> -->
+		<button size="large" @tap="start">下一步</button>
+		<!-- </form> -->
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { post } from '@/utils/request';
+import { toast } from '@/utils';
+import { SUBMIT_FORMID, USER_REGISTER } from '@/utils/url';
+export default class ChooseGender extends wepy.component {
+  config = {
+    navigationBarTitleText: '选择性别'
+  };
+
+  data = {
+    select: 0
+  };
+
+  components = {};
+
+  methods = {
+    choose(index) {
+      this.select = index;
+    },
+    async start() {
+      if (this.select === 0) {
+        toast('请选择性别');
+        return;
+      }
+      let gender = this.select === '1' ? 'male' : 'female';
+      wepy.setStorageSync('gender', gender);
+      this.$emit('changeStep', 1);
+    }
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+}
+</script>
+
+<style lang='scss'>
+	.container-gender {
+	  height: 100vh;
+	  position: relative;
+	  overflow: hidden;
+	  width: 100%;
+	  margin: 0 auto;
+	  .title {
+	    margin-top: 152rpx;
+	    text-align: center;
+	    color: #302f2f;
+	    font-size: 42rpx;
+	  }
+	  .tip {
+	    color: #a6aaa8;
+	    font-size: 24rpx;
+	    margin-top: 10rpx;
+	    text-align: center;
+	  }
+	  .wrap {
+	    margin: 206rpx 132rpx 0;
+	    display: flex;
+	    justify-content: space-between;
+	    .box {
+	      display: flex;
+	      text-align: center;
+	      align-items: center;
+	      flex-direction: column;
+	      image {
+	        width: 196rpx;
+	        height: 196rpx;
+	      }
+	      .text {
+	        font-size: 24rpx;
+	        margin-top: 35rpx;
+	        color: #707070;
+	        &.active {
+	          color: #000;
+	          font-weight: bold;
+	        }
+	      }
+	      .dot {
+	        width: 32rpx;
+	        height: 32rpx;
+	        background: rgba(255, 255, 255, 1);
+	        border-radius: 50%;
+	        position: relative;
+	        border: 4rpx solid #707070;
+	        margin-top: 10rpx;
+	        font-size: 24rpx;
+	        color: #707070;
+	        &.active {
+	          border: 4rpx solid rgba(0, 0, 0, 1);
+	          color: #000000;
+	        }
+	        .circle {
+	          width: 25rpx;
+	          height: 25rpx;
+	          border-radius: 50%;
+	          background: #e1e1e1;
+	          &.active {
+	            background: rgba(0, 0, 0, 1);
+	          }
+	          position: absolute;
+	          top: 50%;
+	          left: 50%;
+	          transform: translate(-12rpx, -12rpx);
+	        }
+	      }
+	    }
+	  }
+	  button {
+	    width: 420rpx;
+	    height: 100rpx;
+	    background: rgba(0, 0, 0, 1);
+	    opacity: 1;
+	    color: #fcfcfc;
+	    font-size: 28rpx;
+	    text-align: center;
+	    line-height: 92rpx;
+	    position: absolute;
+	    left: 50%;
+	    bottom: 156rpx;
+	    transform: translateX(-50%);
+	  }
+	}
+</style>

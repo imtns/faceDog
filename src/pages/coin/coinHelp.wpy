@@ -1,0 +1,49 @@
+<!--  -->
+<template>
+	<navbar title="获取颜币">
+	</navbar>
+	<view class='container'>
+		<image src="https://images.facedog.cn/mp/other/intro-coin.png" mode="scaleToFill" lazy-load="false">
+		</image>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class CoinHelp extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
+
+  data = {};
+
+  components = {};
+
+  methods = {};
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	.container {
+	  width: 100%;
+	  position: relative;
+	  image {
+	    margin: 50rpx 30rpx;
+	    width: 683rpx;
+	    height: 1095rpx;
+	  }
+	}
+</style>

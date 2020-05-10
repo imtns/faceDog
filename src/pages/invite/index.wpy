@@ -1,0 +1,444 @@
+<!--  -->
+<template>
+	<navbar title="邀请奖励">
+	</navbar>
+	<view class='container'>
+		<image class="bg"
+		       src="https://images.facedog.cn/public/invite/bg.png?2"
+		       mode="scaleToFill"
+		       lazy-load="false">
+		</image>
+		<button open-type="share"
+		        class="share">
+			<image src="https://images.facedog.cn/public/invite/share.png"
+			       mode="aspectFill"></image>
+		</button>
+		<view style="position:relative">
+			<image class="shareMoment"
+			       @tap="toMyCard"
+			       src="https://images.facedog.cn/public/invite/shareMoment.png?!"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+			<image class="hot"
+			       src="https://images.facedog.cn/public/invite/hot.png"
+			       mode="aspectFill"></image>
+		</view>
+		<view class="invite-progress">
+			<view class="title">
+				<!-- 继续邀请<text style="font-size:50rpx;color:#5572FA;">2</text>位SR好友可以进红包群 -->
+				<image style="width:455rpx;height:50rpx"
+				       src="https://images.facedog.cn/public/invite/invite-tip.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+			</view>
+			<view class="progress-box">
+				<view class="box {{!list[0] && list[1].level == 'SR'?'grey':''}}">
+					<image wx:if="{{list[0]}}"
+					       src="{{list[0].avatar}}"
+					       mode="scaleToFill"
+					       lazy-load="false">
+					</image>
+					<image wx:else
+					       src="https://images.facedog.cn/public/invite/progress-circle.png"
+					       mode="scaleToFill"
+					       lazy-load="false">
+					</image>
+					<view class="text">恭喜你</view>
+					<view class="text">获得500颜币</view>
+				</view>
+				<view class="line line1">
+					<image src="https://images.facedog.cn/public/invite/progress-line.png"
+					       mode="scaleToFill"
+					       lazy-load="false">
+					</image>
+				</view>
+				<view class="box {{!list[1] && list[1].level == 'SR'?'grey':''}}">
+					<image wx:if="{{list[1]}}"
+					       src="{{list[1].avatar}}"
+					       mode="scaleToFill"
+					       lazy-load="false">
+					</image>
+					<image wx:else
+					       src="https://images.facedog.cn/public/invite/progress-circle.png"
+					       mode="scaleToFill"
+					       lazy-load="false">
+					</image>
+					<view class="text">恭喜你</view>
+					<view class="text">获得500颜币</view>
+				</view>
+				<view class="line line2">
+					<image src="https://images.facedog.cn/public/invite/progress-line.png"
+					       mode="scaleToFill"
+					       lazy-load="false">
+					</image>
+				</view>
+				<view class="box {{list[1] && list[1].level == 'SR'?'':'grey'}}">
+					<image @tap="previewCard"
+					       src="{{list[1]?'https://images.facedog.cn/public/invite/wechat-card-icon.png':'https://images.facedog.cn/public/invite/qrcode.png?1'}}"
+					       mode="scaleToFill"
+					       lazy-load="false">
+					</image>
+					<view class="text">恭喜你</view>
+					<view class="text">进入红包群</view>
+				</view>
+			</view>
+		</view>
+		<view class="invite-box">
+			<view class="title">
+				<view class="invite-status">
+					<view class="value">{{successNum}}人</view>
+					<view class="key">已邀请用户</view>
+				</view>
+				<view class="invite-status">
+					<view class="value">{{invite_coin}}</view>
+					<view class="key">已获得颜币</view>
+				</view>
+			</view>
+			<view class="invite-label">
+				<image src="https://images.facedog.cn/public/invite/btn-progress.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+				邀请进度
+			</view>
+			<view class="title-bar">
+				<view class="title-text">已邀请好友</view>
+				<view class="title-text">认证结果</view>
+				<view class="title-text">认证时间</view>
+			</view>
+			<repeat for="{{list}}"
+			        key="index"
+			        index="index"
+			        item="item">
+				<view class="invite-people">
+					<view class="info">
+						<image src="{{item.avatar}}"
+						       mode="scaleToFill"
+						       lazy-load="false">
+						</image>
+						<text>{{item.nick_name}}</text>
+					</view>
+					<view class="progress-icon">
+						<image src="https://images.facedog.cn/public/invite/process-line.png?2"
+						       mode="scaleToFill"
+						       lazy-load="false">
+						</image>
+						<image class="{{item.level}} level"
+						       src="https://images.facedog.cn/mp/profile/{{item.level}}.png"
+						       mode="aspectFill" />
+					</view>
+					<view class="progress-time">
+						{{item.create_time}}
+					</view>
+				</view>
+			</repeat>
+
+		</view>
+	</view>
+	<van-toast id="van-toast" />
+</template>
+
+<script>
+import wepy from 'wepy';
+import { INVATATION } from '@/utils/url';
+import Toast from '@/components/vant/toast/toast';
+import { get, post } from '@/utils/request';
+export default class Invite extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-toast': '../../components/vant/toast/index',
+    },
+  };
+
+  data = {
+    list: [],
+    successNum: 0,
+    invite_coin: 0,
+  };
+
+  components = {};
+
+  methods = {
+    goWechatGroup() {
+      if (this.list[2]) {
+      }
+    },
+    toMyCard() {
+      wepy.navigateTo({ url: '/sub/my/myCard' });
+    },
+    previewCard() {
+      if (this.list.length < 2) return;
+      wx.previewImage({
+        current: 'https:images.facedog.cn/public/invite/wechat-card.png?1',
+        urls: ['https:images.facedog.cn/public/invite/wechat-card.png?1'],
+      });
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  async onLoad() {
+    let { invitation, invite_coin } = await get(INVATATION);
+    this.list = invitation;
+    this.invite_coin = invite_coin;
+    this.list.forEach((item) => {
+      if (item.avatar.indexOf('x-oss') == -1) {
+        item.avatar =
+          item.avatar + '?x-oss-process=image/resize,w_100,h_100/format,jpg';
+      }
+    });
+    this.successNum = this.list.filter(
+      (item) => item.progress == 'finish'
+    ).length;
+    this.$apply();
+  }
+  onShareAppMessage() {
+    let user = wx.getStorageSync('profile') || '';
+    let num = Math.floor(Math.random() * 5) + 1;
+    return {
+      title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
+      path: `/pages/home?userid=${user ? user.ID : ''}`,
+      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
+      success: (res) => {
+        console.log('转发成功', res);
+      },
+      fail: (res) => {
+        console.log('转发失败', res);
+      },
+    };
+  }
+  onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	.container {
+	  width: 100%;
+	  background: #5572fa;
+	  display: flex;
+	  justify-content: center;
+	  flex-wrap: wrap;
+	  padding-bottom: 60rpx;
+	  .bg {
+	    margin-top: 30rpx;
+	    width: 100%;
+	    height: 777rpx;
+	  }
+	  button {
+	    padding: 0;
+	    border: 0;
+	    &::after {
+	      border: none;
+	    }
+	    background: transparent;
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
+	  }
+	  .share {
+	    width: 425rpx;
+	    height: 101rpx;
+	    margin-top: 50rpx;
+	  }
+	  .shareMoment {
+	    width: 426rpx;
+	    height: 137rpx;
+	    margin-top: 10rpx;
+	  }
+	  .hot {
+	    width: 67rpx;
+	    height: 67rpx;
+	    position: absolute;
+	    top: 5rpx;
+	    right: 1rpx;
+	  }
+	  .wechat-card-icon {
+	    position: absolute;
+	    right: -80rpx;
+	    top: 90rpx;
+	    width: 63rpx;
+	    height: 63rpx;
+	  }
+	  .invite-progress {
+	    background: white;
+	    width: 662rpx;
+	    height: 212rpx;
+	    border-radius: 24rpx;
+	    justify-content: center;
+	    padding-top: 25rpx;
+	    margin-top: 30rpx;
+	    padding-bottom: 15rpx;
+	    .title {
+	      color: #000;
+	      font-size: 30rpx;
+	      text-align: center;
+	    }
+
+	    .progress-box {
+	      width: 580rpx;
+	      display: flex;
+	      margin: 24rpx auto;
+	      justify-content: space-between;
+	      position: relative;
+	      .line {
+	        position: absolute;
+	        width: 110rpx;
+	        height: 2rpx;
+	        image {
+	          width: 100%;
+	          height: 100%;
+	        }
+	        &.line1 {
+	          top: 0rpx;
+	          left: 140rpx;
+	        }
+	        &.line2 {
+	          top: 0rpx;
+	          left: 330rpx;
+	        }
+	      }
+	      .box {
+	        display: flex;
+	        justify-content: center;
+	        flex-wrap: wrap;
+	        &.grey {
+	          .text {
+	            color: #dbdbdb;
+	          }
+	        }
+	        image {
+	          width: 65rpx;
+	          height: 65rpx;
+	          border-radius: 50%;
+	          margin-bottom: 5rpx;
+	        }
+	        .text {
+	          width: 100%;
+	          text-align: center;
+	          font-size: 18rpx;
+	          color: #000;
+	        }
+	      }
+	    }
+	  }
+	  .invite-box {
+	    background: white;
+	    width: 662rpx;
+	    border-radius: 24rpx;
+	    justify-content: center;
+	    padding-top: 30rpx;
+	    margin-top: 30rpx;
+	    .title {
+	      display: flex;
+	      justify-content: center;
+	      position: relative;
+	      &::after {
+	        content: '';
+	        position: absolute;
+	        bottom: 0;
+	        left: 0;
+	        width: 100%;
+	        height: 2rpx;
+	        border-bottom: 2rpx dashed #707070;
+	      }
+	      .invite-status {
+	        margin: 0 65rpx;
+	        margin-bottom: 40rpx;
+	        .key {
+	          color: #000;
+	          font-size: 33rpx;
+	        }
+	        .value {
+	          text-align: center;
+	          color: #5572fa;
+	          font-size: 48rpx;
+	        }
+	      }
+	    }
+	    .invite-label {
+	      width: 100%;
+	      display: flex;
+	      justify-content: center;
+	      align-items: center;
+	      height: 91rpx;
+	      color: #5572fa;
+	      font-size: 33rpx;
+	      image {
+	        width: 42rpx;
+	        height: 40rpx;
+	        margin-right: 10rpx;
+	      }
+	    }
+	    .title-bar {
+	      width: 100%;
+	      height: 67rpx;
+	      background: #a1b3ff;
+	      display: flex;
+	      justify-content: center;
+	      align-items: center;
+	      .title-text {
+	        color: white;
+	        font-size: 27rpx;
+	        margin: 0 51rpx;
+	      }
+	    }
+	    .invite-people {
+	      display: flex;
+	      justify-content: space-around;
+	      align-items: center;
+	      margin: 45rpx 0;
+	      .info {
+	        display: flex;
+	        align-items: center;
+	        width: 150rpx;
+	        image {
+	          width: 62rpx;
+	          height: 62rpx;
+	          border-radius: 50%;
+	          margin-right: 10rpx;
+	        }
+	        color: #000;
+	        font-size: 16rpx;
+	      }
+	      .progress-icon {
+	        display: flex;
+	        align-items: center;
+	        image {
+	          width: 86rpx;
+	          height: 9rpx;
+	        }
+	        .level {
+	          height: 30rpx;
+	          border-radius: 0;
+	          display: inline-block;
+	          &.N {
+	            width: 27rpx;
+	          }
+	          &.R {
+	            width: 28rpx;
+	          }
+	          &.SR {
+	            width: 47rpx;
+	          }
+	          &.SSR {
+	            width: 60rpx;
+	          }
+	        }
+	      }
+	      .progress-time {
+	        font-size: 20rpx;
+	        color: #5572fa;
+	      }
+	    }
+	  }
+	}
+</style>

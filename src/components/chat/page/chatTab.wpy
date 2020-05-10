@@ -1,0 +1,89 @@
+<!--  -->
+<template>
+	<view class="wrapper">
+		<view class="tabs">
+			<view class="tab {{tabIndex == 1?'active':''}}" @tap="tabClick(1)">对话</view>
+			<view class="tab {{tabIndex == 2?'active':''}}" @tap="tabClick(2)">好友</view>
+		</view>
+		<view class="page-container">
+			<view wx:if="{{tabIndex == 1}}">
+				<chatlist />
+			</view>
+			<view wx:if="{{tabIndex == 2}}">
+				<friends />
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	import { dialog } from '@/utils';
+	import chatlist from './chatlist';
+	import friends from './friends';
+	export default class chatTab extends wepy.component {
+	  props = {};
+
+	  data = {
+	    tabIndex: 1
+	  };
+
+	  components = {
+	    chatlist,
+	    friends
+	  };
+
+	  methods = {
+	    tabClick(index) {
+	      this.tabIndex = index;
+	    },
+	    getList() {
+	      this.$invoke('friends', 'getList');
+	    },
+	    getChatList(data) {
+	      this.$invoke('chatlist', 'getChatList', data);
+	    },
+	    receivingMsg(data) {
+	      this.$invoke('chatlist', 'receivingMsg', data);
+	    }
+	  };
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='less' scoped>
+	.wrapper {
+	  .tabs {
+	    width: 690rpx;
+	    margin: 0 auto;
+	    margin-top: 19rpx;
+	    height: 57rpx;
+	    display: flex;
+	    background: rgba(233, 233, 233, 1);
+	    border: 1rpx solid rgba(0, 0, 0, 1);
+	    opacity: 1;
+	    border-radius: 7rpx 6rpx 6rpx 7rpx;
+	    justify-content: space-between;
+	    .tab {
+	      width: 50%;
+	      display: flex;
+	      font-size: 20rpx;
+	      color: #545454;
+	      justify-content: center;
+	      align-items: center;
+	      &.active {
+	        background: black;
+	        color: white;
+	      }
+	    }
+	  }
+	}
+</style>

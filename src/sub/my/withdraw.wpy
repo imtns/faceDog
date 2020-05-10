@@ -1,0 +1,139 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view class="form">
+            <view class="field">
+                <view class="label">输入微信号</view>
+                <input class="input" @input="accountChange"  value="{{account}}" placeholder="请输入微信号" />
+            </view>
+            <view class="field">
+                <view class="label">转出金额</view>
+                <input class="input" @input="moneyChange" value="{{money}}" type="number" placeholder="请输入金额" />
+                <view class="all" @tap="takeAll">全部</view>
+            </view>
+        </view>
+        <view class="withdraw" @tap="take">
+            确认提现
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { post } from '@/utils/request';
+import { WITHDRAW } from '@/utils/url';
+import { toast } from '@/utils';
+export default class Withdraw extends wepy.page {
+    config = {
+        navigationBarTitleText: '红包提现'
+    };
+
+    data = {
+        account: '',
+        money: ''
+    };
+
+    components = {};
+
+    methods = {
+        async take() {
+            if (!this.account) {
+                toast('请填写微信号');
+                return;
+            }
+            if (!this.money || this.money == 0) {
+                toast('请填写金额');
+                return;
+            }
+            if (this.money > wepy.getStorageSync('balance')) {
+                toast('提现金额大于账户余额');
+                return;
+            }
+            try {
+                await post(WITHDRAW, {
+                    wechat_code: this.account,
+                    balance: this.money
+                });
+                toast('提现申请已提交, 工作人员确认后会加微信转账', null, 3000);
+            } catch (e) {
+                toast('提现失败,请稍后重试');
+            }
+        },
+        accountChange({detail}) {
+            this.account = detail.value;
+        },
+        moneyChange({detail}) {
+            this.money = detail.value;
+        },
+        takeAll() {
+            const balance = wepy.getStorageSync('balance');
+            console.log(balance);
+            this.money = balance;
+            this.$apply();
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {}
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.wrapper {
+    width: 100%;
+    padding: 0 65rpx;
+    box-sizing: border-box;
+    .form {
+        .field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 60rpx;
+            font-size: 28rpx;
+            color: rgba(0, 0, 0, 1);
+            flex-wrap: wrap;
+            text-align: left;
+            .label {
+                width: 100%;
+                font-weight: 600;
+                margin-bottom: 22rpx;
+            }
+            .input {
+                width: 620rpx;
+                height: 80rpx;
+                border: 2rpx solid rgba(0, 0, 0, 1);
+                box-sizing: border-box;
+                line-height: 80rpx;
+                padding-left: 24rpx;
+            }
+            .all{
+                position:absolute;
+                right:30rpx;
+                top:80rpx;
+                z-index: 999;
+                font-weight: 600;
+                font-size:28rpx;
+                color:#000;
+            }
+        }
+    }
+    .withdraw {
+        width: 411rpx;
+        height: 92rpx;
+        background: rgba(0, 0, 0, 1);
+        text-align: center;
+        line-height: 92rpx;
+        margin:107rpx auto;
+        color:white;
+        opacity: 1;
+    }
+}
+</style>

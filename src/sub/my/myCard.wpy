@@ -1,0 +1,304 @@
+<!--  -->
+<template>
+	<navbar  title="生成美图">
+	</navbar>
+    <view class="loading" wx:if="{{loading}}">
+        <view class="content">
+            <view class="icon">
+                <van-loading color="#fff" />
+            </view>
+            <view class="word">正在保存...</view>
+        </view>
+
+    </view>
+    <view class='wrapper'>
+        <view class="card">
+            <view class="image">
+                <image mode="aspectFill" src="{{profile.icon}}"></image>
+            </view>
+            <view class="box">
+                <view class="left">
+                    <view class="text1">{{profile.nick_name}}邀请您加入<text>“颜狗”</text></view>
+                    <view class="text2">颜狗，好看的人才能加入的高颜值社交圈</view>
+                </view>
+                <view class="right">
+                    <image mode="aspectFill" src="{{qrcode}}"></image>
+                </view>
+            </view>
+        </view>
+        <view class="btn" @tap="save">保存图片</view>
+        <view class="drawImage" wx:if="{{ready}}">
+            <drawimage id="drawimage" width="570" height="738" background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile" fileType="'jpg'" />
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { get, post } from '@/utils/request';
+import { QRCODE } from '@/utils/url';
+import { getTmpFilePath, toast } from '@/utils/index';
+import { base64src } from '@/utils/base64src';
+export default class MyCard extends wepy.page {
+    config = {
+        navigationBarTitleText: '生成美图',
+        disableScroll: true,
+        usingComponents: {
+			navbar: '../../components/navbar/index',
+            drawimage: './miniprogram-drawimage/index',
+            'van-loading': '../../components/vant/loading/index'
+        }
+    }; 
+
+    data = {
+        profile: {},
+        qrcode: '',
+        layers: [],
+        ready: false,
+        background: {},
+        sharePic: '',
+        loading: false
+    };
+
+    components = {};
+
+    methods = {
+        async save() {
+            // if (!this.ready) return;
+            this.loading = true;
+            this.$apply();
+            await this.initStyleList();
+            this.ready = true;
+
+            this.$apply();
+        },
+
+        async toTempFile(res) {
+            // console.error(res);
+            const { tempFilePath } = res.detail;
+            this.sharePic = tempFilePath;
+            const path = this.sharePic;
+            // console.error(path);
+            await this.savePhotosAlbum(path);
+
+            this.$apply();
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+    // 保存
+    async savePhotosAlbum(path) {
+        try {
+            this.loading = false;
+            this.ready = false;
+            this.$apply();
+
+            await wepy.saveImageToPhotosAlbum({ filePath: path });
+            // console.error(path);
+            wx.previewImage({
+                current: path, // 当前显示图片的http链接
+                urls: [path] // 需要预览的图片http链接列表
+            });
+            toast('截屏分享给其他人吧~');
+        } catch (e) {
+            toast('由于您拒绝了相册授权，无法自动保存到本地相册，请截图保存');
+            console.log('savePhotosAlbum', e);
+        }
+        this.$apply();
+    }
+    async onLoad() {
+        this.profile = wepy.getStorageSync('profile');
+        let that = this;
+        wx.request({
+            url: 'https://www.facedog.cn' + QRCODE,
+            data: {
+                page: 'pages/home',
+                scene: that.profile.ID,
+                width: 300
+            },
+            responseType: 'arraybuffer',
+            method: 'POST',
+            success(res) {
+                const base64 = wx.arrayBufferToBase64(res.data);
+                that.qrcode = 'data:image/jpg;base64,' + base64.replace(/[\r\n]/g, '');
+                that.$apply();
+            },
+            fail() {}
+        });
+    }
+
+    onShow() {}
+    async initStyleList() {
+        this.background.imageResource = '/images/my/background.png';
+        this.headImg = await getTmpFilePath(this.profile.icon);
+        let name = this.profile.nick_name;
+        const path = await base64src(this.qrcode);
+        console.log(path);
+        let qrcode = '';
+        if (path.indexOf('http') > -1) {
+            qrcode = await getTmpFilePath(path);
+        } else {
+            qrcode = path;
+        }
+
+        this.layers = [
+            {
+                type: 'image', //  我的头像
+                imageResource: this.headImg,
+                dx: 0,
+                dy: 0,
+                dWidth: 570,
+                dHeight: 570
+            },
+            {
+                type: 'text', // 城市
+                fontSize: 28,
+                text: name,
+                textAlign: 'left',
+                x:
+                    name.length == 1
+                        ? 140
+                        : name.length == 2
+                        ? 114
+                        : name.length == 3
+                        ? 86
+                        : name.length == 4
+                        ? 64
+                        : name.length == 5
+                        ? 36
+                        : name.length == 6
+                        ? 10
+                        : 80,
+                y: 622,
+                color: '#000000'
+            }
+        ];
+        this.layers.push({
+            type: 'image', //  小程序二维码
+            imageResource: qrcode,
+            dx: 430,
+            dy: 590,
+            dWidth: 120,
+            dHeight: 120
+        });
+        // this.layers.push({
+        //     type: 'image', //  黑色1
+        //     imageResource: 'https://images.facedog.cn/public/my/background.png',
+        //     dx: 79,
+        //     dy: 79,
+        //     dWidth: 570,
+        //     dHeight: 840
+        // });
+        this.$apply();
+    }
+}
+</script>
+
+<style lang='less'>
+.loading {
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    left: 0;
+    z-index: 999;
+    top: 0;
+    .content {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 180rpx;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        transform: translate(-50%, -50%);
+        .icon {
+            width: 100rpx;
+            height: 100rpx;
+        }
+        .word {
+            color: white;
+            font-size: 28rpx;
+            text-align: center;
+            margin: 10rpx aut0;
+            width: 230rpx;
+        }
+    }
+}
+page {
+    background: rgba(245, 245, 245, 1);
+}
+.wrapper {
+    width: 100%;
+
+    .card {
+        display: flex;
+        justify-content: center;
+        margin-top: 121rpx;
+        align-items: center;
+        flex-wrap: wrap;
+        .image {
+            width: 570rpx;
+            height: 570rpx;
+            image {
+                width: 100%;
+                height: 100%;
+            }
+        }
+        .box {
+            width: 570rpx;
+            height: 168rpx;
+            background: white;
+            display: flex;
+            box-shadow: 0px 20rpx 30rpx rgba(0, 0, 0, 0.05);
+            justify-content: space-between;
+            .left {
+                width: 500rpx;
+                text-align: right;
+                margin-top: 48rpx;
+                .text1 {
+                    font-size: 28rpx;
+                    font-weight: 600;
+                    color: rgba(59, 66, 102, 1);
+                    text {
+                        color: #e21b1b;
+                    }
+                }
+                .text2 {
+                    font-size: 20rpx;
+                    font-weight: 400;
+                    color: rgba(59, 66, 102, 1);
+                }
+            }
+            .right {
+                margin: 30rpx;
+                width: 128rpx;
+                margin-top: 20rpx;
+                height: 128rpx;
+                image {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+        }
+    }
+    .btn {
+        width: 638rpx;
+        z-index: 998;
+        height: 92rpx;
+        background: rgba(0, 0, 0, 1);
+        position: fixed;
+        bottom: 22rpx;
+        left: 50%;
+        transform: translateX(-50%);
+        line-height: 92rpx;
+        font-size: 28rpx;
+        text-align: center;
+        color: rgba(252, 252, 252, 1);
+    }
+}
+</style>

@@ -1,0 +1,1042 @@
+<!--  -->
+<template>
+	<navbar title="{{id?user.nick_name:'Cpdd聊天室 （'+groupMemberNumber + '人)'}}"></navbar>
+	<view class="chat"
+	      @longpress="handleLongPress"
+	      @touchmove="handleTouchMove"
+	      @touchend="handleTouchEnd">
+		<scroll-view class="scrollView"
+		             scroll-y
+		             scroll-with-animation="{{false}}"
+		             bindscrolltoupper="getMoreData"
+		             upper-threshold="300"
+		             style="height:{{scrollHeight - inputHeight - (showEmoji?'180':0)}}px;"
+		             scroll-into-view="{{toview}}">
+			<view class="chatBox-content-demo"
+			      @tap="hideEmoji"
+			      wx:for="{{msgList}}"
+			      id="chat{{index}}"
+			      wx:key="index">
+				<view class="clearfloat"
+				      wx:if="{{!item.isSend}}"
+				      style="margin-bottom:{{index == msgList.length-1 && isphoneX?'170rpx':''}}">
+					<view class="author-name"
+					      wx:if="{{item.showtime}}">
+						<text class="chat-date">{{item.sendTime}}</text>
+					</view>
+					<view class="left"
+					      style="margin-bottom:40rpx;"
+					      wx:if="{{Complete && index == 0 && id !='administrator' && id}}">
+						<view class="chat-avatars">
+							<image src="{{user.avatar}}"
+							       class="avatar"
+							       mode="aspectFill"
+							       data-id="{{user.dentifier ||item.from}}"
+							       bindtap="goProfile"></image>
+						</view>
+						<view class="profile-image "
+						      wx:if="{{index==0}}"
+						      data-id="{{user.dentifier ||item.from}}"
+						      bindtap="goProfile">
+							<image class="thumb"
+							       src="{{user.avatar}}"
+							       mode="aspectFill"></image>
+							<view class="profile-desc {{user.be || 'friend'}}">
+								<view class="left-container">
+									<view class="top">{{user.nick_name}} {{user.age}}岁/{{user.constellation}}</view>
+									<view class="bottom">在全国颜值排名前{{user.face}}%</view>
+								</view>
+								<view class="right-container">
+									<image class="like-icon"
+									       src="https://images.facedog.cn/public/profile/{{item.be || 'friend'}}.png?v2"
+									       mode="aspectFill"></image>
+								</view>
+							</view>
+						</view>
+					</view>
+					<view class="{{item.flow == 'in'?'left':'right'}}">
+						<view class="chat-avatars">
+							<image wx:if="{{item.flow == 'in'}}"
+							       src="{{user.avatar || item.avatar}}"
+							       class="avatar"
+							       data-id="{{user.dentifier ||item.from}}"
+							       mode="aspectFill"
+							       bindtap="goProfile"></image>
+						</view>
+						<view class="load"
+						      wx:if="{{item.from === profile.dentifier && item.status === 'unSend'}}">
+							<view class="{{item.status}}">
+							</view>
+						</view>
+						<view wx:if="{{!id && item.flow == 'in'}}"
+						      style="display:inline-block;position:relative;top:-24rpx;">
+							<view class="user-name">{{item.nick}}</view>
+							<view class="chat-message">
+
+								<block wx:if="{{item.type == 'TIMTextElem'}}">
+									<repeat for="{{item.virtualDom}}"
+									        key="index1"
+									        index="index1"
+									        item="item1">
+										<block wx:if="{{item1.name == 'span'}}">
+											<text selectable='true'>{{item1.text}}</text>
+										</block>
+										<block wx:if="{{item1.name == 'img'}}">
+											<image src="{{item1.src}}"
+											       style="width:70rpx;height:60rpx;margin:0 2rpx;"
+											       mode="aspectFit"
+											       lazy-load="false">
+											</image>
+										</block>
+									</repeat>
+								</block>
+								<block wx:elif="{{item.type == 'TIMSoundElem'}}">
+									<view @tap="openAudio({{item.payload.url}})"
+									      style="display:flex;align-items:center;">
+										<image src="https://images.facedog.cn/public/chat/audio-play.png"
+										       style="height:44rpx;width:44rpx" />
+										<text style="padding-left: 4rpx;font-weight: 500; font-size: 36rpx">{{item.payload.second}}s</text>
+									</view>
+								</block>
+							</view>
+						</view>
+						<view class="chat-message"
+						      wx:else>
+							<block wx:if="{{item.type == 'TIMTextElem'}}">
+								<repeat for="{{item.virtualDom}}"
+								        key="index1"
+								        index="index1"
+								        item="item1">
+									<block wx:if="{{item1.name == 'span'}}">
+										<text selectable='true'>{{item1.text}}</text>
+									</block>
+									<block wx:if="{{item1.name == 'img'}}">
+										<image src="{{item1.src}}"
+										       style="width:70rpx;height:60rpx;margin:0 2rpx;"
+										       mode="aspectFit"
+										       lazy-load="false">
+										</image>
+									</block>
+								</repeat>
+							</block>
+							<block wx:elif="{{item.type == 'TIMSoundElem'}}">
+								<view @tap="openAudio({{item.payload.url}})"
+								      style="display:flex;align-items:center;">
+									<image src="https://images.facedog.cn/public/chat/audio-play.png"
+									       style="height:44rpx;width:44rpx" />
+									<text style="padding-left: 4rpx;font-weight: 500; font-size: 36rpx">{{item.payload.second}}s</text>
+								</view>
+							</block>
+						</view>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+		<view class="chatInput"
+		      style="height:82rpx;bottom:{{isFocus?inputHeight*2+10:showEmoji?350:23}}rpx">
+			<view class="input">
+				<image style="margin-right:14rpx;"
+				       wx:if="{{!recordShow}}"
+				       @tap="audioRecordClick"
+				       src="https://images.facedog.cn/public/chat/audio.png"
+				       mode="scaleToFill"
+				       lazy-load="false"></image>
+				<image style="margin-right:14rpx;"
+				       wx:if="{{recordShow}}"
+				       @tap="audioRecordClick"
+				       src="https://images.facedog.cn/public/chat/keyboard-icon.png?1"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+				<view id="record"
+				      wx:if="{{recordShow}}"
+				      class="record-bar">
+					<block wx:if="{{!isRecording}}">按住 说话</block>
+					<block wx:else>抬起 停止</block>
+				</view>
+				<input hidden="{{recordShow}}"
+				       type="text"
+				       adjust-position="{{false}}"
+				       confirm-hold="true"
+				       confirm-type="send"
+				       placeholder="请输入消息~"
+				       bindconfirm="bindConfirm"
+				       bindfocus="bindFocus"
+				       bindinput="bindInput"
+				       bindblur="bindBlur"
+				       value="{{msgContent}}"
+				       class="input_text"></input>
+				<image style="margin-left:14rpx;"
+				       @tap="showEmojiHandler"
+				       src="https://images.facedog.cn/public/chat/smile.png"
+				       mode="scaleToFill"
+				       lazy-load="false">
+				</image>
+			</view>
+			<view class="emojis"
+			      wx:if="{{showEmoji}}">
+				<scroll-view class="scrollView"
+				             scroll-y
+				             style="height:325rpx">
+					<repeat for="{{emojiName}}"
+					        key="index"
+					        index="index"
+					        item="item">
+						<image src="{{emojiUrl + emojiMap[item]}}"
+						       @tap="chooseEmoji({{item}})"
+						       style="width:52rpx;height:52rpx;padding:14rpx;" />
+					</repeat>
+				</scroll-view>
+				<view class="emoji-btn">
+					<image src="https://images.facedog.cn/public/chat/delete-emoji.png"
+					       @tap="deleteInput"
+					       mode="scaleToFill" />
+					<image src="https://images.facedog.cn/public/chat/send.png"
+					       @tap="bindConfirm"
+					       mode="scaleToFill" />
+				</view>
+			</view>
+		</view>
+		<view hidden="{{!isRecording}}"
+		      class="record-modal">
+			<view class="wrapper">
+				<view class="modal-loading"></view>
+			</view>
+			<view class="modal-title">
+				{{title}}
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+// import webim from '@/utils/webim.js'; // 腾讯云im包
+// import webimhandler from '@/utils/handler';
+import Config from '@/utils/config';
+import { formatDateFromSeconds, toast, getAge, contentCheck } from '@/utils';
+import { Event } from '@/utils/event.js';
+import { PROFILE, SEND_UNREAD_MESSAGE, GET_CHATROOM_MEMBER } from '@/utils/url';
+import { get, post } from '@/utils/request';
+import { emojiMap, emojiName, emojiUrl } from '@/utils/emojiMap';
+import { decodeElement } from '@/utils/decodeElement';
+const audioContext = wx.createInnerAudioContext();
+const recorderManager = wx.getRecorderManager();
+const recordOptions = {
+  duration: 60000,
+  sampleRate: 44100,
+  numberOfChannels: 1,
+  encodeBitRate: 192000,
+  format: 'aac', // 音频格式，选择此格式创建的音频消息，可以在即时通信 IM 全平台（Android、iOS、微信小程序和Web）互通
+};
+var loading = false;
+export default class ChatRoom extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
+  data = {
+    nextReqMessageID: '',
+    id: '',
+    conversationID: '',
+    msgList: [],
+    msgContent: '',
+    LastMsgTime: 0, // 最近的消息时间，即从这个时间点向前拉取历史消息
+    MsgKey: '',
+    icon: '',
+    toview: '',
+    profile: {},
+    scrollHeight: 0,
+    msg: '',
+    Complete: false,
+    nick: '',
+    count: 0,
+    user: {},
+    isphoneX: false,
+    groupInfo: null,
+    emojiName,
+    emojiUrl,
+    emojiMap,
+    showEmoji: false,
+    MsgSeq: 1,
+    isRecord: false,
+    isRecording: false,
+    canSend: true,
+    startPoint: 0,
+    title: '正在录音',
+    recordShow: false,
+    inputHeight: 0,
+    isFocus: false,
+    groupMemberNumber: 0,
+  };
+
+  components = {};
+  getMessageList(loadMore) {
+    let that = this;
+    let conversationID = this.conversationID || 'GROUP' + Config.avChatRoomId;
+
+    wx.$app
+      .getMessageList({
+        conversationID,
+        nextReqMessageID: this.nextReqMessageID,
+        count: 20,
+      })
+      .then(function(res) {
+        console.log(res);
+        let msgLength = that.msgList.length;
+        that.Complete = res.data.isCompleted;
+        that.msgList.unshift(...res.data.messageList);
+        try {
+          that.msgList.forEach((item, index) => {
+            item.virtualDom = decodeElement(item);
+            if (!that.id) {
+              item.avatar =
+                item.avatar.indexOf('facedog') > -1 &&
+                item.avatar.indexOf('resize') == -1
+                  ? item.avatar +
+                    '?x-oss-process=image/resize,w_200,h_200/format,jpg'
+                  : item.avatar;
+            }
+            item.sendTime = formatDateFromSeconds(item.time);
+            item.showtime =
+              index > 0 && item.time - that.msgList[index - 1].time > 60;
+          });
+        } catch (e) {}
+        that.nextReqMessageID = res.data.nextReqMessageID;
+        loading = false;
+        that.toview = `chat${
+          loadMore
+            ? that.msgList.length - msgLength + 2
+            : that.msgList.length - 1
+        }`;
+        that.$apply();
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
+  }
+  methods = {
+    getMoreData() {
+      if (loading || this.Complete) return;
+      loading = true;
+      this.getMessageList(true);
+    },
+
+    openAudio(url) {
+      let that = this;
+      audioContext.src = url;
+      audioContext.play();
+      audioContext.onPlay(() => {});
+      audioContext.onEnded(() => {
+        wx.hideToast();
+      });
+      audioContext.onError(() => {
+        toast('小程序暂不支持播放该音频格式');
+      });
+    },
+    handleLongPress(e) {
+      this.startPoint = e.touches[0];
+      if (e.target.id === 'record') {
+        this.title = '正在录音';
+        this.isRecording = true;
+        this.startRecording();
+        this.canSend = true;
+      }
+    },
+    handleTouchMove(e) {
+      if (this.isRecording) {
+        if (
+          this.startPoint.clientY - e.touches[e.touches.length - 1].clientY >
+          100
+        ) {
+          this.title = '松开手指，取消发送';
+          this.canSend = false;
+        } else if (
+          this.startPoint.clientY - e.touches[e.touches.length - 1].clientY >
+          20
+        ) {
+          this.title = '上划可取消';
+          this.canSend = true;
+        } else {
+          this.title = '正在录音';
+          this.canSend = true;
+        }
+      }
+    },
+    handleTouchEnd() {
+      this.isRecording = false;
+      wx.hideLoading();
+      recorderManager.stop();
+    },
+    audioRecordClick() {
+      this.recordShow = !this.recordShow;
+    },
+    chooseEmoji(item) {
+      this.msgContent += item;
+    },
+    showEmojiHandler() {
+      this.showEmoji = !this.showEmoji;
+      setTimeout(() => {
+        this.toview = `chat${this.msgList.length - 1}`;
+        this.$apply();
+      }, 1000);
+    },
+
+    bindInput(e) {
+      this.msgContent = e.detail.value;
+    },
+    bindFocus(e) {
+      this.isFocus = true;
+      this.showEmoji = false;
+      console.log(e, '键盘弹起');
+      if (e.detail.height) {
+        this.inputHeight = e.detail.height;
+        setTimeout(() => {
+          this.toview = `chat${this.msgList.length - 2}`;
+          this.$apply();
+        }, 10);
+      }
+    },
+    bindBlur(e) {
+      this.isFocus = false;
+      this.inputHeight = 0;
+      this.toview = `chat${this.msgList.length - 1}`;
+      this.$apply();
+    },
+    hideEmoji() {
+      this.showEmoji = false;
+    },
+    goProfile(e) {
+      console.log(e);
+      let id = e.currentTarget.dataset.id;
+      if (id == 'administrator') return;
+      wx.navigateTo({
+        url: `../battle/profile?dentifier=${e.currentTarget.dataset.id}`,
+      });
+    },
+    deleteInput() {
+      if (!this.msgContent) return;
+      this.msgContent = this.msgContent.substr(0, this.msgContent.length - 1);
+    },
+    bindConfirm(e) {
+      var that = this;
+      var content = e.detail.value || this.msgContent;
+      if (!content.replace(/^\s*|\s*$/g, '')) return;
+      //   contentCheck(content).then(res => {
+      //     console.log(res);
+      //     if (!res) {
+      //       toast('内容包含敏感内容，请重新输入');
+      //       return;
+      //     } else {
+	  // 发送推送
+      post(SEND_UNREAD_MESSAGE, {
+        open_id: that.id,
+      });
+      this.messageSend(content);
+      //     }
+      //   });
+    },
+  };
+  messageSend(content) {
+    var that = this;
+    const message = wx.$app.createTextMessage({
+      to: that.id || Config.avChatRoomId,
+      conversationType: that.id ? 'C2C' : 'GROUP',
+      payload: { text: content },
+    });
+    message.sendTime = formatDateFromSeconds(
+      parseInt(new Date().getTime() / 1000)
+    );
+    message.showtime =
+      that.msgList.length > 0
+        ? parseInt(new Date().getTime() / 1000) -
+            that.msgList[that.msgList.length - 1].time / 1000 >
+          60
+        : parseInt(new Date().getTime() / 1000);
+    message.virtualDom = decodeElement(message);
+    that.msgList.push(message);
+    that.$apply();
+    wx.$app.sendMessage(message).then((res) => {
+      console.log('!!!!', res);
+      that.msgList.forEach((item, index) => {
+        if (index == that.msgList.length - 1) {
+          item.status = 'ok';
+        }
+      });
+      that.setData({
+        msgList: that.msgList,
+      });
+    });
+    that.toview = `chat${that.msgList.length - 1}`;
+    that.msgContent = '';
+    that.showEmoji = false;
+    that.$apply();
+  }
+  startRecording() {
+    wx.getSetting({
+      success: (res) => {
+        let auth = res.authSetting['scope.record'];
+        if (auth === false) {
+          // 已申请过授权，但是用户拒绝
+          wx.openSetting({
+            success: function(res) {
+              let auth = res.authSetting['scope.record'];
+              if (auth === true) {
+                wx.showToast({
+                  title: '授权成功',
+                  icon: 'success',
+                  duration: 1500,
+                });
+              } else {
+                wx.showToast({
+                  title: '授权失败',
+                  icon: 'none',
+                  duration: 1500,
+                });
+              }
+            },
+          });
+        } else if (auth === true) {
+          // 用户已经同意授权
+          this.isRecording = true;
+          recorderManager.start(recordOptions);
+        } else {
+          // 第一次进来，未发起授权
+          wx.authorize({
+            scope: 'scope.record',
+            success: () => {
+              wx.showToast({
+                title: '授权成功',
+                icon: 'success',
+                duration: 1500,
+              });
+            },
+          });
+        }
+      },
+      fail: function() {
+        wx.showToast({
+          title: '授权失败',
+          icon: 'none',
+          duration: 1500,
+        });
+      },
+    });
+  }
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  async onLoad(options) {
+    let that = this;
+    this.id = options.id;
+
+    this.conversationID = options.conversationID;
+    this.profile = wx.getStorageSync('profile');
+    if (this.id) {
+      if (this.id == 'administrator') {
+        this.user.nick_name = '颜狗客服';
+        this.user.avatar = 'https://images.facedog.cn/public/chat/chatIcon.png';
+      } else {
+        try {
+          const result = await get(PROFILE, { dentifier: this.id });
+          this.user = result;
+          this.user.face = Math.floor(this.user.face * 100);
+          this.user.age = getAge(this.user.birthday);
+          this.user.images.forEach((item) => {
+            if (item.is_avatar) {
+              this.user.avatar =
+                item.image +
+                '?x-oss-process=image/resize,w_200,h_200/format,jpg';
+            }
+          });
+        } catch (e) {}
+        this.$apply();
+      }
+      this.getMessageList();
+    } else {
+      this.groupMemberNumber =
+        150 +
+        (await post(GET_CHATROOM_MEMBER, {
+          dentifier: this.profile.dentifier,
+          room: options.type,
+        }));
+      let promise = wx.$app.joinGroup({
+        groupID: Config.avChatRoomId,
+        type: wx.TIM.TYPES.GRP_PUBLIC,
+      });
+      promise
+        .then((imResponse) => {
+          switch (imResponse.data.status) {
+            case wx.TIM.TYPES.JOIN_STATUS_WAIT_APPROVAL: // 等待管理员同意
+              break;
+            case wx.TIM.TYPES.JOIN_STATUS_SUCCESS: // 加群成功
+              console.log(imResponse.data.group); // 加入的群组资料
+              this.getMessageList();
+              break;
+            case wx.TIM.TYPES.JOIN_STATUS_ALREADY_IN_GROUP: // 已经在群中
+              this.getMessageList();
+              break;
+            default:
+              break;
+          }
+        })
+        .catch(function(imError) {
+          console.warn('joinGroup error:', imError); // 申请加群失败的相关信息
+        });
+    }
+
+    recorderManager.onStart(() => {
+      console.log('recorder start');
+    });
+    recorderManager.onPause(() => {
+      console.log('recorder pause');
+    });
+    recorderManager.onStop((res) => {
+      console.log('recorder stop');
+      wx.hideLoading();
+      if (this.canSend) {
+        if (res.duration < 1000) {
+          toast('录音时间太短');
+        } else {
+          const message = wx.$app.createAudioMessage({
+            to: this.id || Config.avChatRoomId,
+            conversationType: this.id ? 'C2C' : 'GROUP',
+            payload: {
+              file: res,
+            },
+          });
+
+          message.sendTime = formatDateFromSeconds(
+            parseInt(new Date().getTime() / 1000)
+          );
+          message.showtime =
+            that.msgList.length > 0
+              ? parseInt(new Date().getTime() / 1000) -
+                  that.msgList[that.msgList.length - 1].time / 1000 >
+                60
+              : parseInt(new Date().getTime() / 1000);
+          that.msgList.push(message);
+          that.$apply();
+          wx.$app.sendMessage(message).then((res) => {
+            console.log('!!!!', res);
+            that.msgList.forEach((item, index) => {
+              if (index == that.msgList.length - 1) {
+                item.status = 'ok';
+              }
+            });
+            that.setData({
+              msgList: that.msgList,
+            });
+          });
+          this.msgContent = '';
+          this.toview = `chat${this.msgList.length - 1}`;
+          this.$apply();
+        }
+      }
+    });
+    wx.getSystemInfo({
+      success(res) {
+        var name = 'iPhone X';
+        if (
+          res.model.indexOf('iPhone 11') > -1 ||
+          res.model.indexOf('iPhone X') > -1 ||
+          res.model.indexOf('unknown<iPhone') > -1
+        ) {
+          that.scrollHeight = wx.getSystemInfoSync().windowHeight - 150;
+          console.warn('isIphoneX !!!!!!!');
+          that.isphoneX = true;
+          that.$apply();
+        } else {
+          that.scrollHeight = wx.getSystemInfoSync().windowHeight - 124;
+          that.$apply();
+        }
+      },
+    });
+
+    this.$apply();
+  }
+  onShow() {
+    Event.listen('receiveMessage', (message) => {
+      if (this.id && message.conversationType === 'GROUP') return;
+      if (message.type == 'TIMTextElem') {
+        message.virtualDom = decodeElement(message);
+      }
+      this.msgList.push(message);
+      this.toview = `chat${this.msgList.length - 1}`;
+      this.$apply();
+    });
+  }
+  onUnload() {
+    Event.remove('receiveMessage');
+    if (this.id)
+      wx.$app
+        .setMessageRead({ conversationID: this.conversationID })
+        .then((imResponse) => {
+          console.log('messageRead:', imResponse);
+        })
+        .catch(function(imError) {
+          // 已读上报失败
+          console.warn('setMessageRead error:', imError);
+        });
+    loading = false;
+    this.MsgKey = '';
+    this.toview = '';
+    this.LastMsgTime = 0;
+    this.msgList = {};
+    this.msgContent = '';
+    this.groupInfo = null;
+    this.profile = {};
+    this.Complete = false;
+    console.log('chatpage unload');
+    this.$apply();
+  }
+}
+</script>
+
+<style lang='less'>
+	page {
+	  background: #f6f6f6;
+	}
+	/**index.wxss**/
+	.allChatContent {
+	  width: 100%;
+	  position: relative;
+	  top: 0;
+	  /* overflow: scroll; */
+	}
+
+	.chatBox-content-demo {
+	  padding-bottom: 10rpx;
+	  width: 100%;
+	  //   overflow-y: scroll;
+	  &:last-of-type {
+	    // margin-bottom: 45rpx;
+	    .clearfloat {
+	      margin-bottom: 25rpx;
+	    }
+	  }
+	}
+
+	.clearfloat:after {
+	  display: block;
+	  clear: both;
+	  content: '';
+	  visibility: hidden;
+	  height: 0;
+	}
+
+	.clearfloat {
+	  margin: 41rpx 29rpx 0;
+	  .avatar {
+	    width: 82rpx;
+	    height: 82rpx;
+	    border-radius: 50%;
+	  }
+	}
+	.clearfloat .right {
+	  float: right;
+	}
+
+	.author-name {
+	  font-size: 22rpx;
+	  text-align: center;
+	  margin: 35rpx auto;
+	  color: #a5a5a5;
+	}
+
+	.clearfloat .chat-message {
+	  text-align: left;
+	  max-width: 440rpx;
+	  padding: 22rpx 23rpx;
+	  border-radius: 20rpx;
+	  word-wrap: break-word;
+	  position: relative;
+	  align-items: center;
+	  display: inline-flex;
+	  color: #191919;
+	}
+
+	.profile-image {
+	  width: 370rpx;
+	  height: 428rpx;
+	  position: relative;
+	  margin-left: 22rpx;
+	  display: inline-block;
+	  .thumb {
+	    width: 100%;
+	    height: 100%;
+	    display: block;
+	    border-radius: 12rpx 12rpx 0 0;
+	    border: 0;
+	  }
+	  .profile-desc {
+	    width: 370rpx;
+	    height: 79rpx;
+	    &.lover {
+	      background: #ee5361;
+	    }
+	    &.friend {
+	      background: #dc4f56;
+	    }
+	    &.close {
+	      background: #d066ef;
+	    }
+	    border-radius: 0 0 12rpx 12rpx;
+	    color: #070707;
+	    display: flex;
+	    position: relative;
+	    justify-content: space-between;
+	    top: -30rpx;
+	    .left-container {
+	      margin-top: 10rpx;
+	      margin-right: auto;
+	      margin-left: 20rpx;
+	      .top {
+	        font-size: 22rpx;
+	        font-weight: 600;
+	        margin-bottom: 5rpx;
+	      }
+	      .bottom {
+	        font-size: 18rpx;
+	      }
+	    }
+	    .right-container {
+	      width: 60rpx;
+	      margin-right: 20rpx;
+	      .like-icon {
+	        width: 100%;
+	        height: 100%;
+	      }
+	    }
+	  }
+	}
+
+	.clearfloat .left .chat-message {
+	  //   background: white;
+
+	  margin-left: 22rpx;
+	  color: #4b4b4b;
+	  background: rgba(255, 255, 255, 1);
+	  box-shadow: 0px 0px 6rpx rgba(0, 0, 0, 0.16);
+	  opacity: 1;
+	  border-radius: 10rpx 51rpx 51rpx 51rpx;
+	  text {
+	    font-size: 28rpx;
+	    color: #4b4b4b;
+	  }
+	}
+
+	// .clearfloat .left .chat-message:before {
+	//   position: absolute;
+	//   content: '';
+	//   top: 8px;
+	//   left: -6px;
+	//   border-top: 10px solid transparent;
+	//   border-bottom: 10px solid transparent;
+	//   border-right: 10px solid white;
+	// }
+	.clearfloat {
+	  position: relative;
+	}
+	.clearfloat .user-name {
+	  color: #4b4b4b;
+	  font-size: 20rpx;
+	  margin-left: 22rpx;
+	  margin-bottom: 6rpx;
+	}
+	.clearfloat .right {
+	  text-align: right;
+	}
+
+	.clearfloat .right .chat-message {
+	  //   background: #1ccddf;
+	  text-align: left;
+	  //   font-size: 24rpx;
+	  //   font-weight: 600;
+	  //   margin-right: 22rpx;
+
+	  color: white;
+	  background: rgba(0, 219, 219, 1);
+	  box-shadow: 0px 0px 6rpx rgba(0, 0, 0, 0.16);
+	  opacity: 1;
+	  border-radius: 51rpx 10rpx 51rpx 51rpx;
+	  text {
+	    font-size: 28rpx;
+	    color: white;
+	  }
+	}
+	.clearfloat .unSend {
+	  width: 24rpx;
+	  height: 24rpx;
+	  border: 8rpx solid #98c6fd;
+	  border-bottom: #f6f6f6 8rpx solid;
+	  border-radius: 50%;
+	  animation: load 1.1s infinite linear;
+	  @keyframes load {
+	    from {
+	      transform: rotate(0deg);
+	    }
+	    to {
+	      transform: rotate(360deg);
+	    }
+	  }
+	}
+	.clearfloat .load {
+	  height: 100%;
+	  width: 60rpx;
+	  vertical-align: middle;
+	  display: inline-block;
+	}
+
+	// .clearfloat .right .chat-message:before {
+	//   position: absolute;
+	//   content: '';
+	//   top: 23rpx;
+	//   right: -6px;
+	//   border-top: 20rpx solid transparent;
+	//   border-bottom: 20rpx solid transparent;
+	//   border-left: 20rpx solid #1ccddf;
+	// }
+
+	.clearfloat .chat-avatars {
+	  display: inline-block;
+	  vertical-align: top;
+	}
+	.chatInput {
+	  width: 100%;
+	  height: 82rpx;
+	  display: flex;
+	  bottom: 23rpx;
+	  position: fixed;
+	  transform: all 0.4s;
+	  flex-wrap: wrap;
+	  //   padding: 26rpx 32rpx 0;
+	  align-items: center;
+	  //   justify-content: center;
+	  .record-bar {
+	    width: 574rpx;
+	    background-color: #fff;
+	    border: 2rpx solid #dbdbdb;
+	    color: #495060;
+	    border-radius: 16rpx;
+	    box-sizing: border-box;
+	    height: 68rpx;
+	    line-height: 68rpx;
+	    font-weight: 600;
+	    display: flex;
+	    justify-content: center;
+	  }
+	  .input {
+	    width: 100%;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+
+	    image {
+	      //   margin-left: 14rpx;
+	      width: 56rpx;
+	      height: 56rpx;
+	    }
+	  }
+	  .emojis {
+	    width: 100%;
+	    display: flex;
+	    justify-content: center;
+	    background: white;
+	    border-radius: 4rpx;
+	    margin-top: 15rpx;
+
+	    // position: absolute;
+	    position: relative;
+	    // top: -352rpx;
+	    .scrollView {
+	      display: flex;
+	      justify-content: center;
+	      padding: 10rpx 13rpx 20rpx 15rpx;
+	      image {
+	        margin: 2rpx;
+	      }
+	    }
+	    .emoji-btn {
+	      position: absolute;
+	      right: 30rpx;
+	      bottom: 40rpx;
+	      display: flex;
+	      justify-content: center;
+	      image {
+	        width: 90rpx;
+	        height: 54rpx;
+	        margin: 0 10rpx;
+	      }
+	    }
+	  }
+	  .input_text {
+	    background: rgba(255, 255, 255, 1);
+	    border-radius: 41rpx;
+	    font-size: 28rpx;
+	    height: 82rpx;
+	    font-weight: 500;
+	    padding: 0 32rpx;
+	    width: 68%;
+	    color: rgba(158, 157, 157, 1);
+	  }
+	}
+
+	.noMoreChat {
+	  text-align: center;
+	  font-size: 14px;
+	  height: 40px;
+	  line-height: 40px;
+	  color: #888;
+	}
+	.record-modal {
+	  height: 300rpx;
+	  width: 60vw;
+	  background-color: black;
+	  opacity: 0.8;
+	  position: fixed;
+	  top: 400rpx;
+	  z-index: 9999;
+	  left: 20vw;
+	  border-radius: 24rpx;
+	  display: flex;
+	  flex-direction: column;
+	  .wrapper {
+	    display: flex;
+	    height: 200rpx;
+	    box-sizing: border-box;
+	    padding: 10vw;
+	    .modal-loading {
+	      opacity: 1;
+	      width: 40rpx;
+	      height: 16rpx;
+	      border-radius: 16rpx;
+	      background-color: #006fff;
+	      animation: loading 2s cubic-bezier(0.17, 0.37, 0.43, 0.67) infinite;
+	    }
+	  }
+	  .modal-title {
+	    text-align: center;
+	    color: white;
+	  }
+	  @keyframes loading {
+	    0% {
+	      transform: translate(0, 0);
+	    }
+	    50% {
+	      transform: translate(30vw, 0);
+	      background-color: #f5634a;
+	      width: 80rpx;
+	    }
+	    100% {
+	      transform: translate(0, 0);
+	    }
+	  }
+	}
+</style>

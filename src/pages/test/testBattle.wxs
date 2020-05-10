@@ -1,0 +1,97 @@
+var allTouchs = [], len = 0, instances = [], instanceLen, isMoveEnd = false
+
+
+function reset(ownerInstance) {
+  //重置
+//   for (var i = 0; i < instanceLen; i++) {
+//     instances[i].setStyle({
+//       'transform': '',
+//       'display': 'none'
+//     })
+//   }
+}
+
+function touchstart(event, ownerInstance) {
+  if (isMoveEnd) return
+  //获取当前移动的手指
+  var bounds = event.touches, boundsLen = bounds.length
+  allTouchs = event.touches, len = event.touches.length
+  instances = ownerInstance.selectAllComponents('.demo'), instanceLen = instances.length
+
+  for (var i = 0; i < instanceLen; i++) {
+    var instance = instances[i], bound = bounds[i]
+
+    if (i < boundsLen) {
+      //更新
+      instance.disabled = false
+      instance.identifier = bound.identifier
+      instance.setStyle({
+        'transform': 'translateX(' + bound.pageX-300 + 'px) translateY(' + bound.pageY + 'px)',
+        'display': 'block'
+      })
+    } else {
+      instance.setStyle({
+        'transform': '',
+        'display': 'none'
+      })
+      instance.disabled = true
+      instance.identifier = ''
+    }
+  }
+}
+
+function touchmove(event, ownerInstance) {
+  //获取当前移动的手指
+  var bounds = event.changedTouches, boundsLen = bounds.length, bound = null, instance = null, allTouch = null
+
+  for (var i = 0; i < instanceLen; i++) {
+    instance = instances[i]
+    for (var j = 0; j < boundsLen; j++) {
+      bound = bounds[j]
+      if (instance.identifier === bound.identifier) {
+        //更新
+        instance.setStyle({
+          'transform': 'translateX(' + bound.pageX + 'px) translateY(' + bound.pageY + 'px)',
+          'display': 'block'
+        })
+      }
+    }
+  }
+}
+
+function touchend(event, ownerInstance) {
+  isMoveEnd = true
+  //获取当前移动的手指
+  var bounds = event.changedTouches, boundsLen = bounds.length, bound = null, instance = null, allTouch = null
+
+  for (var i = 0; i < instanceLen; i++) {
+    instance = instances[i]
+    for (var j = 0; j < boundsLen; j++) {
+      bound = bounds[j]
+      if (instance.identifier === bound.identifier) {
+        //更新
+        instance.setStyle({
+          'transform': '',
+          'display': 'none'
+        })
+        //移除
+        instances[i].disabled = true
+        instances[i].identifier = ''
+      }
+    }
+  }
+
+  var tmp = instances.filter(function (item) {
+    return !item.disabled
+  })
+  if (tmp.length < 1) {
+    //重置
+    reset(ownerInstance)
+  }
+  isMoveEnd = false
+}
+module.exports = {
+  touchmove: touchmove,
+  touchend: touchend,
+  touchstart: touchstart
+}

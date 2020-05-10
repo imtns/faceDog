@@ -1,0 +1,662 @@
+<!--  -->
+<template>
+	<navbar title="我的排名" background="black" backImage="/static/icon/back-white.png" color="white"></navbar>
+	<view class="loading" wx:if="{{loading}}">
+		<view class="content">
+			<view class="icon">
+				<van-loading color="#fff" />
+			</view>
+			<view class="word">正在保存...</view>
+		</view>
+
+	</view> 
+	<view class='wrapper'>
+		<view class="header"> 
+			<view class="header-text"></view>
+			<view class="face">{{face}}%</view>
+			<view class="city" style="font-size:{{position.length==3?'39rpx':'33rpx'}};top:{{position.length==3?'140rpx':'144rpx'}};left:{{position.length==3?'298rpx':'288rpx'}}">{{position}}</view>
+			<view class="rank">NO.{{city}}</view>
+			<!-- <view class="title">你在全国颜值排名前<text>{{face}}%</text></view>
+			<view class="title">你的颜值在{{position}}排名第<text>{{city}}名</text></view> -->
+			<view class="bar">“{{shareText}}”</view>
+		</view>
+		<view class="w">
+			<view class="boxes">
+				<view class="box1 box">
+					<image class="box-image" src="https://images.facedog.cn/public/rank/rank-icon1.png"></image>
+				</view>
+				<view class="box2 box">
+					<view class="rate1">
+						<image class="ssr" src="https://images.facedog.cn/public/rank/ssr.png" mode="scaleToFill" />
+					</view>
+					<view class="rate2">{{images[0].win}}%</view>
+					<view class="rate3">{{images[0].play}}</view>
+				</view>
+				<view class="box3 box">
+					<!-- <image src="{{images[1].image}}" mode="aspectFill"></image>
+					<view class="info">
+						<view class="word">胜 率 \ <text> {{images[1].win}}%</text></view>
+						<view class="word">出场数 \ <text> {{images[1].play}}</text></view>
+					</view> -->
+					<image class="box-image" src="{{images[0].image}}"></image>
+				</view>
+				<view class="box4 box">
+					<canvas canvas-id="radarCanvas" class="canvas"></canvas>
+				</view>
+			</view>
+			<view wx:if="{{!noData}}" class="shareButton" @tap="share">分享有奖</view>
+		</view>
+		<view class="drawImage" wx:if="{{ready}}">
+			<drawimage id="drawimage" width="750" height="1333" background="{{background}}" layers="{{layers}}" bind:toTempFile="toTempFile" fileType="'jpg'" />
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	import wxCharts from '@/utils/wxcharts';
+	import { get, post } from '@/utils/request';
+	import { USER_RANK, QRCODE } from '@/utils/url';
+	import { base64src } from '@/utils/base64src';
+	import { getTmpFilePath, toast } from '@/utils/index';
+
+	var radarChart = null;
+	export default class Example extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '我的排名',
+	    navigationBarBackgroundColor: '#000',
+	    navigationBarTextStyle: 'white',
+	    usingComponents: {
+	      drawimage: './miniprogram-drawimage/index',
+	      'van-loading': '../../components/vant/loading/index',
+	      navbar: '../../components/navbar/index'
+	    }
+	  };
+
+	  data = {
+	    charData: { 
+	      male: {},
+	      female: {}
+	    },
+	    loading: false,
+	    charLabel: {
+	      male: ['阳光', '帅气', '多金', '智慧', '性感'],
+	      female: ['可爱', '美丽', '高贵', '智慧', '性感']
+	    },
+	    charTexts: {
+	      male: {
+	        sexy: ['想在哥哥的八块腹肌上蹦个迪', '放在心上的宝贝以后也要放在床上'],
+	        cool: ['近朱者赤，近你者甜', '世间万物皆苦，你的偏爱是我的救赎'],
+	        wisdom: [
+	          '始于颜值，陷于才华，忠于人品',
+	          '满地都是六便士，他却抬头看见了月亮'
+	        ],
+	        wealth: [
+	          '我一生中就喜欢两种花，有钱花和随便花',
+	          '男生其实很懂事，有钱了就想多照顾几个女生'
+	        ],
+	        character: [
+	          '什么都可以错，但是别再错过我',
+	          '以梦为马，不负韶华，无问西东',
+	          '两个人的无聊，好过一个人的发呆',
+	          '我百毒不侵，可偏偏你是第一百零一种',
+	          '好看的皮囊扫黄打非，有趣的灵魂账号违规',
+	          '遇见你的那天，我连我们孩子名字都想好了'
+	        ]
+	      },
+	      female: {
+	        sexy: [
+	          '做个万人迷，然后只喜欢你',
+	          '男人喜欢乖的又拒绝不了你',
+	          '不能同日生，但能一起祸害苍生'
+	        ],
+	        cool: [
+	          '可爱不是长久之计，可爱是我',
+	          '像我这样的小盆友是要随时被放在怀里的'
+	        ],
+	        wisdom: [
+	          '世上所有的惊喜与好运，都是你积累的温柔和善良',
+	          '徒手摘星，爱而不得，世人万千，再难遇我'
+	        ],
+	        wealth: ['人生苦短，喜欢就买', '我的心思很好猜，除了想你就是发财'],
+	        character: [
+	          '我是一个没有感情的杀手',
+	          '一生温暖纯良，不舍爱与自由',
+	          '我可以亲口对你说晚安吗？先亲口再说',
+	          '我一般下午出现，不然你早晚会爱上我',
+	          '反正你也没有女朋友，叫我一声老婆怎么了',
+	          '酒那么苦你喜欢喝，我嘴那么甜你怎么不尝尝'
+	        ]
+	      }
+	    },
+	    position: '', // 省份
+	    city: 0, // 城市名次
+	    images: [],
+	    face: 0, // 颜值排名
+	    ready: false,
+	    qrcode: '',
+	    canvasImage: '',
+	    background: {
+	      imageResource: '',
+	      dx: 0,
+	      dy: 0,
+	      dWidth: 750,
+	      dHeight: 1333
+	    },
+	    layers: [],
+	    headImg1: '',
+	    styleImage1: '',
+	    gender: '',
+	    shareText: '',
+	    shareTextArr: [],
+	    noData: false,
+	    blackbg: '' // 黑色的部分，胜率等
+	  };
+
+	  components = {};
+
+	  methods = {
+	    async share() {
+	      if (this.noData) {
+	        toast('数据正在生成中，暂时不能分享');
+	        return;
+	      }
+	      this.loading = true;
+	      this.$apply();
+	      await this.initStyleList();
+	      this.ready = true;
+	      this.$apply();
+	    },
+	    async toTempFile(res) {
+	      // console.error(res);
+	      const { tempFilePath } = res.detail;
+	      const path = tempFilePath;
+	      // console.error(path);
+	      await this.savePhotosAlbum(path);
+
+	      this.$apply();
+	    }
+	  };
+
+	  // 保存
+	  async savePhotosAlbum(path) {
+	    try {
+	      this.loading = false;
+	      this.ready = false;
+	      this.$apply();
+	      await wepy.saveImageToPhotosAlbum({ filePath: path });
+	      wx.previewImage({
+	        current: path, // 当前显示图片的http链接
+	        urls: [path] // 需要预览的图片http链接列表
+	      });
+
+	      toast('截屏分享给其他人吧~');
+	    } catch (e) {
+	      toast('由于您拒绝了相册授权，无法自动保存到本地相册，请截图保存');
+	      console.log('savePhotosAlbum', e);
+	    }
+	    this.$apply();
+	  }
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+	  getRanText() {
+	    let text = '';
+	    if (
+	      !this.charData[this.gender] ||
+	      Object.keys(this.charData[this.gender]).length === 0
+	    ) {
+	      this.shareText = '数据生成中，请等待1-2天';
+	      this.noData = true;
+	      this.$apply();
+	      return;
+	    }
+	    for (const [key, value] of Object.entries(this.charData[this.gender])) {
+	      console.log(key, value);
+	      if (value == 5) {
+	        text = this.getRanValue(this.charTexts[this.gender][key]);
+	      }
+	    }
+	    if (!text) {
+	      text = this.getRanValue(this.charTexts[this.gender]['character']);
+	    }
+	    this.shareText = text;
+	    this.shareTextArr = chunkSubstr(text, 8);
+	    this.$apply();
+	    console.log('text:', text);
+	  }
+	  onShareAppMessage() {
+	    let user = wx.getStorageSync('profile') || '';
+		let num = Math.floor(Math.random() * 5) + 1;
+		
+	    return {
+	      title: num == 1?'你这么美，不来看看吗':'只有好看的人才能收到',
+	      path: `/pages/home?userid=${user ? user.ID : ''}`,
+	      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
+	      success: res => {
+	        console.log('转发成功', res);
+	      },
+	      fail: res => {
+	        console.log('转发失败', res);
+	      }
+	    };
+	  }
+	  async onLoad() {
+	    let profile = wepy.getStorageSync('profile');
+	    let gender = profile.gender;
+	    let that = this;
+	    // this.qrcode = `https://www.facedog.cn/api/auth/qrcode?ID=${profile.ID}`;
+	    wx.request({
+	      url: 'https://www.facedog.cn' + QRCODE,
+	      data: {
+	        page: 'pages/home',
+	        scene: profile.ID,
+	        width: 300
+	      },
+	      responseType: 'arraybuffer',
+	      method: 'POST',
+	      success(res) {
+	        const base64 = wx.arrayBufferToBase64(res.data);
+	        that.qrcode = 'data:image/jpg;base64,' + base64.replace(/[\r\n]/g, '');
+	        that.$apply();
+	      },
+	      fail() {}
+	    });
+	    let info = null;
+	    try {
+	      info = await get(USER_RANK);
+	    } catch (e) {
+	      wepy.redirectTo({ url: '/pages/register' });
+	    }
+	    console.log(info);
+	    const { face, city, position, five } = info;
+	    this.gender = gender;
+	    this.charData[gender] = five;
+	    // 颜值排名
+	    this.face = Number(face).toFixed(1);
+	    // 城市排名
+	    this.city = city;
+	    // 省份
+	    this.position = position;
+	    if (this.position.length == 5) {
+	      this.position = this.position.substr(0, 4);
+	    }
+	    // 图片1
+	    this.images = info.images;
+	    this.images.forEach(item => {
+	      // item.image = item.image + '?x-oss-process=image/resize,w_200,h_200/format,jpg';
+	      item.win = Math.floor(item.win * 100);
+	    });
+	    this.$apply();
+	    this.getRanText();
+	    if (this.charData[this.gender]) {
+	      radarChart = new wxCharts({
+	        canvasId: 'radarCanvas',
+	        type: 'radar',
+	        background: '#333333',
+	        categories: this.charLabel[this.gender],
+	        series: [
+	          {
+	            data: [
+	              this.charData[this.gender].character,
+	              this.charData[this.gender].cool,
+	              this.charData[this.gender].wealth,
+	              this.charData[this.gender].wisdom,
+	              this.charData[this.gender].sexy
+	            ]
+	          }
+	        ],
+	        width: 160,
+	        height: 165,
+	        extra: {
+	          radar: {
+	            max: 5,
+	            labelColor: '#F24858'
+	          }
+	        }
+	      });
+	      setTimeout(() => {
+	        wx.canvasToTempFilePath({
+	          canvasId: 'radarCanvas',
+	          async success(res) {
+	            var tempFilePath = res.tempFilePath;
+	            // // console.error(tempFilePath);
+	            that.canvasImage = tempFilePath;
+	            that.$apply();
+	          },
+	          fail(res) {
+	            console.log(res);
+	          }
+	        });
+	      }, 1000);
+	    }
+	    this.$apply();
+	  }
+	  getRanValue(arr) {
+	    return arr[Math.floor(Math.random() * arr.length)];
+	  }
+	  async initStyleList() {
+	    this.background.imageResource = '/images/my/rank/shareBG.png';
+	    const bg = '/images/my/myrank-bg.png';
+	    this.headImg = await getTmpFilePath(this.images[0].image);
+	    const path = await base64src(this.qrcode);
+	    let qrcode = '';
+	    // let qrcode = await getTmpFilePath(path);
+	    if (path.indexOf('http') > -1) {
+	      qrcode = await getTmpFilePath(path);
+	    } else {
+	      qrcode = path;
+	    }
+	    // let qrcode = await getTmpFilePath(this.qrcode);
+	    this.layers = [
+	      {
+	        type: 'image', //  我的头像1
+	        imageResource: this.headImg,
+	        dx: 114,
+	        dy: 528,
+	        radius: 25,
+	        dWidth: 286,
+	        dHeight: 286
+	      },
+	      {
+	        type: 'text', // 城市
+	        fontSize: 30,
+	        text: this.position,
+	        textAlign: 'center',
+	        x: 365,
+	        y: 429,
+	        color: '#E11220'
+	      },
+	      {
+	        type: 'text', // 排名的百分比
+	        fontSize: 30,
+	        text: `NO.${this.city}`,
+	        textAlign: 'center',
+	        x: 604,
+	        y: 431,
+	        color: '#E11220'
+	      },
+	      {
+	        type: 'text', // 帅气百分比
+	        fontSize: 34,
+	        text: `${100 - this.face}%`,
+	        textAlign: 'center',
+	        x: 512,
+	        y: 370,
+	        color: '#E11220'
+	      }
+	    ];
+	    this.layers.push({
+	      type: 'text', // 胜率
+	      fontSize: 22,
+	      text: `${this.images[0].win}%`,
+	      textAlign: 'center',
+	      x: 512,
+	      y: 539,
+	      color: 'white'
+	    });
+	    this.layers.push({
+	      type: 'text', // 出场率
+	      fontSize: 22,
+	      text: `${this.images[0].play}`,
+	      textAlign: 'center',
+	      x: 507,
+	      y: 574,
+	      color: 'white'
+	    });
+	    if (this.shareTextArr.length && this.shareTextArr[0]) {
+	      this.layers.push({
+	        type: 'text', // 出场率
+	        fontSize: 21,
+	        text: `${this.shareTextArr[0]}`,
+	        textAlign: 'left',
+	        x: 452,
+	        y: 660,
+	        color: 'white'
+	      });
+	    }
+	    if (this.shareTextArr.length && this.shareTextArr[1]) {
+	      this.layers.push({
+	        type: 'text', // 出场率
+	        fontSize: 21,
+	        text: `${this.shareTextArr[1]}`,
+	        textAlign: 'left',
+	        x: 452,
+	        y: 690,
+	        color: 'white'
+	      });
+	    }
+	    if (this.shareTextArr.length && this.shareTextArr[2]) {
+	      this.layers.push({
+	        type: 'text', // 出场率
+	        fontSize: 21,
+	        text: `${this.shareTextArr[2]}`,
+	        textAlign: 'left',
+	        x: 452,
+	        y: 720,
+	        color: 'white'
+	      });
+	    }
+	    if (this.shareTextArr.length && this.shareTextArr[3]) {
+	      this.layers.push({
+	        type: 'text', // 出场率
+	        fontSize: 21,
+	        text: `${this.shareTextArr[3]}`,
+	        textAlign: 'left',
+	        x: 452,
+	        y: 750,
+	        color: 'white'
+	      });
+	    }
+	    this.layers.push({
+	      type: 'image', //  我的头像1
+	      imageResource: this.canvasImage,
+	      dx: 80,
+	      dy: 820,
+	      dWidth: 330,
+	      dHeight: 300
+	    });
+	    this.layers.push({
+	      type: 'image', //  小程序二维码
+	      imageResource: qrcode,
+	      dx: 434,
+	      dy: 1180,
+	      dWidth: 130,
+	      dHeight: 130
+	    });
+	    this.$apply();
+	  }
+	  onShow() {}
+	}
+	function chunkSubstr(str, size) {
+	  const numChunks = Math.ceil(str.length / size);
+	  const chunks = new Array(numChunks);
+
+	  for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
+	    chunks[i] = str.substr(o, size);
+	  }
+
+	  return chunks;
+	}
+</script>
+
+<style lang='less'>
+	.canvas {
+	  width: 355rpx;
+	  height: 282rpx;
+	}
+	.wrapper {
+	  width: 100%;
+
+	  display: flex;
+	  justify-content: center;
+	  flex-wrap: wrap;
+	  .header {
+	    background: black;
+	    height: 300rpx;
+	    // border-top: 1rpx solid white;
+	    position: relative;
+	    width: 100%;
+	    .header-text {
+	      width: 479rpx;
+	      height: 105rpx;
+	      background: url(https://images.facedog.cn/public/rank/header-text.png);
+	      background-size: cover;
+	      position: relative;
+	      left: 70rpx;
+	      top: 80rpx;
+	    }
+	    .face,
+	    .rank,
+	    .city {
+	      position: absolute;
+	      color: #f24858;
+	      font-size: 33rpx;
+	    }
+	    .face {
+	      top: 61rpx;
+	      left: 556rpx;
+	      font-size: 58rpx;
+	    }
+	    .city {
+	      top: 146rpx;
+	      left: 288rpx;
+	      font-size: 28rpx;
+	    }
+	    .rank {
+	      left: 560rpx;
+	      top: 144rpx;
+	    }
+	    .bar {
+	      width: 545rpx;
+	      height: 136rpx;
+	      position: absolute;
+	      left: 50%;
+	      transform: translateX(-50%);
+	      top: 240rpx;
+	      background: url(https://images.facedog.cn/public/rank/bar.png);
+	      background-size: cover;
+	      font-size: 22rpx;
+	      font-weight: 600;
+	      color: white;
+	      text-align: center;
+	      line-height: 95rpx;
+	      margin-left: auto;
+	      margin-right: auto;
+	      opacity: 1;
+	    }
+	  }
+	  .boxes {
+	    display: flex;
+	    justify-content: space-between;
+	    flex-wrap: wrap;
+	    margin: 0 46rpx;
+	    padding-top: 80rpx;
+	    .box {
+	      width: 316rpx;
+	      height: 316rpx;
+
+	      overflow: hidden;
+	      margin: 0rpx 2rpx;
+	      &.box1 {
+	        image {
+	          width: 238rpx;
+	          height: 291rpx;
+	        }
+	      }
+	      &.box2 {
+	        background: url(https://images.facedog.cn/public/rank/rank-icon2.png);
+	        width: 313rpx;
+	        height: 277rpx;
+	        background-size: cover;
+	        position: relative;
+	        > view {
+	          font-size: 39rpx;
+	          position: absolute;
+
+	          color: white;
+	        }
+	        .rate1 {
+	          left: 110rpx;
+	          top: 20rpx;
+	          .ssr {
+	            width: 115rpx;
+	            height: 53rpx;
+	          }
+	        }
+	        .rate2 {
+	          left: 110rpx;
+	          top: 93rpx;
+	        }
+	        .rate3 {
+	          left: 145rpx;
+	          top: 144rpx;
+	        }
+	      }
+	      &.box3 {
+	        image {
+	          width: 100%;
+	          height: 100%;
+	        }
+	        border: 4rpx solid black;
+	        border-radius: 27rpx;
+	      }
+	      &.box4 {
+	        display: flex;
+	        justify-content: center;
+	        align-items: center;
+	        border: 4rpx solid black;
+	        border-radius: 27rpx;
+	      }
+	    }
+	  }
+	  .shareButton {
+	    width: 462rpx;
+	    z-index: 998;
+	    height: 100rpx;
+	    background: rgba(0, 0, 0, 1);
+	    position: fixed;
+	    bottom: 50rpx;
+	    border-radius: 10rpx;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    line-height: 92rpx;
+	    font-size: 28rpx;
+	    text-align: center;
+	    color: rgba(252, 252, 252, 1);
+	  }
+	}
+	.loading {
+	  width: 100%;
+	  height: 100vh;
+	  background: rgba(0, 0, 0, 0.5);
+	  position: absolute;
+	  left: 0;
+	  z-index: 999;
+	  top: 0;
+	  .content {
+	    position: absolute;
+	    left: 50%;
+	    top: 50%;
+	    width: 180rpx;
+	    display: flex;
+	    justify-content: center;
+	    flex-wrap: wrap;
+	    transform: translate(-50%, -50%);
+	    .icon {
+	      width: 100rpx;
+	      height: 100rpx;
+	    }
+	    .word {
+	      color: white;
+	      font-size: 28rpx;
+	      text-align: center;
+	      margin: 10rpx aut0;
+	      width: 230rpx;
+	    }
+	  }
+	}
+</style>

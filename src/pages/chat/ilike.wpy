@@ -1,0 +1,222 @@
+<!--  -->
+<template>
+	<navbar title="我喜欢的">
+	</navbar>
+	<block wx:if="{{!show}}">
+		<loadingHeart top="-160rpx" />
+	</block>
+	<block wx:if="{{!list.length && show}}">
+		<empty></empty>
+	</block>
+	<view class='container'>
+		<repeat for="{{list}}" key="index" index="index" item="item">
+			<view class="box">
+				<view class="content">
+					<image class="avatar" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg"></image>
+					<view class="info">
+						<view class="name">{{item.nick_name}} {{item.age}}</view>
+						<view class="city">{{item.province}} {{item.city}}</view>
+					</view>
+					<image @tap="askWechat({{item.user_id}},{{item.nick_name}},{{item.ask_wechat}},{{index}})" class="icon" src="https://images.facedog.cn/public/profile/wechat{{item.ask_wechat?'-disable':''}}.png" mode="scaleToFill" lazy-load="false">
+					</image>
+					<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
+					</image>
+				</view>
+			</view>
+		</repeat>
+	</view>
+	<van-toast id="van-toast" />
+	<van-dialog id="van-dialog" />
+</template>
+
+<script>
+import wepy from 'wepy';
+import { get, post } from '@/utils/request';
+
+import empty from '@/components/empty';
+import Toast from '@/components/vant/toast/toast';
+import loadingHeart from '@/components/battle/module/loadingHeart';
+import Dialog from '@/components/vant/dialog/dialog';
+import {
+  MAKEFRIEND,
+  MY_FAVORITE,
+  DELETE_FAVORITE,
+  ASK_WECHAT
+} from '@/utils/url';
+export default class ILIKE extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-toast': '../components/vant/toast/index',
+      'van-dialog': '../components/vant/dialog/index'
+    }
+  };
+
+  data = {
+    list: [],
+    init: false,
+    nomore: false,
+    show: false,
+    me: {}
+  };
+
+  components = {
+    empty,
+    loadingHeart
+  };
+
+  methods = {
+    async askWechat(id, name, ask, index) {
+      if (ask) return;
+      let message = '';
+      Dialog.confirm({
+        confirmButtonText: this.me.coin >= 200 ? '确认' : '如何获得?',
+        cancelButtonText: '取消',
+        asyncClose: true,
+        message: `向 ${name}申请微信号?
+								Ta会收到你赠送的200颜币
+								你当前的颜币为${this.me.coin}
+								如果没同意，3天后自动返还`
+      })
+        .then(async () => {
+          if (this.me.coin >= 200) {
+            await post(ASK_WECHAT, { user_id: id });
+            setTimeout(() => {
+              this.me.coin = this.me.coin - 200;
+              this.list[index].ask_wechat = true;
+              this.$apply();
+              Dialog.close();
+              Dialog.alert({
+                message: '已发送，请到消息页颜币红包处查看进度'
+              }).then(() => {
+                // on close
+              });
+            }, 1000);
+          } else {
+            Dialog.close();
+            wepy.navigateTo({ url: '/pages/coin/coinHelp' });
+
+            console.log('如何获得');
+          }
+        })
+        .catch(() => {
+          Dialog.close();
+          // this.methods.uploadVideo.bind(this)();
+        });
+    },
+    goProfile(id) {
+      console.log(id);
+      wx.navigateTo({
+        url: `../battle/profile?id=${id}`,
+        success: result => {},
+        fail: () => {},
+        complete: () => {}
+      });
+    },
+    async clearFavorites(id) {
+      wepy.showLoading({
+        title: '', //提示的内容,
+        mask: true, //显示透明蒙层，防止触摸穿透,
+        success: res => {}
+      });
+
+      if (id == 'all') {
+        id = [];
+        this.list.forEach(item => {
+          id.push(item._id);
+        });
+      }
+      await post(DELETE_FAVORITE, { id });
+      Toast('删除成功');
+      wepy.hideLoading();
+      this.fetchData();
+    }
+  };
+  onReachBottom() {}
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    this.fetchData();
+  }
+  async fetchData() {
+    this.list = [];
+    const result = await get(MY_FAVORITE, { page: 1 });
+    this.list.push(...result.favorites);
+    this.init = true;
+    this.show = true;
+    this.me = wepy.getStorageSync('profile');
+    this.$apply();
+  }
+  onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	page {
+	  background: #f7f7f7;
+	}
+	.container {
+	  display: flex;
+	  flex-wrap: wrap;
+	  justify-content: center;
+	  padding-top: 10rpx;
+	  .box {
+	    width: 722rpx;
+	    background: white;
+	    margin: 10rpx 0;
+	    .content {
+	      display: flex;
+	      justify-content: space-between;
+	      align-items: center;
+	      padding: 25rpx 0;
+	    }
+	    .avatar {
+	      width: 157rpx;
+	      height: 157rpx;
+	      border-radius: 50%;
+	      border: 4rpx solid #5cd4d4;
+	      position: relative;
+	      margin-left: 30rpx;
+	      &::before {
+	        border: 5rpx solid white;
+	        content: '';
+	        display: block;
+	        position: absolute;
+	        border-radius: 50%;
+	        top: 0rpx;
+	        left: 0rpx;
+	        right: 0rpx;
+	        bottom: 0rpx;
+	      }
+	    }
+	    .info {
+	      margin-right: auto;
+	      margin-left: 20rpx;
+	      .name {
+	        font-size: 31rpx;
+	        color: #000;
+	      }
+	      .city {
+	        color: #a2a7b2;
+	        font-size: 25rpx;
+	      }
+	    }
+
+	    .icon {
+	      width: 60rpx;
+	      height: 60rpx;
+	      margin-right: 60rpx;
+	    }
+	    .delete {
+	      width: 43rpx;
+	      height: 43rpx;
+	      margin-right: 60rpx;
+	    }
+	  }
+	}
+</style>

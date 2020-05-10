@@ -1,0 +1,70 @@
+<!--  -->
+<template>
+<navbar  title="我的动态"></navbar>
+    <block wx:if="{{!list.length}}">
+        <empty></empty>
+    </block>
+    <view wx:else class="mymoment-moment-list-page">
+        <momentCard></momentCard>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+import { get } from '@/utils/request';
+import momentCard from '@/components/discover/momentCard';
+import empty from '@/components/empty';
+export default class mymoment extends wepy.page {
+    config = {
+        navigationBarTitleText: '我的动态',
+        usingComponents: {
+			'van-popup': '../../components/vant/popup/index',
+			navbar: '../../components/navbar/index'
+        }
+    }
+    data = {
+        userId: '',
+        list: []
+    };
+    components = {
+        momentCard,
+        empty
+    };
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    async onLoad(options) {
+        const { id } = options;
+        this.userId = id;
+        const list = await get(`/api/discover/${this.userId}/moment`, {
+            user_id: this.userId
+        });
+        this.list = list;
+        console.log('TA的动态', list);
+        if (list.length) this.$invoke('momentCard', 'setMomentList', list);
+        this.$apply();
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.mymoment-moment-list-page{
+    .warn-pop{
+        .warn{
+            height: 120rpx;
+            text-align: center;
+            font-size:32rpx;
+            font-weight:600;
+            line-height:120rpx;
+            color:rgba(0,0,0,1);
+            border-bottom:1px solid rgba(226,225,225,1);
+        }
+    }
+}
+</style>

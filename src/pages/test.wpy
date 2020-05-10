@@ -1,0 +1,100 @@
+<!--  -->
+<template>
+    <view class="wrapper">
+        <repeat for="{{40}}" key="index" index="index" item="item">
+            <view class="bot" data-code="botfm{{170+index}}" @tap="click">botfm{{index+170}}</view>
+        </repeat>
+
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import { post } from '@/utils/request';
+    import { LOGIN, SUBMIT_FORMID } from '@/utils/url';
+    let inviteUserId = '';
+    export default class TEST extends wepy.page {
+      config = {
+        navigationBarTitleText: '颜狗切换'
+      };
+
+      data = {
+        show: false,
+        code: '',
+        disabled: false,
+        verify: false,
+        certify: false,
+        name: '',
+        isphoneX: false,
+        showPositionButton: true,
+        // showUserInfoButton: false,
+        loading: false,
+        latitude: 39.9219,
+        longitude: 116.44355
+      };
+
+      components = {};
+
+      methods = {
+        async submitForm(e) {
+          await post(SUBMIT_FORMID, {
+            formId: e.detail.formId
+          });
+        },
+        click(ev) {
+          let {
+            code,
+            identifier,
+            tencent: tencent_token,
+            token
+          } = ev.currentTarget.dataset;
+          console.log(code);
+          this.methods.goLogin(code, this);
+        },
+        async goLogin(code, t) {
+          t.loading = true;
+          t.$apply();
+          const result = await post(
+            LOGIN,
+            { code },
+            {
+              latitude: this.latitude,
+              longitude: this.longitude
+            }
+          );
+          wepy.setStorageSync('welcome', result.welcome);
+          wepy.setStorageSync('token', result.access_token);
+          wepy.setStorageSync('tencent_token', result.tencent_token);
+          wepy.setStorageSync('identifier', result.identifier);
+          if (result.welcome) {
+            wx.redirectTo({
+              url: `register/chooseGender`
+            });
+          } else {
+            wx.redirectTo({
+              url: 'index'
+            });
+          }
+        }
+      };
+
+      watch = {};
+      computed = {};
+
+      onLoad(options) {}
+    }
+</script>
+
+<style lang='less' scoped>
+    .bot {
+      width: 100%;
+      height: 100rpx;
+      background: #f3acac;
+      color: rgb(255, 255, 255);
+      font-size: 32rpx;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30rpx;
+    }
+</style>

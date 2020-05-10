@@ -1,0 +1,454 @@
+<template>
+	<navbar center="true" showHome="{{true}}" wx:if="{{selectedTab ==1 }}">
+		<view slot="center">
+			<view class="square">
+				<view class="tab {{tabSelect==0?'active':''}}" @tap="tabClick(0)">PK</view>
+				<view class="tab-split"></view>
+				<view class="tab tab2 {{tabSelect==1?'active':''}}" @tap="tabClick(1)">探索</view>
+				<view class="underline" style="left:{{tabSelect==0?'42rpx':'149rpx'}}"></view>
+			</view>
+		</view>
+	</navbar>
+	<navbar center="true" showSquare="{{true}}" wx:elif="{{selectedTab ==0 }}">
+	</navbar>
+	<navbar wx:else title="{{pageTitle}}">
+	</navbar>
+	<block wx:if="{{verify}}">
+		<verify />
+	</block>
+	<view wx:if="{{selectedTab == 0}}">
+		<chat />
+	</view>
+	<view wx:if="{{selectedTab == 1}}">
+		<block wx:if="{{tabSelect == 0}}">
+			<battle />
+		</block>
+		<block wx:if="{{tabSelect == 1}}">
+			<explore :verify.sync="hasProfile" />
+		</block>
+	</view>
+	<view wx:if="{{selectedTab == 2}}">
+		<my />
+	</view>
+	<block wx:if="{{tabbarshow}}">
+		<tabbar :tabIndex.sync="selectedTab" />
+	</block>
+	<!-- <van-popup show="{{ showRedpacketLayer}}" bind:close="onClose">
+		<redpacketLayer />
+	</van-popup> -->
+	<van-popup show="{{ showVipBuy}}" bind:close="onClose">
+		<vipBuyPop />
+	</van-popup>
+	<van-toast id="van-toast" />
+	<van-dialog id="van-dialog" />
+	<van-popup show="{{ showLevelPop}}" bind:close="onClose">
+		<levelPop @close="close" />
+	</van-popup>
+	<block wx:if="{{showVerify}}">
+		<verify />
+	</block>
+</template>
+
+<script>
+import wepy from 'wepy';
+import tabbar from '@/components/tabbar';
+import battle from '@/components/battle/battle';
+import explore from '@/components/explore/index';
+import levelPop from '@/components/pop/upgrade/levelPop';
+import vipBuyPop from '@/components/pop/vip/index';
+import redpacketLayer from '@/components/pop/redpackage/index';
+import my from '@/components/my/my';
+import chat from '@/components/chat/chat';
+import { sleep } from '@/utils';
+import { get, put } from '@/utils/request';
+import { NEW_PROFILE, GET_LEVEL_INFO, USER_SETTING } from '@/utils/url';
+import { getAge } from '@/utils';
+import { Event } from '@/utils/event.js';
+import verify from '@/components/pop/verify/index';
+
+let tabClicked = false;
+let optionFrom = false;
+// import { toast } from '@/utils';
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '谁的颜值更高？',
+    // disableScroll: true,
+    usingComponents: {
+      navbar: '../components/navbar/index',
+      'van-button': '../components/vant/button/index',
+      'van-tabbar': '../components/vant/tabbar/index',
+      'van-tabbar-item': '../components/vant/tabbar-item/index',
+      'van-dialog': '../components/vant/dialog/index',
+      'van-icon': '../components/vant/icon/index',
+      'van-tabs': '../components/vant/tabs/index',
+      'van-tab': '../components/vant/tab/index',
+      'van-popup': '../components/vant/popup/index',
+      'van-overlay': '../components/vant/overlay/index',
+      'van-swipe-cell': '../components/vant/swipe-cell/index',
+      'van-toast': '../components/vant/toast/index',
+      'van-progress': '../components/vant/progress/index',
+      'van-collapse': '../components/vant/collapse/index',
+      'van-collapse-item': '../components/vant/collapse-item/index',
+      'van-checkbox': '../components/vant/checkbox/index',
+    },
+  };
+  components = {
+    tabbar,
+    battle,
+    explore,
+    // discover,
+    chat,
+    my,
+    verify,
+    // redpacketLayer,
+    vipBuyPop,
+    levelPop,
+  };
+
+  data = {
+    mynum: 20,
+    userInfo: {
+      nickName: '加载中...',
+    },
+    test: false,
+    selectedTab: -1,
+    tabbarshow: true,
+    hide: false,
+    user: {},
+    verify: false,
+    hasProfile: false,
+    tabSelect: 0,
+    pageTitle: '',
+    loaded: false,
+    showHome: true,
+    showRedpacketLayer: false,
+    showVipBuy: false,
+    showLevelPop: false,
+    showVerify: false,
+  };
+  computed = {
+    now() {
+      return +new Date();
+    },
+  };
+  methods = {
+    verifyShow() {
+      this.verify = true;
+    },
+    tabClick(tab) {
+      this.tabSelect = tab;
+    },
+    onGotUserInfo(e) {
+      console.log(e.detail.errMsg);
+      console.log(e.detail.userInfo);
+      console.log(e.detail.rawData);
+    },
+    counterEmit(...args) {
+      let $event = args[args.length - 1];
+      console.log(
+        `${this.$name} receive ${$event.name} from ${$event.source.$name}`
+      );
+    },
+  };
+  onPullDownRefresh() {
+    // console.error('ssss');
+  }
+  async setProfile() {
+    try {
+      const data = await get(NEW_PROFILE, { loading: false });
+      data.age = (data.birthday && getAge(data.birthday)) || 18;
+      if (data.progress == 'profile' || data.progress == 'refuse') {
+        this.hasProfile = false;
+        this.$apply();
+      } else {
+        this.hasProfile = true;
+      }
+      this.$apply();
+      this.profile = data;
+      this.profile.images &&
+        this.profile.images.forEach((item) => {
+          if (item.is_avatar) {
+            this.profile.icon = item.image;
+          }
+        });
+      wepy.setStorageSync('hasProfile', this.hasProfile);
+      this.$invoke('battle', 'hasProfile', this.hasProfile);
+      this.profile.images = this.switchOrder(this.profile.images);
+      wepy.setStorageSync('profile', this.profile);
+      this.$invoke('battle', 'init', this.profile);
+      this.$invoke('my', 'setProfile', this.profile);
+      let showLevel = wepy.getStorageSync('showLevel');
+      if (!showLevel && this.profile.level && !this.loaded) {
+        // let level = await get(GET_LEVEL_INFO);
+        this.showLevelPop = true;
+        wepy.setStorageSync('level', this.profile.level);
+        this.$invoke('levelPop', 'setLevel', this.profile.level, 'home');
+
+        this.$apply();
+      }
+      this.loaded = true;
+      this.$apply();
+    } catch (e) {
+      // console.error(e);
+      this.hasProfile = false;
+      wepy.setStorageSync('hasProfile', false);
+      this.$apply();
+      let profile = wepy.getStorageSync('wx_profile');
+      this.$invoke('my', 'setProfile', profile);
+      this.loaded = true;
+      this.$apply();
+      // setTimeout(() => {
+      //     wepy.redirectTo({ url: 'home' });
+      // }, 1000);
+    }
+  }
+  switchOrder(d) {
+    var r = [];
+    d.forEach((e) => {
+      if (e['is_avatar']) r.unshift(e);
+      else r.push(e);
+    });
+    return r;
+  }
+  events = {
+    showVipPop() {
+      this.showVipBuy = true;
+    },
+    closeVipPop() {
+      this.showVipBuy = false;
+    },
+    closeRedPacketLayer() {
+      this.showRedpacketLayer = false;
+    },
+    verifyShow() {
+      this.verify = true;
+    },
+    recommendTap() {
+      this.tabSelect = 1;
+    },
+    close() {
+      this.showLevelPop = false;
+    },
+    tabSelect: (...args) => {
+      let $event = args[args.length - 1];
+      this.selectedTab = $event.source.tabIndex;
+      this.showHome = false;
+      if (this.selectedTab == 0) {
+        this.pageTitle = '消息';
+        this.$invoke('chat', 'refreshData');
+      }
+      if (this.selectedTab == 1) {
+        // wx.setNavigationBarTitle({
+        //   title: '谁的颜值更高？'
+        // });
+        this.showHome = true;
+        if (optionFrom) {
+          if (!tabClicked) {
+            tabClicked = true;
+            return;
+          }
+          //   this.$invoke('battle', 'displayPage');
+        }
+        // this.$invoke('battle', 'init');
+      }
+
+      if (this.selectedTab == 2) {
+        // wx.setNavigationBarTitle({
+        //   title: ''
+        // });
+        this.pageTitle = '';
+        // this.$invoke('my', 'setProfile');
+      } else if (this.selectedTab == 1) {
+        // wx.setNavigationBarTitle({
+        //   title: '发现'
+        // });
+        // this.$invoke('discover', 'initList');
+      }
+    },
+    unreadSet(num) {
+      this.$invoke('tabbar', 'unreadSet', num);
+    },
+    enjoySet(num) {
+      this.$invoke('tabbar', 'enjoySet', num);
+    },
+    showtab(status) {
+      this.tabbarshow = status;
+      this.$apply();
+    },
+    getProfile() {
+      this.setProfile();
+    },
+  };
+  async onLoad(options) {
+    if (options.test) {
+      this.test = true;
+    }
+    if (options.select) {
+      optionFrom = true;
+      this.selectedTab = options.select;
+      if (options.select == 0) {
+        this.pageTitle = '消息';
+        this.$invoke('chat', 'refreshData');
+      } else if (options.select == 2) {
+        this.pageTitle = '我';
+      }
+      setTimeout(() => {
+        Event.trigger('tab', options.tab);
+      }, 500);
+      console.log(options.select);
+      this.$apply();
+      // return;
+    } else {
+      this.selectedTab = 1;
+    }
+
+    this.user = wx.getStorageSync('profile');
+    this.setProfile();
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
+    let setting = {};
+    const settingResult = await get(USER_SETTING);
+    Object.assign(setting, settingResult);
+    wepy.setStorageSync('setting', JSON.stringify(setting));
+
+    Event.listen('settingShowLevel', async (level) => {
+      let setting = JSON.parse(wepy.getStorageSync('setting'));
+      setting.show = level;
+      await put(USER_SETTING, setting);
+    });
+    // let showRedpacket = wx.getStorageSync('showRedpacket');
+    // if (showRedpacket != 'ok') {
+    //   let interval = setInterval(() => {
+    //     if (wepy.getStorageSync('tutorial')) {
+    //     //   this.redpacketLayer();
+    //       clearInterval(interval);
+    //     }
+    //   }, 5000);
+    // }
+    wx.$app
+      .login({
+        userID: wx.getStorageSync('identifier'),
+        userSig: wx.getStorageSync('tencent_token'),
+      })
+      .then(function(imResponse) {
+        console.log('im登录日志::::::', imResponse.data); // 登录成功
+        if (imResponse.data.errorInfo) {
+          wx.$app.logout().then(function(imResponse) {
+            console.log('重复登录，先登出:::', imResponse);
+            wx.$app
+              .login({
+                userID: wx.getStorageSync('identifier'),
+                userSig: wx.getStorageSync('tencent_token'),
+              })
+              .then(function(imResponse1) {
+                console.log('再次登录！！！！', imResponse1);
+              });
+          });
+        }
+        if (imResponse.data.repeatLogin === true) {
+          // 标识账号已登录，本次登录操作为重复登录。v2.5.1 起支持
+          console.log(imResponse.data.errorInfo);
+        }
+      });
+  }
+  //   redpacketLayer() {
+  //     this.showRedpacketLayer = true;
+  //     this.$apply();
+  //   }
+  onShareAppMessage() {
+    let user = wx.getStorageSync('profile') || '';
+    let num = Math.floor(Math.random() * 5) + 1;
+
+    return {
+      title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
+      path: `/pages/home?userid=${user ? user.ID : ''}`,
+      imageUrl: `https://images.facedog.cn/public/home/share-${num}.jpg?x-oss-process=image/resize,w_500,h_500/format,jpg`,
+      success: (res) => {
+        console.log('转发成功', res);
+      },
+      fail: (res) => {
+        console.log('转发失败', res);
+      },
+    };
+  }
+  onShow() {
+    this.setProfile();
+    if (this.selectedTab === 0) {
+      this.$invoke('chat', 'refreshData');
+    }
+    if (this.selectedTab === 2) {
+      //   this.$invoke('chat', 'initChat');
+    } else if (this.selectedTab === 3) {
+      // this.setProfile();
+      // this.$invoke('my', 'setProfile', this.profile);
+    }
+  }
+  onHide() {
+    this.hide = true;
+  }
+}
+</script>
+<style lang="less">
+	.van-popup {
+	  background: white;
+	}
+	.guest-button {
+	  position: fixed;
+	  right: 0;
+	  top: 170rpx;
+	  width: 156rpx;
+	  line-height: 55rpx;
+	  text-align: center;
+	  color: white;
+	  font-size: 25rpx;
+	  height: 55rpx;
+	  background: rgba(0, 77, 193, 1);
+	  box-shadow: 0px 3rpx 6rpx rgba(0, 0, 0, 0.38);
+	  opacity: 1;
+	  border-radius: 20rpx 0px 0px 20rpx;
+	  z-index: 9;
+	}
+	.square {
+	  display: flex;
+	  justify-content: center;
+	  padding: 8rpx 0;
+	  position: relative;
+	  .tab {
+	    margin: 0 24rpx;
+	    padding: 10rpx 0;
+	    font-size: 35rpx;
+	    color: #c5c5c5;
+	    font-weight: bold;
+	    &:first-child {
+	      padding-left: 20rpx;
+	    }
+	    &.tab2 {
+	      padding-right: 20rpx;
+	    }
+	    &.active {
+	      color: #000;
+	    }
+	  }
+	  .tab-split {
+	    width: 2rpx;
+	    height: 34rpx;
+	    background: #c5c5c5;
+	    position: relative;
+	    top: 18rpx;
+	  }
+	  .underline {
+	    position: absolute;
+	    left: 20rpx;
+	    bottom: 10rpx;
+	    width: 50rpx;
+	    height: 4rpx;
+	    background: #f25458;
+	    transition: left 0.2s ease-in-out;
+	    will-change: left;
+	    border-radius: 12rpx;
+	  }
+	}
+</style>

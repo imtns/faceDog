@@ -1,0 +1,271 @@
+<!-- 上传图片 -->
+<template>
+    <view class='wapper'>
+        <view class="step-info">
+            <view class="num">2.</view>上传照片
+        </view>
+        <view class="desc">在颜狗里，颜值就是王道！请上传你本人最满意的一张照片，它将直接关系到你是否通过认证（认证失败可以再次尝试）</view>
+        <image class="thumb" src="{{src}}" @tap="uploadPic" mode="aspectFill"></image>
+        <!-- <button class="button" @tap="next">下一步</button> -->
+    </view>
+    <view wx:if="{{show}}">
+        <cropper :options="cropperOpt" @beforeImageLoad="bl"></cropper>
+    </view>
+    <block wx:if="{{loading}}">
+        <loading></loading>
+    </block>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { uploader } from '@/utils/uploader';
+import { get } from '@/utils/request';
+import { toast, sleep } from '@/utils';
+import cropper from '../../cropper';
+import { PROFILE } from '@/utils/url';
+import Toast from '@/components/vant/toast/toast';
+import loading from '@/components/loading';
+import Dialog from '@/components/vant/dialog/dialog';
+
+const device = wx.getSystemInfoSync();
+const width = device.windowWidth;
+const height = device.windowHeight - 50;
+
+export default class uploadPic extends wepy.component {
+    props = {
+        step: {
+            type: Number,
+            default: 0,
+            twoWay: true
+        },
+        verify: {
+            type: Boolean,
+            default: false
+        }
+    };
+
+    data = {
+        src: 'https://images.facedog.cn/public/reg/upload.png',
+        show: false,
+        loading: false,
+        uploaded: false,
+        cropperOpt: {
+            width,
+            height,
+            scale: 2.5,
+            zoom: 8,
+            cut: {
+                x: (width - 300) / 2,
+                y: (height - 300) / 2,
+                width: 300,
+                height: 300
+            }
+        }
+    };
+
+    components = {
+        cropper,
+        loading
+    };
+
+    methods = {
+        async uploadPic() {
+            try {
+                const { tempFilePaths } = await wepy.chooseImage({ count: 1 });
+                this.$invoke('cropper', 'pushOrigin', tempFilePaths[0]);
+                this.show = true;
+            } catch (e) {
+                console.log(e);
+            }
+        },
+        next() {
+            if (!this.uploaded) {
+                toast('请上传图片');
+                return;
+            }
+            this.$emit('changeStep', 4);
+        }
+    };
+
+    events = {
+        ready() {
+            // console.log('we-cropper ready');
+        },
+        beforeImageLoad() {
+            // console.log('we-cropper beforeImageLoad');
+        },
+        imageLoad() {
+            // console.log('we-cropper imageLoad');
+        },
+        beforeDraw() {
+            // console.log('we-cropper beforeDraw');
+        },
+        cancel() {
+            this.show = false;
+        },
+        getCropImage: () => {
+            this.$invoke('cropper', 'getCropperImage')
+                .then(src => {
+                    console.log(src);
+                    this.loading = true;
+                    this.show = false;
+                    this.$apply();
+                    let data = {};
+                    if (this.verify) {
+                        data.nick_name = wepy.getStorageSync('profile').nick_name;
+                        data.gender = wepy.getStorageSync('profile').gender;
+                        data.birthday = wepy.getStorageSync('profile').birthday;
+                    } else {
+                        data = wepy.getStorageSync('reg_profile');
+                        data.formId = wepy.getStorageSync('formId');
+                    }
+                    // console.error(data);
+                    uploader(
+                        src,
+                        {
+                            data,
+                            name: 'avatar',
+                            noLoading: true
+                        },
+                        async result => {
+                            this.show = false;
+                            this.loading = false;
+                            this.src = src;
+                            if (result === 'ok') {
+                                this.uploaded = true;
+                                // Toast.success('上传成功');
+                                // await sleep(2);
+
+                                Dialog.confirm({
+                                    confirmButtonText: '现在认证',
+                                    cancelButtonText: '先去逛逛',
+                                    title: '需要现在去认证吗？限时免费',
+                                    message: '颜狗是高颜值用户交友平台,通过官方认证的用户才可以参与照片竞技并享受添加好友等权益'
+                                }).then(() => {
+                                    this.$emit('changeStep', 4);
+                                }).catch(() => {
+                                    wepy.redirectTo({ url: 'index' });
+                                });
+                                // this.$emit('changeStep', 4);
+                            } else {
+                                Toast.fail(result);
+                            }
+                            this.$apply();
+                        },
+                    );
+                })
+                .catch(async err => {
+                    // toast('error');
+                    this.show = false;
+                    console.log(err + '获取图片地址失败，请稍后重试');
+                });
+        }
+    };
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {}
+
+    onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+.wapper {
+    width: 556rpx;
+    margin: 60rpx auto 0;
+    text-align: center;
+    .van-cell {
+        padding: 10rpx 0 !important;
+    }
+    .desc {
+        font-size: 24rpx;
+        margin-top: 61rpx;
+        font-weight: 600;
+        text-align: left;
+    }
+    .step-info {
+        display: flex;
+        justify-content: flex-start;
+        font-size: 36rpx;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 1);
+        .num {
+            width: 51rpx;
+            height: 51rpx;
+            text-align: center;
+            line-height: 51rpx;
+            background: rgba(28, 28, 28, 1);
+            border-radius: 50%;
+            color: white;
+            font-weight: 600;
+            font-size: 36rpx;
+            margin-right: 21rpx;
+        }
+    }
+    .form {
+        .field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-top: 105rpx;
+            font-size: 28rpx;
+            color: rgba(0, 0, 0, 1);
+            text-align: left;
+            .label {
+                width: 84rpx;
+                font-weight: 600;
+            }
+            .icon {
+                width: 40rpx;
+                height: 40rpx;
+                position: absolute;
+                right: 15rpx;
+            }
+            .input {
+                width: 481rpx;
+                height: 80rpx;
+                border: 2rpx solid rgba(0, 0, 0, 1);
+                box-sizing: border-box;
+                padding-left: 24rpx;
+            }
+            .sex-container {
+                width: 481rpx;
+                .button {
+                    display: inline-block;
+                    width: 211rpx;
+                    height: 80rpx;
+                    &:nth-child(1) {
+                        margin-right: 53rpx;
+                    }
+                }
+            }
+        }
+    }
+    .thumb {
+        width: 470rpx;
+        height: 470rpx;
+        margin-top: 81rpx;
+        margin-bottom: 132rpx;
+    }
+    button {
+        width: 394rpx;
+        height: 84rpx;
+        margin: 0 auto;
+        font-size: 28rpx;
+        line-height: 84rpx;
+        font-weight: 600;
+        border-radius: 0;
+        color: rgba(252, 252, 252, 1);
+        background: rgba(0, 0, 0, 1);
+        opacity: 1;
+    }
+    image {
+        width: 100%;
+        height: 100%;
+    }
+}
+</style>

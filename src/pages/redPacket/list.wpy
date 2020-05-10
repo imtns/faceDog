@@ -1,0 +1,286 @@
+<!--  -->
+<template>
+	<navbar title="颜币红包">
+	</navbar>
+	<view class='container'>
+		<van-tabs active="receive" animated>
+			<van-tab title="我收到的" name="receive">
+				<block wx:if="{{!getList.length}}">
+					<empty></empty>
+				</block>
+				<block wx:else>
+					<repeat for="{{getList}}" key="index" index="index" item="item">
+						<view class="box">
+							<view class="content">
+								<image class="avatar" @tap="goProfile({{item._id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg"></image>
+								<view class="info">
+									<view class="name">{{item.nick_name}} {{item.age}}</view>
+									<view class="city">{{item.province}} {{item.city}}</view>
+								</view>
+								<image class="redpacket {{item.status=='no_receive'?'waiting':''}}" @tap="redPacketClick({{item}},'get')" style="margin-left:5rpx;" src="https://images.facedog.cn/public/redpacket/redpacket-{{item.status=='no_receive'?'waiting':item.status=='expire'?'expire':'opened'}}1.png" mode="scaleToFill" lazy-load="false"></image>
+								<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="deleteItem({{item._id}},'get_wechat_list')" mode="scaleToFill" lazy-load="false">
+								</image>
+							</view>
+						</view>
+					</repeat>
+				</block>
+			</van-tab>
+			<van-tab title="我发出的">
+				<block wx:if="{{!sendList.length}}">
+					<empty></empty>
+				</block>
+				<block wx:else>
+					<repeat for="{{sendList}}" key="index" index="index" item="item">
+						<view class="box">
+							<view class="content">
+								<image class="avatar" @tap="goProfile({{item._id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg"></image>
+								<view class="info">
+									<view class="name">{{item.nick_name}} {{item.age}}</view>
+									<view class="city">{{item.province}} {{item.city}}</view>
+								</view>
+								<image class="redpacket" @tap="redPacketClick({{item}},'send')" style="width:{{item.status == 'receive'?'65rpx':'119rpx'}};height:{{item.status=='receive'?'105rpx':'119rpx'}};margin-right:{{item.status=='receive'?'40':'10'}}rpx" src="https://images.facedog.cn/public/redpacket/redpacket-{{item.status == 'receive'?'ok':item.status=='no_receive'?'waiting':'expire'}}.png?4" mode="aspectFill" lazy-load="false"></image>
+								<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="deleteItem({{item._id}},'send_wechat_list')" mode="scaleToFill" lazy-load="false">
+								</image>
+							</view>
+						</view>
+					</repeat>
+				</block>
+			</van-tab>
+		</van-tabs>
+	</view>
+	<van-toast id="van-toast" />
+	<van-popup show="{{ showPop }}" bind:close="onClose">
+		<notify />
+	</van-popup>
+	<van-popup show="{{ showCoinPop }}" bind:close="onClose">
+		<popCoin />
+	</van-popup>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { get, post } from '@/utils/request';
+
+import empty from '@/components/empty';
+import Toast from '@/components/vant/toast/toast';
+import notify from '@/components/notify/notify';
+import popCoin from '@/components/battle/module/popCoin';
+import {
+  SEND_WECHAT_LIST,
+  GET_WECHAT_LIST,
+  SEND_WECHAT,
+  UPDATE_REDPACKET_STATUS,
+  DELETE_REDPACKAGE,
+} from '@/utils/url';
+export default class RedPackList extends wepy.page {
+  config = {
+    navigationBarTitleText: '我喜欢的',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-toast': '../components/vant/toast/index',
+      'van-tab': '../components/vant/tab/index',
+      'van-tabs': '../components/vant/tabs/index',
+      'van-popup': '../components/vant/popup/index',
+    },
+  };
+
+  data = {
+    showPop: false,
+    getList: [],
+    sendList: [],
+    init: false,
+    nomore: false,
+    show: false,
+    active: 1,
+    showCoinPop: false,
+    redpacketTypeObj: {
+      0: 'coin',
+      1: 'invite',
+      2: 'refund',
+      3: 'agree',
+    },
+    redpacketType: '',
+  };
+
+  components = {
+    empty,
+    notify,
+    popCoin,
+  };
+
+  methods = {
+    redPacketClick(user, type) {
+      console.log(this.redpacketTypeObj);
+      //   this.redpacketType = this.redpacketTypeObj[index];
+      let status = '';
+      if (type == 'send' && user.status == 'no_receive') return;
+      if (type == 'get' && user.status == 'receive') return;
+      if (user.status == 'no_receive') status = 'invite';
+      if (user.status == 'receive') status = 'agree';
+      if (user.status == 'expire') status = 'refund';
+
+      let me = wepy.getStorageSync('profile');
+      user.myWechat = me.wechat;
+      this.$invoke('notify', 'setData', status, user);
+      this.showPop = true;
+    },
+    // sendWechat(id){
+    // 	this.$invoke('notify', 'setData', 'invite',id,);
+    // 	this.$invoke('notify', 'setUserid', id);
+    // 	this.showPop = true;
+    // },
+    async deleteItem(user_id, list_type) {
+      await post(DELETE_REDPACKAGE, {
+        user_id,
+        list_type,
+      });
+      Toast('删除成功');
+      this.fetchData();
+    },
+    onClose() {
+      this.showPop = false;
+    },
+    goProfile(id) {
+      console.log(id);
+      wx.navigateTo({
+        url: `../battle/profile?id=${id}`,
+        success: (result) => {},
+        fail: () => {},
+        complete: () => {},
+      });
+    },
+  };
+  onReachBottom() {}
+  events = {
+    closeNotify(refresh) {
+      if (refresh) {
+        this.showCoinPop = true;
+        setTimeout(() => {
+          this.showCoinPop = false;
+          this.$apply();
+        }, 2000);
+        this.fetchData();
+        this.$apply();
+      }
+      this.showPop = false;
+    },
+  };
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    get(UPDATE_REDPACKET_STATUS);
+  }
+  async fetchData() {
+    this.sendList = await get(SEND_WECHAT_LIST);
+    this.getList = await get(GET_WECHAT_LIST);
+    this.init = true;
+    this.$apply();
+  }
+  onShow() {
+    this.fetchData();
+  }
+}
+</script>
+
+<style lang='scss'>
+	.van-tabs__wrap {
+	  width: 722rpx;
+	  margin: auto;
+	  height: 100rpx !important;
+	}
+	.van-tabs__line {
+	  bottom: 20rpx !important;
+	  width: 68rpx;
+	  background-color: #707070 !important;
+	}
+	.van-ellipsis {
+	  font-size: 30rpx;
+	  color: #8e8e8e;
+	}
+	.van-tabs__nav {
+	  padding-top: 20rpx;
+	}
+	page {
+	  background: #f7f7f7;
+	}
+	.container {
+	  display: block;
+	  width: 100%;
+	  margin: 0 auto;
+	  .box {
+	    width: 722rpx;
+	    background: white;
+	    margin: 20rpx auto;
+	    .content {
+	      display: flex;
+	      justify-content: space-between;
+	      align-items: center;
+	      padding: 25rpx 0;
+	    }
+	    .avatar {
+	      width: 157rpx;
+	      height: 157rpx;
+	      border-radius: 50%;
+	      border: 4rpx solid #5cd4d4;
+	      position: relative;
+	      margin-left: 30rpx;
+	      &::before {
+	        border: 5rpx solid white;
+	        content: '';
+	        display: block;
+	        position: absolute;
+	        border-radius: 50%;
+	        top: 0rpx;
+	        left: 0rpx;
+	        right: 0rpx;
+	        bottom: 0rpx;
+	      }
+	    }
+	    .info {
+	      margin-right: auto;
+	      margin-left: 20rpx;
+	      .name {
+	        font-size: 31rpx;
+	        color: #000;
+	      }
+	      .city {
+	        color: #a2a7b2;
+	        font-size: 25rpx;
+	      }
+	    }
+
+	    .icon {
+	      width: 119rpx;
+	      height: 119rpx;
+	      margin-right: 20rpx;
+	    }
+	    .redpacket {
+	      width: 119rpx;
+	      height: 128rpx;
+	      &.waiting {
+	        animation: pop 0.7s ease-in-out infinite;
+	        animation-fill-mode: both;
+	        @keyframes pop {
+	          0% {
+	            transform: scale(1);
+	          }
+	          50% {
+	            transform: scale(1.1);
+	          }
+	          100% {
+	            transform: scale(1);
+	          }
+	        }
+	      }
+	    }
+	    .delete {
+	      width: 43rpx;
+	      height: 43rpx;
+	      margin-right: 60rpx;
+	    }
+	  }
+	}
+</style>

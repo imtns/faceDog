@@ -1,0 +1,380 @@
+<!--  -->
+<template>
+	<view class='container-avatar'>
+		<view class='title'>请上传本人清晰头像</view>
+		<view class='desc'>你的初始评级将在24小时之内完成，请耐心等待</view>
+		<view class='wrap'>
+			<image class='thumb' src='{{src}}' @tap='uploadPic' mode='aspectFill' />
+		</view>
+		<!-- <form report-submit='true' bindsubmit='submitForm'> -->
+		<button size='large' @tap='next'>下一步</button>
+		<!-- </form> -->
+		<view hidden='{{!show}}'>
+			<cropper :options='cropperOpt' @beforeImageLoad='bl'></cropper>
+		</view>
+		<block wx:if='{{loading}}'>
+			<loading></loading>
+		</block>
+		<view class="wrong-tip" wx:if="{{tipCover}}">
+			<view class="text">上传的头像将决定你的<text style="color:#68e1a5;">初始评级</text></view>
+			<view class="text">根据<text style="color:#68e1a5;">大数据算法</text>和<text style="color:#68e1a5;">大众审核</text>得出</view>
+			<view class="text">评级影响你的权益，通过任务可以升级</view>
+			<view class="pic-box">
+				<view>
+					<image style="height:313rpx" src="https://images.facedog.cn/mp/register/wrong1.png?1" mode="aspectFit" lazy-load="false">
+					</image>
+				</view>
+				<view>
+					<image src="https://images.facedog.cn/mp/register/wrong-2.png?1" mode="aspectFill" lazy-load="false">
+					</image>
+					<image src="https://images.facedog.cn/mp/register/wrong-3.png?1" mode="aspectFill" lazy-load="false">
+					</image>
+				</view>
+			</view>
+			<!-- <view class="text" style="color:#CBC9C8;">*每人拥有一次重新评级的机会</view> -->
+			<view class="btn" @tap="closeTipCover">我知道了</view>
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { post } from '@/utils/request';
+import { SUBMIT_FORMID } from '@/utils/url';
+import { uploader } from '@/utils/uploader';
+import { toast } from '@/utils';
+import cropper from '@/components/cropper';
+import Toast from '@/components/vant/toast/toast';
+import loading from '@/components/loading';
+
+const device = wx.getSystemInfoSync();
+const width = device.windowWidth;
+const height = device.windowHeight - 50;
+
+export default class ChooseGender extends wepy.component {
+  config = {
+    navigationBarTitleText: '3/4',
+    usingComponents: {
+      'van-loading': '../../components/vant/loading/index',
+      'van-dialog': '../../components/vant/dialog/index',
+    },
+  };
+
+  data = {
+    tipCover: true,
+    src: 'https://images.facedog.cn/public/reg/upload.png',
+    show: false,
+    loading: false,
+	uploaded: false,
+	number:'',
+    cropperOpt: {
+      width,
+      height,
+      scale: 2.5,
+      zoom: 8,
+      cut: {
+        x: (width - 300) / 2,
+        y: (height - 300) / 2,
+        width: 300,
+        height: 300,
+      },
+    },
+  };
+
+  components = {
+    cropper,
+    loading,
+  };
+
+  upload(src) {
+    this.loading = true;
+    this.show = false;
+    this.$apply();
+    const data = {
+      birthday: wepy.getStorageSync('birthday'),
+      nick_name: wepy.getStorageSync('name'),
+      gender: wepy.getStorageSync('gender'),
+      number: this.number,
+    };
+    console.log('注册data!!!!!!!!:', data);
+    uploader(
+      src,
+      {
+        data,
+        name: 'avatar',
+        noLoading: true,
+      },
+      async (result) => {
+        this.show = false;
+        this.loading = false;
+        this.src = src;
+        if (result === 'ok') {
+          this.uploaded = true;
+          this.$apply();
+        } else {
+          Toast.fail(result);
+        }
+        this.$apply();
+      }
+    );
+  }
+  methods = {
+	setNumber(number){
+		this.number = number;
+	},
+    closeTipCover() {
+      this.tipCover = false;
+    },
+    async submitForm(e) {
+      await post(SUBMIT_FORMID, {
+        formId: e.detail.formId,
+      });
+      // wepy.navigateTo({ url: 'verify' });
+    },
+    async uploadPic() {
+      try {
+        const { tempFilePaths } = await wepy.chooseImage({ count: 1 });
+        this.$invoke('cropper', 'pushOrigin', tempFilePaths[0]);
+        this.show = true;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    next() {
+      if (!this.uploaded) {
+        Toast.fail('请上传头像');
+        return;
+      }
+      this.$emit('changeStep', 4);
+      //   wepy.navigateTo({ url: 'verify' });
+    },
+  };
+
+  events = {
+    ready() {
+      // console.log('we-cropper ready');
+    },
+    beforeImageLoad() {
+      // console.log('we-cropper beforeImageLoad');
+    },
+    imageLoad() {
+      // console.log('we-cropper imageLoad');
+    },
+    beforeDraw() {
+      // console.log('we-cropper beforeDraw');
+    },
+    cancel() {
+      this.show = false;
+    },
+    getCropImage: () => {
+      this.$invoke('cropper', 'getCropperImage')
+        .then((src) => {
+          this.loading = true;
+          this.$apply();
+          console.log(src);
+          checkImgSafe(src, 0)
+            .then((res) => {
+              this.upload(src);
+            })
+            .catch((err) => {
+              Toast('上传图片包含敏感信息，请重新上传');
+              this.show = false;
+              this.loading = false;
+              this.$apply();
+            });
+        })
+        .catch(async (err) => {
+          // toast('error');
+          this.show = false;
+          console.log(err + '获取图片地址失败，请稍后重试');
+        });
+    },
+  };
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+
+function checkImgSafe(tempFiles, index) {
+  return new Promise((resolve, reject) => {
+    // 压缩图片
+    getImg(tempFiles, index)
+      .then((tmpPath) => {
+        //先将图片转换为base64，然后调用云函数
+        const fs = wx.getFileSystemManager();
+        fs.readFile({
+          filePath: tmpPath,
+          encoding: 'base64',
+          success: function(res) {
+            wx.cloud
+              .callFunction({
+                name: 'securityCheck',
+                data: { imgbase64: res.data },
+              })
+              .then((res) => {
+                if (res && res.result && res.result.errCode === 87014) {
+                  reject(); //有安全风险
+                } else {
+                  resolve('ok');
+                }
+              })
+              .catch((err) => {
+                //只要检查失败，都算作没有安全风险
+                resolve('ok');
+              });
+          },
+        });
+      })
+      .catch((err) => {
+        resolve();
+      });
+  });
+}
+function getImg(path, index) {
+  return new Promise((resolve, reject) => {
+    wx.getImageInfo({
+      src: path,
+      success(res) {
+        // 图片原尺寸
+        let height = res.height;
+        let width = res.width;
+
+        let maxWidth = 200;
+        let maxHeight = 200;
+
+        // 压缩后尺寸
+        let targetWidth = width;
+        let targetHeight = height;
+        // 等比例压缩，如果宽度大于高度，则宽度优先，否则高度优先
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            // 要求宽度*(原生图片比例)=新图片尺寸
+            targetWidth = maxWidth;
+            targetHeight = Math.round(maxWidth * (height / width));
+          } else {
+            targetHeight = maxHeight;
+            targetWidth = Math.round(maxHeight * (width / height));
+          }
+        }
+
+        const ctx = wx.createCanvasContext(`canvas-img-${index}`);
+
+        ctx.clearRect(0, 0, targetWidth, targetHeight);
+        ctx.drawImage(path, 0, 0, targetWidth, targetHeight);
+        ctx.draw(true, function() {
+          wx.canvasToTempFilePath({
+            canvasId: `canvas-img-${index}`,
+            x: 0,
+            y: 0,
+            width: targetWidth,
+            height: targetHeight,
+            quality: 0.5,
+            fileType: 'jpg',
+            success: function(res) {
+              console.log('index', index);
+              resolve(res.tempFilePath);
+            },
+            fail: function(err) {
+              reject(err);
+            },
+          });
+        });
+      },
+      fail: function(err) {
+        reject(err);
+      },
+    });
+  });
+}
+</script>
+
+<style lang='scss'>
+	.container-avatar {
+	  .wrong-tip {
+	    width: 100%;
+	    background: rgba(0, 0, 0, 0.7);
+	    height: 99vh;
+	    position: absolute;
+	    z-index: 99;
+	    top: 0;
+	    left: 0;
+	    padding-top: 160rpx;
+	    text-align: center;
+	    .text {
+	      font-size: 35rpx;
+	      color: white;
+	      margin: 6rpx auto;
+	    }
+	    .pic-box {
+	      width: 560rpx;
+	      display: flex;
+	      flex-wrap: wrap;
+	      margin: 52rpx auto;
+	      justify-content: center;
+	      image {
+	        width: 227rpx;
+	        height: 313rpx;
+	        object-fit: cover;
+	        margin: 15rpx 20rpx;
+	      }
+	    }
+	    .btn {
+	      width: 181rpx;
+	      height: 69rpx;
+	      margin: 20rpx auto;
+	      border: 3rpx solid rgba(248, 184, 0, 1);
+	      opacity: 1;
+	      display: flex;
+	      justify-content: center;
+	      align-items: center;
+	      color: #f8b800;
+	      border-radius: 11rpx;
+	    }
+	  }
+	  height: 100vh;
+	  position: relative;
+	  overflow: hidden;
+	  width: 100%;
+	  margin: 0 auto;
+	  .title {
+	    margin-top: 152rpx;
+	    text-align: center;
+	    color: #302f2f;
+	    font-size: 42rpx;
+	  }
+	  .desc {
+	    color: #a6aaa8;
+	    font-size: 28rpx;
+	    margin-top: 20rpx;
+	    text-align: center;
+	  }
+	  .wrap {
+	    margin: 80rpx 132rpx 0;
+	    display: flex;
+	    justify-content: center;
+	  }
+	  .thumb {
+	    width: 470rpx;
+	    height: 470rpx;
+	  }
+	  button {
+	    width: 420rpx;
+	    height: 100rpx;
+	    background: rgba(0, 0, 0, 1);
+	    opacity: 1;
+	    color: #fcfcfc;
+	    font-size: 28rpx;
+	    text-align: center;
+	    line-height: 92rpx;
+	    position: absolute;
+	    left: 50%;
+	    bottom: 156rpx;
+	    transform: translateX(-50%);
+	  }
+	}
+</style>

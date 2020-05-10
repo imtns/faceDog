@@ -1,0 +1,148 @@
+<!--  -->
+<template>
+	<view class='upgrade-wrap {{level}}' wx:if="{{level}}">
+		<image class="close" @tap="close" src="https://images.facedog.cn/mp/upgrade/close.png" mode="scaleToFill" lazy-load="false">
+		</image>
+		<view class="text">{{fromHome?'你的当前等级为:':'你的等级提升至:'}}</view>
+		<view class="tip-wrap">
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{level}}-1.png?1" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{level}}-2.png?1" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{level}}-3.png?1" mode="scaleToFill" lazy-load="false">
+			</image>
+			<image class="tip" src="https://images.facedog.cn/mp/upgrade/{{level}}-4.png?1" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view>
+		<view class="btn" @tap="go">查看详情</view>
+		<view class="checked">
+			<van-checkbox value="{{ checked }}" bind:change="onChange">下次不再显示该页面</van-checkbox>
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Upgrade extends wepy.component {
+  props = {};
+  data = {
+    upgradeType: '', // N,R,SR,SSR
+    checked: false,
+    level: '',
+    fromHome: false,
+  };
+
+  components = {};
+
+  methods = {
+    onChange(event) {
+      this.checked = event.detail;
+      if (this.checked) {
+        wepy.setStorageSync('showLevel', true);
+      } else {
+        wepy.setStorageSync('showLevel', false);
+      }
+    },
+    close() {
+      this.$emit('close');
+    },
+    setLevel(level, fromHome) {
+      if (fromHome) this.fromHome = fromHome;
+      console.log('level!!!!!!!~~~~~~~~~~~~~~~~!', level);
+      this.level = level;
+    },
+    go() {
+      if (
+        getCurrentPages()[getCurrentPages().length - 1].route ==
+        'pages/upgrade/index'
+      ) {
+        this.$emit('close');
+        return;
+      }
+      wepy.navigateTo({ url: '/pages/upgrade/index' });
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {
+    this.levelInfo = wepy.getStorageSync('level');
+  }
+}
+</script>
+<style lang="scss">
+	.van-checkbox__label {
+	  color: #bcbcbc !important;
+	  font-size: 22rpx;
+	  margin-left: 7rpx !important;
+	}
+</style>
+
+<style lang='scss' scoped>
+	.upgrade-wrap {
+	  width: 520rpx;
+	  height: 810rpx;
+	  &.N {
+	    background: url('https://images.facedog.cn/mp/upgrade/bg-N.png?1');
+	    background-size: contain;
+	  }
+	  &.R {
+	    background: url('https://images.facedog.cn/mp/upgrade/bg-R.png?1');
+	    background-size: contain;
+	  }
+	  &.SR {
+	    background: url('https://images.facedog.cn/mp/upgrade/bg-SR.png?1');
+	    background-size: contain;
+	  }
+	  &.SSR {
+	    background: url('https://images.facedog.cn/mp/upgrade/bg-SSR.png?1');
+	    background-size: contain;
+	  }
+	  .close {
+	    width: 45rpx;
+	    height: 45rpx;
+	    position: absolute;
+	    top: 10rpx;
+	    right: 10rpx;
+	  }
+	  .text {
+	    position: absolute;
+	    font-size: 27rpx;
+	    color: white;
+	    top: 136rpx;
+	    left: 67rpx;
+	  }
+	  .tip-wrap {
+	    width: 420rpx;
+	    padding-top: 292rpx;
+	    margin: 0 auto;
+	    .tip {
+	      width: 420rpx;
+	      height: 62rpx;
+	      margin-bottom: 15rpx;
+	    }
+	  }
+	  .btn {
+	    background: url('https://images.facedog.cn/mp/upgrade/btn-bg.png') no-repeat;
+	    background-size: contain;
+	    width: 366rpx;
+	    height: 80rpx;
+	    line-height: 80rpx;
+	    text-align: center;
+	    margin: 10rpx auto;
+	    color: #fcfcfc;
+	    font-size: 28rpx;
+	  }
+	  .checked {
+	    display: flex;
+	    justify-content: center;
+	    margin-top: 20rpx;
+	  }
+	}
+</style>

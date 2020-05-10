@@ -1,0 +1,46 @@
+<!--  -->
+<template>
+	<view class='COIN'>
+		<image src="https://images.facedog.cn/public/battle/coin-pop-up{{coinType}}.png" mode="scaleToFill" lazy-load="false">
+		</image>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	export default class COIN extends wepy.component {
+	  props = {};
+
+	  data = {
+		  coinType:'',
+	  };
+
+	  components = {};
+
+	  methods = {
+		  setType(type){
+			  this.coinType = type;
+		  }
+	  };
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='scss' scoped>
+	.COIN {
+	  image {
+	    width: 460rpx;
+	    height: 360rpx;
+	    opacity: 1;
+	  }
+	}
+</style>

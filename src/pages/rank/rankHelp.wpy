@@ -1,0 +1,59 @@
+<!--  -->
+<template>
+	<navbar title="排行榜说明"></navbar>
+	<view class='wrapper'>
+		<view class="content">
+			<view class="block">用户颜值排名和排行榜名次完全根据被划动PK的胜率和场次决定，与其他任何因素均无关系，排行榜数据每6小时刷新一次。</view>
+
+			<view class="block">
+				上传优质的本人照片、增加活跃度，将有助排名提升及增加曝光率。
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	export default class LikeHelp extends wepy.page {
+	  config = {
+	    navigationBarTitleText: '累计点击次数',
+	    usingComponents: {
+	      navbar: '../../components/navbar/index'
+	    }
+	  };
+
+	  data = {
+	    time: {}
+	  };
+
+	  components = {};
+
+	  methods = {};
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  async onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='less'>
+	.wrapper {
+	  width: 100%;
+	  padding-top: 100rpx;
+	  .block {
+	    .title {
+	      margin-bottom: 10rpx;
+	    }
+	    margin: 0 50rpx 40rpx;
+	    color: #5a5a5a;
+	    font-size: 26rpx;
+	    margin-bottom: 10rpx;
+	  }
+	}
+</style>

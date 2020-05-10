@@ -1,0 +1,205 @@
+<!--  -->
+<template>
+	<navbar title="我的颜币">
+	</navbar>
+	<view class='container'>
+		<view class="coin-info">
+			<view class="coin-help"
+			      @tap="coinHelp">颜币获取</view>
+			<image src="https://images.facedog.cn/public/coin/icon-coin.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+			<view class="text">
+				<view class="number">{{coin}}</view>
+				<view class="tip">(价值{{coin/10}}元)</view>
+			</view>
+			<view class="button"
+			      @tap="previewCard">
+				<image src="https://images.facedog.cn/mp/other/withdraw.png"
+				       mode="aspectFill"
+				       lazy-load="false">
+				</image>
+				<!-- <view class="button-text">
+					*下一版本开放
+				</view> -->
+			</view>
+
+		</view>
+		<view class="waiting">
+			<image src="https://images.facedog.cn/mp/other/waiting.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+		</view>
+		<!-- <view class="button button1" @tap="show(1)">
+			<image src="https://images.facedog.cn/public/coin/red-banner.png" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view>
+		<view class="button button2" @tap="show(2)">
+			<image src="https://images.facedog.cn/public/coin/green-banner.png" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view> -->
+	</view>
+	<van-popup show="{{ showPop }}"
+	           bind:close="onClose">
+		<coinPop />
+	</van-popup>
+</template>
+
+<script>
+import wepy from 'wepy';
+import coinPop from './module/coinPop';
+import { toast, sleep } from '@/utils';
+export default class Coin extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-popup': '../components/vant/popup/index',
+    },
+  };
+
+  data = {
+    showPop: false,
+    coin: 0,
+  };
+
+  components = {
+    coinPop,
+  };
+
+  methods = {
+    coinHelp() {
+      wepy.navigateTo({ url: 'coinHelp' });
+    },
+    show(type) {
+      //   this.$invoke('coinPop', 'setType', type);
+      //   this.showPop = true;
+    },
+    previewCard() {
+      if (this.coin < 1000) {
+        toast('你的颜币不足1000，暂时不能提现哦');
+        return;
+      }
+      //    this.$emit('closePop');
+      wx.previewImage({
+        current: 'https:images.facedog.cn/public/invite/wechat-card.png?1',
+        urls: ['https:images.facedog.cn/public/invite/wechat-card.png?1'],
+      });
+    },
+  };
+
+  events = {
+    closePop() {
+      this.showPop = false;
+    },
+  };
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    let profile = wx.getStorageSync('profile');
+    this.coin = profile.coin;
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	.container {
+	  position: relative;
+	  width: 100%;
+	  .waiting {
+	    width: 336rpx;
+	    height: 384rpx;
+	    position: absolute;
+	    top: 500rpx;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
+	  }
+	  .coin-info {
+	    width: 100%;
+	    height: 240rpx;
+	    background: #3e3a3f;
+	    display: flex;
+	    justify-content: center;
+	    padding-top: 100rpx;
+	    position: relative;
+
+	    .coin-help {
+	      position: absolute;
+	      right: 30rpx;
+	      top: 30rpx;
+	      width: 111rpx;
+	      height: 50rpx;
+	      border: 1rpx solid rgba(255, 255, 255, 1);
+	      opacity: 1;
+	      border-radius: 5rpx;
+	      font-size: 20rpx;
+	      color: white;
+	      display: flex;
+	      justify-content: center;
+	      align-items: center;
+	    }
+	    image {
+	      width: 70rpx;
+	      height: 70rpx;
+	      margin-right: 10rpx;
+	      margin-top: 5rpx;
+	    }
+	    .text {
+	      text-align: center;
+	      color: white;
+	      .number {
+	        font-size: 80rpx;
+	        line-height: 80rpx;
+	      }
+	      .tip {
+	        font-size: 25rpx;
+	      }
+	    }
+	    .button {
+	      width: 230rpx;
+	      height: 75rpx;
+	      position: absolute;
+	      bottom: -80rpx;
+	      left: 50%;
+	      display: flex;
+	      justify-content: center;
+	      flex-wrap: wrap;
+	      transform: translateX(-50%);
+	      image {
+	        width: 100%;
+	        height: 100%;
+	      }
+	      .button-text {
+	        color: #a19595;
+	        font-size: 20rpx;
+	        width: 100%;
+	        text-align: center;
+	      }
+	    }
+	  }
+	  .button {
+	    width: 100%;
+	    display: flex;
+	    justify-content: center;
+	    margin: 100rpx auto 50rpx;
+	    &.button1 {
+	      margin-top: 150rpx;
+	    }
+	    image {
+	      width: 582rpx;
+	      height: 210rpx;
+	    }
+	  }
+	}
+</style>

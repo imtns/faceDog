@@ -1,0 +1,98 @@
+<!--  -->
+<template>
+	<view class='notify'>
+		<!-- <view class="wrap" @tap="go" wx:if="{{profile.progress =='certify' || profile.progress == 'refuse'|| profile.progress =='profile'}}">
+			<image src="https://images.facedog.cn/public/my/notify-unverify.png" mode="scaleToFill" lazy-load="false">
+			</image>
+		</view> -->
+		<!-- <view class="wrap" wx:if="{{profile.progress =='audit'}}">
+			<image src="https://images.facedog.cn/public/my/notify-verifying.png" mode="scaleToFill" lazy-load="false" />
+		</view> -->
+		<view class="wrap">
+			<image wx:if="{{!profile.level}}" src="https://images.facedog.cn/mp/profile/unLevel.png" mode="scaleToFill" lazy-load="false" />
+			<image @tap="hide3" wx:if="{{profile.progress == 'finish' && showFinish1}}" src="https://images.facedog.cn/mp/profile/level-set.png" mode="scaleToFill" lazy-load="false" />
+		</view>
+		<view class="wrap" @tap="hide2" wx:if="{{profile.video_audit == 'finish' && showFinish2}}">
+			<image src="https://images.facedog.cn/mp/profile/video-finish.png" mode="scaleToFill" lazy-load="false" />
+		</view>
+		<!-- <view class="wrap" @tap="close" wx:if="{{profile.progress === 'finish'}}">
+			<image src="https://images.facedog.cn/public/my/notify-verified.png" mode="scaleToFill" lazy-load="false">
+		</view> -->
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Notify extends wepy.component {
+  props = {};
+
+  data = {
+    profile: {},
+    showFinish1: null,
+    showFinish2: null,
+  };
+
+  components = {};
+
+  methods = {
+    close() {
+      this.profile = {};
+    },
+    go() {
+      wepy.navigateTo({ url: `register/verify` });
+    },
+    hide3() {
+      wepy.setStorageSync('showFinish', true);
+      console.log(12123);
+      this.showFinish1 = false;
+      this.$apply();
+    },
+    hide2() {
+      wepy.setStorageSync('showVideoFinish', true);
+      this.showFinish2 = false;
+      this.$apply();
+    },
+    setProfile(profile) {
+      this.profile = profile;
+      let showFinish1 = wepy.getStorageSync('showFinish');
+      if (!showFinish1) {
+        this.showFinish1 = true;
+      }
+      let showFinish2 = wepy.getStorageSync('showVideoFinish');
+      if (!showFinish2) {
+        this.showFinish2 = true;
+      }
+      console.log('PROGRESS:::', this.profile.progress);
+      this.$apply();
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {
+    console.log(this.profile);
+  }
+}
+</script>
+
+<style lang='less' scoped>
+	.notify {
+	  .wrap {
+	    width: 100%;
+	    height: 84rpx;
+	    position: absolute;
+	    top: 0;
+	    z-index: 99;
+	    image {
+	      width: 100%;
+	      height: 100%;
+	    }
+	  }
+	}
+</style>

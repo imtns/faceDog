@@ -1,0 +1,137 @@
+<!--  -->
+<template>
+	<navbar title="我的人设"></navbar>
+	<view class='container'>
+		<view class="tag-wrap">
+			<repeat for="{{tags}}" key="index" index="index" item="item">
+				<view class="tag {{item.choose?'active':''}}" @tap="tagClick({{item}},{{index}})">{{item.name}}</view>
+			</repeat>
+		</view>
+		<view class="btn" @tap="save">确定</view>
+	</view>
+	<van-toast id="van-toast" />
+</template>
+
+<script>
+import wepy from 'wepy';
+import { get, post } from '@/utils/request';
+import { GET_USER_CHARACTER, SETTING_PROFILE_EXTRA } from '@/utils/url';
+import Toast from '@/components/vant/toast/toast';
+export default class MyCharacter extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-toast': '../../components/vant/toast/index',
+    },
+  };
+
+  data = {
+    tags: [],
+    chooseTags: [],
+  };
+
+  components = {};
+
+  methods = {
+    async save() {
+      await post(SETTING_PROFILE_EXTRA, {
+        character: this.chooseTags.map((item) => item.name),
+      });
+      Toast('设置成功');
+      setTimeout(() => {
+        wepy.navigateBack({
+          delta: 1, //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+        });
+      }, 1500);
+    },
+    tagClick(tag, index) {
+      if (tag.choose) {
+        let findIndex = this.chooseTags.findIndex((x) => x.name === tag.name);
+        this.tags[index].choose = false;
+        this.chooseTags.splice(findIndex, 1);
+        return;
+      }
+      if (this.chooseTags.length === 3) {
+        Toast('最多选择三个');
+        return;
+      }
+      this.chooseTags.push(tag);
+      this.tags[index].choose = true;
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  async onLoad() {
+    this.tags = await get(GET_USER_CHARACTER);
+    let profile = wepy.getStorageSync('profile');
+    this.tags = this.tags.map((tag) => {
+      return {
+        name: tag,
+        choose: false,
+      };
+    });
+    console.log(profile);
+    if (profile.character && profile.character.length) {
+      //   profile.character.forEach((c) => {
+      this.tags.forEach((t) => {
+        t.choose =
+          profile.character.indexOf(t.name) > -1 && this.chooseTags.push(t);
+      });
+      //   });
+    }
+    this.$apply();
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	.container {
+	  position: relative;
+	  height: 85vh;
+	  .tag-wrap {
+	    display: flex;
+	    justify-content: center;
+	    width: 100%;
+	    flex-wrap: wrap;
+	    margin-top: 20rpx;
+	    .tag {
+	      background: rgba(255, 255, 255, 1);
+	      border-radius: 32rpx;
+	      border: 2rpx solid rgba(0, 0, 0, 1);
+	      color: #211f1f;
+	      font-size: 28rpx;
+	      display: flex;
+	      justify-content: center;
+	      align-items: center;
+	      margin: 15rpx;
+	      padding: 12rpx 30rpx;
+	      &.active {
+	        background: rgba(27, 26, 40, 1);
+	        color: white;
+	      }
+	    }
+	  }
+	  .btn {
+	    width: 626rpx;
+	    height: 93rpx;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    color: white;
+	    font-size: 28rpx;
+	    background: rgba(27, 26, 40, 1);
+	    position: absolute;
+	    bottom: 30rpx;
+	    left: 50%;
+	    transform: translateX(-50%);
+	  }
+	}
+</style>

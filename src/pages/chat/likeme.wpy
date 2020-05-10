@@ -1,0 +1,235 @@
+<!--  -->
+<template>
+	<navbar title="喜欢我的">
+	</navbar>
+	<block wx:if="{{!show}}">
+		<loadingHeart top="-160rpx" />
+	</block>
+	<block wx:if="{{!list.length && show}}">
+		<empty></empty>
+	</block>
+	<block wx:if="{{showVerify}}">
+		<verify />
+	</block>
+	<view class='container' wx:else>
+		<repeat for="{{list}}" key="index" index="index" item="item">
+			<view class="box">
+				<view class="content">
+					<image class="avatar" @tap="goProfile({{item._id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
+					<view class="info">
+						<view class="name">{{item.nick_name}} {{item.age}}</view>
+						<view class="city">{{item.province}} {{item.city}}</view>
+					</view>
+					<form report-submit='true' bindsubmit='agree' data-user="{{item}}">
+						<button form-type='submit' hover-class="hover-heart" class="icon">
+						</button>
+						<!-- </view> -->
+					</form>
+					<image class="delete" src="https://images.facedog.cn/public/chat/delete.png" @tap="clearFavorites({{item._id}})" mode="scaleToFill" lazy-load="false">
+					</image>
+					<!-- <image class="icon" @touchstart="touchstart({{item._id}})" @touchend="touchend" src="{{likemeIcon}}" src="https://images.facedog.cn/public/likeme/heart.png" @tap="agree({{item}})" mode="scaleToFill" lazy-load="false">
+					</image> -->
+				</view>
+			</view>
+		</repeat>
+	</view>
+	<van-toast id="van-toast" />
+</template>
+
+<script>
+import wepy from 'wepy';
+
+import { getAge } from '@/utils';
+import { get, post } from '@/utils/request';
+import empty from '@/components/empty';
+import { Event } from '@/utils/event.js';
+import Toast from '@/components/vant/toast/toast';
+import verify from '@/components/pop/verify/index';
+import loadingHeart from '@/components/battle/module/loadingHeart';
+import { LIKE_ME, AGREE_FRIEND, MAKEFRIEND, DELETE_ENJOY } from '@/utils/url';
+export default class LikeMe extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    enablePullDownRefresh: true,
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-toast': '../../components/vant/toast/index',
+    },
+  };
+
+  data = {
+    list: [],
+    show: false,
+    showVerify: false,
+  };
+
+  components = {
+    empty,
+    loadingHeart,
+    verify,
+  };
+
+  methods = {
+    async clearFavorites(id) {
+      wepy.showLoading({
+        title: '', //提示的内容,
+        mask: true, //显示透明蒙层，防止触摸穿透,
+        success: (res) => {},
+      });
+      await post(DELETE_ENJOY, { user_id: id });
+      Toast('删除成功');
+      wepy.hideLoading();
+      this.initData();
+    },
+    async agree(e) {
+      let user = e.currentTarget.dataset.user;
+      //   await get(AGREE_FRIEND, {
+      //     user_id: user._id
+      //   });
+      await post(MAKEFRIEND, {
+        to_be: 'friend',
+        user_id: user._id,
+      });
+      wepy.setStorageSync(
+        'chatIcon',
+        `${user.avatar}?x-oss-process=image/resize,w_100,h_100/format,jpg`
+      );
+
+      wx.navigateTo({
+        url: `/pages/chat/becomeFriend?id=${user.dentifier}&nick=${
+          user.nick_name
+        }&icon=${encodeURI(
+          `${user.avatar}?x-oss-process=image/resize,w_100,h_100/format,jpg`
+        )}`,
+      });
+    },
+    goProfile(id) {
+      console.log(id);
+      wx.navigateTo({
+        url: `../battle/profile?id=${id}`,
+        success: (result) => {},
+        fail: () => {},
+        complete: () => {},
+      });
+    },
+  };
+  onPullDownRefresh() {
+    this.initData();
+  }
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onShow() {
+    Event.listen('showVerify', (status, type) => {
+      this.showVerify = status;
+      if (type) this.$invoke('verify', 'setValue', type);
+      this.$apply();
+    });
+    this.initData();
+  }
+  async initData() {
+    const result = await get(LIKE_ME);
+    // this.list = result;
+    // console.warn(this.list);
+    this.list = [];
+    result.forEach((item) => {
+      this.list.push(...item.users);
+      //   item.day = item.date_time.split('-')[2];
+      //   item.month = new Date(item.date_time).toDateString().split(' ')[1];
+      //   item.users.forEach(t => {
+      //     t.age = getAge(t.birthday);
+      //   });
+    });
+    this.show = true;
+    wx.stopPullDownRefresh();
+    this.$apply();
+  }
+  //   onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	page {
+	  background: #f7f7f7;
+	}
+	.container {
+	  display: flex;
+	  flex-wrap: wrap;
+	  justify-content: center;
+	  padding-top: 10rpx;
+	  .box {
+	    width: 722rpx;
+	    background: white;
+	    margin: 10rpx 0;
+	    .content {
+	      display: flex;
+	      justify-content: space-between;
+	      align-items: center;
+	      padding: 25rpx 0;
+	    }
+	    .avatar {
+	      width: 157rpx;
+	      height: 157rpx;
+	      border-radius: 50%;
+	      border: 4rpx solid #f25458;
+	      position: relative;
+	      margin-left: 30rpx;
+	      &::before {
+	        border: 5rpx solid white;
+	        content: '';
+	        display: block;
+	        position: absolute;
+	        border-radius: 50%;
+	        top: 0rpx;
+	        left: 0rpx;
+	        right: 0rpx;
+	        bottom: 0rpx;
+	      }
+	    }
+	    .info {
+	      margin-right: auto;
+	      margin-left: 20rpx;
+	      width: 240rpx;
+	      .name {
+	        font-size: 31rpx;
+	        color: #000;
+	      }
+	      .city {
+	        color: #a2a7b2;
+	        font-size: 25rpx;
+	      }
+	    }
+	    .icon {
+	      &::after {
+	        content: '';
+	        border: none;
+	      }
+	      border: none;
+	      background: url('https://images.facedog.cn/public/likeme/heart.png');
+	      background-size: contain;
+	      background-repeat: no-repeat;
+	      margin-left: auto;
+	      margin-right: 30rpx;
+	      width: 149rpx;
+	      height: 149rpx;
+	    }
+	    .hover-heart {
+	      background: url('https://images.facedog.cn/public/likeme/heart-hover.png');
+	      background-size: contain;
+	      background-repeat: no-repeat;
+	      margin-left: auto;
+	      margin-right: 30rpx;
+	      width: 149rpx;
+	      height: 149rpx;
+	    }
+	  }
+	  .delete {
+	    width: 43rpx;
+	    height: 43rpx;
+	    margin-right: 60rpx;
+	  }
+	}
+</style>

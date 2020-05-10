@@ -1,0 +1,117 @@
+<!--  -->
+<template>
+    <view class='wrapper'>
+        <view class="top">
+            <view class="sec">
+                <image class="icon" src="https://images.facedog.cn/public/my/friend.png" mode="aspectFill"></image>
+                <view class="title">有好感</view>
+                <view class="word">剩余 {{time.friend}} 次</view>
+            </view>
+            <view class="sec">
+                <image class="icon" src="https://images.facedog.cn/public/my/lover.png" mode="aspectFill"></image>
+                <view class="title">一见钟情</view>
+                <view class="word">剩余 {{time.lover}} 次</view>
+            </view>
+            <view class="sec">
+                <image class="icon" src="https://images.facedog.cn/public/my/close.png" mode="aspectFill"></image>
+                <view class="title">真爱降临</view>
+                <view class="word">剩余 {{time.close}} 次</view>
+            </view>
+        </view>
+        <view class="line"></view>
+        <view class="desc">
+            <view class="d">通过以下方式可以增加次数：</view>
+            <view class="d">1.通过真人认证，一次性获得次数</view>
+            <view class="d">2.每天参与颜值Battle，随机获得奖励次数</view>
+            <view class="d">3.根据个人颜值排名，每天获得不同奖励次数</view>
+            <view class="d">4.添加客服小哥哥/小姐姐，随机获赠稀有次数</view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { MAKEFRIEND } from '@/utils/url';
+import { get } from '@/utils/request';
+export default class MyTime extends wepy.page {
+    config = {
+        navigationBarTitleText: '我的次数'
+    };
+
+    data = {
+        time: {}
+    };
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    async onLoad() {
+        this.time = await get(MAKEFRIEND);
+        this.$apply();
+    }
+
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.wrapper {
+    width: 100%;
+
+    .top {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 76rpx;
+        padding: 0 74rpx;
+        box-sizing: border-box;
+        .sec {
+            width: 33%;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            .icon {
+                width: 124rpx;
+                height: 124rpx;
+            }
+            .title {
+                margin-top: 20rpx;
+                font-size: 28rpx;
+                font-weight: 600;
+                color: rgba(6, 5, 5, 1);
+                width:100%;
+                text-align: center;
+            }
+            .word {
+                font-size: 24rpx;
+                font-weight: 400;
+                color: rgba(158, 157, 157, 1);
+            }
+        }
+    }
+    .line {
+        width: 100%;
+        height: 18rpx;
+        background: rgba(246, 246, 246, 1);
+        margin: 87rpx 0 74rpx;
+    }
+    .desc {
+        width: 100%;
+        display: block;
+        margin: 0 74rpx;
+
+        .d {
+            font-size: 28rpx;
+            font-weight: 600;
+            margin-bottom: 34rpx;
+            color: rgba(6, 5, 5, 1);
+        }
+    }
+}
+</style>

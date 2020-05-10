@@ -1,0 +1,123 @@
+<!--  -->
+<template>
+	<view class='container-name'>
+		<view class="title">请填写你的昵称</view>
+		<view class="wrap">
+			<input type="text" value="{{name}}" maxlength="6" placeholder="最多6个字符" @input="inputChange" />
+		</view>
+		<form report-submit='true' bindsubmit='submitForm'>
+			<button size="large" form-type='submit'>下一步</button>
+		</form>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy';
+	import { post } from '@/utils/request';
+	import { toast, contentCheck } from '@/utils';
+	import { SUBMIT_FORMID, USER_REGISTER } from '@/utils/url';
+	export default class ChooseName extends wepy.component {
+	  config = {
+	    navigationBarTitleText: '1/4'
+	  };
+	  props = {
+	    number: {
+	      type: String,
+	      default: ''
+	    }
+	  };
+	  data = {
+	    name: ''
+	  };
+
+	  components = {};
+
+	  methods = {
+	    async submitForm(e) {
+	      if (!this.name) {
+	        toast('昵称不能为空');
+	        return;
+	      }
+	      wepy.setStorageSync('name', this.name);
+	      //   contentCheck(this.name).then(res => {
+	      //     console.log(res);
+	      //     if (!res) {
+	      //       toast('内容包含敏感内容，请重新输入');
+	      //       return;
+	      //     } else {
+	      this.$emit('changeStep', 2);
+	      //     }
+	      //   });
+
+	      //   await post(SUBMIT_FORMID, {
+	      //     formId: e.detail.formId
+	      //   });
+	      //   let gender = wepy.getStorageSync('gender');
+	      //   let data = await post(USER_REGISTER, {
+	      //     nick_name: this.name,
+	      //     gender,
+	      //     src: 'https://images.facedog.cn/public/discover/default-avatar.png',
+	      //     number: this.number
+	      //   });
+	      //   wepy.navigateTo({ url: 'chooseBirth' });
+	    },
+
+	    inputChange({ detail }) {
+	      this.name = detail.value;
+	    }
+	  };
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+	}
+</script>
+
+<style lang='scss'>
+	.container-name {
+	  height: 100vh;
+	  position: relative;
+	  overflow: hidden;
+	  width: 100%;
+	  margin: 0 auto;
+	  .title {
+	    margin-top: 152rpx;
+	    text-align: center;
+	    color: #302f2f;
+	    font-size: 42rpx;
+	  }
+	  .wrap {
+	    margin: 206rpx auto;
+	    width: 630rpx;
+	    height: 96rpx;
+	    display: flex;
+	    justify-content: center;
+	    background: rgba(242, 244, 245, 1);
+	    border-radius: 10rpx;
+	    input {
+	      width: 630rpx;
+	      height: 96rpx;
+	      padding-left: 15rpx;
+	      font-size: 14px;
+	      background: rgba(242, 244, 245, 1);
+	      opacity: 1;
+	    }
+	  }
+	  button {
+	    width: 420rpx;
+	    height: 100rpx;
+	    background: rgba(0, 0, 0, 1);
+	    opacity: 1;
+	    color: #fcfcfc;
+	    font-size: 28rpx;
+	    text-align: center;
+	    line-height: 92rpx;
+	    position: absolute;
+	    left: 50%;
+	    bottom: 156rpx;
+	    transform: translateX(-50%);
+	  }
+	}
+</style>

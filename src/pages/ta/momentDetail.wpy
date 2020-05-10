@@ -1,0 +1,61 @@
+<!--  -->
+<template>
+	<navbar title="动态详情">
+	</navbar>
+	<view class="ta-moment-detail-page">
+		<momentCard></momentCard>
+	</view>
+</template>
+<script>
+import wepy from 'wepy';
+import { get } from '@/utils/request';
+import momentCard from '@/components/discover/momentCard';
+
+export default class momentDetail extends wepy.page {
+  config = {
+    navigationBarTitleText: '动态详情', 
+    usingComponents: {
+      'van-popup': '../../components/vant/popup/index',
+      navbar: '../../components/navbar/index'
+    }
+  };
+  data = {
+    userId: ''
+  };
+  components = {
+    momentCard
+  };
+  methods = {};
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+  async onLoad(options) {
+    const { momentId } = options;
+    this.momentId = momentId;
+    const data = await get(`/api/discover/moments/${this.momentId}`);
+    console.log('动态详情', data);
+    this.$invoke('momentCard', 'setMomentList', [data]);
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='less'>
+	.ta-moment-detail-page {
+	  .warn-pop {
+	    .warn {
+	      height: 120rpx;
+	      text-align: center;
+	      font-size: 32rpx;
+	      font-weight: 600;
+	      line-height: 120rpx;
+	      color: rgba(0, 0, 0, 1);
+	      border-bottom: 1px solid rgba(226, 225, 225, 1);
+	    }
+	  }
+	}
+</style>

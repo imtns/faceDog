@@ -1,0 +1,14 @@
+{
+  "description": "颜狗faceDog微信小程序",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "cloudfunctionRoot": "./functions",
+  "compileType": "miniprogram",
+  "appid": "wx83bb88f9c0f7263d",
+  "projectname": "battle",
+  "miniprogramRoot": "./dist"
+}

@@ -1,0 +1,482 @@
+<!--  -->
+<template>
+	<navbar title="编辑资料">
+	</navbar>
+	<view class='wrapper'>
+		<view class="avatar-box">
+			<view class="avatar big">
+				<image @tap.stop="upload(0)" src="{{profile.images[0].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
+			</view>
+			<view class="inner-flex-container">
+				<view class="avatar">
+					<image @tap.stop="upload(1)" src="{{profile.images[1].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
+				</view>
+				<view class="avatar">
+					<image @tap.stop="upload(2)" src="{{profile.images[2].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
+				</view>
+			</view>
+
+			<view class="avatar">
+				<image @tap.stop="upload(3)" src="{{profile.images[3].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
+			</view>
+			<view class="avatar">
+				<image @tap.stop="upload(4)" src="{{profile.images[4].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
+			</view>
+			<view class="avatar">
+				<image @tap.stop="upload(5)" src="{{profile.images[5].image || 'https://images.facedog.cn/public/my/empty.png'}}" mode="aspectFill"></image>
+			</view>
+		</view>
+		<view class="item">
+			<view class="title">ID</view>
+			<view class="content">
+				{{profile.ID}}
+			</view>
+		</view>
+		<view class="line"></view>
+		<view class="item" @tap="redirect('editname')">
+			<view class="title">昵称</view>
+			<view class="content">{{profile.nick_name}}</view>
+			<view class="detail2">
+				<van-icon name="arrow" />
+			</view>
+		</view>
+		<view class="line"></view>
+		<picker mode="date" value="{{profile.birthday}}" start="1970-01-01" end="2019-12-31" bindchange="bindDateChange">
+			<view class="item">
+				<view class="title">出生日期</view>
+				<view class="content">{{profile.birthday}}</view>
+				<view class="detail2">
+
+					<van-icon name="arrow" />
+				</view>
+			</view>
+		</picker>
+		<view class="line"></view>
+		<view class="item" @tap="redirect('editdesc')">
+			<view class="title">我的愿望</view>
+			<view class="content">{{profile.signature}}</view>
+			<view class="detail2">
+				<van-icon name="arrow" />
+			</view>
+		</view>
+		<view class="line"></view>
+		<picker bindchange="bindPickerChange" value="{{heightIndex}}" range="{{heightList}}">
+			<view class="item">
+				<view class="title">我的身高</view>
+				<view class="content">{{profile.height ?profile.height + 'cm' : '设置身高'}}</view>
+				<view class="detail2">
+					<van-icon name="arrow" />
+				</view>
+			</view>
+		</picker>
+		<view class="line"></view>
+		<view class="item" @tap="redirect('myCharacter')">
+			<view class="title">我的人设</view>
+			<view class="content character">
+				<repeat for="{{profile.character}}" key="index" index="index" item="item">
+					<view class="tag">{{item}}</view>
+				</repeat>
+			</view>
+			<view class="detail2">
+				<van-icon name="arrow" />
+			</view>
+		</view>
+		<view class="line"></view>
+	</view>
+	<view wx:if="{{showCrop}}">
+		<cropper :options="cropperOpt" @beforeImageLoad="bl"></cropper>
+	</view>
+	<block wx:if="{{loading}}">
+		<loading></loading>
+	</block>
+	<van-toast id="van-toast" />
+	<!-- <van-popup show="{{ showHeight }}" bind:close="onClose"> -->
+
+	<!-- </van-popup> -->
+	<canvas canvas-id="canvas-img-0" style="top:-500rpx;position:fixed;"></canvas>
+	<van-action-sheet cancel-text="取消" show="{{ show }}" actions="{{ actions }}" bind:cancel="onClose" bind:close="onClose" bind:select="onSelect" />
+</template>
+
+<script>
+import wepy from 'wepy';
+import { uploader } from '@/utils/uploader';
+import { get, post } from '@/utils/request';
+import { toast, sleep, contentCheck, range } from '@/utils';
+
+import Toast from '@/components/vant/toast/toast';
+import cropper from '@/components/cropper';
+import { PROFILE, SETTING_PROFILE_EXTRA } from '@/utils/url';
+import mixin from '@/mixins/editMixin';
+import loading from '@/components/loading';
+const device = wx.getSystemInfoSync();
+const width = device.windowWidth;
+const height = device.windowHeight - 50;
+export default class EditFile extends wepy.page {
+  config = {
+    navigationBarTitleText: '编辑资料',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-button': '../../components/vant/button/index',
+      'van-icon': '../../components/vant/icon/index',
+      'van-switch': '../../components/vant/switch/index',
+      'van-action-sheet': '../../components/vant/action-sheet/index',
+      'van-toast': '../../components/vant/toast/index',
+      'van-loading': '../../components/vant/loading/index',
+      'van-picker': '../../components/vant/picker/index',
+      'van-popup': '../../components/vant/popup/index',
+    },
+  };
+
+  data = {
+    birth: '',
+    show: false,
+    showCrop: false,
+    loading: false,
+    showHeight: false,
+    deleteDisable: false,
+    heightIndex: 0,
+    heightList: Array.from(range(150, 200)),
+    actions: [
+      {
+        name: '设为默认头像',
+        disabled: false,
+      },
+      {
+        name: '删除此照片',
+        disabled: false,
+      },
+    ],
+    cropperOpt: {
+      width,
+      height,
+      scale: 2.5,
+      zoom: 8,
+      cut: {
+        x: (width - 300) / 2,
+        y: (height - 300) / 2,
+        width: 300,
+        height: 300,
+      },
+    },
+    clickIndex: 0,
+  };
+  mixins = [mixin];
+  components = {
+    cropper,
+    loading,
+  };
+
+  methods = {
+    async bindPickerChange(e) {
+      let height = this.heightList[e.detail.value];
+      await post(SETTING_PROFILE_EXTRA, {
+        height,
+      });
+      this.profile.height = height;
+      this.$apply();
+    },
+    onClose() {
+      this.show = false;
+    },
+    setHeight() {
+      this.showHeight = true;
+    },
+    async onSelect({ detail }) {
+      console.log(detail);
+      if (detail.name === '删除此照片') {
+        this.del(this.profile.images[this.clickIndex]._id);
+        this.show = false;
+        this.$apply();
+        await sleep(1);
+        this.getProfile(true, true);
+      } else {
+        this.changeAvatar({
+          image_id: this.profile.images[this.clickIndex]._id,
+        });
+        this.show = false;
+        this.$apply();
+        await sleep(1);
+        this.getProfile();
+      }
+    },
+    async upload(index) {
+      try {
+        console.log(index);
+        if (index == 0) this.actions[0].disabled = true;
+        else this.actions[0].disabled = false;
+        this.clickIndex = index;
+        if (this.profile.images[index]) {
+          this.show = true;
+        } else {
+          this.chooseImage();
+        }
+        this.$apply();
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    bindDateChange(event) {
+      console.log(event);
+      this.submit(
+        {
+          birthday: event.detail.value,
+        },
+        false
+      );
+      console.log(event.detail.value);
+      this.profile.birthday = event.detail.value;
+      this.$apply();
+    },
+  };
+
+  async chooseImage() {
+    const { tempFilePaths } = await wepy.chooseImage({ count: 1 });
+    this.$invoke('cropper', 'pushOrigin', tempFilePaths[0]);
+    this.showCrop = true;
+  }
+  events = {
+    ready() {
+      // console.log('we-cropper ready');
+    },
+    beforeImageLoad() {
+      // console.log('we-cropper beforeImageLoad');
+    },
+    imageLoad() {
+      // console.log('we-cropper imageLoad');
+    },
+    beforeDraw() {
+      // console.log('we-cropper beforeDraw');
+    },
+    cancel() {
+      this.showCrop = false;
+    },
+    getCropImage: () => {
+      this.loading = true;
+      this.$invoke('cropper', 'getCropperImage')
+        .then((src) => {
+          console.log(src);
+          this.showCrop = false;
+          this.$apply();
+          checkImgSafe(src, 0)
+            .then((res) => {
+              uploader(
+                src,
+                {
+                  profile: true,
+                  data: {
+                    id:
+                      (this.profile.images[this.clickIndex] &&
+                        this.profile.images[this.clickIndex]._id) ||
+                      '',
+                  },
+                  name: 'files',
+                  noLoading: true,
+                },
+                async (result) => {
+                  this.loading = false;
+                  await this.getProfile();
+                  this.$apply();
+                  Toast.success('上传成功');
+                }
+              );
+            })
+            .catch((err) => {
+              Toast('上传图片包含敏感信息，请重新上传');
+              this.show = false;
+              this.loading = false;
+              this.$apply();
+            });
+        })
+        .catch((err) => {
+          console.log(err + '获取图片地址失败，请稍后重试');
+        });
+    },
+  };
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+
+function checkImgSafe(tempFiles, index) {
+  return new Promise((resolve, reject) => {
+    // 压缩图片
+    getImg(tempFiles, index)
+      .then((tmpPath) => {
+        //先将图片转换为base64，然后调用云函数
+        const fs = wx.getFileSystemManager();
+        fs.readFile({
+          filePath: tmpPath,
+          encoding: 'base64',
+          success: function(res) {
+            wx.cloud
+              .callFunction({
+                name: 'securityCheck',
+                data: { imgbase64: res.data },
+              })
+              .then((res) => {
+                if (res && res.result && res.result.errCode === 87014) {
+                  reject(); //有安全风险
+                } else {
+                  resolve('ok');
+                }
+              })
+              .catch((err) => {
+                //只要检查失败，都算作没有安全风险
+                resolve('ok');
+              });
+          },
+        });
+      })
+      .catch((err) => {
+        resolve();
+      });
+  });
+}
+function getImg(path, index) {
+  return new Promise((resolve, reject) => {
+    wx.getImageInfo({
+      src: path,
+      success(res) {
+        // 图片原尺寸
+        let height = res.height;
+        let width = res.width;
+
+        let maxWidth = 200;
+        let maxHeight = 200;
+
+        // 压缩后尺寸
+        let targetWidth = width;
+        let targetHeight = height;
+        // 等比例压缩，如果宽度大于高度，则宽度优先，否则高度优先
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            // 要求宽度*(原生图片比例)=新图片尺寸
+            targetWidth = maxWidth;
+            targetHeight = Math.round(maxWidth * (height / width));
+          } else {
+            targetHeight = maxHeight;
+            targetWidth = Math.round(maxHeight * (width / height));
+          }
+        }
+
+        const ctx = wx.createCanvasContext(`canvas-img-${index}`);
+
+        ctx.clearRect(0, 0, targetWidth, targetHeight);
+        ctx.drawImage(path, 0, 0, targetWidth, targetHeight);
+        ctx.draw(true, function() {
+          wx.canvasToTempFilePath({
+            canvasId: `canvas-img-${index}`,
+            x: 0,
+            y: 0,
+            width: targetWidth,
+            height: targetHeight,
+            quality: 0.5,
+            fileType: 'jpg',
+            success: function(res) {
+              console.log('index', index);
+              resolve(res.tempFilePath);
+            },
+            fail: function(err) {
+              reject(err);
+            },
+          });
+        });
+      },
+      fail: function(err) {
+        reject(err);
+      },
+    });
+  });
+}
+</script>
+
+<style lang='less'>
+	.van-action-sheet__cancel,
+	.van-action-sheet__item {
+	  font-size: 32rpx !important;
+	}
+	.wrapper {
+	  width: 100%;
+	  padding-bottom: 20rpx;
+	  .avatar-box {
+	    padding: 0 30rpx;
+	    width: 690rpx;
+	    display: flex;
+	    justify-content: space-around;
+	    flex-wrap: wrap;
+	    .inner-flex-container {
+	      display: flex;
+	      flex-direction: column;
+	      margin-left: 5px;
+	    }
+	    .avatar {
+	      margin-bottom: 18rpx;
+	      width: 218rpx;
+	      height: 218rpx;
+	      overflow: hidden;
+	      border-radius: 20rpx;
+	      display: flex;
+	      flex-wrap: wrap;
+	      &.big {
+	        width: 454rpx;
+	        height: 454rpx;
+	      }
+	      image {
+	        width: 100%;
+	        height: 100%;
+	      }
+	    }
+	  }
+	  .item {
+	    display: flex;
+	    justify-content: space-between;
+	    height: 120rpx;
+	    align-items: center;
+	    padding: 0 30rpx;
+	    .content {
+	      margin-left: auto;
+	      font-size: 30rpx;
+	      color: #000;
+	      &.character {
+	        display: flex;
+	        .tag {
+	          background: rgba(255, 255, 255, 1);
+	          border: 2rpx solid rgba(112, 112, 112, 1);
+	          opacity: 1;
+	          border-radius: 5rpx;
+	          padding: 3rpx 10rpx;
+	          margin-right: 15rpx;
+	          color: #000;
+	          font-size: 26rpx;
+	        }
+	      }
+	    }
+	    .title {
+	      font-size: 28rpx;
+	      font-family: PingFang SC;
+	      font-weight: 600;
+	      color: rgba(0, 0, 0, 1);
+	    }
+	  }
+
+	  .detail2 {
+	    font-size: 30rpx;
+	    display: flex;
+	    align-items: center;
+	    margin-top: 8rpx;
+	    margin-left: 15rpx;
+	    color: rgba(178, 178, 178, 1);
+	  }
+
+	  .line {
+	    width: 690rpx;
+	    margin: 0 auto;
+	    border: 1rpx solid rgba(226, 225, 225, 0.5);
+	  }
+	}
+</style>

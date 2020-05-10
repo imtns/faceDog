@@ -1,0 +1,133 @@
+<!--  -->
+<template>
+	<view class='container-pop'>
+		<view class="box beta" wx:if="{{showType == 1}}">
+			<view class="text">
+				<view>内测礼包内容：玛莎拉蒂12元实体优惠券</view>
+				<view>额外赠送1000颜币，每账号仅限一次</view>
+			</view>
+			<view class="btns">
+				<button class="btn cancel" @tap="close"></button>
+				<button class="btn get" @tap="previewCard" hover-class="get-hover"></button>
+			</view>
+		</view>
+		<view class="box vip" wx:if="{{showType == 2}}">
+			<view class="text">
+				<view>尊享认证内容：玛莎拉蒂69元实体优惠券</view>
+				<view>额外赠送3000颜币+认证包过修图服务</view>
+			</view>
+			<view class="btns"> 
+				<button class="btn cancel" @tap="close"></button>
+				<button class="btn get1" @tap="previewCard" hover-class="get-hover1"></button>
+			</view>
+		</view>
+	</view>
+
+</template> 
+   
+<script>
+	import wepy from 'wepy';
+	import { toast } from '@/utils';
+	export default class coinPop extends wepy.component {
+	  props = {};
+
+	  data = {
+	    showType: ''
+	  };
+
+	  components = {};
+
+	  methods = {
+	    setType(type) {
+	      this.showType = type;
+	    },
+	    close() {
+	      this.$emit('closePop');
+	    },
+	    previewCard() {
+		   this.$emit('closePop');
+	      wx.previewImage({
+	        current: 'https:images.facedog.cn/public/invite/wechat-card.png?1',
+	        urls: ['https:images.facedog.cn/public/invite/wechat-card.png?1']
+	      });
+	    }
+	  };
+
+	  events = {};
+
+	  watch = {};
+
+	  computed = {};
+
+	  onLoad() {}
+
+	  onShow() {}
+	}
+</script>
+
+<style lang='scss' scoped>
+	.container-pop {
+	  width: 672rpx;
+	  height: 811rpx;
+	  margin: 0 auto;
+	  box-shadow: 0px 3rpx 10rpx rgba(39, 39, 39, 0.31);
+	  opacity: 1;
+	  border-radius: 28rpx;
+	  display: flex;
+	  justify-content: center;
+	  flex-wrap: wrap;
+	  .box {
+	    width: 672rpx;
+	    height: 605rpx;
+	    &.beta {
+	      background: url(https://images.facedog.cn/public/coin/beta-pop.png);
+	      background-size: cover;
+	    }
+	    &.vip {
+	      background: url(https://images.facedog.cn/public/coin/vip-pop.png);
+	      background-size: cover;
+	    }
+	    .text {
+	      color: #5f5f5f;
+	      font-size: 28rpx;
+	      text-align: center;
+	      margin-top: 350rpx;
+	    }
+	    .btns {
+	      width: 100%;
+	      display: flex;
+	      justify-content: center;
+	      margin-top: 30rpx;
+	      .btn {
+	        width: 185rpx;
+	        height: 83rpx;
+	        padding: 0;
+	        margin: 0 24rpx;
+	        &::after {
+	          border: 0;
+	        }
+	        &.cancel {
+	          background: url(https://images.facedog.cn/public/coin/btn-cancel.png);
+	          background-size: cover;
+	        }
+	        &.get {
+	          background: url(https://images.facedog.cn/public/coin/btn-get.png);
+	          background-size: cover;
+	        }
+	        &.get1 {
+	          background: url(https://images.facedog.cn/public/coin/btn-get1.png);
+	          background-size: cover;
+	        }
+	        &.get-hover {
+	          background: url(https://images.facedog.cn/public/coin/btn-get-hover.png);
+	          background-size: cover;
+	        }
+	        &.get-hover1 {
+	          background: url(https://images.facedog.cn/public/coin/btn-get1-hover.png);
+	          background-size: cover;
+	        }
+	      }
+	    }
+	  }
+	}
+</style>

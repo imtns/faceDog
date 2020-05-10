@@ -1,0 +1,196 @@
+<!-- 注册 -->
+<template>
+    <view class='main'>
+        <!-- <block wx:if="{{step===1}}">
+            <getInfo></getInfo>
+        </block> -->
+        <!-- <block wx:if="{{step===2}}">
+            <profile :code.sync="code" :userInfo.sync="userInfo"></profile>
+        </block>
+        <block wx:if="{{step===3}}">
+            <uploadPic :verify.sync="verify"></uploadPic>
+        </block>
+        <block wx:if="{{step===4}}">
+            <chooseVerify :disabled.sync="disabled"></chooseVerify>
+        </block>
+        <block wx:if="{{step===5}}">
+            <uploadVideo></uploadVideo>
+        </block>
+        <view @tap="back" wx:if="{{step != 2 && step!= 1 && step != 4}}" class="back">返回</view>
+        <van-toast id="van-toast" />
+        <van-dialog id="van-dialog" /> -->
+    </view>
+
+</template>
+
+<script>
+import wepy from 'wepy';
+// import getInfo from '@/components/register/getInfo';
+// import profile from '@/components/register/profile';
+// import uploadPic from '@/components/register/uploadPic';
+// import chooseVerify from '@/components/register/chooseVerify';
+// import uploadVideo from '@/components/register/uploadVideo';
+import { post } from '@/utils/request';
+import { LOGIN } from '@/utils/url';
+
+export default class Register extends wepy.page {
+    config = {
+        navigationBarTitleText: '颜狗',
+        usingComponents: {
+            'van-button': '../components/vant/button/index',
+            'van-cell': '../components/vant/cell/index',
+            'van-cell-group': '../components/vant/cell-group/index',
+            'van-field': '../components/vant/field/index',
+            'van-datetime-picker': '../components/vant/datetime-picker/index',
+            'van-action-sheet': '../components/vant/action-sheet/index',
+            'van-toast': '../components/vant/toast/index',
+            'van-loading': '../components/vant/loading/index',
+            'van-dialog': '../components/vant/dialog/index'
+        }
+    };
+
+    data = {
+        step: 1,
+        scopeUser: false,
+        userInfo: {},
+        code: '',
+        disabled: false,
+        verify: false,
+        certify: false
+    };
+
+    components = {
+        // profile,
+        // getInfo,
+        // uploadPic,
+        // chooseVerify,
+        // uploadVideo
+    };
+
+    methods = {
+        back() {
+            this.step = this.step - 1;
+        }
+    };
+
+    events = {
+        changeStep(step) {
+            this.step = step;
+        }
+    };
+    async goLogin(latitude, longitude) {
+        const result = await post(
+            LOGIN,
+            { code: wepy.getStorageSync('code') },
+            // { code: 'ygtest0003' || wepy.getStorageSync('code') },
+            {
+                latitude,
+                longitude
+            }
+        );
+        wepy.setStorageSync('welcome', result.welcome);
+        wepy.setStorageSync('token', result.access_token);
+        wepy.setStorageSync('tencent_token', result.tencent_token);
+        wepy.setStorageSync('identifier', result.identifier);
+        if (result.welcome) {
+            if (this.certify) {
+                this.step = 4;
+            } else if (this.verify) {
+                this.step = 3;
+            } else {
+                this.step = 2;
+            }
+            this.$apply();
+        } else {
+            wx.redirectTo({
+                url: 'index'
+            });
+        }
+    }
+    watch = {};
+
+    computed = {};
+
+    onLoad(options) {
+        if (options.userid) {
+            // console.error(options.userid);
+            this.code = options.userid;
+            wepy.setStorageSync('inviteCode', this.code);
+        }
+        if (options.verify && options.verify !== 'false') {
+            this.verify = true;
+            this.step = 3;
+            return;
+        }
+        if (options.certify && options.certify !== 'false') {
+            this.certify = true;
+            this.step = 4;
+            return;
+        }
+        if (options.name === 'reg') {
+            this.step = 2;
+            return;
+        }
+        wx.login({
+            success: res => {
+                console.log(res);
+                wepy.setStorageSync('code', res.code);
+                this.goLogin(
+                    wepy.getStorageSync('latitude'),
+                    wepy.getStorageSync('longitude')
+                );
+                // this.goLogin();
+                // if (!wepy.getStorageSync('latitude')) {
+                //     this.$invoke('getInfo', 'display');
+                // } else {
+                //     this.events.getLocation(this);
+                //     // this.goLogin(
+                //     //     wepy.getStorageSync('latitude'),
+                //     //     wepy.getStorageSync('longitude')
+                //     // );
+                // }
+            }
+        });
+    }
+
+    authorizeLocation() {
+        wx.showModal({
+            title: '是否授权当前位置',
+            content: '需要获取您的地理位置，请确认授权，否则无法使用',
+            success: res => {
+                if (res.cancel) {
+                } else if (res.confirm) {
+                    wx.openSetting({
+                        success: data => {
+                            console.log(data);
+                            if (data.authSetting['scope.userLocation']) {
+                                this.events.getLocation(this);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+    onShow() {}
+}
+</script>
+
+<style lang='less'>
+.back {
+    width: 394rpx;
+    height: 88rpx;
+    color: #040404;
+    margin: 10rpx auto;
+    text-align: center;
+    line-height: 88rpx;
+    font-size: 28rpx;
+}
+.main {
+    padding: 0 30rpx;
+}
+.van-dialog__confirm {
+    background: #07c160 !important;
+    color: white !important;
+}
+</style>

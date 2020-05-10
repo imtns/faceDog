@@ -1,0 +1,123 @@
+<template>
+  <view class="Constellation-com">
+    <repeat for="{{constellationData}}" key="index" index="index" item="constellation">
+        <view class="box" data-value="{{constellation.value}}" data-text="{{constellation.text}}" @tap="chosedConstellation">
+          <image class="icon" src="{{constellation.icon}}" mode="aspectFill"></image>
+          <view class="text">{{constellation.text}}</view>
+        </view>
+    </repeat>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Constellation extends wepy.component {
+    data = {
+        constellationData: [{
+            value: 1,
+            text: '白羊座',
+            icon: 'https://images.facedog.cn/public/rank/a1-ari.png',
+        }, {
+            value: 2,
+            text: '金牛座',
+            icon: 'https://images.facedog.cn/public/rank/a2-tau.png',
+        }, {
+            value: 3,
+            text: '双子座',
+            icon: 'https://images.facedog.cn/public/rank/a3-gem.png',
+        }, {
+            value: 4,
+            text: '巨蟹座',
+            icon: 'https://images.facedog.cn/public/rank/a4-cnc.png',
+        }, {
+            value: 5,
+            text: '狮子座',
+            icon: 'https://images.facedog.cn/public/rank/a5-leo.png',
+        }, {
+            value: 6,
+            text: '处女座',
+            icon: 'https://images.facedog.cn/public/rank/a6-vir.png',
+        }, {
+            value: 7,
+            text: '天秤座',
+            icon: 'https://images.facedog.cn/public/rank/a7-lib.png',
+        }, {
+            value: 8,
+            text: '天蝎座',
+            icon: 'https://images.facedog.cn/public/rank/a8-sco.png',
+        }, {
+            value: 9,
+            text: '射手座',
+            icon: 'https://images.facedog.cn/public/rank/a9-sgr.png',
+        }, {
+            value: 10,
+            text: '魔羯座',
+            icon: 'https://images.facedog.cn/public/rank/a10-cap.png',
+        }, {
+            value: 11,
+            text: '水瓶座',
+            icon: 'https://images.facedog.cn/public/rank/a11-agr.png',
+        }, {
+            value: 12,
+            text: '双鱼座',
+            icon: 'https://images.facedog.cn/public/rank/a12--psc.png',
+        }],
+    };
+    props = {
+
+    };
+    components = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+    methods = {
+        chosedConstellation(e) {
+            const { text = '' } = e.currentTarget.dataset;
+            this.$emit('getRankListByXZ', {
+                by: text,
+            });
+        },
+    }
+    onLoad() {
+
+    };
+
+    onShow() {};
+}
+</script>
+
+<style lang='less'>
+.Constellation-com{
+    background:rgba(9, 9, 9, 0.96);
+    position: absolute;
+    width: 100vw;
+    display: flex;
+    flex-wrap: wrap;
+    z-index: 100;
+    font-size: 0;
+    padding: 0 14rpx;
+    .box{
+        width: 49vw;
+        font-size: 24rpx;
+        color:rgba(252,252,252,1);
+        text-align: center;
+        height: 100rpx;
+        border-bottom: 1px solid rgba(64,64,64,1);
+        border-right: 1px solid rgba(64,64,64,1);
+        .icon{
+          width: 25rpx;
+          height: 25rpx;
+          display: inline-block;
+          margin-right: 32rpx;
+          vertical-align: middle;
+        }
+        .text{
+          display: inline-block;
+          line-height: 100rpx;
+        }
+    }
+}
+</style>

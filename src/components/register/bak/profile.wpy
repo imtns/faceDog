@@ -1,0 +1,207 @@
+<!--  -->
+<template>
+    <view class='wapper'>
+        <view class="step-info">
+            <view class="num">1.</view>编辑资料
+        </view>
+        <view class="form">
+            <view class="field">
+                <view class="label">昵称:</view>
+                <input class="input" @change="onChangeName" label="用户名" placeholder="请输入昵称" />
+            </view>
+            <view class="field" wx:if="{{code}}">
+                <view class="label">推荐人ID:</view>
+                <input class="input" value="{{ code }}" disabled label="推荐人ID" />
+            </view>
+            <view class="field">
+                <view class="label">性别:</view>
+                <view class="sex-container">
+                    <view class="male button" @tap="choose(2)">
+                        <image src="https://images.facedog.cn/public/reg/male{{gender==2?'-active':''}}.png" mode="aspectFill"></image>
+                    </view>
+                    <view class="female button" @tap="choose(1)">
+                        <image src="https://images.facedog.cn/public/reg/female1{{gender==1?'-active':''}}.png" mode="aspectFill"></image>
+                    </view>
+                </view>
+            </view>
+            <picker mode="date" value="{{currentDate}}" start="1970-01-01" end="2019-01-01" bindchange="bindDateChange">
+                <view class="field">
+                    <view class="label">生日:</view>
+                    <view class="input">{{ currentDate }}</view>
+                    <image class="icon" src="https://images.facedog.cn/public/reg/birth-icon.png" mode="aspectFill"></image>
+                </view>
+            </picker>
+        </view>
+        <form report-submit='true' bindsubmit='next'>
+            <button form-type='submit' class="btn">下一步</button>
+        </form>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+// import { post } from '@/utils/request.js';
+import { toast } from '@/utils';
+import Dialog from '@/components/vant/dialog/dialog';
+export default class Profile extends wepy.component {
+    props = {
+        userInfo: {
+            type: Object,
+            default: {}
+        },
+        code: {
+            type: String,
+            defalut: ''
+        }
+    };
+
+    data = {
+        gender: 0,
+        show: false,
+        currentDate: new Date().now,
+        nickName: '',
+        formId: ''
+    };
+
+    components = {};
+
+    methods = {
+        onChangeName(event) {
+            this.nickName = event.detail.value;
+        },
+        choose(gender) {
+            this.gender = gender;
+            this.$apply();
+        },
+        onClickIcon() {
+            this.show = true;
+        },
+        onClose() {
+            this.show = false;
+        },
+        birthConfirm() {
+            this.show = false;
+            this.$apply();
+        },
+        bindDateChange(event) {
+            this.currentDate = event.detail.value;
+        },
+        next(e) {
+            console.log(e.detail.formId);
+            if (!this.nickName || this.gender === 0 || !this.currentDate) {
+                toast('请填写全部资料');
+                return;
+            }
+            const data = {
+                nick_name: this.nickName,
+                gender: this.gender == 2 ? 'male' : 'female',
+                birthday: this.currentDate,
+                number: this.code
+            };
+            wepy.setStorageSync('formId', e.detail.formId);
+            wepy.setStorageSync('reg_profile', data);
+            this.$emit('changeStep', 3);
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+}
+</script>
+
+<style lang='less'>
+#van-dialog .van-dialog__confirm {
+    background: #07c160 !important;
+    color: white !important;
+}
+.wapper {
+    width: 600rpx;
+    margin: 60rpx auto 0;
+    text-align: center;
+    .van-cell {
+        padding: 10rpx 0 !important;
+    }
+    .step-info {
+        display: flex;
+        justify-content: flex-start;
+        font-size: 36rpx;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 1);
+        .num {
+            width: 51rpx;
+            height: 51rpx;
+            text-align: center;
+            line-height: 51rpx;
+            background: rgba(28, 28, 28, 1);
+            border-radius: 50%;
+            color: white;
+            font-weight: 600;
+            font-size: 36rpx;
+            margin-right: 21rpx;
+        }
+    }
+    .form {
+        .field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-top: 105rpx;
+            font-size: 28rpx;
+            color: rgba(0, 0, 0, 1);
+            text-align: left;
+            .label {
+                width: 120rpx;
+                font-weight: 600;
+                text-align: right;
+                margin-right: 15rpx;
+            }
+            .icon {
+                width: 40rpx;
+                height: 40rpx;
+                position: absolute;
+                right: 15rpx;
+            }
+            .input {
+                width: 481rpx;
+                height: 80rpx;
+                border: 2rpx solid rgba(0, 0, 0, 1);
+                box-sizing: border-box;
+                line-height: 80rpx;
+                padding-left: 24rpx;
+            }
+            .sex-container {
+                width: 500rpx;
+                .button {
+                    display: inline-block;
+                    width: 211rpx;
+                    height: 80rpx;
+                    &:nth-child(1) {
+                        margin-right: 30rpx;
+                    }
+                }
+            }
+        }
+    }
+    button {
+        width: 394rpx;
+        height: 84rpx;
+        margin: 0 auto;
+        line-height: 84rpx;
+        font-weight: 600;
+        border-radius: 0;
+        font-size: 28rpx;
+        color: rgba(252, 252, 252, 1);
+        background: rgba(0, 0, 0, 1);
+        opacity: 1;
+        margin-top: 210rpx;
+    }
+    image {
+        width: 100%;
+        height: 100%;
+    }
+}
+</style>

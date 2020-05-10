@@ -1,0 +1,81 @@
+<!--  -->
+<template>
+    <view class="wrapper" wx:if="{{show}}">
+        <image class="logo" src="https://images.facedog.cn/public/reg/logo.png" mode="aspectFill"></image>
+        <button size="large" @tap="onGotUserInfo">进入颜狗</button>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class getInfo extends wepy.component {
+    props = {};
+
+    data = {
+        show: false
+    };
+
+    components = {};
+
+    methods = {
+        async onGotUserInfo(e) {
+            var that = this;
+            wx.getSetting({
+                success: res => {
+                    // console.log(res.authSetting['scope.userLocation']);
+                    // if (
+                    //     res.authSetting['scope.userLocation'] != undefined &&
+                    //     res.authSetting['scope.userLocation'] != true
+                    // ) {
+                    that.$emit('getLocationAuth', this.$parent);
+                    // } else {
+                    //     //初始化进入
+                    //     that.$emit('changeStep', 2);
+                    //     that.$apply();
+                    // }
+                }
+            });
+        }
+    };
+    display() {
+        this.show = true;
+        this.$apply();
+    }
+    events = {};
+
+    watch = {};
+    computed = {};
+
+    onLoad() {}
+
+    onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+.wrapper {
+    width: 690rpx;
+    margin: 112rpx auto 0;
+    .logo {
+        width: 272rpx;
+        height: 557rpx;
+        margin: 0 auto;
+        display: block;
+    }
+    button {
+        width: 394rpx;
+        height: 92rpx;
+        background: rgba(0, 0, 0, 1);
+        opacity: 1;
+        color: #fcfcfc;
+        font-size: 28rpx;
+        text-align: center;
+        line-height: 92rpx;
+        position: absolute;
+        left: 50%;
+        bottom: 164rpx;
+        transform: translateX(-50%);
+    }
+}
+</style>

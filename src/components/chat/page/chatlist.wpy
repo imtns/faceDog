@@ -1,0 +1,389 @@
+<!--  -->
+<template>
+	<!-- <block wx:if="{{!list.length}}">
+		<empty></empty>
+	</block> -->
+	<view class="wrapper {{isphoneX?'iphoneX':''}}">
+		<view class="chat-box"
+		      @tap.capture.stop="onClick('颜币红包')">
+			<image class="icon"
+			       src="https://images.facedog.cn/mp/other/wechat-icon.png"
+			       mode="aspectFill"></image>
+			<view class="msg">
+				<view class="name">微信申请
+					<view wx:if="{{unreadRedPacket}}"
+					      class="unreadMsg">
+						<image style="width:94rpx;height:37rpx;"
+						       src="https://images.facedog.cn/mp/other/new-msg.png"
+						       mode="scaleToFill"
+						       lazy-load="false">
+						</image>
+					</view>
+				</view>
+				<view class="content">通过微信申请，可以获得颜币奖励哦</view>
+			</view>
+			<view class="right-part">
+				<view class="time"></view>
+			</view>
+		</view>
+		<view class="chat-box"
+		      @tap.capture.stop="toFriendList">
+			<image class="icon"
+			       src="https://images.facedog.cn/mp/other/friend-icon.png"
+			       mode="aspectFill"></image>
+			<view class="msg">
+				<view class="name">好友列表
+				</view>
+				<view class="content">聊天列表消失，可以在这里重新打开</view>
+			</view>
+			<view class="right-part">
+				<view class="time"></view>
+			</view>
+		</view>
+		<repeat for="{{list}}"
+		        key="index"
+		        index="index"
+		        item="item">
+			<van-swipe-cell class="swipe"
+			                id="{{item.id}}"
+			                async-close
+			                data-index="{{index}}"
+			                right-width="{{ 70 }}"
+			                data-unread="{{item.unreadCount}}"
+			                async-close
+			                bind:close="onDelete">
+				<view class="chat-box {{index==list.length-1?'last':''}}">
+					<image class="icon"
+					       @tap.capture.stop="goProfile({{item.id}})"
+					       src="{{item.avatar}}?x-oss-process=image/resize,w_200,h_200/format,jpg"
+					       mode="aspectFill"></image>
+					<image class="level {{item.level}}"
+					       src="https://images.facedog.cn/mp/profile/{{item.level}}.png"
+					       mode="scaleToFill"
+					       lazy-load="false">
+					</image>
+					<view class="msg"
+					      @tap.capture.stop="onClick({{item.id}},{{item.conversationID}},{{item.unreadCount}})">
+						<view class="name">{{item.nick}}<image wx:if="{{item.vip}}"
+							       class="vip"
+							       src="https://images.facedog.cn/public/profile/vip-icon.png"
+							       mode="scaleToFill"
+							       lazy-load="false">
+							</image>
+						</view>
+						<view class="content">{{item.message}}</view>
+					</view>
+					<view class="right-part">
+						<view class="time">{{item.showTime}}</view>
+						<view class="unread"
+						      wx:if="{{item.unreadCount>0}}">{{item.unreadCount}}</view>
+					</view>
+				</view>
+				<view class="delete"
+				      slot="right">解除匹配</view>
+			</van-swipe-cell>
+		</repeat>
+	</view>
+
+</template>
+
+<script>
+import wepy from 'wepy';
+import { formatDateFromSeconds } from '@/utils';
+import { get, deltemp } from '@/utils/request';
+import { FRIENDS_LIST, GET_CHATLIST_USERINFO } from '@/utils/url';
+// import webimhandler from '@/utils/handler';
+// import webim from '@/utils/webim.js'; // 腾讯云im包
+import empty from '@/components/empty';
+import { Event } from '@/utils/event.js';
+var unread = 0;
+export default class Chatlist extends wepy.component {
+  props = {};
+
+  data = {
+    list: [],
+    unread: 0,
+    touch: false,
+    friendList: [],
+    unreadRedPacket: false,
+    isphoneX: false,
+  };
+
+  components = {
+    empty,
+  };
+  methods = {
+    toFriendList() {
+      wepy.navigateTo({ url: '/pages/chat/friendList' });
+    },
+    touchstart() {
+      this.touch = true;
+    },
+    goProfile(id) {
+      if (id === 'administrator') return;
+      wepy.navigateTo({ url: 'battle/profile?dentifier=' + id });
+    },
+    async getChatList(data) {
+      console.log(this.$parent);
+      this.isphoneX = wepy.getStorageSync('iphoneX');
+      const friendList = await get(FRIENDS_LIST);
+      this.list = [];
+      this.unread = 0;
+      this.$apply();
+      if (wepy.getStorageSync('unread_ask_wechat') == 'ok') {
+        this.unreadRedPacket = true;
+      } else {
+        this.unreadRedPacket = false;
+      }
+      data = data.filter((x) => x.type == 'C2C' || x.type == 'TIMTextElem');
+      console.log('DATA:::::', data);
+      data.forEach((item) => {
+        item.nick = decodeURIComponent(item.userProfile.nick);
+        item.id = item.userProfile.userID;
+        item.message = decodeURIComponent(item.lastMessage.messageForShow);
+        item.showTime = formatDateFromSeconds(item.lastMessage.lastTime);
+        item.avatar = item.userProfile.avatar;
+        item.type = 'C2C';
+        if (item.conversationID == 'C2Cadministrator') {
+          item.avatar = 'https://images.facedog.cn/public/chat/chatIcon.png';
+          item.nick = '颜狗客服';
+        }
+        // if (!item.nick) {
+        friendList.forEach((friend) => {
+          if (item.id == friend.dentifier) {
+            item.nick = friend.nick_name;
+            item.avatar = friend.avatar;
+            item.level = friend.level;
+            item.vip = friend.vip;
+          }
+        });
+        // }
+      });
+      data.sort((x, y) => {
+        return x.conversationID === 'C2Cadministrator'
+          ? -1
+          : y.conversationID === 'C2Cadministrator'
+            ? 1
+            : 0;
+      });
+
+      const r = data.filter((elem) =>
+        friendList.find(
+          ({ dentifier }) => elem.id === dentifier || elem.id == 'administrator'
+        )
+      );
+      r.forEach((x) => {
+        this.unread += x.unreadCount;
+      });
+      this.$emit('unreadSet', this.unread);
+      this.list = r;
+      this.$apply();
+    },
+    onClick(id, conversationID, unread) {
+      let that = this;
+      if (id == '颜币红包') {
+        wepy.navigateTo({ url: '/pages/redPacket/list' });
+        return;
+      }
+      if (unread) {
+        this.unread = this.unread - unread;
+        if (this.unread >= 0) {
+          this.$emit('unreadSet', this.unread);
+        }
+      }
+      let list = JSON.parse(JSON.stringify(that.list));
+      list.forEach((item) => {
+        if (item.conversationID == conversationID) {
+          item.unreadCount = 0;
+        }
+      });
+      that.list = list;
+      that.$apply();
+      wx.$app.setMessageRead({ conversationID });
+      wx.navigateTo({
+        url: `chat/chatRoom?id=${id}&conversationID=${conversationID}`,
+      });
+    },
+    async onDelete(event) {
+      // console.error(event.detail);
+      const { position, instance } = event.detail;
+      switch (position) {
+        case 'left':
+        case 'cell':
+          instance.close();
+          event.preventDefault();
+          break;
+        case 'right':
+          console.log('delete', instance);
+          instance.close();
+          console.log(instance.id);
+          wx.$app
+            .deleteConversation(`C2C${instance.id}`)
+            .then(function(imResponse) {
+              console.log('删除成功,', imResponse);
+            });
+          if (instance.id != 'administrator') {
+            await deltemp(FRIENDS_LIST, {
+              user_id: instance.id,
+            });
+          }
+          this.list.splice(instance.dataset.index, 1);
+          this.unread = this.unread - instance.dataset.unread;
+          this.$emit('unreadSet', this.unread);
+          this.$apply();
+          break;
+      }
+    },
+  };
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  async onLoad() {}
+
+  onShow() {}
+}
+</script>
+
+<style lang='less' scoped>
+	.wrapper {
+	  width: 750rpx;
+	  margin-top: 32rpx;
+	  padding-bottom: 80rpx;
+	  &.iphoneX {
+	    padding-bottom: 150rpx;
+	  }
+	  .redpacket {
+	    width: 100%;
+	    height: 100rpx;
+	    background: red;
+	    color: white;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	  }
+	  .delete {
+	    background: red;
+	    height: 100rpx;
+	    line-height: 100rpx;
+	    color: white;
+	    text-align: center;
+	    width: 142rpx;
+	  }
+	  .chat-box {
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	    margin-bottom: 34rpx;
+	    position: relative;
+	    padding: 0 32rpx;
+	    .unreadMsg {
+	      width: 100rpx;
+	      height: 40rpx;
+	      display: flex;
+	      justify-content: center;
+	      align-items: center;
+	      color: rgb(250, 43, 43);
+	      //   border: 1rpx solid rgb(250, 43, 43);
+	      border-radius: 8rpx;
+	      font-size: 20rpx;
+	      position: absolute;
+	      top: 50%;
+	      transform: translateY(-50%);
+	      left: 140rpx;
+	    }
+	    &.active {
+	      background: red;
+	    }
+	    &:not(.last):after {
+	      content: '';
+	      position: absolute;
+	      bottom: -12rpx;
+	      left: 186rpx;
+	      width: 533rpx;
+	      height: 2rpx;
+	      background: rgba(223, 223, 223, 1);
+	      opacity: 1;
+	    }
+	    .icon {
+	      width: 126rpx;
+	      height: 126rpx;
+	      border-radius: 50%;
+	    }
+	    .level {
+	      height: 28rpx;
+	      position: absolute;
+	      left: 72rpx;
+	      top: 110rpx;
+	      border-radius: 0;
+	      &.N {
+	        width: 26rpx;
+	      }
+	      &.R {
+	        width: 26rpx;
+	        left: 86rpx;
+	      }
+	      &.SR {
+	        width: 44rpx;
+	      }
+	      &.SSR {
+	        width: 65rpx;
+	      }
+	    }
+	    .msg {
+	      margin-right: auto;
+	      margin-left: 30rpx;
+	      width: 400rpx;
+
+	      .name {
+	        font-size: 31rpx;
+	        font-family: PingFang SC;
+	        font-weight: 600;
+	        color: rgba(0, 0, 0, 1);
+	        position: relative;
+	        .vip {
+	          width: 72rpx;
+	          height: 24rpx;
+	          position: relative;
+	          left: 10rpx;
+	          top: 0rpx;
+	        }
+	      }
+	      .content {
+	        margin-top: 4rpx;
+	        font-size: 25rpx;
+	        font-family: PingFang SC;
+	        font-weight: 300;
+	        color: #a2a7b2;
+	        text-overflow: ellipsis;
+	        white-space: nowrap;
+	        overflow: hidden;
+	      }
+	    }
+	    .right-part {
+	      display: block;
+	      text-align: right;
+	      .time {
+	        font-size: 20rpx;
+	        font-family: PingFang SC;
+	        font-weight: 400;
+	        color: rgba(158, 157, 157, 1);
+	      }
+	      .unread {
+	        margin-top: 17rpx;
+	        width: 38rpx;
+	        height: 38rpx;
+	        background: rgba(237, 72, 87, 1);
+	        border-radius: 50%;
+	        float: right;
+	        line-height: 41rpx;
+	        text-align: center;
+	        color: white;
+	        font-size: 20rpx;
+	      }
+	    }
+	  }
+	}
+</style>

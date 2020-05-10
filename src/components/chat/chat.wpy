@@ -1,0 +1,429 @@
+<!--  -->
+<template>
+	<view class="{{!scroll?'scroll-lock':''}}">
+		<scroll-view scroll-y class="container ">
+			<van-collapse value="{{ activeNames }}" bind:change="onChange">
+				<van-collapse-item title="喜欢我的({{likemeList.length}})" name="1">
+					<scroll-view scroll-x class="scroll-x" style="width:100%;">
+						<image @tap="checkAllLikeMe" @touchstart="touchstart('likeme')" @touchend="touchend" src="{{likemeIcon}}" mode="scaleToFill" lazy-load="false">
+						</image>
+						<block wx:if="{{likemeList.length}}">
+							<repeat for="{{likemeList}}" key="index" index="index" item="item">
+								<image class="icon" @tap="goProfile({{item._id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
+							</repeat>
+						</block>
+						<block wx:else>
+							<repeat for="{{[0,1,2,3]}}" key="index" index="index" item="item">
+								<view class="icon-empty"></view>
+							</repeat>
+						</block>
+					</scroll-view>
+
+				</van-collapse-item>
+				<van-collapse-item title="我喜欢的({{ilikeTotal}})" name="2">
+					<scroll-view scroll-x class="scroll-x" style="width:100%;">
+						<image @tap="checkAllIlike" @touchstart="touchstart('melike')" @touchend="touchend" src="{{meLikeIcon}}" mode="scaleToFill" lazy-load="false">
+						</image>
+						<block wx:if="{{ilikeList.length}}">
+							<repeat for="{{ilikeList}}" key="index" index="index" item="item">
+								<image class="icon blue" @tap="goProfile({{item.user_id}})" src="{{item.avatar}}?x-oss-process=image/resize,w_100,h_100/format,jpg" mode="scaleToFill"></image>
+							</repeat>
+						</block>
+						<block wx:else>
+							<repeat for="{{[0,1,2,3]}}" key="index" index="index" item="item">
+								<view class="icon-empty"></view>
+							</repeat>
+						</block>
+					</scroll-view>
+				</van-collapse-item>
+			</van-collapse>
+			<chatlist />
+			<tutorial wx:if="{{!scroll}}" @setScroll="setScroll" />
+		</scroll-view>
+	</view>
+</template>
+
+<script>
+import util from '@/utils/util.js'; // 转换时间插件
+// import webim from '@/utils/webim.js'; // 腾讯云im包
+// import webimhandler from '@/utils/handler';
+// import {
+//   onMsgNotify,
+//   onMsgNotifyChat,
+//   init,
+//   sdkLogin
+// } from '@/utils/handler.js'; // 这个是所有事件的腾讯js，这个页面需要用到登录
+import Config from '@/utils/config';
+import likeme from './page/likeme';
+import ilike from './page/ilike';
+import chatTab from './page/chatTab';
+import chatlist from './page/chatlist';
+import notify from './page/notify';
+import { Event } from '@/utils/event.js';
+import tutorial from './page/tutorial';
+import wepy from 'wepy';
+import { get, post } from '@/utils/request';
+import {
+  MY_FAVORITE,
+  LIKE_ME,
+  FRIENDS_LIST,
+  GET_UNREAD_MSG,
+} from '@/utils/url';
+
+export default class Chat extends wepy.component {
+  data = {
+    scroll: false,
+    isNoData: true,
+    noData: '/no-msg.png', // 无数据的图片
+    contactList: [], // 会话列表
+    tabIndex: 1,
+    scrollHeight: 0,
+    activeNames: ['1', '2'],
+    ilikeList: [],
+    likemeList: [],
+    ilikeTotal: 0,
+    likeMeTotal: 0,
+    likemeIcon: 'https://images.facedog.cn/public/chat/like-me-all.png',
+    meLikeIcon: 'https://images.facedog.cn/public/chat/i-like-all.png',
+  };
+  components = {
+    likeme,
+    ilike,
+    chatlist,
+    notify,
+    tutorial,
+  };
+
+  methods = {
+    touchstart(type) {
+      if (type == 'likeme') {
+        this.likemeIcon =
+          'https://images.facedog.cn/public/chat/like-me-all-active.png';
+      } else {
+        this.meLikeIcon =
+          'https://images.facedog.cn/public/chat/i-like-all-active.png';
+      }
+    },
+    touchend() {
+      this.likemeIcon = 'https://images.facedog.cn/public/chat/like-me-all.png';
+      this.meLikeIcon = 'https://images.facedog.cn/public/chat/i-like-all.png';
+    },
+    goProfile(id) {
+      wx.navigateTo({
+        url: `battle/profile?id=${id}`,
+        success: (result) => {},
+        fail: () => {},
+        complete: () => {},
+      });
+    },
+    checkAllLikeMe() {
+      wepy.navigateTo({ url: '/pages/chat/likeme' });
+    },
+    checkAllIlike() {
+      wepy.navigateTo({ url: '/pages/chat/ilike' });
+    },
+    receivingMsg(data) {
+      console.log('receivingMsg!!!', data);
+      this.$invoke('chatlist', 'receivingMsg', data);
+    },
+    onChange(event) {
+      console.log(event.detail);
+      this.activeNames = event.detail;
+    },
+    tabClick(index) {
+      this.tabIndex = index;
+      if (index == 1) {
+        this.$invoke('ilike', 'initData');
+      } else if (index == 2) {
+        this.$invoke('likeme', 'initData');
+      } else if (index == 3) {
+        this.$invoke('chatTab', 'getList');
+      } else if (index == 4) {
+        this.$invoke('notify', 'initData');
+      }
+    },
+  };
+  refreshData() {
+    this.fetchData();
+  }
+  events = {
+    setScroll() {
+      this.scroll = true;
+    },
+  };
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    this.scrollHeight = wx.getSystemInfoSync().windowHeight - 84;
+    // Event.listen('send', () => {
+    //   this.initRecentContactList();
+    // });
+    Event.listen('conversationListUpdate', (list) => {
+      console.log('收到的联系列表', list);
+      this.$invoke('chatlist', 'getChatList', list);
+    });
+    Event.listen('tab', (tab) => {
+      this.tabIndex = tab;
+      console.log('tab', tab);
+      if (tab == 1) {
+        this.$invoke('ilike', 'initData');
+      }
+      this.$apply();
+    });
+    this.$apply();
+  }
+  async fetchData() {
+    this.getIlikeList();
+    this.getLikeMeList();
+    this.getUnread();
+  }
+  async getUnread() {
+    let data = await get(GET_UNREAD_MSG);
+    console.log('unreadMsg:::', data);
+    // let { unread_ask_wechat, unread_moment } = await get(GET_UNREAD_MSG);
+    wepy.setStorageSync(
+      'unread_moment',
+      data && data.unread_moment ? 'ok' : ''
+    );
+    wepy.setStorageSync(
+      'unread_ask_wechat',
+      data && data.unread_ask_wechat ? 'ok' : ''
+    );
+  }
+  async getLikeMeList() {
+    this.likemeList = [];
+    get(LIKE_ME).then((likeme) => {
+      likeme.forEach((item) => {
+        this.likemeList.push(...item.users);
+      });
+      // this.likemeList = this.likemeList.slice(0,5);
+      this.$apply();
+    });
+  }
+  async getIlikeList() {
+    this.ilikeList = [];
+    get(MY_FAVORITE).then((ilike) => {
+      console.log(ilike.length);
+      this.ilikeTotal = ilike.total;
+      this.ilikeList = ilike.favorites.slice(0, 5);
+      this.$apply();
+    });
+  }
+
+  // 初始化聊天界面最近会话列表
+  initRecentContactList() {
+    var that = this;
+    // wx.showLoading();
+    webim.getRecentContactList(
+      {
+        // 获取会话列表的方法
+        Count: 100, // 最近的会话数 ,最大为 100
+      },
+      function(resp) {
+        wx.hideLoading();
+        // console.log('resp:' + JSON.stringify(resp));
+        if (resp.SessionItem) {
+          if (resp.SessionItem.length == 0) {
+            that.setData({
+              isNoData: false,
+            });
+          } else {
+            that.$invoke('chatlist', 'getChatList', resp.SessionItem);
+            that.initUnreadMsgCount(that, null, true);
+          }
+        }
+      },
+      function(resp) {
+        // 错误回调
+      }
+    );
+  }
+  // 初始化最近会话的消息未读数（这个方法用不到，多余，这是个坑，登录之后仍然返回空对象）
+  initUnreadMsgCount(that, msg, init = false) {
+    console.warn('这是未读信息的位置!!!!!!');
+    var sessMap = webim.MsgStore.sessMap();
+    console.log(sessMap);
+    var sess = null;
+    for (var s in sessMap) {
+      if (sessMap[s].type() != 'GROUP') {
+        that.$invoke('chatlist', 'receivingMsg', sessMap, msg || {}, init);
+      }
+    }
+  }
+}
+</script>
+<style lang="less">
+	.van-collapse-item__content {
+	  padding: 0 !important;
+	  width: 100%;
+	}
+	.van-cell:after {
+	  left: 0 !important;
+	}
+	.van-cell__title {
+	  font-weight: bold;
+	}
+</style>
+
+<style lang='less' scoped>
+	.scroll-lock {
+	  height: 90vh;
+	  overflow-y: hidden;
+	}
+	.container {
+	  width: 100%;
+	  overflow: scroll;
+	  height: 100%;
+	  .tabs {
+	    width: 690rpx;
+	    display: flex;
+	    margin-left: 30rpx;
+	    justify-content: space-between;
+	    .tab {
+	      width: 157rpx;
+	      height: 64rpx;
+	    }
+	  }
+	}
+
+	.scroll-x {
+	  height: 186rpx;
+	  width: 500rpx;
+	  display: flex;
+	  align-items: center;
+	  background: #f5f6f7;
+	  white-space: nowrap;
+	  //   &:first-child {
+	  //     image:not(:first-child) {
+	  //       border: 4rpx solid red;
+	  //     }
+	  //   }
+	  &.i-like {
+	  }
+	  .icon-empty {
+	    width: 122rpx;
+	    height: 122rpx;
+	    border-radius: 50%;
+	    display: inline-block;
+	    margin-right: 18rpx;
+	    border: 4rpx dashed #ccc;
+	  }
+	  .icon {
+	    width: 122rpx;
+	    height: 122rpx;
+	    border-radius: 50%;
+	    display: inline-block;
+	    position: relative;
+	    margin-right: 18rpx;
+	    border: 4rpx solid red;
+	    &::before {
+	      border: 4rpx solid white;
+	      content: '';
+	      display: block;
+	      position: absolute;
+	      border-radius: 50%;
+	      top: 0rpx;
+	      left: 0rpx;
+	      right: 0rpx;
+	      bottom: 0rpx;
+	    }
+	    &.blue {
+	      border: 4rpx solid #5cd4d4;
+	    }
+	  }
+	  image {
+	    margin-top: 24rpx;
+	  }
+	  image:first-child {
+	    margin-left: 32rpx;
+	    margin-right: 30rpx;
+	    width: 130rpx;
+	    height: 139rpx;
+	  }
+	}
+	.msg-con {
+	  width: 100%;
+	  height: auto;
+	  background: #ffffff;
+	  padding: 0px 10px;
+	  box-sizing: border-box;
+	}
+	.service-msg {
+	  width: 100%;
+	  height: 70px;
+	}
+	.msg-item {
+	  border-top: 1px solid #e5e5e5;
+	}
+	.service-avatar {
+	  width: 50px;
+	  height: 50px;
+	  background: #69beff;
+	  margin: 10px 0;
+	  border-radius: 50%;
+	}
+	.msg-avatar {
+	  width: 50px;
+	  height: 50px;
+	  margin: 10px 0;
+	  border-radius: 50%;
+	}
+	.msg-text {
+	  margin-top: 12px;
+	}
+	.name {
+	  font-size: 16px;
+	  color: #333333;
+	  height: 25px;
+	}
+	.name.s {
+	  height: 70px;
+	  line-height: 70px;
+	}
+	.text {
+	  color: #999999;
+	  font-size: 13px;
+	  position: relative;
+	}
+	.icon-kefu::before {
+	  width: 50px;
+	  height: 50px;
+	  line-height: 50px;
+	  display: block;
+	  color: #ffffff;
+	  text-align: center;
+	  font-size: 60rpx;
+	}
+	.count {
+	  width: 20px;
+	  height: 20px;
+	  background: #f74c31;
+	  border-radius: 50%;
+	  line-height: 20px;
+	  display: block;
+	  color: #ffffff;
+	  text-align: center;
+	  position: absolute;
+	  right: 0px;
+	  top: 0;
+	}
+	button {
+	  color: #333333;
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  z-index: 1;
+	  width: 100%;
+	  height: 100%;
+	  background: rgba(0, 0, 0, 0);
+	}
+	button:after {
+	  border: none;
+	}
+	.service-msg {
+	  position: relative;
+	}
+</style>

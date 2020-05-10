@@ -1,0 +1,180 @@
+<!--  -->
+<template>
+
+	<navbar title=""></navbar>
+	<view class='container'>
+		<view class='title'>请填写你的微信号</view>
+		<view class='desc'>微信号不公开，你可以随时修改</view>
+		<view class='desc'>只有填写真实微信号的用户才可以<text style="color:#02F685;">领取红包奖励</text></view>
+		<view class='wrap'>
+			<view class='field'>
+				<view class='label'>输入真实微信号(选填)</view>
+				<input class='input'
+				       @change='onName'
+				       type='text'
+				       placeholder='不公开，任何人不经你同意无法查看'
+				       placeholder-class='placeholder' />
+			</view>
+			<button class='verify2'
+			        @tap='finishRegister'>完成注册</button>
+			<button class="verify1"
+			        @tap='goPass'>跳过</button>
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { get, post } from '@/utils/request';
+import {
+  USER_VERIFY,
+  VERIFY,
+  SUBMIT_FORMID,
+  ADD_REG_WECHAT,
+} from '@/utils/url';
+import { toast, sleep } from '@/utils';
+export default class FinishRegister extends wepy.component {
+  config = {
+    navigationBarTitleText: '4/4',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
+
+  data = {
+    wechat: '',
+    status: false,
+    profile: {},
+  };
+
+  components = {};
+  redirect() {
+    wx.requestSubscribeMessage({
+      tmplIds: ['ZGHXSxMLbaSFgE1KoWsMW4SxOSzQsRkcsbNq1IVkWdk'],
+      success: async () => {
+        //   toast('申请已提交，最晚1个工作日内完成完成审核');
+        //   await sleep(2);
+        wepy.reLaunch({ url: '/pages/index' });
+      },
+      complete() {
+        console.log('订阅complete');
+      },
+    });
+  }
+  methods = {
+    onName(event) {
+      this.wechat = event.detail.value;
+    },
+
+    async finishRegister() {
+      if (!this.wechat) {
+        toast('请填写微信号');
+        return;
+      }
+      await post(ADD_REG_WECHAT, {
+        wechat: this.wechat,
+      });
+      this.redirect();
+    },
+    goPass() {
+      this.redirect();
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  async onLoad() {
+    let data = await get(USER_VERIFY);
+    // console.error(data);
+    this.status = data.general;
+    this.profile = wx.getStorageSync('profile');
+    this.$apply();
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss' scoped>
+	.container {
+	  height: 100vh;
+	  position: relative;
+	  overflow: hidden;
+	  width: 100%;
+	  margin: 0 auto;
+	  .title {
+	    margin-top: 152rpx;
+	    text-align: center;
+	    color: #302f2f;
+	    font-size: 42rpx;
+	    margin-bottom: 20rpx;
+	  }
+	  .desc {
+	    color: #a6aaa8;
+	    font-size: 24rpx;
+	    margin: 10rpx auto;
+	    text-align: center;
+	    width: 604rpx;
+	    white-space: normal;
+	  }
+	  .wrap {
+	    margin: 150rpx 60rpx 0;
+	    .filed {
+	      text-align: left;
+	      .label {
+	        font-size: 28rpx;
+	        color: #302f2f;
+	      }
+	    }
+	  }
+
+	  input {
+	    margin-top: 22rpx;
+	    width: 630rpx;
+	    height: 96rpx;
+	    line-height: 96rpx;
+	    border-radius: 10rpx;
+	    padding-left: 22rpx;
+	    font-size: 24rpx;
+	    background: #f2f4f5;
+	  }
+	  .verify1 {
+	    margin-top: 28rpx;
+	    width: 420rpx;
+	    height: 92rpx;
+	    background: rgba(45, 45, 45, 1);
+	    opacity: 1;
+	    color: white;
+	    font-size: 28rpx;
+	    line-height: 92rpx;
+	    border-radius: 10rpx;
+	  }
+	  .verify2 {
+	    margin-top: 180rpx;
+
+	    width: 420rpx;
+	    height: 92rpx;
+	    background: rgba(9, 167, 118, 1);
+	    line-height: 92rpx;
+	    opacity: 1;
+	    color: white;
+	    font-size: 28rpx;
+	    border-radius: 10rpx;
+	  }
+	  .text {
+	    font-size: 24rpx;
+	    color: #a6aaa8;
+	    text-align: center;
+	    width: 410rpx;
+	    white-space: normal;
+	    margin: 25rpx auto;
+	  }
+	}
+	.placeholder {
+	  color: #a6aaa8;
+	}
+</style>
