@@ -30,7 +30,8 @@
 		       lazy-load="false">
 		</image>
 		<view class="upgrade-mission">
-			<repeat for="{{mission[level[levelIndex]]}}"
+			<repeat wx:if="{{level[levelIndex]!='SSR'}}"
+			        for="{{mission[level[levelIndex]]}}"
 			        key="index"
 			        index="index"
 			        item="item">
@@ -162,6 +163,24 @@ export default class Upgrade extends wepy.page {
         },
         {
           text: '滑动次数达到300次',
+          status: '',
+        },
+      ],
+      SSR: [
+        {
+          text: '',
+          status: '',
+        },
+        {
+          text: '',
+          status: '',
+        },
+        {
+          text: '',
+          status: '',
+        },
+        {
+          text: '',
           status: '',
         },
       ],

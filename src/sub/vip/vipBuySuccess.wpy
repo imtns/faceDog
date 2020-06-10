@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-	<navbar title="直接获取">
+	<navbar title="开通成功">
 	</navbar>
 	<view class='container'>
 		<view class="bg">

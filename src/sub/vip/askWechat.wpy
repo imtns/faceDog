@@ -1,0 +1,425 @@
+<!--  -->
+<template>
+	<navbar title="真爱降临">
+	</navbar>
+	<view class='container'>
+		<view class="wrap">
+			<view class="frame-wrap">
+				<view class="img-wrap">
+					<repeat for="{{list.data}}"
+					        key="index"
+					        wx:if="{{index<3}}"
+					        index="index"
+					        item="item">
+
+						<view class="box">
+							<image class="frame"
+							       @tap="goProfile({{item.user_id}})"
+							       src="{{item.avatar  || 'https://images.facedog.cn/public/vip/askwechat/frame.png'}}"
+							       mode="scaleToFill"
+							       lazy-load="false">
+							</image>
+
+							<image class="{{item.level}} level"
+							       @tap="goProfile({{item.user_id}})"
+							       src="https://images.facedog.cn/mp/profile/{{item.level}}.png"
+							       mode="aspectFill" />
+
+							<view class="copy"
+							      wx:if="{{list.is_buy}}"
+							      @tap="copy({{item.wechat}})">复制微信</view>
+						</view>
+
+					</repeat>
+				</view>
+				<view class="img-wrap">
+					<repeat for="{{list.data}}"
+					        key="index"
+					        wx:if="{{index>2}}"
+					        index="index"
+					        item="item">
+						<view class="box">
+							<image class="frame"
+							       @tap="goProfile({{item.user_id}})"
+							       src="{{item.avatar  || 'https://images.facedog.cn/public/vip/askwechat/frame.png'}}"
+							       mode="scaleToFill"
+							       lazy-load="false">
+							</image>
+
+							<image class="{{item.level}} level"
+							       @tap="goProfile({{item.user_id}})"
+							       src="https://images.facedog.cn/mp/profile/{{item.level}}.png"
+							       mode="aspectFill" />
+
+							<view class="copy"
+							      wx:if="{{list.is_buy}}"
+							      @tap="copy({{item.wechat}})">复制微信</view>
+						</view>
+					</repeat>
+				</view>
+			</view>
+			<image wx:if="{{!list.is_buy}}"
+			       class="comment comment1 p1"
+			       src="https://images.facedog.cn/public/vip/askwechat/comment-1.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+			<image wx:if="{{!list.is_buy}}"
+			       class="comment comment1 p2"
+			       src="https://images.facedog.cn/public/vip/askwechat/comment-2.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+			<image wx:if="{{!list.is_buy}}"
+			       class="comment comment1 p3"
+			       src="https://images.facedog.cn/public/vip/askwechat/comment-3.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
+			<view class="btn-wrap"
+			      wx:if="{{!list.is_buy}}">
+				<view class="try"
+				      @tap="try">
+					试试手气
+					<view>（剩余{{count}}次机会）</view>
+				</view>
+				<view @tap="pay(990)"
+				      class="ask {{asked?'d':''}}">获取微信</view>
+			</view>
+			<view class="btn-wrap"
+			      wx:else>
+				<view class="try"
+				      style="background:#B2B2B2;">
+					已获取
+				</view>
+			</view>
+		</view>
+		<view class="countdown"
+		      wx:if="{{!list.isBuy}}">剩余时间：{{countdown}}</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import {
+  PAY,
+  PAY_CALLBACK,
+  SHOW_ASK_WECHAT,
+  ASK_GROUP_WECHAT,
+  BUY_COUNT
+} from '@/utils/url';
+import { post, get } from '@/utils/request';
+import { countDown, toast } from '@/utils';
+export default class extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
+
+  data = {
+    countdown: '',
+    show1: true,
+    show2: false,
+    show3: false,
+    count: 3,
+    ID: [],
+    asked: false,
+    initList: {},
+    list: { data: [0, 1, 2, 3, 4, 5] },
+  };
+
+  components = {};
+
+  methods = {
+    goProfile(id) {
+      wx.navigateTo({
+        url: `/pages/battle/profile?id=${id}`,
+        success: (result) => {},
+        fail: () => {},
+        complete: () => {},
+      });
+    },
+    copy(wechat) {
+      wx.setClipboardData({
+        data: wechat,
+        success: (res) => {
+          wx.showToast({
+            title: '复制成功',
+          });
+        },
+      });
+    },
+    async try() {
+      if (this.count == 0) return;
+      let data = await get(ASK_GROUP_WECHAT, { count: this.count-- });
+      data.data.forEach((d) => {
+        d.avatar =
+          d.avatar + '?x-oss-process=image/resize,w_100,h_00/format,jpg';
+      });
+      this.list = data;
+      this.ID = this.list.data.map((s) => s.ID);
+      this.$apply();
+    },
+    async pay(price) {
+      if (!this.ID.length) {
+        toast('还没有试试手气哦');
+        return;
+	  }
+	  post(BUY_COUNT,{type:'wechat'});
+      let { nonceStr, package: _package, paySign, timeStamp } = await post(
+        PAY,
+        {
+          price,
+        }
+      );
+      wx.requestPayment({
+        timeStamp,
+        nonceStr,
+        package: _package,
+        signType: 'MD5',
+        paySign,
+        success: async (res) => {
+          if (res.errMsg === 'requestPayment:ok') {
+            await post(PAY_CALLBACK, { price, ID: this.ID });
+            wepy.redirectTo({ url: 'vipBuySuccess' });
+          }
+        },
+        fail: function(res) {
+          console.log('fail:', res);
+        },
+        complete: function(res) {},
+      });
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+  async initData() {
+    let data = await get(ASK_GROUP_WECHAT, { count: this.count-- });
+    data.data.forEach((d) => {
+      d.avatar = d.avatar + '?x-oss-process=image/resize,w_100,h_00/format,jpg';
+    });
+    if (data.is_buy) {
+      this.list = data;
+      this.$apply();
+    }
+  }
+  onLoad() {
+    this.initData();
+    get(SHOW_ASK_WECHAT).then((res) => {
+      console.log('回调::::::::', res);
+      setInterval(() => {
+        this.countdown = countDown(1, true);
+        this.$apply();
+      }, 1000);
+    });
+  }
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	.container {
+	  background: #302a2f;
+	  width: 100%;
+	  height: 90vh;
+	  padding-top: 100rpx;
+	  .wrap {
+	    width: 628rpx;
+	    height: 745rpx;
+	    background: url(https://images.facedog.cn/public/vip/askwechat/bg.png);
+	    background-size: cover;
+	    margin: 0rpx auto;
+
+	    position: relative;
+	    .frame-wrap {
+	      position: relative;
+	      width: 100%;
+	      padding-top: 280rpx;
+	      .img-wrap {
+	        display: flex;
+	        justify-content: center;
+	        margin-bottom: 25rpx;
+	        .box {
+	          position: relative;
+	          .level {
+	            height: 21rpx;
+	            position: absolute;
+	            left: 5rpx;
+	            top: 5rpx;
+	            border-radius: 0;
+	            &.N {
+	              width: 20rpx;
+	            }
+	            &.R {
+	              width: 20rpx;
+	            }
+	            &.SR {
+	              width: 33rpx;
+	            }
+	            &.SSR {
+	              width: 38rpx;
+	            }
+	          }
+	        }
+	        image {
+	          width: 116rpx;
+	          height: 116rpx;
+	          margin: 0 25rpx;
+
+	          &.frame {
+	            border: 2rpx solid white;
+	            border-radius: 14rpx;
+	          }
+	        }
+	        .copy {
+	          width: 95rpx;
+	          height: 33rpx;
+	          margin: 5rpx auto;
+	          display: flex;
+	          justify-content: center;
+	          align-items: center;
+	          color: white;
+	          font-size: 18rpx;
+	          background: #9285b8;
+	        }
+	      }
+	    }
+	  }
+	  .btn-wrap {
+	    position: absolute;
+	    bottom: 36rpx;
+	    display: flex;
+	    justify-content: center;
+	    width: 100%;
+	    .try,
+	    .ask {
+	      width: 171rpx;
+	      height: 62rpx;
+	      color: white;
+	      display: flex;
+	      font-size: 25rpx;
+	      justify-content: center;
+	      align-items: center;
+	      flex-wrap: wrap;
+	      margin: 0 15rpx;
+	      border-radius: 12rpx;
+	    }
+	    .try {
+	      background: #9683bc;
+	      view {
+	        font-size: 13rpx;
+	        position: relative;
+	        top: -4rpx;
+	      }
+	    }
+	    .ask {
+	      background: #09a776;
+	      &.d {
+	        background: rgb(182, 182, 182);
+	      }
+	    }
+	  }
+	}
+	.countdown {
+	  color: #fcc930;
+	  font-size: 28rpx;
+	  text-align: center;
+	  margin-top: 20rpx;
+	}
+	.comment {
+	  width: 378rpx;
+	  height: 54rpx;
+	  left: 50%;
+	  transform: translateX(-50%);
+	  position: relative;
+	}
+	.comment1 {
+	  bottom: 130rpx;
+	  position: absolute;
+	  &.p1 {
+	    animation: fade1 ease-in-out 7s infinite;
+	    animation-fill-mode: both;
+	    @keyframes fade1 {
+	      0% {
+	        opacity: 1;
+	      }
+	      10% {
+	        opacity: 1;
+	      }
+	      20% {
+	        opacity: 1;
+	      }
+	      50% {
+	        opacity: 1;
+	      }
+	      60% {
+	        opacity: 1;
+	      }
+	      70% {
+	        opacity: 0;
+	      }
+	      80% {
+	        opacity: 0;
+	      }
+	      100% {
+	        opacity: 0;
+	      }
+	    }
+	  }
+	  &.p2 {
+	    animation: fade2 ease-in-out 7s infinite;
+	    animation-fill-mode: both;
+	    @keyframes fade2 {
+	      0% {
+	        opacity: 0;
+	      }
+	      20% {
+	        opacity: 0;
+	      }
+	      30% {
+	        opacity: 1;
+	      }
+	      60% {
+	        opacity: 1;
+	      }
+	      80% {
+	        opacity: 0;
+	      }
+	      100% {
+	        opacity: 0;
+	      }
+	    }
+	  }
+	  &.p3 {
+	    animation: fade3 ease-in-out 7s infinite;
+	    animation-fill-mode: both;
+	    @keyframes fade3 {
+	      0% {
+	        opacity: 0;
+	      }
+	      50% {
+	        opacity: 0;
+	      }
+	      60% {
+	        opacity: 1;
+	      }
+	      80% {
+	        opacity: 1;
+	      }
+	      95% {
+	        opacity: 1;
+	      }
+	      100% {
+	        opacity: 0;
+	      }
+	    }
+	  }
+	}
+</style>

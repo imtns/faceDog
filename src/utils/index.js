@@ -174,7 +174,7 @@ function throttle(fn, interval) {
 		}
 	};
 }
-var start = new Date;
+
 
 
 function pad(num) {
@@ -185,18 +185,15 @@ Date.prototype.addDays = function (days) {
 	date.setDate(date.getDate() + days);
 	return date;
 }
-function countDown(date) {
+
+function countDown(date, isFormat) {
+	var start = new Date;
 	var now = new Date;
-	// if (now.getHours() > 12) {
-	// start.setHours(23, 59, 59); 
-	// } else { 
-	if (date) start = new Date(date);
 	if (!date)
 		start.setHours(6, '00', '00');
-
-
-	// }
-	if (now > start || date) { // too late, go to tomorrow
+	else
+		start.setHours(23, 59, 59);
+	if (now > start) {
 		start.setDate(start.getDate() + 1);
 	}
 	var remain = ((start - now) / 1000);
@@ -204,8 +201,12 @@ function countDown(date) {
 	var mm = pad((remain / 60) % 60);
 	var ss = pad(remain % 60);
 	let time = hh + ":" + mm + ":" + ss;
+	if (isFormat) {
+		time = `${hh}小时${mm}分${ss}秒`
+	}
 	return time;
 }
+
 function contentCheck(content) {
 	return new Promise((resolve, reject) => {
 		wx.cloud

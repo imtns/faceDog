@@ -1,17 +1,25 @@
 <template>
-	<navbar center="true" showHome="{{true}}" wx:if="{{selectedTab ==1 }}">
+	<navbar center="true"
+	        showHome="{{true}}"
+	        wx:if="{{selectedTab ==1 }}">
 		<view slot="center">
 			<view class="square">
-				<view class="tab {{tabSelect==0?'active':''}}" @tap="tabClick(0)">PK</view>
+				<view class="tab {{tabSelect==0?'active':''}}"
+				      @tap="tabClick(0)">PK</view>
 				<view class="tab-split"></view>
-				<view class="tab tab2 {{tabSelect==1?'active':''}}" @tap="tabClick(1)">探索</view>
-				<view class="underline" style="left:{{tabSelect==0?'42rpx':'149rpx'}}"></view>
+				<view class="tab tab2 {{tabSelect==1?'active':''}}"
+				      @tap="tabClick(1)">探索</view>
+				<view class="underline"
+				      style="left:{{tabSelect==0?'42rpx':'149rpx'}}"></view>
 			</view>
 		</view>
 	</navbar>
-	<navbar center="true" showSquare="{{true}}" wx:elif="{{selectedTab ==0 }}">
+	<navbar center="true"
+	        showSquare="{{true}}"
+	        wx:elif="{{selectedTab ==0 }}">
 	</navbar>
-	<navbar wx:else title="{{pageTitle}}">
+	<navbar wx:else
+	        title="{{pageTitle}}">
 	</navbar>
 	<block wx:if="{{verify}}">
 		<verify />
@@ -36,13 +44,18 @@
 	<!-- <van-popup show="{{ showRedpacketLayer}}" bind:close="onClose">
 		<redpacketLayer />
 	</van-popup> -->
-	<van-popup show="{{ showVipBuy}}" bind:close="onClose">
+	<van-popup show="{{ showVipBuy}}"
+	           bind:close="onClose">
 		<vipBuyPop />
 	</van-popup>
 	<van-toast id="van-toast" />
 	<van-dialog id="van-dialog" />
-	<van-popup show="{{ showLevelPop}}" bind:close="onClose">
+	<van-popup show="{{ showLevelPop}}"
+	           bind:close="onClose">
 		<levelPop @close="close" />
+	</van-popup>
+	<van-popup show="{{ showActivity}}">
+		<activityPop />
 	</van-popup>
 	<block wx:if="{{showVerify}}">
 		<verify />
@@ -57,11 +70,17 @@ import explore from '@/components/explore/index';
 import levelPop from '@/components/pop/upgrade/levelPop';
 import vipBuyPop from '@/components/pop/vip/index';
 import redpacketLayer from '@/components/pop/redpackage/index';
+import activityPop from '@/components/pop/activity/index';
 import my from '@/components/my/my';
 import chat from '@/components/chat/chat';
 import { sleep } from '@/utils';
-import { get, put } from '@/utils/request';
-import { NEW_PROFILE, GET_LEVEL_INFO, USER_SETTING } from '@/utils/url';
+import { get, put, post } from '@/utils/request';
+import {
+  NEW_PROFILE,
+  GET_LEVEL_INFO,
+  USER_SETTING,
+  GET_ACTIVITY,
+} from '@/utils/url';
 import { getAge } from '@/utils';
 import { Event } from '@/utils/event.js';
 import verify from '@/components/pop/verify/index';
@@ -103,6 +122,7 @@ export default class Index extends wepy.page {
     // redpacketLayer,
     vipBuyPop,
     levelPop,
+    activityPop,
   };
 
   data = {
@@ -125,6 +145,7 @@ export default class Index extends wepy.page {
     showVipBuy: false,
     showLevelPop: false,
     showVerify: false,
+    showActivity: false,
   };
   computed = {
     now() {
@@ -152,6 +173,17 @@ export default class Index extends wepy.page {
   };
   onPullDownRefresh() {
     // console.error('ssss');
+  }
+  async getActivity() {
+    let result = await get(GET_ACTIVITY);
+    console.log(result.count);
+    setTimeout(() => {
+      if (result.count >= 1) {
+        this.showActivity = true;
+        this.$invoke('activityPop', 'getData', result);
+        this.$apply();
+      }
+    }, 1500);
   }
   async setProfile() {
     try {
@@ -211,6 +243,10 @@ export default class Index extends wepy.page {
     return r;
   }
   events = {
+    closeActivity() {
+      console.log(2323);
+      this.showActivity = false;
+    },
     showVipPop() {
       this.showVipBuy = true;
     },
@@ -241,6 +277,7 @@ export default class Index extends wepy.page {
         // wx.setNavigationBarTitle({
         //   title: '谁的颜值更高？'
         // });
+        this.$invoke('battle', 'getData');
         this.showHome = true;
         if (optionFrom) {
           if (!tabClicked) {
@@ -304,11 +341,13 @@ export default class Index extends wepy.page {
 
     this.user = wx.getStorageSync('profile');
     this.setProfile();
+    this.getActivity();
     Event.listen('showVerify', (status, type) => {
       this.showVerify = status;
       if (type) this.$invoke('verify', 'setValue', type);
       this.$apply();
     });
+
     let setting = {};
     const settingResult = await get(USER_SETTING);
     Object.assign(setting, settingResult);
@@ -378,6 +417,9 @@ export default class Index extends wepy.page {
     this.setProfile();
     if (this.selectedTab === 0) {
       this.$invoke('chat', 'refreshData');
+    }
+    if (this.selectedTab == 1) {
+      this.$invoke('battle', 'getData');
     }
     if (this.selectedTab === 2) {
       //   this.$invoke('chat', 'initChat');

@@ -82,7 +82,7 @@ export default class extends wepy.app {
       //   'pages/my/mymoment', // 我的动态
       //   'pages/my/propaganda', // 我的推广
       //   'pages/activity/activity',
-      //   'pages/activity/webview', // webview页面
+      'pages/activity/webview', // webview页面
       //   'pages/register/chooseName',
       //   'pages/register/chooseGender',
       //   'pages/register/chooseBirth',
@@ -109,6 +109,7 @@ export default class extends wepy.app {
       'pages/upgrade/index',
       'pages/upgrade/levelRule', // 评级规则
       'pages/battle/reward', //赏金模式
+      'pages/test/publish',
     ],
     subPackages: [
       {
@@ -130,6 +131,7 @@ export default class extends wepy.app {
           'vip/coinBuy', // 颜币购买
           'vip/vipBuySuccess',
           'vip/vipPackageBuy',
+          'vip/askWechat',
         ], // 点击说明
       },
     ],

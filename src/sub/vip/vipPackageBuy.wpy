@@ -14,6 +14,11 @@
 			       mode="scaleToFill"
 			       lazy-load="false">
 			</image>
+			<image class="comment comment1 p3"
+			       src="https://images.facedog.cn/public/vip/package/comment-3.png"
+			       mode="scaleToFill"
+			       lazy-load="false">
+			</image>
 			<image class="btn"
 			       @tap="pay(600)"
 			       src="https://images.facedog.cn/public/vip/package/btn.png"
@@ -22,38 +27,23 @@
 			</image>
 		</view>
 		<view class="countdown">剩余时间：{{countdown}}</view>
-
-		<image class="comment comment2 p3"
-		       src="https://images.facedog.cn/public/vip/package/comment-2.png"
-		       mode="scaleToFill"
-		       lazy-load="false">
-		</image>
-		<image class="comment comment2 p4"
-		       src="https://images.facedog.cn/public/vip/package/comment-3.png"
-		       mode="scaleToFill"
-		       lazy-load="false">
-		</image>
-		<image class="comment comment3 p5"
-		       src="https://images.facedog.cn/public/vip/package/comment-3.png"
-		       lazy-load="false">
-		</image>
-		<image class="comment comment3 p6"
-		       src="https://images.facedog.cn/public/vip/package/comment-1.png"
-		       lazy-load="false">
-		</image>
 	</view>
+	<van-toast id="van-toast" />
 </template>
 
 <script>
 import wepy from 'wepy';
-import { PAY, PAY_CALLBACK, SHOW_VIP_PACKAGE } from '@/utils/url';
+import { PAY, PAY_CALLBACK, SHOW_VIP_PACKAGE, BUY_COUNT } from '@/utils/url';
 import { post, get } from '@/utils/request';
-import { countDown } from '@/utils';
+import { countDown, toast } from '@/utils';
+import Toast from '@/components/vant/toast/toast';
+import { Event } from '@/utils/event.js';
 export default class extends wepy.page {
   config = {
     navigationBarTitleText: '',
     usingComponents: {
       navbar: '../../components/navbar/index',
+      'van-toast': '../../components/vant/toast/index',
     },
   };
 
@@ -74,6 +64,7 @@ export default class extends wepy.page {
           price,
         }
       );
+      post(BUY_COUNT, { type: 'gift' });
       wx.requestPayment({
         timeStamp,
         nonceStr,
@@ -83,7 +74,14 @@ export default class extends wepy.page {
         success: async function(res) {
           if (res.errMsg === 'requestPayment:ok') {
             await post(PAY_CALLBACK, { price });
-            wepy.navigateTo({ url: 'vipBuySuccess' });
+            // wepy.navigateTo({ url: 'vipBuySuccess' });
+            Toast('购买成功');
+            Event.trigger('packageRefresh');
+            setTimeout(() => {
+              wepy.navigateBack({
+                delta: 1, //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+              });
+            }, 2000);
           }
         },
         fail: function(res) {
@@ -102,8 +100,9 @@ export default class extends wepy.page {
 
   onLoad() {
     get(SHOW_VIP_PACKAGE).then((res) => {
+      console.log('回调::::::::', res);
       setInterval(() => {
-        this.countdown = countDown(res.create_time);
+        this.countdown = countDown(1, true);
         this.$apply();
       }, 1000);
     });
@@ -114,21 +113,11 @@ export default class extends wepy.page {
 </script>
 
 <style lang='scss'>
-	.van-enter-active-class,
-	.van-leave-active-class {
-	  transition-property: background-color, transform;
-	}
-
-	.van-enter-class,
-	.van-leave-to-class {
-	  background-color: red;
-	  transform: rotate(-360deg) translate3d(-100%, -100%, 0);
-	}
 	.container {
 	  background: #302a2f;
 	  width: 100%;
-	  height: 100vh;
-	  padding-top: 120rpx;
+	  height: 90vh;
+	  padding-top: 100rpx;
 	  .wrap {
 	    width: 628rpx;
 	    height: 745rpx;
@@ -162,17 +151,20 @@ export default class extends wepy.page {
 	.comment1 {
 	  bottom: 130rpx;
 	  position: absolute;
-	  &.p2 {
-	    animation: fade1 ease-in-out 5s infinite;
+	  &.p1 {
+	    animation: fade1 ease-in-out 7s infinite;
 	    animation-fill-mode: both;
 	    @keyframes fade1 {
 	      0% {
-	        opacity: 0;
+	        opacity: 1;
 	      }
 	      10% {
-	        opacity: 0;
+	        opacity: 1;
 	      }
 	      20% {
+	        opacity: 1;
+	      }
+	      50% {
 	        opacity: 1;
 	      }
 	      60% {
@@ -181,34 +173,31 @@ export default class extends wepy.page {
 	      70% {
 	        opacity: 0;
 	      }
+	      80% {
+	        opacity: 0;
+	      }
 	      100% {
 	        opacity: 0;
 	      }
 	    }
 	  }
-	}
-	.comment2 {
-	  position: relative;
-	  margin-top: 20rpx;
-	  &.p4 {
-	    position: absolute;
-	    animation: fade2 ease-in-out 5s infinite;
+	  &.p2 {
+	    animation: fade2 ease-in-out 7s infinite;
 	    animation-fill-mode: both;
-	    animation-delay: 1s;
 	    @keyframes fade2 {
 	      0% {
 	        opacity: 0;
 	      }
-	      10% {
+	      20% {
 	        opacity: 0;
 	      }
-	      20% {
+	      30% {
 	        opacity: 1;
 	      }
 	      60% {
 	        opacity: 1;
 	      }
-	      70% {
+	      80% {
 	        opacity: 0;
 	      }
 	      100% {
@@ -216,30 +205,24 @@ export default class extends wepy.page {
 	      }
 	    }
 	  }
-	}
-	.comment3 {
-	  position: relative;
-	  margin-top: 20rpx;
-	  &.p6 {
-	    position: absolute;
-	    animation: fade3 ease-in-out 5s infinite;
+	  &.p3 {
+	    animation: fade3 ease-in-out 7s infinite;
 	    animation-fill-mode: both;
-	    animation-delay: 2s;
 	    @keyframes fade3 {
 	      0% {
 	        opacity: 0;
 	      }
-	      10% {
+	      50% {
 	        opacity: 0;
-	      }
-	      20% {
-	        opacity: 1;
 	      }
 	      60% {
 	        opacity: 1;
 	      }
-	      70% {
-	        opacity: 0;
+	      80% {
+	        opacity: 1;
+	      }
+	      95% {
+	        opacity: 1;
 	      }
 	      100% {
 	        opacity: 0;

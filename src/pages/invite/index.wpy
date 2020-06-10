@@ -203,6 +203,7 @@ export default class Invite extends wepy.page {
   onShareAppMessage() {
     let user = wx.getStorageSync('profile') || '';
     let num = Math.floor(Math.random() * 5) + 1;
+    if (num == 2) num = 1;
     return {
       title: num == 1 ? '你这么美，不来看看吗' : '只有好看的人才能收到',
       path: `/pages/home?userid=${user ? user.ID : ''}`,

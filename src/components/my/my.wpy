@@ -176,6 +176,16 @@
 			</image>
 		</view>
 		<view class="nav-item"
+		      wx:if="{{debug >= 12}}">
+			<navigator url="test/publish"
+			           open-type="navigate"
+			           hover-class="none">
+				<view class="item">
+					<view class="title">发动态</view>
+				</view>
+			</navigator>
+		</view>
+		<view class="nav-item"
 		      wx:if="{{debug1 >= 12}}">
 			<navigator url="test/testCharge"
 			           open-type="navigate"

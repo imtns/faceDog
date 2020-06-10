@@ -12,6 +12,8 @@ export const HANDLE_PICTURE = '/api/user/image';
 export const DISCOVER_MOMENT_LIST = '/api/discover/moments/nearby';
 // 发布页面-发布动态
 export const FABU_FABU_MOMENT = '/api/discover/moments';
+// 发布页面-发布测试动态
+export const FABU_TEST_MOMENT = '/api/v1.5/moments';
 // 发布页面 - 上传图片
 export const FABU_UPLOAD_PIC = '/api​/discover​/moment​/images';
 // 颜值PK
@@ -47,7 +49,8 @@ export const WITHDRAW = '/api/user/take_money';
 // 获取小程序二维码
 export const QRCODE = '/api/auth/qrcode';
 // 获取活动
-export const GET_ACTIVITY = '/api/activity/list';
+// export const GET_ACTIVITY = '/api/activity/list';
+export const GET_ACTIVITY = '/api/v1.5/activity';
 // 每日日报
 export const DAILY_REPORT = '/api/face/daily_news';
 // 获取二维码
@@ -139,3 +142,9 @@ export const GET_ROOM_INFO = '/api/user/enter_house';
 export const ADD_REG_WECHAT = '/api/user/add_wechat';
 // 会员礼包显示状态
 export const SHOW_VIP_PACKAGE = '/api/v1.5/get_gift';
+// 获取要微信状态
+export const SHOW_ASK_WECHAT = '/api/v1.5/buy_wechat';
+// 要微信
+export const ASK_GROUP_WECHAT = '/api/v1.5/get_wechat_gift';
+// 购买统计
+export const BUY_COUNT = '/api/v1.5/count';

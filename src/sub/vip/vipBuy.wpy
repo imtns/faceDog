@@ -105,7 +105,7 @@ export default class VipBuy extends wepy.page {
         success: async function(res) {
           if (res.errMsg === 'requestPayment:ok') {
             await post(PAY_CALLBACK, { price });
-            wepy.navigateTo({ url: 'vipBuySuccess' });
+            wepy.redirectTo({ url: 'vipBuySuccess' });
 
             // console.log('支付成功');
             // Dialog.alert({

@@ -27,7 +27,7 @@
 
 		</view>
 		<view class="waiting">
-			<image src="https://images.facedog.cn/mp/other/waiting.png"
+			<image src="https://images.facedog.cn/mp/other/waiting.png?2"
 			       mode="scaleToFill"
 			       lazy-load="false">
 			</image>

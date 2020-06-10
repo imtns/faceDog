@@ -1,0 +1,586 @@
+<!--  -->
+<template>
+	<navbar title="发布动态">
+	</navbar>
+	<view class="fabu-page">
+		<view class="actions">
+			<view class="btn"
+			      @tap="prepareToCancle">取消</view>
+			<form report-submit='true'
+			      bindsubmit='publish'>
+				<button form-type='submit'
+				        class="btn">发布</button>
+			</form>
+		</view>
+
+		<view class="inputArea">
+			<textarea class="desc"
+			          placeholder="请输入内容..."
+			          placeholder-style="color:#cccccc;"
+			          maxlength="1000"
+			          data-type="content"
+			          @input="inputDesc"
+			          value="{{content}}" />
+			<view class="len">{{ content.length + '/1000'}}</view>
+        </view>
+		<view class="inputUID">
+			<input class="desc" placeholder="用户UID"  @input="inputUID" value="{{UID}}" />
+        </view>
+        <view class="img-box">
+            <repeat for="{{uploadedPics}}" key="index" index="index" item="item">
+                <view class="imgBox">
+                    <image class="items" src="{{item}}" mode="aspectFill" @tap="preview(item)"></image>
+                    <view class="minus" data-index="{{index}}" @tap="minus">
+                        <view class="line"></view>
+                    </view>
+                </view>
+            </repeat>
+            <view class="addbtn" @tap="uploadPic" wx:if="{{uploadedPics.length < 6}}">
+                <van-icon name="plus" size="25px" custom-style="margin-top:50%;transform:translate3d(0, -50%, 0);"/>
+            </view>
+        </view>
+        <!-- <view class="location" @tap="choseLocation">
+            <view class="flex">
+                <image class="location-icon" src="https://images.facedog.cn/public/fabu/fabu-location.png" ></image>
+                <view class="location-address">{{ region || '您的位置' }}</view>
+            </view>
+            <view class="icon">
+                <van-icon name="arrow" color="#B2B2B2"/>
+            </view>
+        </view> -->
+		<view class="loadingLayer" wx:if="{{loading}}">
+			<view class="loading">
+				<view class="icon">
+					<van-loading type="spinner" color="#ccc" />
+				</view>
+				<view class="text">{{loadingText}}</view>
+			</view>
+		</view>
+        <van-toast id="van-toast" />
+		<canvas canvas-id="canvas-img-0" style="top:-500rpx;position:fixed;"></canvas>
+		<canvas canvas-id="canvas-img-1" style="top:-500rpx;position:fixed;"></canvas>
+		<canvas canvas-id="canvas-img-2" style="top:-500rpx;position:fixed;"></canvas>
+		<canvas canvas-id="canvas-img-3" style="top:-500rpx;position:fixed;"></canvas>
+		<canvas canvas-id="canvas-img-4" style="top:-500rpx;position:fixed;"></canvas>
+		<canvas canvas-id="canvas-img-5" style="top:-500rpx;position:fixed;"></canvas>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+import { post, put } from '@/utils/request';
+import { sleep, toast } from '@/utils/index';
+import { FABU_TEST_MOMENT, FABU_UPLOAD_PIC } from '@/utils/url';
+import { Event } from '@/utils/event.js';
+import Toast from '@/components/vant/toast/toast';
+let auth = false;
+function IsJsonString(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+export default class Publish extends wepy.page {
+  config = {
+    navigationBarTitleText: '发布动态',
+    usingComponents: {
+      'van-icon': '../../components/vant/icon/index',
+      'van-loading': '../components/vant/loading/index',
+      'van-toast': '../components/vant/toast/index',
+      navbar: '../components/navbar/index',
+    },
+  };
+  data = {
+    content: '', // 动态内容
+    region: '',
+    latitude: '',
+    longitude: '',
+    loading: false,
+    loadingText: '',
+    // tempFilePaths: [],
+    uploadedPics: [],
+    postPics: [],
+    isPublishing: false,
+    uid: '',
+  };
+
+  components = {};
+  showLoading(text) {
+    this.loading = true;
+    this.loadingText = text;
+    this.$apply();
+  }
+  hideLoading() {
+    this.loading = false;
+    this.loadingText = '';
+    this.$apply();
+  }
+  methods = {
+    preview(url) {
+      const urls = this.uploadedPics.map((x) => x);
+      wepy.previewImage({
+        url, // 当前显示图片的http链接
+        urls, // 需要预览的图片http链接列表
+      });
+    },
+    // 点击取消
+    prepareToCancle() {
+      wx.showModal({
+        title: '提示',
+        content: '确认退出吗',
+        success(res) {
+          if (res.confirm) {
+            // wx.navigateBack({
+            //   delta: 1
+            // });
+            wepy.redirectTo({ url: '/pages/discover/discover' });
+          } else if (res.cancel) {
+            console.log('用户点击取消');
+          }
+        },
+      });
+    },
+    // 删除照片
+    minus(e) {
+      const { index } = e.currentTarget.dataset;
+      this.uploadedPics.splice(index, 1);
+      this.postPics.splice(index, 1);
+      this.$apply();
+    },
+    inputUID(e) {
+      this.uid = e.detail.value;
+    },
+    inputDesc(e) {
+      this.content = e.detail.value;
+    },
+    async uploadPic() {
+      const { tempFilePaths } = await wepy.chooseImage({ count: 6 });
+      if (this.uploadedPics.length + tempFilePaths.length > 6) {
+        toast('最多只能上传六张照片！');
+        return;
+      }
+      // this.tempFilePaths = tempFilePaths;
+      this.showLoading('上传中');
+      //   wx.showLoading({ title: '上传中', mask: true });
+      Promise.all(
+        tempFilePaths.map((x, index) => this.methods.wxUploade(x, index))
+      ).then((res) => {
+        console.log('上传图片成功', res);
+        let imgs = res.filter((r) => {
+          return r != 'fail';
+        });
+        let uploadPics = imgs.map((img) => {
+          return img.data;
+        });
+        let showPics = imgs.map((img) => {
+          return img.tempFilePath;
+        });
+        this.hideLoading();
+        // wx.hideLoading();
+        this.postPics = this.postPics.concat(uploadPics);
+        this.uploadedPics = this.uploadedPics.concat(showPics);
+        if (imgs.length != res.length) {
+          if (tempFilePaths.length > 1) {
+            toast('部分图片存在违规，请重新上传');
+          } else {
+            toast('图片存在违规，请重新上传');
+          }
+        }
+        this.$apply();
+      });
+      this.$apply();
+    },
+    wxUploade(tempFilePath, index) {
+      console.log(tempFilePath);
+      return new Promise((resolve, reject) => {
+        // 	resolve('111')
+        checkImgSafe(tempFilePath, index)
+          .then((res) => {
+            resolve(upload(tempFilePath));
+          })
+          .catch((err) => {
+            resolve('fail');
+          });
+      });
+    },
+    async choseLocation() {
+      const {
+        latitude = 0,
+        longitude = 0,
+        name = '',
+        address = '',
+      } = await wepy.chooseLocation();
+      this.region = name;
+      this.longitude = longitude;
+      this.latitude = latitude;
+      this.$apply();
+    },
+    async publish(e) {
+      if (auth) {
+        toast('认证审核中，加急审核请联系客服微信：yanzc1023');
+        return;
+      }
+      try {
+        if (this.isPublishing) {
+          return;
+        }
+        if (!this.uploadedPics.length) {
+          toast('未上传图片');
+          return;
+        }
+        if (!this.uid) {
+          toast('请输入uid');
+          return;
+        }
+        const subData = {
+          content: this.content,
+          region: this.region,
+          uid: this.uid,
+          latitude: this.latitude,
+          longitude: this.longitude,
+          formId: e.detail.formId,
+          images: this.postPics,
+        };
+        this.showLoading('正在发布');
+        // wx.showLoading({
+        //   title: '正在发布',
+        //   mask: true
+        // });
+        this.msgSecCheck(this.content).then(async (valid) => {
+          console.warn(valid);
+          console.log(subData);
+          if (valid) {
+            this.isPublishing = true;
+            await post(FABU_TEST_MOMENT, subData);
+            this.hideLoading();
+            Event.trigger('refresh');
+            Toast.success('发布成功');
+            await sleep(2);
+            this.isPublishing = false;
+            wepy.redirectTo({ url: '/pages/discover/discover' });
+
+            // wx.hideLoading();
+            // wx.navigateBack({
+            //   delta: 1
+            // });
+            this.$apply();
+          } else {
+            this.hideLoading();
+            // wx.hideLoading();
+            toast('文字存在违规,请重新编辑后发布');
+          }
+        });
+      } catch (error) {
+        this.isPublishing = false;
+      }
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+  onShow() {
+    auth = false;
+  }
+  msgSecCheck(content) {
+    return new Promise((resolve, reject) => {
+      wx.cloud
+        .callFunction({
+          name: 'securityCheck',
+          data: { content, type: 2 },
+        })
+        .then((res) => {
+          console.log(res);
+          if (res && res.result && res.result.errCode === 87014) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          //只要检查失败，都算作没有安全风险
+          resolve(true);
+        });
+    });
+  }
+}
+function upload(tempFilePath) {
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: `${wepy.$appConfig.baseUrl}/api/discover/moment/images`,
+      filePath: tempFilePath,
+      name: 'image',
+      header: {
+        Authorization: `Bearer ${wx.getStorageSync('token')}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      success(res) {
+        // console.warn(res);
+        // if (!IsJsonStrifng(res.data)) {
+        //   toast('服务器开小差了，请稍后重试');
+        //   return;
+        // }
+        const data = JSON.parse(res.data);
+        console.log(data);
+        if (data.message === '用户未审核') {
+          toast('认证审核中，加急审核请联系客服微信：yanzc1023');
+          auth = true;
+          return;
+        }
+        let o = {
+          tempFilePath,
+          data: data.data.id,
+        };
+        resolve(o);
+        // do something
+      },
+      fail(res) {
+        toast(res.message);
+        reject(res);
+      },
+    });
+  });
+}
+function checkImgSafe(tempFiles, index) {
+  return new Promise((resolve, reject) => {
+    // 压缩图片
+    getImg(tempFiles, index)
+      .then((tmpPath) => {
+        //先将图片转换为base64，然后调用云函数
+        const fs = wx.getFileSystemManager();
+        fs.readFile({
+          filePath: tmpPath,
+          encoding: 'base64',
+          success: function(res) {
+            wx.cloud
+              .callFunction({
+                name: 'securityCheck',
+                data: { imgbase64: res.data },
+              })
+              .then((res) => {
+                if (res && res.result && res.result.errCode === 87014) {
+                  reject(); //有安全风险
+                } else {
+                  resolve('ok');
+                }
+              })
+              .catch((err) => {
+                //只要检查失败，都算作没有安全风险
+                resolve('ok');
+              });
+          },
+        });
+      })
+      .catch((err) => {
+        resolve();
+      });
+  });
+}
+function getImg(path, index) {
+  return new Promise((resolve, reject) => {
+    wx.getImageInfo({
+      src: path,
+      success(res) {
+        // 图片原尺寸
+        let height = res.height;
+        let width = res.width;
+
+        let maxWidth = 200;
+        let maxHeight = 200;
+
+        // 压缩后尺寸
+        let targetWidth = width;
+        let targetHeight = height;
+        // 等比例压缩，如果宽度大于高度，则宽度优先，否则高度优先
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            // 要求宽度*(原生图片比例)=新图片尺寸
+            targetWidth = maxWidth;
+            targetHeight = Math.round(maxWidth * (height / width));
+          } else {
+            targetHeight = maxHeight;
+            targetWidth = Math.round(maxHeight * (width / height));
+          }
+        }
+
+        const ctx = wx.createCanvasContext(`canvas-img-${index}`);
+
+        ctx.clearRect(0, 0, targetWidth, targetHeight);
+        ctx.drawImage(path, 0, 0, targetWidth, targetHeight);
+        ctx.draw(true, function() {
+          wx.canvasToTempFilePath({
+            canvasId: `canvas-img-${index}`,
+            x: 0,
+            y: 0,
+            width: targetWidth,
+            height: targetHeight,
+            quality: 0.5,
+            fileType: 'jpg',
+            success: function(res) {
+              console.log('index', index);
+              resolve(res.tempFilePath);
+            },
+            fail: function(err) {
+              reject(err);
+            },
+          });
+        });
+      },
+      fail: function(err) {
+        reject(err);
+      },
+    });
+  });
+}
+</script>
+
+<style lang='less' scoped>
+	.fabu-page {
+	  padding: 0 30rpx;
+	  .actions {
+	    display: flex;
+	    justify-content: space-between;
+	    height: 60rpx;
+	    .btn {
+	      height: 45rpx;
+	      font-size: 32rpx;
+	      font-weight: 600;
+	      line-height: 60rpx;
+	      color: rgba(7, 7, 7, 1);
+	      background: transparent;
+	      &::after {
+	        border: 0;
+	      }
+	    }
+	  }
+	  .inputUID {
+	    border: 1px solid black;
+	  }
+	  .inputArea {
+	    position: relative;
+	    .desc {
+	      width: 100%;
+	      height: 200rpx;
+	      font-size: 28rpx;
+	      margin-top: 40rpx;
+	      line-height: 30rpx;
+	    }
+	    .len {
+	      position: absolute;
+	      bottom: 0;
+	      right: 0;
+	      font-size: 20rpx;
+	      font-weight: 500;
+	      line-height: 38rpx;
+	      color: rgba(165, 165, 165, 1);
+	    }
+	  }
+	  .img-box {
+	    margin-top: 15rpx;
+	    display: flex;
+	    flex-wrap: wrap;
+	    .addbtn {
+	      width: 27.8vw;
+	      height: 214rpx;
+	      margin: 30rpx 20rpx 0 0;
+	      border: 1px solid rgba(44, 44, 44, 1);
+	      text-align: center;
+	    }
+	    .imgBox {
+	      width: 28vw;
+	      height: 214rpx;
+	      margin: 30rpx 20rpx 0 0;
+	      position: relative;
+	      .items {
+	        width: 28vw;
+	        height: 214rpx;
+	        display: block;
+	      }
+	      .minus {
+	        position: absolute;
+	        top: -23rpx;
+	        right: -8rpx;
+	        width: 46rpx;
+	        height: 46rpx;
+	        border-radius: 100%;
+	        background: rgba(230, 0, 17, 1);
+	        text-align: center;
+	        display: flex;
+	        align-items: center;
+	        .line {
+	          width: 27rpx;
+	          height: 4rpx;
+	          background: rgba(255, 255, 255, 1);
+	          margin: 0 auto;
+	        }
+	      }
+	    }
+	  }
+	  .location {
+	    height: 73rpx;
+	    border-bottom: 1px solid rgba(226, 225, 225, 1);
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-between;
+	    margin-top: 30rpx;
+	    .flex {
+	      display: flex;
+	      align-items: center;
+	      .location-icon {
+	        width: 24rpx;
+	        height: 31rpx;
+	        margin-right: 16rpx;
+	      }
+	      .location-address {
+	        font-size: 24rpx;
+	        font-weight: 500;
+	        line-height: 38rpx;
+	        color: rgba(165, 165, 165, 1);
+	      }
+	    }
+	    .icon {
+	      text-align: right;
+	    }
+	  }
+	}
+	.loadingLayer {
+	  width: 100%;
+	  height: 100%;
+	  position: absolute;
+	  background: rgba(0, 0, 0, 0.1);
+	  top: 0;
+	  left: 0;
+	  z-index: 9999;
+	  .loading {
+	    position: absolute;
+	    top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	    width: 200rpx;
+	    height: 200rpx;
+	    background: rgba(0, 0, 0, 0.7);
+	    border-radius: 10rpx;
+	    display: flex;
+	    flex-wrap: wrap;
+	    justify-content: center;
+	    .icon {
+	      width: 100%;
+	      margin-top: 40rpx;
+	      text-align: center;
+	      height: 50rpx;
+	    }
+	    .text {
+	      width: 100%;
+	      text-align: center;
+	      color: white;
+	      font-size: 28rpx;
+	    }
+	  }
+	}
+</style>

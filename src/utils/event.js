@@ -1,4 +1,4 @@
-// 下面是完整代码实现
+
 module.exports.Event = (() => {
     let Event;
     let _default = 'default';

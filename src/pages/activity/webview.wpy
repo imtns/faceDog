@@ -1,40 +1,49 @@
 <!--  -->
 <template>
-    <view class='container'>
-        <web-view src="{{src}}">
-        </web-view>
-    </view>
+	<navbar title="活动">
+	</navbar>
+	<view class='container'>
+		<web-view src="{{src}}">
+		</web-view>
+	</view>
 </template>
-
+ 
 <script>
 import wepy from 'wepy';
 export default class Webview extends wepy.page {
-    config = {
-        navigationBarTitleText: ''
-    };
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
 
-    data = {
-        src: ''
-    };
+  data = {
+    src: '',
+  };
 
-    components = {};
+  components = {};
 
-    methods = {};
+  methods = {};
 
-    events = {};
+  events = {};
 
-    watch = {};
+  watch = {};
 
-    computed = {};
+  computed = {};
 
-    onLoad() {
-        // this.src = wepy.getStorageSync('h5url');
-        this.src= 'https://mp.weixin.qq.com/s/5EAKmIVJZYGDSbylRSBc7w';
-    }
+  onLoad() {
+    this.src = wepy.getStorageSync('h5url');
+    // this.src = 'https://mp.weixin.qq.com/s/5EAKmIVJZYGDSbylRSBc7w';
+  }
 
-    onShow() {}
+  onShow() {}
 }
 </script>
 
 <style lang='scss'>
+.container{
+	
+}
+
 </style>
