@@ -91,6 +91,7 @@ let optionFrom = false;
 export default class Index extends wepy.page {
   config = {
     navigationBarTitleText: '谁的颜值更高？',
+    enablePullDownRefresh: true,
     // disableScroll: true,
     usingComponents: {
       navbar: '../components/navbar/index',
@@ -171,6 +172,7 @@ export default class Index extends wepy.page {
       );
     },
   };
+
   onPullDownRefresh() {
     // console.error('ssss');
   }

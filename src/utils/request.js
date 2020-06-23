@@ -45,7 +45,11 @@ const http = (method, ...props) => new Promise((resolve, reject) => {
 				wx.hideLoading && wx.hideLoading();
 				if (data.return_code === 0) {
 					if (!data.error) {
-						resolve(data.data);
+						if (props[3]) {
+							resolve(data);
+						} else {
+							resolve(data.data);
+						}
 					} else {
 						toast(data.error);
 						reject(data.error);

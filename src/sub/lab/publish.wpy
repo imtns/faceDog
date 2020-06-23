@@ -1,0 +1,644 @@
+<!--  -->
+<template>
+    <navbar title="发布邀约">
+    </navbar>
+    <view class='container'>
+        <view class="wrap">
+            <view class="inputArea">
+                <textarea class="desc"
+                          placeholder="请描述邀约内容，请勿发布有害信息..."
+                          placeholder-style="color:#cccccc;"
+                          maxlength="60"
+                          data-type="content"
+                          @input="inputContent"
+                          value="{{submit.content}}" />
+                <view class="len">{{ submit.content.length || 0 + '/60'}}</view>
+        	</view>
+			<view class="img-box">
+				<repeat for="{{displayPics}}" key="index" index="index" item="item">
+					<view class="imgBox">
+						<image class="items" src="{{item}}" mode="aspectFill" @tap="preview(item)"></image>
+						<view class="minus" data-index="{{index}}" @tap="minus">
+							<view class="line"></view>
+						</view>
+					</view>
+				</repeat>
+				<view class="addbtn" @tap="uploadPic" wx:if="{{displayPics.length < 3}}">
+					<van-icon name="plus" size="25px" custom-style="margin-top:50%;transform:translate3d(0, -50%, 0);"/>
+				</view>
+			</view>
+			<view class="info-wrap">
+				<picker mode="date" value="{{submit.time}}" start="{{submit.time}}" end="2025-12-31" bindchange="bindDateChange">
+					<view class="item">
+						<view class="title">邀约时间</view>
+						<view class="content">{{submit.time || '不限'}}</view>
+						<view class="detail2">
+							<van-icon name="arrow" />
+						</view>
+					</view>
+				</picker>
+				<view class="item"  @tap="showArea">
+					<view class="title">邀约地点</view>
+					<view class="detail2">
+						<text >{{submit.location || '请选择'}}</text>
+						<van-icon name="arrow" />
+					</view>
+				</view>
+				
+				<picker bindchange="bindFigureChange" value="{{submit.figure}}" range="{{figure}}">
+					<view class="item">
+						<view class="title">我的身材</view>
+						<view class="content">{{submit.figure || '请选择'}}</view>
+						<view class="detail2">
+							<van-icon name="arrow" />
+						</view>
+					</view>
+				</picker>
+			</view>
+		</view>
+		 <van-toast id="van-toast" />
+		 <view class="loadingLayer" wx:if="{{loading}}">
+			<view class="loading">
+				<view class="icon">
+					<van-loading type="spinner" color="#ccc" />
+				</view>
+				<view class="text">{{loadingText}}</view>
+			</view>
+		</view>
+		<canvas canvas-id="canvas-img-0" style="top:-500rpx;position:fixed;"></canvas>
+		<canvas canvas-id="canvas-img-1" style="top:-500rpx;position:fixed;"></canvas>
+		<canvas canvas-id="canvas-img-2" style="top:-500rpx;position:fixed;"></canvas>
+		<van-popup position="bottom" show="{{ show }}" bind:close="onClose">
+			<van-area area-list="{{ areaList }}" columns-num="2" @confirm="confirm" @cancel="cancel" />
+		</van-popup>
+		<view class="btn" @tap="addInvation">发布邀约</view>
+				<van-popup show="{{ showPop}}"
+				z-index="{{9999}}"
+		           bind:close="onClose1">
+			<view class="pop">
+				<view class="content">
+					<view class="c">你的账号未获得测试权限</view>
+					<view class="c">添加「实验室管理员」微信</view>
+					<view class="c">可以申请解锁实验室全部功能</view>
+				</view>
+				<view class="btn1 copy"
+				      @tap="copyWechat('yanzc1023')">复制微信</view>
+				<view class="btn1 giveup"
+				      @tap="onClose1">放弃满分</view>
+			</view>
+		</van-popup>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import Toast from '@/components/vant/toast/toast';
+import { post, get } from '@/utils/request';
+import { toast, sleep, contentCheck, range } from '@/utils';
+import { Event } from '@/utils/event.js';
+import { INVATATION_ADD, SET_TEST_INVATION_USER } from '@/utils/url';
+const area = require('@/utils/area');
+let pending = false;
+export default class extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+      'van-icon': '../../components/vant/icon/index',
+      'van-loading': '../components/vant/loading/index',
+      'van-toast': '../components/vant/toast/index',
+      'van-cell': '../components/vant/cell/index',
+      'van-icon': '../components/vant/icon/index',
+      'van-popup': '../../components/vant/popup/index',
+      'van-area': '../../components/vant/area/index',
+    },
+  };
+
+  data = {
+    content: '',
+    uploadedPics: [],
+    displayPics: [],
+    loading: false,
+    loadingText: '',
+    show: false,
+    areaList: [],
+    figure: ['很瘦', '匀称', '微胖'],
+    submit: {
+      time: '',
+    },
+    showPop: false,
+  };
+
+  components = {};
+  showLoading(text) {
+    this.loading = true;
+    this.loadingText = text;
+    this.$apply();
+  }
+  hideLoading() {
+    this.loading = false;
+    this.loadingText = '';
+    this.$apply();
+  }
+  methods = {
+    copyWechat(wx) {
+      wepy.setClipboardData({
+        data: wx,
+        success: (res) => {
+          wepy.showToast({
+            title: '复制成功',
+          });
+        },
+      });
+    },
+    onClose1() {
+      this.showPop = false;
+      this.$apply();
+    },
+    async addInvation() {
+      if (pending) return;
+      if (!this.uploadedPics.length) {
+        Toast('请上传照片');
+        return;
+      }
+      if (!this.submit.province) {
+        Toast('请选择邀约地点');
+        return;
+      }
+
+      pending = true;
+      try {
+        let result = await post(
+          INVATATION_ADD,
+          {
+            imgs: this.uploadedPics,
+            content: this.submit.content,
+            province: this.submit.province,
+            city: this.submit.city,
+            time: this.submit.time,
+            figure: this.submit.figure,
+          },
+          {},
+          true
+        );
+        console.log(result);
+        pending = false;
+        Event.trigger('lab-refresh');
+        wx.requestSubscribeMessage({
+          tmplIds: ['bDMcAwgY7FE2QUBS3FgSvVg3bFnf1yHqt-v8vvwhWM0'],
+          success(res) {
+            console.log('订阅消息', res);
+          },
+          complete() {
+            console.log('订阅complete');
+            Toast('发布成功');
+            setTimeout(() => {
+              wepy.navigateBack({
+                delta: 1, //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+              });
+            }, 1500);
+          },
+        });
+      } catch (e) {
+        pending = false;
+        this.showPop = true;
+        this.$apply();
+      }
+    },
+    confirm({ detail }) {
+      console.log(detail);
+      this.submit.province = detail.values[0].name;
+      this.submit.city = detail.values[1].name;
+      this.submit.location = this.submit.province + ' ' + this.submit.city;
+      this.show = false;
+      this.$apply();
+    },
+    bindDateChange(event) {
+      this.submit.time = event.detail.value;
+      this.$apply();
+    },
+    bindFigureChange(event) {
+      console.log(event);
+      this.submit.figure = this.figure[event.detail.value];
+      this.$apply();
+    },
+    showArea() {
+      console.log(this.areaList);
+      this.show = true;
+    },
+    cancel() {
+      this.show = false;
+    },
+    wxUploade(tempFilePath, index) {
+      console.log(tempFilePath);
+      return new Promise((resolve, reject) => {
+        // 	resolve('111')
+        checkImgSafe(tempFilePath, index)
+          .then((res) => {
+            resolve(upload(tempFilePath));
+          })
+          .catch((err) => {
+            resolve('fail');
+          });
+      });
+    },
+    inputContent(e) {
+      this.submit.content = e.detail.value;
+    },
+    async uploadPic() {
+      const { tempFilePaths } = await wepy.chooseImage({ count: 3 });
+      if (this.uploadedPics.length + tempFilePaths.length > 3) {
+        toast('最多只能上传3张照片！');
+        return;
+      }
+      this.showLoading('上传中');
+      Promise.all(
+        tempFilePaths.map((x, index) => this.methods.wxUploade(x, index))
+      ).then((res) => {
+        console.log('上传图片成功', res);
+        let imgs = res.filter((r) => {
+          return r != 'fail';
+        });
+        let uploadPics = imgs.map((img) => {
+          return img.data;
+        });
+        let showPics = imgs.map((img) => {
+          return img.tempFilePath;
+        });
+        this.hideLoading();
+        this.uploadedPics = this.uploadedPics.concat(uploadPics);
+        this.displayPics = this.displayPics.concat(showPics);
+        if (imgs.length != res.length) {
+          if (tempFilePaths.length > 1) {
+            Toast('部分图片存在违规，请重新上传');
+          } else {
+            Toast('图片存在违规，请重新上传');
+          }
+        }
+        this.$apply();
+      });
+      this.$apply();
+    },
+    minus(e) {
+      const { index } = e.currentTarget.dataset;
+      this.uploadedPics.splice(index, 1);
+      this.displayPics.splice(index, 1);
+      this.$apply();
+    },
+  };
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {
+    // get(SET_TEST_INVATION_USER, {
+    //   ID: 10337,
+    // });
+    this.areaList = area;
+    this.$apply();
+  }
+
+  onShow() {}
+}
+function upload(tempFilePath) {
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: `${wepy.$appConfig.baseUrl}/api/discover/moment/images`,
+      filePath: tempFilePath,
+      name: 'image',
+      header: {
+        Authorization: `Bearer ${wx.getStorageSync('token')}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      success(res) {
+        // console.warn(res);
+        // if (!IsJsonStrifng(res.data)) {
+        //   toast('服务器开小差了，请稍后重试');
+        //   return;
+        // }
+        const data = JSON.parse(res.data);
+        console.log(data);
+        let o = {
+          tempFilePath,
+          data: data.data.image_url,
+        };
+        resolve(o);
+        // do something
+      },
+      fail(res) {
+        toast(res.message);
+        reject(res);
+      },
+    });
+  });
+}
+function checkImgSafe(tempFiles, index) {
+  return new Promise((resolve, reject) => {
+    // 压缩图片
+    getImg(tempFiles, index)
+      .then((tmpPath) => {
+        //先将图片转换为base64，然后调用云函数
+        const fs = wx.getFileSystemManager();
+        fs.readFile({
+          filePath: tmpPath,
+          encoding: 'base64',
+          success: function(res) {
+            wx.cloud
+              .callFunction({
+                name: 'securityCheck',
+                data: { imgbase64: res.data },
+              })
+              .then((res) => {
+                if (res && res.result && res.result.errCode === 87014) {
+                  reject(); //有安全风险
+                } else {
+                  resolve('ok');
+                }
+              })
+              .catch((err) => {
+                //只要检查失败，都算作没有安全风险
+                resolve('ok');
+              });
+          },
+        });
+      })
+      .catch((err) => {
+        resolve();
+      });
+  });
+}
+function getImg(path, index) {
+  return new Promise((resolve, reject) => {
+    wx.getImageInfo({
+      src: path,
+      success(res) {
+        // 图片原尺寸
+        let height = res.height;
+        let width = res.width;
+
+        let maxWidth = 200;
+        let maxHeight = 200;
+
+        // 压缩后尺寸
+        let targetWidth = width;
+        let targetHeight = height;
+        // 等比例压缩，如果宽度大于高度，则宽度优先，否则高度优先
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            // 要求宽度*(原生图片比例)=新图片尺寸
+            targetWidth = maxWidth;
+            targetHeight = Math.round(maxWidth * (height / width));
+          } else {
+            targetHeight = maxHeight;
+            targetWidth = Math.round(maxHeight * (width / height));
+          }
+        }
+
+        const ctx = wx.createCanvasContext(`canvas-img-${index}`);
+
+        ctx.clearRect(0, 0, targetWidth, targetHeight);
+        ctx.drawImage(path, 0, 0, targetWidth, targetHeight);
+        ctx.draw(true, function() {
+          wx.canvasToTempFilePath({
+            canvasId: `canvas-img-${index}`,
+            x: 0,
+            y: 0,
+            width: targetWidth,
+            height: targetHeight,
+            quality: 0.5,
+            fileType: 'jpg',
+            success: function(res) {
+              console.log('index', index);
+              resolve(res.tempFilePath);
+            },
+            fail: function(err) {
+              reject(err);
+            },
+          });
+        });
+      },
+      fail: function(err) {
+        reject(err);
+      },
+    });
+  });
+}
+</script>
+
+<style lang='scss'>
+    page {
+      background: #2b2c2d;
+    }
+    .van-icon-arrow {
+      position: relative;
+      top: 2px;
+    }
+    .van-icon-plus::before {
+      color: #a5a5a5;
+    }
+    .pop {
+      background: url(https://images.facedog.cn/public/lab/pop.png) no-repeat;
+      background-size: contain;
+      width: 520rpx;
+      height: 810rpx;
+
+      .content {
+        width: 380rpx;
+        color: #000;
+        font-size: 30rpx;
+        margin: 0 auto;
+        font-weight: bold;
+        padding-top: 376rpx;
+        .c {
+          text-align: center;
+        }
+      }
+      .btn1 {
+        width: 420rpx;
+        height: 92rpx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20rpx auto;
+        color: white;
+        font-size: 28rpx;
+        border-radius: 10rpx;
+        &.copy {
+          background: #000;
+          margin-top: 40rpx;
+        }
+        &.giveup {
+          background: #c2c2c2;
+        }
+      }
+    }
+    .container {
+      position: relative;
+      width: 750rpx;
+      overflow: hidden;
+      .wrap {
+        width: 690rpx;
+        margin: 0 auto;
+        .inputArea {
+          position: relative;
+          background: #333;
+          .desc {
+            width: 90%;
+            height: 200rpx;
+            font-size: 28rpx;
+            padding: 20rpx;
+            color: #a5a5a5;
+            margin-top: 40rpx;
+            line-height: 30rpx;
+          }
+          .len {
+            position: absolute;
+            bottom: 20rpx;
+            right: 20rpx;
+            font-size: 20rpx;
+            font-weight: 500;
+            line-height: 38rpx;
+            color: rgba(165, 165, 165, 1);
+          }
+        }
+        .img-box {
+          margin-top: 15rpx;
+          display: flex;
+          flex-wrap: wrap;
+          .addbtn {
+            width: 27.8vw;
+            height: 214rpx;
+            margin: 30rpx 20rpx 0 0;
+            border: 1rpx solid #a5a5a5;
+            text-align: center;
+          }
+          .imgBox {
+            width: 214rpx;
+            height: 214rpx;
+            margin: 30rpx 20rpx 0 0;
+            position: relative;
+            &:last-child {
+              margin-right: 0;
+            }
+            .items {
+              width: 28vw;
+              height: 214rpx;
+              display: block;
+            }
+            .minus {
+              position: absolute;
+              top: -23rpx;
+              right: -8rpx;
+              width: 46rpx;
+              height: 46rpx;
+              border-radius: 100%;
+              background: rgba(230, 0, 17, 1);
+              text-align: center;
+              display: flex;
+              align-items: center;
+              .line {
+                width: 27rpx;
+                height: 4rpx;
+                background: rgba(255, 255, 255, 1);
+                margin: 0 auto;
+              }
+            }
+          }
+        }
+      }
+      .info-wrap {
+        margin-top: 20rpx;
+      }
+      .detail2 {
+        color: #a5a5a5 !important;
+      }
+      .item {
+        display: flex;
+        justify-content: space-between;
+        height: 106rpx;
+        align-items: center;
+        margin: 20rpx 0;
+        padding: 0 30rpx;
+        color: #a5a5a5;
+        background: rgba(51, 51, 51, 1);
+        opacity: 1;
+        border-radius: 5px;
+        .content {
+          margin-left: auto;
+          font-size: 30rpx;
+          &.character {
+            display: flex;
+            .tag {
+              background: rgba(255, 255, 255, 1);
+              border: 2rpx solid rgba(112, 112, 112, 1);
+              opacity: 1;
+              border-radius: 5rpx;
+              padding: 3rpx 10rpx;
+              margin-right: 15rpx;
+              color: #a5a5a5;
+              font-size: 26rpx;
+            }
+          }
+        }
+
+        .title {
+          font-size: 28rpx;
+          font-family: PingFang SC;
+          font-weight: 600;
+          color: #a5a5a5;
+        }
+      }
+      .btn {
+        position: fixed;
+        bottom: 40rpx;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 347rpx;
+        height: 94rpx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 32rpx;
+        background: #ac9a64;
+        border-radius: 5px;
+      }
+      .loadingLayer {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0, 0, 0, 0.1);
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        .loading {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 200rpx;
+          height: 200rpx;
+          background: rgba(0, 0, 0, 0.7);
+          border-radius: 10rpx;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          .icon {
+            width: 100%;
+            margin-top: 40rpx;
+            text-align: center;
+            height: 50rpx;
+          }
+          .text {
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 28rpx;
+          }
+        }
+      }
+    }
+</style>

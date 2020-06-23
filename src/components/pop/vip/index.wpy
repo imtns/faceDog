@@ -78,7 +78,7 @@ export default class vipPop extends wepy.component {
       this.$emit('closeVipPop');
     },
     go() {
-      wepy.navigateTo({ url: '/pages/vip/superVip' });
+      wepy.navigateTo({ url: '/sub/vip/superVip' });
       this.$emit('closeVipPop');
     },
   };

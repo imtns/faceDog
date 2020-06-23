@@ -1,0 +1,60 @@
+<!--  -->
+<template>
+	<navbar title="权限介绍">
+	</navbar>
+	<view class='container'>
+		<view>【满分入口】</view>
+		<view>1、所有已评级用户，无论等级和性别，都可以进入；未通过评级用户点击后弹出审核弹框；审核失败用户点击后显示“用户违规”;</view>
+
+		<view style="margin-top:40rpx">【满分首页】</view>
+		<view>1、点击顶部banner进入公众号文章，任何人可以点;</view>
+		<view>2、任何人都可以进入邀约详情;</view>
+		<view>3、任何人都可以点击底部的发布按钮;</view>
+
+		<view style="margin-top:40rpx">【发布邀约】</view>
+		<view>1、点击发布邀约，有权限的可以发布成功，无权限的显示“钥匙弹框”;</view>
+
+		<view style="margin-top:40rpx">【我要报名】</view>
+		<view>1、点击“我要报名”，有权限的可以进到报名页，无权限的显示“钥匙弹框”;</view>
+
+		<view style="margin-top:40rpx">【权限说明】</view>
+		<view>1、权限通过脚本处理，筛选出来某些用户统一修改权限状态，也可以针对某个用户单独修改权限状态;</view>
+
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Example extends wepy.page {
+  config = {
+    navigationBarTitleText: '',
+    usingComponents: {
+      navbar: '../../components/navbar/index',
+    },
+  };
+
+  data = {};
+
+  components = {};
+
+  methods = {};
+
+  events = {};
+
+  watch = {};
+
+  computed = {};
+
+  onLoad() {}
+
+  onShow() {}
+}
+</script>
+
+<style lang='scss'>
+	.container {
+	  width: 580rpx;
+	  margin: 10rpx auto;
+	  font-size: 30rpx;
+	}
+</style>

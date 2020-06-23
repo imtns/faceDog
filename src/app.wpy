@@ -132,7 +132,11 @@ export default class extends wepy.app {
           'vip/vipBuySuccess',
           'vip/vipPackageBuy',
           'vip/askWechat',
-        ], // 点击说明
+          'lab/index', // 满分实验室
+          'lab/rules', // 实验室规则
+          'lab/detail', // 实验室详情
+          'lab/publish', // 发布邀约
+        ],
       },
     ],
     window: {

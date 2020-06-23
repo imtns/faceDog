@@ -148,3 +148,20 @@ export const SHOW_ASK_WECHAT = '/api/v1.5/buy_wechat';
 export const ASK_GROUP_WECHAT = '/api/v1.5/get_wechat_gift';
 // 购买统计
 export const BUY_COUNT = '/api/v1.5/count';
+ 
+
+// 邀约
+// 测试
+export const SET_TEST_INVATION_USER = '/api/invitation/can';
+ // 发布邀约
+export const INVATATION_ADD = '/api/invitation/add';
+// 邀约列表
+export const INVATATION_LIST = '/api/invitation/all';
+// 邀约详情
+export const INVATATION_DETAIL = '/api/invitation/detail';
+// 报名邀约
+export const INVATATION_JOIN = '/api/invitation/join';
+// 选TA
+export const INVATATION_SELECT = '/api/invitation/select';
+// 关闭邀约
+export const INVATATION_CLOSE = '/api/invitation/close';

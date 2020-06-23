@@ -1,10 +1,18 @@
 <!--  -->
 <template>
 	<view class="top">
-		<image class="banner" src="https://images.facedog.cn/public/discover/my-rank.png?1" @tap="toMyRank"></image>
-		<image class="banner" src="https://images.facedog.cn/public/discover/rank-list.png?1" @tap="toRank"></image>
-		<image class="banner" src="https://images.facedog.cn/public/discover/square.png?3" @tap="toSquare"></image>
-		<image class="banner" src="https://images.facedog.cn/public/discover/chat-room.png?3" @tap="toChatroom"></image>
+		<image class="banner"
+		       src="https://images.facedog.cn/public/discover/my-rank.png?1"
+		       @tap="toMyRank"></image>
+		<image class="banner"
+		       src="https://images.facedog.cn/public/discover/rank-list.png?1"
+		       @tap="toRank"></image>
+		<image class="banner"
+		       src="https://images.facedog.cn/public/discover/square.png?3"
+		       @tap="toSquare"></image>
+		<image class="banner"
+		       src="https://images.facedog.cn/public/discover/match.png?3"
+		       @tap="toLab"></image>
 	</view>
 </template>
 <script>
@@ -33,19 +41,22 @@ export default class topBanner extends wepy.component {
         url: 'discover/discover',
       });
     },
-    toChatroom() {
-      //   let profile = wepy.getStorageSync('profile');
-      //   if (!profile || profile.progress == 'profile') {
-      //     Event.trigger('showVerify', true, 2);
-      //     return;
-      //   } else if (profile.progress !== 'finish') {
-      //     toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
-      //     return;
-      //   }
-      if (!VerifyControl()) return;
-      wepy.navigateTo({
-        url: '/pages/chat/chatRoomList',
-      });
+    // toChatroom() {
+    //   //   let profile = wepy.getStorageSync('profile');
+    //   //   if (!profile || profile.progress == 'profile') {
+    //   //     Event.trigger('showVerify', true, 2);
+    //   //     return;
+    //   //   } else if (profile.progress !== 'finish') {
+    //   //     toast('认证审核中，加急审核请联系客服微信：yanzc1023', null, 2500);
+    //   //     return;
+    //   //   }
+    //   if (!VerifyControl()) return;
+    //   wepy.navigateTo({
+    //     url: '/pages/chat/chatRoomList',
+    //   });
+    // },
+    toLab() {
+      wepy.navigateTo({ url: '/sub/lab/index' });
     },
   };
 
