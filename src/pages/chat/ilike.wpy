@@ -48,8 +48,8 @@ export default class ILIKE extends wepy.page {
     navigationBarTitleText: '',
     usingComponents: {
       navbar: '../../components/navbar/index',
-      'van-toast': '../components/vant/toast/index',
-      'van-dialog': '../components/vant/dialog/index'
+      'van-toast': '../../components/vant/toast/index',
+      'van-dialog': '../../components/vant/dialog/index'
     }
   };
 

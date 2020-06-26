@@ -1,23 +1,35 @@
 <!--  -->
 <template>
-	<view class="wrapper" wx:if="{{show}}" style="padding-top:{{isphoneX?'100rpx':'0'}};height:{{isphoneX?'93vh':'100vh'}}">
+	<view class="wrapper"
+	      wx:if="{{show}}"
+	      style="padding-top:{{isphoneX?'100rpx':'0'}};height:{{isphoneX?'93vh':'100vh'}}">
 		<view class="wrap">
-			<image class="logo-text" src="https://images.facedog.cn/public/home/logo-text.png?1" mode="aspectFill"></image>
+			<image class="logo-text"
+			       src="https://images.facedog.cn/public/home/logo-text.png?1"
+			       mode="aspectFill"></image>
 			<!-- <image class="beta" src="https://images.facedog.cn/public/home/icon-beta.png?1" mode="aspectFill"></image> -->
-			<image class="logo" src="https://images.facedog.cn/public/home/home-logo.png?1" mode="aspectFill"></image>
+			<image class="logo"
+			       src="https://images.facedog.cn/public/home/home-logo.png?1"
+			       mode="aspectFill"></image>
 			<view class="bottom">
-				<form report-submit='true' bindsubmit='submitForm'>
+				<form report-submit='true'
+				      bindsubmit='submitForm'>
 					<!-- <image class="btn try" src="https://images.facedog.cn/public/index/try.png" @tap="onGotUserInfo" mode="scaleToFill"></image>          </view> -->
-					<button size="large" wx:if="{{showPositionButton}}" form-type='submit' @tap="onGetPosition">{{buttonText}}</button>
+					<button size="large"
+					        wx:if="{{showPositionButton}}"
+					        form-type='submit'
+					        @tap="onGetPosition">{{buttonText}}</button>
 					<!-- <button size="large" wx:if="{{showUserInfoButton}}" from-type='submit' open-type="getUserInfo" bindgetuserinfo="onGetUserInfo">微信授权登录</button> -->
 				</form>
 			</view>
 			<!-- <view class="tag" @tap="redirect">什么是颜狗？</view> -->
 		</view>
-		<view class="loadingLayer" wx:if="{{loading}}">
+		<view class="loadingLayer"
+		      wx:if="{{loading}}">
 			<view class="loading">
 				<view class="icon">
-					<van-loading type="spinner" color="#ccc" />
+					<van-loading type="spinner"
+					             color="#ccc" />
 				</view>
 				<view class="text">请稍后...</view>
 			</view>

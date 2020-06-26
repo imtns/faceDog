@@ -224,7 +224,7 @@ export default class extends wepy.page {
         return;
       }
       wx.requestSubscribeMessage({
-        tmplIds: ['bDMcAwgY7FE2QUBS3FgSvbHjDqFFXym6Xhk_bIozz9E'],
+        tmplIds: ['bDMcAwgY7FE2QUBS3FgSvVg3bFnf1yHqt-v8vvwhWM0'],
         success(res) {
           console.log('订阅消息', res);
         },

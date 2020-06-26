@@ -31,7 +31,7 @@
 	  config = {
 	    navigationBarTitleText: '测试页面',
 	    usingComponents: {
-	      navbar: '../components/navbar/index'
+	      navbar: '../../components/navbar/index'
 	    }
 	  };
 

@@ -86,9 +86,9 @@ export default class Publish extends wepy.page {
     navigationBarTitleText: '发布动态',
     usingComponents: {
       'van-icon': '../../components/vant/icon/index',
-      'van-loading': '../components/vant/loading/index',
-      'van-toast': '../components/vant/toast/index',
-      navbar: '../components/navbar/index',
+      'van-loading': '../../components/vant/loading/index',
+      'van-toast': '../../components/vant/toast/index',
+      navbar: '../../components/navbar/index',
     },
   };
   data = {

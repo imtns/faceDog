@@ -105,10 +105,10 @@ export default class extends wepy.page {
     usingComponents: {
       navbar: '../../components/navbar/index',
       'van-icon': '../../components/vant/icon/index',
-      'van-loading': '../components/vant/loading/index',
-      'van-toast': '../components/vant/toast/index',
-      'van-cell': '../components/vant/cell/index',
-      'van-icon': '../components/vant/icon/index',
+      'van-loading': '../../components/vant/loading/index',
+      'van-toast': '../../components/vant/toast/index',
+      'van-cell': '../../components/vant/cell/index',
+      'van-icon': '../../components/vant/icon/index',
       'van-popup': '../../components/vant/popup/index',
       'van-area': '../../components/vant/area/index',
     },
@@ -167,6 +167,15 @@ export default class extends wepy.page {
       }
 
       pending = true;
+      wx.requestSubscribeMessage({
+        tmplIds: ['bDMcAwgY7FE2QUBS3FgSvVg3bFnf1yHqt-v8vvwhWM0'],
+        success(res) {
+          console.log('订阅消息', res);
+        },
+        complete() {
+          console.log('订阅complete');
+        },
+      });
       try {
         let result = await post(
           INVATATION_ADD,
@@ -184,21 +193,12 @@ export default class extends wepy.page {
         console.log(result);
         pending = false;
         Event.trigger('lab-refresh');
-        wx.requestSubscribeMessage({
-          tmplIds: ['bDMcAwgY7FE2QUBS3FgSvVg3bFnf1yHqt-v8vvwhWM0'],
-          success(res) {
-            console.log('订阅消息', res);
-          },
-          complete() {
-            console.log('订阅complete');
-            Toast('发布成功');
-            setTimeout(() => {
-              wepy.navigateBack({
-                delta: 1, //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
-              });
-            }, 1500);
-          },
-        });
+        Toast('发布成功');
+        setTimeout(() => {
+          wepy.navigateBack({
+            delta: 1, //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
+          });
+        }, 1500);
       } catch (e) {
         pending = false;
         this.showPop = true;

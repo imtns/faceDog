@@ -56,7 +56,7 @@ export default class Coin extends wepy.page {
     navigationBarTitleText: '',
     usingComponents: {
       navbar: '../../components/navbar/index',
-      'van-popup': '../components/vant/popup/index',
+      'van-popup': '../../components/vant/popup/index',
     },
   };
 

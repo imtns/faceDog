@@ -77,10 +77,10 @@ export default class RedPackList extends wepy.page {
     navigationBarTitleText: '我喜欢的',
     usingComponents: {
       navbar: '../../components/navbar/index',
-      'van-toast': '../components/vant/toast/index',
-      'van-tab': '../components/vant/tab/index',
-      'van-tabs': '../components/vant/tabs/index',
-      'van-popup': '../components/vant/popup/index',
+      'van-toast': '../../components/vant/toast/index',
+      'van-tab': '../../components/vant/tab/index',
+      'van-tabs': '../../components/vant/tabs/index',
+      'van-popup': '../../components/vant/popup/index',
     },
   };
 
